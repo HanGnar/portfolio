@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ko" data-routes="path">
+<head>
+<base href="../../">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>헝그리한정민 · 한정민 포트폴리오</title>
+<link rel="icon" href="data:,">
+<meta name="description" content="UI/UX 서비스 기획자 한정민(헝그리한정민)의 포트폴리오. 프로젝트의 근거와 판단 과정을 보여 줍니다.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css"></noscript>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<a class="skip" href="#main">본문 바로가기</a>
+
+<div id="page">
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="#top" aria-label="헝그리한정민, 맨 위로">헝그리<span>한정민</span></a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav">메뉴</button>
+      <nav class="nav" id="nav" aria-label="주요 메뉴">
+        <a href="#projects">프로젝트</a>
+        <a href="#capabilities">역량</a>
+        <a href="#history">이력</a>
+        <a href="#about">소개</a>
+        <a href="#contact">연락처</a>
+      </nav>
+      <span data-doc="resume" data-label="이력서 다운로드" data-cls="btn--sm resume-btn"></span>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="wrap">
+        <p class="hero-role" id="hero-role"></p>
+        <h1 id="hero-title"></h1>
+        <p class="hero-sub" id="hero-sub"></p>
+        <div class="hero-actions">
+          <a class="btn btn--primary" href="#projects">프로젝트 보기</a>
+          <span data-doc="resume" data-label="이력서 다운로드"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--alt" id="projects" aria-labelledby="projects-title">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="num">Projects</p>
+          <h2 id="projects-title">프로젝트</h2>
+        </div>
+        <div class="filter-bar">
+          <div class="filters" id="filters" role="group" aria-label="프로젝트 분류"></div>
+          <p class="filter-count" id="filter-count" aria-live="polite"></p>
+        </div>
+        <div class="group" id="group-featured">
+          <h3 class="group-title">대표 프로젝트 <span class="group-count" id="count-featured"></span></h3>
+          <div class="projects" id="project-list"></div>
+        </div>
+        <div class="group" id="group-more">
+          <h3 class="group-title">추가 프로젝트 <span class="group-count" id="count-more"></span></h3>
+          <div class="tiles" id="more-list"></div>
+        </div>
+        <div class="group" id="group-other">
+          <h3 class="group-title">기타 제작물</h3>
+          <ul class="outputs others" id="other-list"></ul>
+        </div>
+        <p class="filter-empty" id="filter-empty" hidden>이 분류에 해당하는 프로젝트를 정리하고 있습니다.</p>
+      </div>
+    </section>
+
+    <section class="section" id="capabilities" aria-labelledby="cap-title">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="num">Capabilities</p>
+          <h2 id="cap-title">핵심 역량</h2>
+        </div>
+        <div class="caps" id="cap-list"></div>
+      </div>
+    </section>
+
+    <section class="section section--alt" id="history" aria-labelledby="history-title">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="num">Resume</p>
+          <h2 id="history-title">이력</h2>
+        </div>
+        <div class="resume-grid">
+          <div class="resume-photo" id="resume-photo"></div>
+          <div class="records">
+            <div id="rec-edu"></div>
+            <div id="rec-awards"></div>
+            <div id="rec-pt"></div>
+            <div id="activities"></div>
+            <div id="rec-career"></div>
+            <div id="rec-methods"></div>
+            <div id="rec-tools"></div>
+            <p class="records-note" id="records-note"></p>
+        </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="about" aria-labelledby="about-title">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="num">About</p>
+          <h2 id="about-title">자기소개</h2>
+        </div>
+        <div class="about-text" id="about-text"></div>
+      </div>
+    </section>
+
+    <section class="section section--alt" id="contact" aria-labelledby="contact-title">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="num">Contact</p>
+          <h2 id="contact-title">연락처 · 문서</h2>
+        </div>
+        <div class="contact-grid">
+          <div>
+            <a class="mail" id="mail" href="#"></a>
+            <div class="contact-actions">
+              <button class="btn" type="button" id="copy-mail">이메일 주소 복사</button>
+              <a class="btn" id="mail-write" href="#">이메일 쓰기<span aria-hidden="true">↗</span></a>
+            </div>
+            <div class="docs" id="docs"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap"><span>© 한정민 · 헝그리한정민</span><span id="footer-updated"></span></div>
+  </footer>
+</div>
+
+<div class="layer" id="layer" hidden>
+  <div class="layer-shade"></div>
+  <div class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+    <div class="panel-bar">
+      <p class="crumb" id="crumb"></p>
+      <button class="close-btn" type="button" data-close aria-label="프로젝트 닫기">
+        <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.6"/></svg>닫기
+      </button>
+    </div>
+    <div class="panel-scroll" id="panel-scroll">
+      <div class="panel-inner">
+        <nav class="toc" id="toc" aria-label="프로젝트 구역"></nav>
+        <article class="detail" id="detail"></article>
+      </div>
+    </div>
+  </div>
+</div>
+
+<dialog class="lightbox" id="lightbox" aria-label="이미지 확대 보기">
+  <div class="lb-bar"><button class="close-btn" type="button" id="lb-close">닫기</button></div>
+  <img id="lb-img" alt="">
+  <p id="lb-cap"></p>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/js/content.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
