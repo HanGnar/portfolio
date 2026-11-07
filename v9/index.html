@@ -700,7 +700,7 @@ p { margin: 0; }
   var BROWSER_VOICE = false;
   var VOICE = { ok: !!TTS_ENDPOINT || (BROWSER_VOICE && 'speechSynthesis' in window), auto: false, run: 0, audio: null, btn: null, voice: null };
   VOICE.auto = true;   // 답이 오면 바로 읽어 준다(스피커 버튼으로 끌 수 있고, 끈 상태는 기억)
-  try { VOICE.auto = localStorage.getItem('hj-autoread') !== '0'; } catch (e) {}
+  try { VOICE.auto = localStorage.getItem('hj-read') !== '0'; } catch (e) {}
   // 빨리 감기: 속도 버튼은 1 → 1.25 → 1.5 → 2배로 돌고, 읽는 중에 문장을 누르면 그 문장으로 건너뛴다
   var RATES = [1, 1.25, 1.5, 2];
   VOICE.rate = 1;
@@ -793,7 +793,7 @@ p { margin: 0; }
     go.finally(function () { if (run === VOICE.run) { mark(A, -1); setBtn(btn, false); VOICE.btn = null; } });
   }
   function setAuto(on) {
-    VOICE.auto = on; try { localStorage.setItem('hj-autoread', on ? '1' : '0'); } catch (e) {}
+    VOICE.auto = on; try { localStorage.setItem('hj-read', on ? '1' : '0'); } catch (e) {}
     var b = $('#auto-read'); if (b) { b.setAttribute('aria-pressed', String(on)); b.querySelector('.ms').textContent = on ? 'volume_up' : 'volume_off'; b.title = on ? '답 읽어 주기 켜짐' : '답 읽어 주기 꺼짐'; }
     if (!on) stopVoice();
   }
