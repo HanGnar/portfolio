@@ -715,7 +715,9 @@ p { margin: 0; }
    * 읽는 문장은 형광펜으로 따라간다. 한 번에 하나만 읽고, 새 질문 · 멈춤 시 바로 끊는다. */
   var TTS_ENDPOINT = SERVER && SERVER + '/tts';
   var BROWSER_VOICE = false;
-  var VOICE = { ok: !!TTS_ENDPOINT || (BROWSER_VOICE && 'speechSynthesis' in window), auto: false, run: 0, audio: null, btn: null, voice: null };
+  // claude.ai 링크는 바깥 서버에 닿지 못한다. 그래서 거기서는 이 기기에 있는 한국어 목소리로 같은 일(바로 읽기 · 형광펜 · 목소리 고르기)을 한다
+  var DEVICE = !TTS_ENDPOINT && 'speechSynthesis' in window;
+  var VOICE = { ok: !!TTS_ENDPOINT || DEVICE, auto: false, run: 0, audio: null, btn: null, voice: null };
   VOICE.auto = true;   // 답이 오면 바로 읽어 준다(스피커 버튼으로 끌 수 있고, 끈 상태는 기억)
   try { VOICE.auto = localStorage.getItem('hj-read') !== '0'; } catch (e) {}
   // 읽는 속도는 1.15배로 고정(목소리 높이는 그대로 두고 빠르기만 바꾼다). 읽는 중에 문장을 누르면 그 문장으로 건너뛴다
@@ -733,16 +735,21 @@ p { margin: 0; }
   var VSAY = '안녕하세요, 한정민이에요. 이 목소리로 답을 읽어 드릴게요.';
   VOICE.name = 'Laomedeia';
   try { var sv = localStorage.getItem('hj-voice'); if (VNAME[sv]) VOICE.name = sv; } catch (e) {}
-  function pickVoice() {   // 기기에 있는 한국어 목소리 중 가장 자연스러운 것
+  function vrank(v) { var n = v.name; return /Natural|Neural/i.test(n) ? 5 : /Premium|Enhanced|향상/i.test(n) ? 4 : /Google/i.test(n) ? 3 : /Yuna|유나/i.test(n) ? 2 : 1; }
+  function dname(v) { return v.name.replace(/\s*[-–]\s*Korean.*$/i, '').replace(/^Microsoft\s+/i, '').replace(/\s*Online\s*\(Natural\)/i, '').replace(/\s*\(한국어.*\)$/, '').replace(/^Google 한국의$/, 'Google 한국어'); }
+  function dnote(v) { return ['', '기본 목소리', '기본 목소리', '온라인 목소리', '고음질 목소리', '자연스러운 목소리'][vrank(v)]; }
+  function pickVoice() {   // 기기에 있는 한국어 목소리, 자연스러운 것부터. 고른 게 있으면 그것
     if (!('speechSynthesis' in window)) return;
-    var vs = speechSynthesis.getVoices().filter(function (v) { return /^ko/i.test(v.lang); });
-    var rank = function (v) { var n = v.name; return /Natural|Neural/i.test(n) ? 5 : /Premium|Enhanced|향상/i.test(n) ? 4 : /Google/i.test(n) ? 3 : /Yuna|유나/i.test(n) ? 2 : 1; };
-    vs.sort(function (a, b) { return rank(b) - rank(a); });
-    VOICE.voice = vs[0] || null;
+    var seen = {}, vs = speechSynthesis.getVoices().filter(function (v) { if (!/^ko/i.test(v.lang) || seen[v.name]) return false; seen[v.name] = 1; return true; });
+    vs.sort(function (a, b) { return vrank(b) - vrank(a); });
+    VOICE.dlist = vs;
+    var keep = null; try { keep = localStorage.getItem('hj-dvoice'); } catch (e) {}
+    VOICE.voice = vs.filter(function (v) { return v.voiceURI === keep; })[0] || vs[0] || null;
+    if (DEVICE && VC) renderVoices();
   }
   if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
   function speakText(t) { return t.replace(/·/g, ',').replace(/→/g, '').replace(/\s+/g, ' ').trim(); }
-  function mark(A, i) { A.querySelectorAll('.sn.reading').forEach(function (n) { n.classList.remove('reading'); }); if (i > -1) { var n = A.querySelector('.sn[data-sn="' + i + '"]'); if (n) n.classList.add('reading'); } }
+  function mark(A, i) { if (!A) return; A.querySelectorAll('.sn.reading').forEach(function (n) { n.classList.remove('reading'); }); if (i > -1) { var n = A.querySelector('.sn[data-sn="' + i + '"]'); if (n) n.classList.add('reading'); } }
   function setBtn(b, on) {
     if (!b) return; b.classList.toggle('on', on); b.querySelector('.ms').textContent = on ? 'stop_circle' : 'volume_up'; b.querySelector('.lt').textContent = on ? '멈추기' : '듣기';
     var A = b.closest('.ans'); if (A) A.classList.toggle('speaking', on);
@@ -754,6 +761,7 @@ p { margin: 0; }
   // 소리는 Web Audio로 낸다. 사파리는 클릭 · 키 입력 순간에 깨운 오디오만 나중에 소리를 낼 수 있어서, 첫 입력 때 깨워 둔다
   function actx() { if (!VOICE.ac) { var C = window.AudioContext || window.webkitAudioContext; if (C) VOICE.ac = new C(); } return VOICE.ac; }
   function unlock() {
+    if (DEVICE && !VOICE.unlocked) { var z = new SpeechSynthesisUtterance(' '); z.volume = 0; speechSynthesis.speak(z); VOICE.unlocked = true; }   // 아이폰은 첫 입력 때 한 번 말해 둬야 나중에 읽는다
     if (!TTS_ENDPOINT) return; var ac = actx(); if (!ac) return;
     if (ac.state !== 'running') ac.resume();
     if (!VOICE.unlocked) { var s = ac.createBufferSource(); s.buffer = ac.createBuffer(1, 1, 22050); s.connect(ac.destination); s.start(0); VOICE.unlocked = true; }
@@ -896,10 +904,10 @@ p { margin: 0; }
       (function next() {
         if (run !== VOICE.run || i >= said.length) { res(); return; }
         var u = new SpeechSynthesisUtterance(speakText(said[i]));
-        u.lang = 'ko-KR'; if (VOICE.voice) u.voice = VOICE.voice; u.rate = 1.02 * RATE;
+        u.lang = 'ko-KR'; if (VOICE.voice) u.voice = VOICE.voice; u.rate = RATE;
         var me = i; u.onstart = function () { if (run === VOICE.run) mark(A, me); };
-        u.onend = u.onerror = function () { i++; next(); };
-        speechSynthesis.speak(u);
+        u.onend = u.onerror = function () { if (VOICE.utt !== u) return; i++; next(); };
+        VOICE.utt = u; speechSynthesis.resume(); speechSynthesis.speak(u);   // 크롬은 붙잡아 두지 않은 문장의 끝 알림을 잃기도 한다
       })();
     });
   }
@@ -923,9 +931,20 @@ p { margin: 0; }
 
   // 목소리 고르기: 고르면 바로 그 목소리로 한 문장 들려준다(목록은 열어 둔 채로 여러 개 비교)
   var VM = $('#vmenu'), VC = $('#vchip');
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function curName() { return DEVICE ? (VOICE.voice ? dname(VOICE.voice) : '기기 목소리') : VNAME[VOICE.name]; }
+  function vrow(id, name, note, on) {
+    return '<button class="vopt" type="button" role="menuitemradio" aria-checked="' + on + '" data-voice="' + esc(id) + '"><span class="vt"><span>' + esc(name) + '</span><small>' + note + '</small></span><span class="ms" aria-hidden="true">check</span></button>';
+  }
   function renderVoices() {
-    VC.querySelector('.vname').textContent = VNAME[VOICE.name];
-    VC.title = '목소리: ' + VNAME[VOICE.name];
+    VC.querySelector('.vname').textContent = curName();
+    VC.title = '목소리: ' + curName();
+    if (DEVICE) {
+      VM.innerHTML = '<div class="vcap">이 기기의 한국어 목소리</div>' + (VOICE.dlist || []).map(function (v) { return vrow(v.voiceURI, dname(v), dnote(v), v === VOICE.voice); }).join('') +
+        ((VOICE.dlist || []).length ? '' : '<p class="vnote">기기에 한국어 목소리가 없어 기본 목소리로 읽어요.</p>') +
+        '<p class="vnote">claude.ai 링크에서는 이 기기의 목소리로 읽어요. 라오메데이아 같은 목소리는 <a class="link" href="https://hangnar.github.io/portfolio/v9/" target="_blank" rel="noopener">사이트</a>에서 들을 수 있어요.</p>';
+      return;
+    }
     VM.innerHTML = VOICES.map(function (g) {
       return '<div class="vcap">' + g[0] + '</div>' + g[1].map(function (v) {
         return '<button class="vopt" type="button" role="menuitemradio" aria-checked="' + (v[0] === VOICE.name) + '" data-voice="' + v[0] + '"><span class="vt"><span>' + v[1] + '</span><small>' + v[2] + '</small></span><span class="ms" aria-hidden="true">check</span></button>';
@@ -940,12 +959,20 @@ p { margin: 0; }
   }
   function closeVoices(back) { if (VM.hidden) return; VM.hidden = true; VC.setAttribute('aria-expanded', 'false'); if (back) VC.focus(); }
   function chooseVoice(name, row) {
-    VOICE.name = name; try { localStorage.setItem('hj-voice', name); } catch (e) {}
+    if (!DEVICE) { VOICE.name = name; try { localStorage.setItem('hj-voice', name); } catch (e) {} }
     VM.querySelectorAll('.vopt').forEach(function (b) { b.setAttribute('aria-checked', String(b.dataset.voice === name)); b.classList.remove('playing'); });
+    var done = function () { row.classList.remove('playing'); row.querySelector('.ms').textContent = 'check'; };
+    if (DEVICE) {
+      VOICE.voice = (VOICE.dlist || []).filter(function (v) { return v.voiceURI === name; })[0] || VOICE.voice;
+      try { localStorage.setItem('hj-dvoice', name); } catch (e) {}
+      VC.querySelector('.vname').textContent = curName(); VC.title = '목소리: ' + curName();
+      stopVoice(); row.classList.add('playing'); row.querySelector('.ms').textContent = 'graphic_eq';
+      viaBrowser([VSAY], null, VOICE.run).then(done);
+      return;
+    }
     VC.querySelector('.vname').textContent = VNAME[name]; VC.title = '목소리: ' + VNAME[name];
     if (!TTS_ENDPOINT) return;
     stopVoice(); row.classList.add('playing'); row.querySelector('.ms').textContent = 'graphic_eq';
-    var done = function () { row.classList.remove('playing'); row.querySelector('.ms').textContent = 'check'; };
     streamVoice(VSAY, name, null, null).catch(function () {}).then(done);
   }
   VM.addEventListener('keydown', function (e) {
