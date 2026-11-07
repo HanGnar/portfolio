@@ -580,12 +580,33 @@ p { margin: 0; }
     var a = (r.actions || []).filter(function (a) { return a && ACTIONS[a.type] && a.label; })[0];
     return { s: s, act: a ? [a.type, a.target, String(a.label).slice(0, 24)] : null, ask: r.ask_team && !CTX.team ? 'team' : null };
   }
+  // 읽어 주기가 켜져 있으면 say에 목소리 이름을 실어 보낸다. 서버는 답(첫 줄)을 보낸 뒤 같은 연결로 소리를 이어 보내고,
+  // 남은 연결은 VOICE.pending에 두었다가 speak()가 그대로 이어 받는다(소리 요청을 따로 다시 하지 않아 바로 나온다)
+  function dropPending() { if (VOICE.pending) { try { VOICE.pending.rd.cancel(); } catch (e) {} VOICE.pending = null; } }
   function askServer(q) {
     if (!AI_ENDPOINT) return Promise.resolve(null);
+    dropPending();
+    var say = VOICE.ok && VOICE.auto && TTS_ENDPOINT ? VOICE.name : null;
     var ctl = new AbortController(); var t = setTimeout(function () { ctl.abort(); }, 12000);
     return fetch(AI_ENDPOINT, { method: 'POST', headers: { 'content-type': 'application/json' }, signal: ctl.signal,
-      body: JSON.stringify({ q: q, team: CTX.team, seen: CTX.seen }) })
-      .then(function (r) { return r.ok ? r.json() : null; }).then(validate).catch(function () { return null; })
+      body: JSON.stringify({ q: q, team: CTX.team, seen: CTX.seen, say: say }) })
+      .then(function (r) {
+        if (!r.ok) return null;
+        if (!say || !r.body) return r.json();
+        var rd = r.body.getReader(), dec = new TextDecoder(), buf = '';
+        return (function next() {
+          return rd.read().then(function (v) {
+            if (v.done) return null;
+            buf += dec.decode(v.value, { stream: true });
+            var i = buf.indexOf('\n\n'); if (i < 0) return next();
+            var first = buf.slice(0, i).replace(/^data:\s*/, ''); buf = buf.slice(i + 2);
+            clearTimeout(t);
+            var ans = null; try { ans = JSON.parse(first); } catch (e) {}
+            if (ans) VOICE.pending = { rd: rd, dec: dec, buf: buf }; else rd.cancel();
+            return ans;
+          });
+        })();
+      }).then(function (ans) { var r = validate(ans); if (!r) dropPending(); return r; }).catch(function () { dropPending(); return null; })
       .finally(function () { clearTimeout(t); });
   }
   /* ── LLM 대화 ─────────────────────────────────────────
@@ -832,16 +853,20 @@ p { margin: 0; }
       stop: function () { ctl.abort(); clearInterval(timer); nodes.forEach(function (n) { try { n.stop(); } catch (e) {} }); }
     };
     VOICE.play = api;
-    return fetch(TTS_ENDPOINT, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: text, voice: voice }), signal: ctl.signal })
-      .then(function (r) {
-        if (!r.ok || !r.body) throw 0;
-        var rd = r.body.getReader(), dec = new TextDecoder(), buf = '';
+    var pend = A ? VOICE.pending : null; VOICE.pending = null;
+    if (pend) ctl.signal.addEventListener('abort', function () { try { pend.rd.cancel(); } catch (e) {} });
+    var src = pend ? Promise.resolve(pend) : fetch(TTS_ENDPOINT, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: text, voice: voice }), signal: ctl.signal })
+      .then(function (r) { if (!r.ok || !r.body) throw 0; return { rd: r.body.getReader(), dec: new TextDecoder(), buf: '' }; });
+    return src
+      .then(function (p) {
+        var rd = p.rd, dec = p.dec, buf = p.buf;
         return new Promise(function (res, rej) {
           timer = setInterval(function () {
             if (run !== VOICE.run) { clearInterval(timer); res(); return; }
             if (A && chars) { var o = outNow(); if (o > -1) { var c = o * RATE / inTotal() * chars, i = 0; while (i < ends.length - 1 && c > ends[i]) i++; mark(A, i); } }
             if (done && sp >= on && ac.currentTime >= next) { clearInterval(timer); res(); }
           }, 80);
+          if (buf.indexOf('\n') > -1) { var ls0 = buf.split('\n'); buf = ls0.pop(); ls0.forEach(function (l) { line(l.trim()); }); }
           (function read() {
             rd.read().then(function (v) {
               if (run !== VOICE.run) return;
