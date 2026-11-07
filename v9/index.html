@@ -257,10 +257,6 @@ p { margin: 0; }
 .listen .ms { font-size: 20px; }
 .listen.on { color: var(--md-primary); }
 .vctl { display: inline-flex; align-items: center; gap: 4px; }
-.speed { display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 12px 0 8px; border-radius: var(--md-full); color: var(--md-on-surface-variant); font-size: 15px; font-variant-numeric: tabular-nums; transition: background-color .2s, color .2s; }
-.speed:hover { background: color-mix(in srgb, var(--md-on-surface) 6%, transparent); color: var(--md-on-surface); }
-.speed .ms { font-size: 20px; }
-.speed:not([hidden]) { animation: fadeIn .2s ease; }
 .ans.speaking .sn { cursor: pointer; }
 .ans.speaking .sn:hover:not(.reading) { background: color-mix(in srgb, var(--mk) 45%, transparent); }
 .ans .next { align-items: center; }
@@ -671,7 +667,7 @@ p { margin: 0; }
   function tail(r) {
     var h = '', lab = r.act && actLabel(r.act);
     h += '<div class="next">' + (VOICE.ok ? '<span class="vctl"><button class="listen" type="button" data-listen><span class="ms" aria-hidden="true">volume_up</span><span class="lt">듣기</span></button>' +
-      '<button class="speed" type="button" data-speed hidden aria-label="읽는 속도 바꾸기"><span class="ms" aria-hidden="true">fast_forward</span><span class="st"></span></button></span>' : '') +
+      '</span>' : '') +
       (lab ? '<button class="link" type="button" data-act="' + r.act[0] + '" data-t="' + esc(r.act[1]) + '">' + esc(lab) + ' →</button>' : '') + '</div>';
     if (r.askTeam && !CTX.team) {
       h += '<div class="ask-back"><p>어떤 팀에서 보고 계세요? 맞춰서 더 보여 드릴게요.</p><div class="opts">' +
@@ -701,11 +697,8 @@ p { margin: 0; }
   var VOICE = { ok: !!TTS_ENDPOINT || (BROWSER_VOICE && 'speechSynthesis' in window), auto: false, run: 0, audio: null, btn: null, voice: null };
   VOICE.auto = true;   // 답이 오면 바로 읽어 준다(스피커 버튼으로 끌 수 있고, 끈 상태는 기억)
   try { VOICE.auto = localStorage.getItem('hj-read') !== '0'; } catch (e) {}
-  // 빨리 감기: 속도 버튼은 1 → 1.25 → 1.5 → 2배로 돌고, 읽는 중에 문장을 누르면 그 문장으로 건너뛴다
-  var RATES = [1, 1.25, 1.5, 2];
-  VOICE.rate = 1;
-  try { var sr = parseFloat(localStorage.getItem('hj-rate')); if (RATES.indexOf(sr) > -1) VOICE.rate = sr; } catch (e) {}
-  function rateLabel() { return VOICE.rate + '배'; }
+  // 읽는 속도는 1.15배로 고정(목소리 높이는 그대로 두고 빠르기만 바꾼다). 읽는 중에 문장을 누르면 그 문장으로 건너뛴다
+  var RATE = 1.15, SR = 24000;
   // Gemini 3.1 Flash TTS 목소리(같은 이름이 Chirp 3: HD에도 있음). 느낌은 Google이 붙인 설명을 옮긴 것. worker.js의 VOICES와 이름을 맞출 것
   var VOICES = [
     ['기본 목소리', [['Laomedeia', '라오메데이아', '경쾌한 여성 목소리']]],
@@ -731,32 +724,140 @@ p { margin: 0; }
   function mark(A, i) { A.querySelectorAll('.sn.reading').forEach(function (n) { n.classList.remove('reading'); }); if (i > -1) { var n = A.querySelector('.sn[data-sn="' + i + '"]'); if (n) n.classList.add('reading'); } }
   function setBtn(b, on) {
     if (!b) return; b.classList.toggle('on', on); b.querySelector('.ms').textContent = on ? 'stop_circle' : 'volume_up'; b.querySelector('.lt').textContent = on ? '멈추기' : '듣기';
-    var sp = b.parentNode.querySelector('[data-speed]'); if (sp) { sp.hidden = !on; sp.querySelector('.st').textContent = rateLabel(); }
     var A = b.closest('.ans'); if (A) A.classList.toggle('speaking', on);
   }
-  function nextRate(sp) {
-    VOICE.rate = RATES[(RATES.indexOf(VOICE.rate) + 1) % RATES.length];
-    try { localStorage.setItem('hj-rate', String(VOICE.rate)); } catch (e) {}
-    if (VOICE.audio) VOICE.audio.playbackRate = VOICE.rate;
-    sp.querySelector('.st').textContent = rateLabel();
-  }
   function seekTo(A, i) {
-    var au = VOICE.audio;
-    if (au && au.duration && A._starts) { au.currentTime = A._starts[i] / A._chars * au.duration; mark(A, i); }
+    if (VOICE.play && VOICE.play.A === A) VOICE.play.seek(i);
     else if (!TTS_ENDPOINT) speak(A, VOICE.btn, i);   // 브라우저 음성은 그 문장부터 다시 읽는다
   }
-  // 사파리는 클릭 순간에 재생을 시작한 오디오만 나중에 소리를 낼 수 있다. 첫 클릭 · 키 입력 때 같은 오디오를 무음으로 한 번 틀어 둔다
-  function player() { if (!VOICE.el) VOICE.el = new Audio(); return VOICE.el; }
+  // 소리는 Web Audio로 낸다. 사파리는 클릭 · 키 입력 순간에 깨운 오디오만 나중에 소리를 낼 수 있어서, 첫 입력 때 깨워 둔다
+  function actx() { if (!VOICE.ac) { var C = window.AudioContext || window.webkitAudioContext; if (C) VOICE.ac = new C(); } return VOICE.ac; }
   function unlock() {
-    if (!TTS_ENDPOINT || VOICE.unlocked) return; VOICE.unlocked = true;
-    var a = player(); a.src = 'data:audio/wav;base64,UklGRrQBAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YZABAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA'; a.play().catch(function () { VOICE.unlocked = false; });
+    if (!TTS_ENDPOINT) return; var ac = actx(); if (!ac) return;
+    if (ac.state !== 'running') ac.resume();
+    if (!VOICE.unlocked) { var s = ac.createBufferSource(); s.buffer = ac.createBuffer(1, 1, 22050); s.connect(ac.destination); s.start(0); VOICE.unlocked = true; }
   }
   document.addEventListener('click', unlock, true);
   document.addEventListener('keydown', function (e) { if (e.key === 'Enter') unlock(); }, true);
+
+  // 빠르기만 바꾸기(WSOLA): 들어오는 소리를 조각내 겹쳐 붙이되, 이어지는 파형이 가장 닮은 자리를 골라 높이가 변하지 않게 한다
+  function Stretch(rate) {
+    var N = 1024, HS = 512, HA = Math.round(HS * rate), D = 160, win = new Float32Array(N), i;
+    for (i = 0; i < N; i++) win[i] = 0.5 - 0.5 * Math.cos(2 * Math.PI * i / N);
+    var x = new Float32Array(1 << 16), xn = 0, y = new Float32Array(N), k = 0, prev = 0;
+    function at(j) { return j < xn ? x[j] : 0; }
+    return {
+      push: function (f) {
+        if (xn + f.length > x.length) { var nx = new Float32Array(Math.max(x.length * 2, xn + f.length)); nx.set(x.subarray(0, xn)); x = nx; }
+        x.set(f, xn); xn += f.length;
+      },
+      pull: function (last) {
+        var out = [], n = 0;
+        while (true) {
+          var nom = k * HA, nat = prev + HS, pos = nom;
+          if (!last && (nom + D + N > xn || nat + N > xn)) break;
+          if (last && nom >= xn) { out.push(y.slice(0, HS)); n += HS; y.fill(0); break; }
+          if (k > 0) {
+            var best = -Infinity;
+            for (var d = -D; d <= D; d++) {
+              var p = nom + d; if (p < 0) continue;
+              var c = 0; for (var j = 0; j < N; j += 4) c += at(p + j) * at(nat + j);
+              if (c > best) { best = c; pos = p; }
+            }
+          }
+          for (i = 0; i < N; i++) y[i] += at(pos + i) * win[i];
+          out.push(y.slice(0, HS)); n += HS;
+          y.copyWithin(0, HS); y.fill(0, N - HS);
+          prev = pos; k++;
+        }
+        var r = new Float32Array(n), o = 0; out.forEach(function (c) { r.set(c, o); o += c.length; });
+        return r;
+      }
+    };
+  }
+
+  // 서버가 만드는 대로 흘려보내는 소리(SSE: Gemini 원본 형식)를 받아 바로 튼다. A가 있으면 읽는 문장을 형광펜으로 따라간다
+  function streamVoice(text, voice, A, said) {
+    var ac = actx(); if (!ac) return Promise.reject(0);
+    if (ac.state !== 'running') ac.resume();
+    var run = VOICE.run, ctl = new AbortController(), st = Stretch(RATE);
+    var ob = new Float32Array(SR * 8), on = 0, sp = 0, next = 0, blocks = [], nodes = [], inN = 0, done = false, carry = null, head = true, timer = 0;
+    var ends = [], chars = 0; (said || []).forEach(function (x) { chars += speakText(x).length + 1; ends.push(chars); });
+    function store(f) {
+      if (on + f.length > ob.length) { var nb = new Float32Array(Math.max(ob.length * 2, on + f.length)); nb.set(ob.subarray(0, on)); ob = nb; }
+      ob.set(f, on); on += f.length;
+    }
+    function pump() {
+      if (run !== VOICE.run) return;
+      while (sp < on) {
+        var n = on - sp; if (n < 2048 && !done) break;
+        var buf = ac.createBuffer(1, n, SR); buf.getChannelData(0).set(ob.subarray(sp, sp + n));
+        var src = ac.createBufferSource(); src.buffer = buf; src.connect(ac.destination);
+        if (next < ac.currentTime + 0.02) next = ac.currentTime + 0.05;
+        src.start(next); nodes.push(src); blocks.push({ t: next, o: sp, n: n });
+        next += n / SR; sp += n;
+      }
+    }
+    function pcm(bytes) {
+      if (carry) { var m = new Uint8Array(bytes.length + 1); m[0] = carry; m.set(bytes, 1); bytes = m; carry = null; }
+      if (head && bytes.length > 44 && bytes[0] === 82 && bytes[1] === 73 && bytes[2] === 70 && bytes[3] === 70) bytes = bytes.subarray(44);   // Chirp 대체 음성의 WAV 머리
+      head = false;
+      if (bytes.length & 1) { carry = bytes[bytes.length - 1]; bytes = bytes.subarray(0, bytes.length - 1); }
+      var dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.length), f = new Float32Array(bytes.length / 2);
+      for (var i = 0; i < f.length; i++) f[i] = dv.getInt16(i * 2, true) / 32768;
+      inN += f.length; st.push(f); store(st.pull(false)); pump();
+    }
+    function b64(t) { var s = atob(t), u = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; }
+    function line(l) {
+      if (l.indexOf('data:') !== 0) return;
+      try { (JSON.parse(l.slice(5)).candidates[0].content.parts || []).forEach(function (p) { if (p.inlineData) pcm(b64(p.inlineData.data)); }); } catch (e) {}
+    }
+    function outNow() {   // 지금 들리는 자리(늘린 뒤 기준 샘플)
+      var t = ac.currentTime;
+      for (var i = blocks.length - 1; i >= 0; i--) if (t >= blocks[i].t) return Math.min(blocks[i].o + (t - blocks[i].t) * SR, blocks[i].o + blocks[i].n);
+      return -1;
+    }
+    function inTotal() { return done ? inN : Math.max(inN, chars * 3700); }   // 다 받기 전엔 한 글자 약 0.15초로 어림
+    var api = {
+      A: A,
+      seek: function (i) {
+        if (!chars) return;
+        nodes.forEach(function (n) { try { n.stop(); } catch (e) {} }); nodes = []; blocks = []; next = 0;
+        sp = Math.max(0, Math.floor((i ? ends[i - 1] : 0) / chars * inTotal() / RATE)); pump(); mark(A, i);
+      },
+      stop: function () { ctl.abort(); clearInterval(timer); nodes.forEach(function (n) { try { n.stop(); } catch (e) {} }); }
+    };
+    VOICE.play = api;
+    return fetch(TTS_ENDPOINT, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: text, voice: voice }), signal: ctl.signal })
+      .then(function (r) {
+        if (!r.ok || !r.body) throw 0;
+        var rd = r.body.getReader(), dec = new TextDecoder(), buf = '';
+        return new Promise(function (res, rej) {
+          timer = setInterval(function () {
+            if (run !== VOICE.run) { clearInterval(timer); res(); return; }
+            if (A && chars) { var o = outNow(); if (o > -1) { var c = o * RATE / inTotal() * chars, i = 0; while (i < ends.length - 1 && c > ends[i]) i++; mark(A, i); } }
+            if (done && sp >= on && ac.currentTime >= next) { clearInterval(timer); res(); }
+          }, 80);
+          (function read() {
+            rd.read().then(function (v) {
+              if (run !== VOICE.run) return;
+              if (v.done) {
+                if (buf) line(buf.trim());
+                if (!inN) { clearInterval(timer); rej(0); return; }
+                done = true; store(st.pull(true)); pump(); return;
+              }
+              buf += dec.decode(v.value, { stream: true });
+              var ls = buf.split('\n'); buf = ls.pop(); ls.forEach(function (l) { line(l.trim()); });
+              read();
+            }, function (e) { clearInterval(timer); run === VOICE.run ? rej(e) : res(); });
+          })();
+        });
+      });
+  }
   function stopVoice() {
     VOICE.run++;
     if ('speechSynthesis' in window) speechSynthesis.cancel();
-    if (VOICE.audio) { VOICE.audio.pause(); VOICE.audio = null; }
+    if (VOICE.play) { VOICE.play.stop(); VOICE.play = null; }
     document.querySelectorAll('.sn.reading').forEach(function (n) { n.classList.remove('reading'); });
     setBtn(VOICE.btn, false); VOICE.btn = null;
   }
@@ -766,31 +867,24 @@ p { margin: 0; }
       (function next() {
         if (run !== VOICE.run || i >= said.length) { res(); return; }
         var u = new SpeechSynthesisUtterance(speakText(said[i]));
-        u.lang = 'ko-KR'; if (VOICE.voice) u.voice = VOICE.voice; u.rate = 1.02 * VOICE.rate;
+        u.lang = 'ko-KR'; if (VOICE.voice) u.voice = VOICE.voice; u.rate = 1.02 * RATE;
         var me = i; u.onstart = function () { if (run === VOICE.run) mark(A, me); };
         u.onend = u.onerror = function () { i++; next(); };
         speechSynthesis.speak(u);
       })();
     });
   }
-  function viaServer(said, A, run) {
-    var text = said.map(speakText).join(' ');
-    return fetch(TTS_ENDPOINT, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: text, voice: VOICE.name }) })
-      .then(function (r) { if (!r.ok) throw 0; return r.blob(); })
-      .then(function (blob) {
-        if (run !== VOICE.run) return;
-        var au = player(); au.src = URL.createObjectURL(blob); VOICE.audio = au; au.playbackRate = VOICE.rate;
-        var ends = [], c = 0; said.forEach(function (x) { c += speakText(x).length + 1; ends.push(c); });
-        A._starts = [0].concat(ends.slice(0, -1)); A._chars = c;
-        au.ontimeupdate = function () { if (!au.duration) return; var pos = au.currentTime / au.duration * c, i = 0; while (i < ends.length - 1 && pos > ends[i]) i++; mark(A, i); };
-        return new Promise(function (res, rej) { au.onended = res; au.onerror = rej; au.play().catch(rej); });
-      });
-  }
+  function viaServer(said, A) { return streamVoice(said.map(speakText).join(' '), VOICE.name, A, said); }
   function speak(A, btn, from) {
     stopVoice(); var said = A._said || []; if (!said.length) return;
     var run = VOICE.run; VOICE.btn = btn; setBtn(btn, true);
-    var go = TTS_ENDPOINT ? viaServer(said, A, run).catch(function () { return run === VOICE.run && BROWSER_VOICE && 'speechSynthesis' in window ? viaBrowser(said, A, run) : null; }) : viaBrowser(said, A, run, from);
-    go.finally(function () { if (run === VOICE.run) { mark(A, -1); setBtn(btn, false); VOICE.btn = null; } });
+    var failed = false;
+    var go = TTS_ENDPOINT ? viaServer(said, A).catch(function () { failed = true; return run === VOICE.run && BROWSER_VOICE && 'speechSynthesis' in window ? viaBrowser(said, A, run) : null; }) : viaBrowser(said, A, run, from);
+    go.finally(function () {
+      if (run !== VOICE.run) return;
+      mark(A, -1); setBtn(btn, false); VOICE.btn = null;
+      if (failed && btn) { btn.querySelector('.lt').textContent = '지금은 읽을 수 없어요'; setTimeout(function () { if (!btn.classList.contains('on')) btn.querySelector('.lt').textContent = '듣기'; }, 2600); }
+    });
   }
   function setAuto(on) {
     VOICE.auto = on; try { localStorage.setItem('hj-read', on ? '1' : '0'); } catch (e) {}
@@ -821,15 +915,9 @@ p { margin: 0; }
     VM.querySelectorAll('.vopt').forEach(function (b) { b.setAttribute('aria-checked', String(b.dataset.voice === name)); b.classList.remove('playing'); });
     VC.querySelector('.vname').textContent = VNAME[name]; VC.title = '목소리: ' + VNAME[name];
     if (!TTS_ENDPOINT) return;
-    stopVoice(); var run = VOICE.run; row.classList.add('playing'); row.querySelector('.ms').textContent = 'graphic_eq';
+    stopVoice(); row.classList.add('playing'); row.querySelector('.ms').textContent = 'graphic_eq';
     var done = function () { row.classList.remove('playing'); row.querySelector('.ms').textContent = 'check'; };
-    fetch(TTS_ENDPOINT, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: VSAY, voice: name }) })
-      .then(function (r) { if (!r.ok) throw 0; return r.blob(); })
-      .then(function (blob) {
-        if (run !== VOICE.run) return;
-        var au = player(); au.src = URL.createObjectURL(blob); VOICE.audio = au; au.playbackRate = 1;
-        return new Promise(function (res, rej) { au.onended = res; au.onerror = rej; au.play().catch(rej); });
-      }).catch(function () {}).then(done);
+    streamVoice(VSAY, name, null, null).catch(function () {}).then(done);
   }
   VM.addEventListener('keydown', function (e) {
     var items = [].slice.call(VM.querySelectorAll('.vopt')), i = items.indexOf(document.activeElement);
@@ -915,7 +1003,6 @@ p { margin: 0; }
 
   /* ── 클릭 위임 ─────────────────────────────────────── */
   document.addEventListener('click', function (e) {
-    var sp = e.target.closest('[data-speed]'); if (sp) { nextRate(sp); return; }
     var sn = e.target.closest('.ans.speaking .sn');
     if (sn && !e.target.closest('[data-cite]') && VOICE.btn && VOICE.btn.closest('.ans') === sn.closest('.ans')) { seekTo(sn.closest('.ans'), +sn.dataset.sn); return; }
     var lb = e.target.closest('[data-listen]');
