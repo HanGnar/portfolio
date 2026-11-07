@@ -689,7 +689,7 @@ p { margin: 0; }
 
 
   /* ── 음성으로 읽어 주기 ─────────────────────────────────
-   * TTS_ENDPOINT(Worker → Gemini 3.1 Flash TTS, 안 되면 Chirp 3: HD)가 있을 때만 켠다. 브라우저 내장 음성은 기계 느낌이 강해 기본으로 쓰지 않는다
+   * TTS_ENDPOINT(Worker → Gemini Live 음성, 안 되면 TTS 모델 · Chirp 3: HD)가 있을 때만 켠다. 브라우저 내장 음성은 기계 느낌이 강해 기본으로 쓰지 않는다
    * (BROWSER_VOICE = true로 바꾸면 서버 음성이 실패할 때 대신 읽는다).
    * 읽는 문장은 형광펜으로 따라간다. 한 번에 하나만 읽고, 새 질문 · 멈춤 시 바로 끊는다. */
   var TTS_ENDPOINT = SERVER && SERVER + '/tts';
@@ -810,7 +810,11 @@ p { margin: 0; }
     function b64(t) { var s = atob(t), u = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; }
     function line(l) {
       if (l.indexOf('data:') !== 0) return;
-      try { (JSON.parse(l.slice(5)).candidates[0].content.parts || []).forEach(function (p) { if (p.inlineData) pcm(b64(p.inlineData.data)); }); } catch (e) {}
+      try {
+        var m = JSON.parse(l.slice(5)), c = m.candidates && m.candidates[0], sc = m.serverContent;   // TTS 모델 · Live 모델 두 형식
+        var parts = (c && c.content && c.content.parts) || (sc && sc.modelTurn && sc.modelTurn.parts) || [];
+        parts.forEach(function (p) { if (p.inlineData) pcm(b64(p.inlineData.data)); });
+      } catch (e) {}
     }
     function outNow() {   // 지금 들리는 자리(늘린 뒤 기준 샘플)
       var t = ac.currentTime;
