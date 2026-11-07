@@ -699,7 +699,8 @@ p { margin: 0; }
   var TTS_ENDPOINT = SERVER && SERVER + '/tts';
   var BROWSER_VOICE = false;
   var VOICE = { ok: !!TTS_ENDPOINT || (BROWSER_VOICE && 'speechSynthesis' in window), auto: false, run: 0, audio: null, btn: null, voice: null };
-  try { VOICE.auto = localStorage.getItem('hj-autoread') === '1'; } catch (e) {}
+  VOICE.auto = true;   // 답이 오면 바로 읽어 준다(스피커 버튼으로 끌 수 있고, 끈 상태는 기억)
+  try { VOICE.auto = localStorage.getItem('hj-autoread') !== '0'; } catch (e) {}
   // 빨리 감기: 속도 버튼은 1 → 1.25 → 1.5 → 2배로 돌고, 읽는 중에 문장을 누르면 그 문장으로 건너뛴다
   var RATES = [1, 1.25, 1.5, 2];
   VOICE.rate = 1;
@@ -744,6 +745,14 @@ p { margin: 0; }
     if (au && au.duration && A._starts) { au.currentTime = A._starts[i] / A._chars * au.duration; mark(A, i); }
     else if (!TTS_ENDPOINT) speak(A, VOICE.btn, i);   // 브라우저 음성은 그 문장부터 다시 읽는다
   }
+  // 사파리는 클릭 순간에 재생을 시작한 오디오만 나중에 소리를 낼 수 있다. 첫 클릭 · 키 입력 때 같은 오디오를 무음으로 한 번 틀어 둔다
+  function player() { if (!VOICE.el) VOICE.el = new Audio(); return VOICE.el; }
+  function unlock() {
+    if (!TTS_ENDPOINT || VOICE.unlocked) return; VOICE.unlocked = true;
+    var a = player(); a.src = 'data:audio/wav;base64,UklGRrQBAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YZABAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA'; a.play().catch(function () { VOICE.unlocked = false; });
+  }
+  document.addEventListener('click', unlock, true);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Enter') unlock(); }, true);
   function stopVoice() {
     VOICE.run++;
     if ('speechSynthesis' in window) speechSynthesis.cancel();
@@ -770,7 +779,7 @@ p { margin: 0; }
       .then(function (r) { if (!r.ok) throw 0; return r.blob(); })
       .then(function (blob) {
         if (run !== VOICE.run) return;
-        var au = new Audio(URL.createObjectURL(blob)); VOICE.audio = au; au.playbackRate = VOICE.rate;
+        var au = player(); au.src = URL.createObjectURL(blob); VOICE.audio = au; au.playbackRate = VOICE.rate;
         var ends = [], c = 0; said.forEach(function (x) { c += speakText(x).length + 1; ends.push(c); });
         A._starts = [0].concat(ends.slice(0, -1)); A._chars = c;
         au.ontimeupdate = function () { if (!au.duration) return; var pos = au.currentTime / au.duration * c, i = 0; while (i < ends.length - 1 && pos > ends[i]) i++; mark(A, i); };
@@ -798,7 +807,7 @@ p { margin: 0; }
       return '<div class="vcap">' + g[0] + '</div>' + g[1].map(function (v) {
         return '<button class="vopt" type="button" role="menuitemradio" aria-checked="' + (v[0] === VOICE.name) + '" data-voice="' + v[0] + '"><span class="vt"><span>' + v[1] + '</span><small>' + v[2] + '</small></span><span class="ms" aria-hidden="true">check</span></button>';
       }).join('');
-    }).join('') + (TTS_ENDPOINT ? '' : '<p class="vnote">음성 서버를 연결하면 고른 목소리로 들려요.</p>');
+    }).join('') + (TTS_ENDPOINT ? '' : '<p class="vnote">claude.ai 링크에서는 소리가 나지 않아요. <a class="link" href="https://hangnar.github.io/portfolio/v9/" target="_blank" rel="noopener">사이트에서 듣기</a></p>');
   }
   function openVoices() {
     closeSug(); renderVoices(); VM.hidden = false; VC.setAttribute('aria-expanded', 'true');
@@ -818,7 +827,7 @@ p { margin: 0; }
       .then(function (r) { if (!r.ok) throw 0; return r.blob(); })
       .then(function (blob) {
         if (run !== VOICE.run) return;
-        var au = new Audio(URL.createObjectURL(blob)); VOICE.audio = au;
+        var au = player(); au.src = URL.createObjectURL(blob); VOICE.audio = au; au.playbackRate = 1;
         return new Promise(function (res, rej) { au.onended = res; au.onerror = rej; au.play().catch(rej); });
       }).catch(function () {}).then(done);
   }
