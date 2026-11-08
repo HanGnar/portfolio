@@ -717,7 +717,9 @@ p { margin: 0; }
   var BROWSER_VOICE = false;
   // claude.ai 링크는 바깥 서버에 닿지 못한다. 그래서 거기서는 이 기기에 있는 한국어 목소리로 같은 일(바로 읽기 · 형광펜 · 목소리 고르기)을 한다
   var DEVICE = !TTS_ENDPOINT && 'speechSynthesis' in window;
-  var VOICE = { ok: !!TTS_ENDPOINT || DEVICE, auto: false, run: 0, audio: null, btn: null, voice: null };
+  // 그래도 사이트와 같은 목소리를 내려고, claude.ai 커넥터 '헝그리한정민 목소리'(Worker /mcp)가 있으면 그걸로 소리를 받아 Web Audio로 튼다(VOICE.relay)
+  var RELAY = '헝그리한정민 목소리';
+  var VOICE = { ok: !!TTS_ENDPOINT || DEVICE || (!TTS_ENDPOINT && !!(window.claude && window.claude.use)), auto: false, run: 0, audio: null, btn: null, voice: null };
   VOICE.auto = true;   // 답이 오면 바로 읽어 준다(스피커 버튼으로 끌 수 있고, 끈 상태는 기억)
   try { VOICE.auto = localStorage.getItem('hj-read') !== '0'; } catch (e) {}
   // 읽는 속도는 1.15배로 고정(목소리 높이는 그대로 두고 빠르기만 바꾼다). 읽는 중에 문장을 누르면 그 문장으로 건너뛴다
@@ -745,7 +747,7 @@ p { margin: 0; }
     VOICE.dlist = vs;
     var keep = null; try { keep = localStorage.getItem('hj-dvoice'); } catch (e) {}
     VOICE.voice = vs.filter(function (v) { return v.voiceURI === keep; })[0] || vs[0] || null;
-    if (DEVICE && VC) renderVoices();
+    if (DEVICE && !VOICE.relay && VC) renderVoices();
   }
   if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
   function speakText(t) { return t.replace(/·/g, ',').replace(/→/g, '').replace(/\s+/g, ' ').trim(); }
@@ -756,15 +758,15 @@ p { margin: 0; }
   }
   function seekTo(A, i) {
     if (VOICE.play && VOICE.play.A === A) VOICE.play.seek(i);
-    else if (!TTS_ENDPOINT) speak(A, VOICE.btn, i);   // 브라우저 음성은 그 문장부터 다시 읽는다
+    else if (!TTS_ENDPOINT && !VOICE.relay) speak(A, VOICE.btn, i);   // 브라우저 음성은 그 문장부터 다시 읽는다
   }
   // 소리는 Web Audio로 낸다. 사파리는 클릭 · 키 입력 순간에 깨운 오디오만 나중에 소리를 낼 수 있어서, 첫 입력 때 깨워 둔다
   function actx() { if (!VOICE.ac) { var C = window.AudioContext || window.webkitAudioContext; if (C) VOICE.ac = new C(); } return VOICE.ac; }
   function unlock() {
-    if (DEVICE && !VOICE.unlocked) { var z = new SpeechSynthesisUtterance(' '); z.volume = 0; speechSynthesis.speak(z); VOICE.unlocked = true; }   // 아이폰은 첫 입력 때 한 번 말해 둬야 나중에 읽는다
-    if (!TTS_ENDPOINT) return; var ac = actx(); if (!ac) return;
+    if (DEVICE && !VOICE.relay && !VOICE.unlocked) { var z = new SpeechSynthesisUtterance(' '); z.volume = 0; speechSynthesis.speak(z); VOICE.unlocked = true; }   // 아이폰은 첫 입력 때 한 번 말해 둬야 나중에 읽는다
+    var ac = actx(); if (!ac) return;
     if (ac.state !== 'running') ac.resume();
-    if (!VOICE.unlocked) { var s = ac.createBufferSource(); s.buffer = ac.createBuffer(1, 1, 22050); s.connect(ac.destination); s.start(0); VOICE.unlocked = true; }
+    if (!VOICE.aunlocked) { VOICE.aunlocked = true; var s = ac.createBufferSource(); s.buffer = ac.createBuffer(1, 1, 22050); s.connect(ac.destination); s.start(0); }
   }
   document.addEventListener('click', unlock, true);
   document.addEventListener('keydown', function (e) { if (e.key === 'Enter') unlock(); }, true);
@@ -863,7 +865,7 @@ p { margin: 0; }
     VOICE.play = api;
     var pend = A ? VOICE.pending : null; VOICE.pending = null;
     if (pend) ctl.signal.addEventListener('abort', function () { try { pend.rd.cancel(); } catch (e) {} });
-    var src = pend ? Promise.resolve(pend) : fetch(TTS_ENDPOINT, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: text, voice: voice }), signal: ctl.signal })
+    var src = pend ? Promise.resolve(pend) : VOICE.relay ? Promise.resolve(relayReader(said || [text], voice)) : fetch(TTS_ENDPOINT, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: text, voice: voice }), signal: ctl.signal })
       .then(function (r) { if (!r.ok || !r.body) throw 0; return { rd: r.body.getReader(), dec: new TextDecoder(), buf: '' }; });
     return src
       .then(function (p) {
@@ -891,6 +893,37 @@ p { margin: 0; }
         });
       });
   }
+  // 커넥터로 받은 소리를 서버 SSE와 같은 모양으로 흘려 streamVoice가 그대로 쓰게 한다.
+  // 첫 문장은 혼자 보내 빨리 시작하고, 나머지는 140자 안팎으로 묶어 앞질러 두 개씩 받아 둔다
+  function relayReader(said, voice) {
+    var groups = [], cur = '';
+    said.map(speakText).forEach(function (t, i) { if (cur && (i === 1 || (cur + ' ' + t).length > 140)) { groups.push(cur); cur = t; } else cur = cur ? cur + ' ' + t : t; });
+    if (cur) groups.push(cur);
+    var enc = new TextEncoder(), i = 0, ahead = [], dead = false;
+    function call(t) {
+      return VOICE.mcp.callTool(RELAY, 'read_aloud', { text: t, voice: voice }).then(function (r) {
+        var p = r && r.payload; if (typeof p === 'string') p = JSON.parse(p);
+        if (!p || !p.pcm) throw { code: 'empty' }; return p.pcm;
+      }, function (e) { if (e && /server_not_connected|not_granted|not_in_manifest|needs_reauth|capability_disabled|capability_removed/.test(e.code)) VOICE.relay = false; throw e; });
+    }
+    function fill() { while (ahead.length < 2 && i < groups.length) { var c = call(groups[i++]); c.catch(function () {}); ahead.push(c); } }
+    fill();
+    return { dec: new TextDecoder(), buf: '', rd: {
+      read: function () {
+        if (dead || !ahead.length) return Promise.resolve({ done: true });
+        var c = ahead.shift(); fill();
+        return c.then(function (b) { return { done: false, value: enc.encode('data: ' + JSON.stringify({ serverContent: { modelTurn: { parts: [{ inlineData: { data: b } }] } } }) + '\n') }; });
+      },
+      cancel: function () { dead = true; }
+    } };
+  }
+  if (!TTS_ENDPOINT && window.claude && window.claude.use) window.claude.use('mcp').then(function (m) {
+    if (!m) return;
+    return m.listTools().then(function (l) {
+      if (!(l.servers || []).some(function (x) { return x.server === RELAY && x.authStatus !== 'needs_reauth'; })) return;
+      VOICE.mcp = m; VOICE.relay = true; VOICE.ok = true; if (VC) renderVoices();
+    });
+  }).catch(function () {}).then(function () { if (!VOICE.relay && !DEVICE) VOICE.ok = false; });
   function stopVoice() {
     VOICE.run++;
     if ('speechSynthesis' in window) speechSynthesis.cancel();
@@ -916,7 +949,7 @@ p { margin: 0; }
     stopVoice(); var said = A._said || []; if (!said.length) return;
     var run = VOICE.run; VOICE.btn = btn; setBtn(btn, true);
     var failed = false;
-    var go = TTS_ENDPOINT ? viaServer(said, A).catch(function () { failed = true; return run === VOICE.run && BROWSER_VOICE && 'speechSynthesis' in window ? viaBrowser(said, A, run) : null; }) : viaBrowser(said, A, run, from);
+    var go = TTS_ENDPOINT || VOICE.relay ? viaServer(said, A).catch(function () { failed = !DEVICE; return run === VOICE.run && (BROWSER_VOICE || DEVICE) && 'speechSynthesis' in window ? viaBrowser(said, A, run) : null; }) : viaBrowser(said, A, run, from);
     go.finally(function () {
       if (run !== VOICE.run) return;
       mark(A, -1); setBtn(btn, false); VOICE.btn = null;
@@ -932,14 +965,14 @@ p { margin: 0; }
   // 목소리 고르기: 고르면 바로 그 목소리로 한 문장 들려준다(목록은 열어 둔 채로 여러 개 비교)
   var VM = $('#vmenu'), VC = $('#vchip');
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function curName() { return DEVICE ? (VOICE.voice ? dname(VOICE.voice) : '기기 목소리') : VNAME[VOICE.name]; }
+  function curName() { return DEVICE && !VOICE.relay ? (VOICE.voice ? dname(VOICE.voice) : '기기 목소리') : VNAME[VOICE.name]; }
   function vrow(id, name, note, on) {
     return '<button class="vopt" type="button" role="menuitemradio" aria-checked="' + on + '" data-voice="' + esc(id) + '"><span class="vt"><span>' + esc(name) + '</span><small>' + note + '</small></span><span class="ms" aria-hidden="true">check</span></button>';
   }
   function renderVoices() {
     VC.querySelector('.vname').textContent = curName();
     VC.title = '목소리: ' + curName();
-    if (DEVICE) {
+    if (DEVICE && !VOICE.relay) {
       VM.innerHTML = '<div class="vcap">이 기기의 한국어 목소리</div>' + (VOICE.dlist || []).map(function (v) { return vrow(v.voiceURI, dname(v), dnote(v), v === VOICE.voice); }).join('') +
         ((VOICE.dlist || []).length ? '' : '<p class="vnote">기기에 한국어 목소리가 없어 기본 목소리로 읽어요.</p>') +
         '<p class="vnote">claude.ai 링크에서는 이 기기의 목소리로 읽어요. 라오메데이아 같은 목소리는 <a class="link" href="https://hangnar.github.io/portfolio/v9/" target="_blank" rel="noopener">사이트</a>에서 들을 수 있어요.</p>';
@@ -949,7 +982,7 @@ p { margin: 0; }
       return '<div class="vcap">' + g[0] + '</div>' + g[1].map(function (v) {
         return '<button class="vopt" type="button" role="menuitemradio" aria-checked="' + (v[0] === VOICE.name) + '" data-voice="' + v[0] + '"><span class="vt"><span>' + v[1] + '</span><small>' + v[2] + '</small></span><span class="ms" aria-hidden="true">check</span></button>';
       }).join('');
-    }).join('') + (TTS_ENDPOINT ? '' : '<p class="vnote">claude.ai 링크에서는 소리가 나지 않아요. <a class="link" href="https://hangnar.github.io/portfolio/v9/" target="_blank" rel="noopener">사이트에서 듣기</a></p>');
+    }).join('');
   }
   function openVoices() {
     closeSug(); renderVoices(); VM.hidden = false; VC.setAttribute('aria-expanded', 'true');
@@ -959,10 +992,11 @@ p { margin: 0; }
   }
   function closeVoices(back) { if (VM.hidden) return; VM.hidden = true; VC.setAttribute('aria-expanded', 'false'); if (back) VC.focus(); }
   function chooseVoice(name, row) {
-    if (!DEVICE) { VOICE.name = name; try { localStorage.setItem('hj-voice', name); } catch (e) {} }
+    var dev = DEVICE && !VOICE.relay;
+    if (!dev) { VOICE.name = name; try { localStorage.setItem('hj-voice', name); } catch (e) {} }
     VM.querySelectorAll('.vopt').forEach(function (b) { b.setAttribute('aria-checked', String(b.dataset.voice === name)); b.classList.remove('playing'); });
     var done = function () { row.classList.remove('playing'); row.querySelector('.ms').textContent = 'check'; };
-    if (DEVICE) {
+    if (dev) {
       VOICE.voice = (VOICE.dlist || []).filter(function (v) { return v.voiceURI === name; })[0] || VOICE.voice;
       try { localStorage.setItem('hj-dvoice', name); } catch (e) {}
       VC.querySelector('.vname').textContent = curName(); VC.title = '목소리: ' + curName();
@@ -971,7 +1005,7 @@ p { margin: 0; }
       return;
     }
     VC.querySelector('.vname').textContent = VNAME[name]; VC.title = '목소리: ' + VNAME[name];
-    if (!TTS_ENDPOINT) return;
+    if (!TTS_ENDPOINT && !VOICE.relay) return;
     stopVoice(); row.classList.add('playing'); row.querySelector('.ms').textContent = 'graphic_eq';
     streamVoice(VSAY, name, null, null).catch(function () {}).then(done);
   }
