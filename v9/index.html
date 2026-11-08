@@ -949,7 +949,7 @@ p { margin: 0; }
     stopVoice(); var said = A._said || []; if (!said.length) return;
     var run = VOICE.run; VOICE.btn = btn; setBtn(btn, true);
     var failed = false;
-    var go = TTS_ENDPOINT || VOICE.relay ? viaServer(said, A).catch(function () { failed = !DEVICE; return run === VOICE.run && (BROWSER_VOICE || DEVICE) && 'speechSynthesis' in window ? viaBrowser(said, A, run) : null; }) : viaBrowser(said, A, run, from);
+    var go = TTS_ENDPOINT || VOICE.relay ? viaServer(said, A).catch(function () { failed = true; return null; })   // 다른 목소리로 대신 읽지 않는다(목소리가 섞인다) : viaBrowser(said, A, run, from);
     go.finally(function () {
       if (run !== VOICE.run) return;
       mark(A, -1); setBtn(btn, false); VOICE.btn = null;
