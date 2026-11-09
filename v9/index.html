@@ -904,11 +904,17 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   // 읽어 주기가 켜져 있으면 say에 목소리 이름을 실어 보낸다. 서버는 답(첫 줄)을 보낸 뒤 같은 연결로 소리를 이어 보내고,
   // 남은 연결은 VOICE.pending에 두었다가 speak()가 그대로 이어 받는다(소리 요청을 따로 다시 하지 않아 바로 나온다)
   function dropPending() { if (VOICE.pending) { try { VOICE.pending.rd.cancel(); } catch (e) {} VOICE.pending = null; } }
+  // 한 번 실패하면(서버가 모델을 다 돌려도 안 됐거나 네트워크가 끊김) 잠깐 쉬고 한 번 더 묻는다. 그래도 안 될 때만 미리 쓴 안내를 보인다
   function askServer(q) {
+    return askOnce(q, true).then(function (r) {
+      return r || new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return askOnce(q, false); });
+    });
+  }
+  function askOnce(q, first) {
     if (!AI_ENDPOINT) return Promise.resolve(null);
     dropPending();
-    var say = VOICE.ok && VOICE.auto && TTS_ENDPOINT ? VOICE.name : null;
-    var ctl = new AbortController(); var t = setTimeout(function () { ctl.abort(); }, 12000);
+    var say = first && VOICE.ok && VOICE.auto && TTS_ENDPOINT ? VOICE.name : null;
+    var ctl = new AbortController(); var t = setTimeout(function () { ctl.abort(); }, 30000);
     return fetch(AI_ENDPOINT, { method: 'POST', headers: { 'content-type': 'application/json' }, signal: ctl.signal,
       body: JSON.stringify({ q: q, team: CTX.team, seen: CTX.seen, say: say }) })
       .then(function (r) {
