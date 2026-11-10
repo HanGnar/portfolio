@@ -777,7 +777,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
 
   // Gemini 서버 함수(worker.js, Cloudflare hungry-ai) 주소. GitHub 사이트에서만 쓴다.
   // 아티팩트는 바깥 서버에 접속할 수 없어서 Claude로 답하고, 읽어 주기는 꺼진다.
-  var SERVER = /(^|\.)github\.io$/.test(location.hostname) ? 'https://hungry-ai.publichk03.workers.dev' : '';
+  var SERVER = /(^|\.)github\.io$/.test(location.hostname) || /hanjungmin[a-z0-9-]*\.vercel\.app$/.test(location.hostname) ? 'https://hungry-ai.publichk03.workers.dev' : '';
   var AI_ENDPOINT = SERVER;
 
   /* ── 작은 도구 ─────────────────────────────────────── */
