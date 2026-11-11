@@ -2234,14 +2234,14 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     });
   }
   function makePdf(B, name) {
+    // 화면 밖에 둔 상자는 높이가 0으로 잡혀 빈 PDF가 된다. 글을 html2pdf에 바로 넘겨 html2pdf가 상자를 만들게 한다
     return lib('pdf').then(function () {
-      var box = document.createElement('div');
-      box.style.cssText = 'position:fixed;left:-10000px;top:0;width:180mm;background:#fff;color:#111;font:11pt/1.6 system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif';
-      box.innerHTML = '<style>.pf h1{font-size:18pt;margin:0 0 10px}.pf h2{font-size:13pt;margin:16px 0 6px}.pf h3{font-size:11.5pt;margin:12px 0 4px}.pf p{margin:0 0 6px}.pf ul{margin:0 0 6px;padding-left:18px}' +
-        '.pf table{border-collapse:collapse;width:100%;margin:6px 0 10px;font-size:9.5pt}.pf th,.pf td{border:1px solid #ccc;padding:4px 6px;text-align:left;vertical-align:top}.pf th{background:#f3f3f3}</style><div class="pf">' + blocksHtml(B) + '</div>';
-      document.body.appendChild(box);
-      return window.html2pdf().set({ margin: 15, filename: name, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4' }, pagebreak: { mode: ['css', 'legacy'] } })
-        .from(box).outputPdf('blob').finally(function () { box.remove(); });
+      var html = '<div style="width:180mm;background:#fff;color:#111;font:11pt/1.6 system-ui,-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif">' +
+        '<style>.pf h1{font-size:18pt;margin:0 0 10px}.pf h2{font-size:13pt;margin:16px 0 6px}.pf h3{font-size:11.5pt;margin:12px 0 4px}.pf p{margin:0 0 6px}.pf ul{margin:0 0 6px;padding-left:18px}' +
+        '.pf table{border-collapse:collapse;width:100%;margin:6px 0 10px;font-size:9.5pt}.pf th,.pf td{border:1px solid #ccc;padding:4px 6px;text-align:left;vertical-align:top}.pf th{background:#f3f3f3}.pf tr,.pf li,.pf p{page-break-inside:avoid}</style>' +
+        '<div class="pf">' + blocksHtml(B) + '</div></div>';
+      return window.html2pdf().set({ margin: 15, filename: name, html2canvas: { scale: 2, backgroundColor: '#ffffff' }, jsPDF: { unit: 'mm', format: 'a4' }, pagebreak: { mode: ['css', 'legacy'] } })
+        .from(html, 'string').outputPdf('blob');
     });
   }
   function saveFile(f, btn) {
