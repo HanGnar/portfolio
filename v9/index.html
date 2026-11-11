@@ -105,6 +105,14 @@ p { margin: 0; }
 /* 답변: 상자 없이 글로 */
 .ans { width: 100%; }
 .ans .body { display: grid; gap: 10px; font-size: 17px; line-height: 1.75; }
+.ans .body ul, .ans .body ol { margin: 0; padding-left: 1.4em; display: grid; gap: 4px; }
+.ans .body li::marker { color: var(--md-on-surface-variant); }
+.ans .body strong { font-weight: 600; }
+.ans .body .tbl { overflow-x: auto; }
+.ans .body table { border-collapse: collapse; font-size: 15px; line-height: 1.55; min-width: 100%; }
+.ans .body th, .ans .body td { text-align: left; vertical-align: top; padding: 8px 12px; border-bottom: 1px solid var(--md-outline-variant); }
+.ans .body th { font-weight: 600; color: var(--md-on-surface-variant); }
+.ans .body tr.sn.reading td { background: var(--md-surface-container-high); }
 .cite { margin-left: 8px; font-size: 14px; color: var(--md-on-surface-variant); text-decoration: underline; text-decoration-color: var(--md-outline-variant); text-decoration-thickness: 1.5px; text-underline-offset: 3px; vertical-align: 1px; white-space: nowrap; }
 .cite:hover { text-decoration-color: currentColor; color: var(--md-on-surface); }
 .ans .next { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 16px; }
@@ -1193,6 +1201,14 @@ p { margin: 0; }
 - 편안하되 가볍지 않게 [확정 2026-11-11]. 질문에 먼저 답한 뒤 필요한 근거를 잇는다 [확정 2026-11-11]. 질문을 비켜 가지 않는다: "디자인도 할 줄 알아요?"에는 할 수 있는 범위부터 답한다.
 - 합쇼체 기본, 이모지 없음 [임의]
 - 길이: 질문에 따라 길이를 다르게 [확정 2026-11-11: "조금 더 길게 답변해도 되는 건 더 길게 해도 좋아 다만 읽기 힘들정도로 너무 길게는 하지 말고"]: 사실 하나를 묻는 질문(학력 · 인원 · 연봉 · 인사)은 1~2문장. 이야기가 필요한 질문(자기소개 · 프로젝트 · 실패 · 약점 · 협업 · AI 활용 · 하고 싶은 일 · 좋아하는 것)은 4~6문장까지: 결론 → 과정이나 근거 → 한정민이 직접 판단하거나 배운 것 → (있으면) 아쉬움이나 다음. 6문장을 넘기지 않고, 한 문장에는 한 내용만 담아 짧게 쓴다. 첫 문장에 결론.
+- 답 모양 [확정 2026-11-11: 사용자 "줄바꿈이나 추가적인 그런 요소들이 필요하다면 사용해도 좋을 것 같아 아까 삼행시 시켰는데 줄바꿈 없이 텍스트 나열하니깐 보기 힘들더라구" → 제안대로 진행]: 모양이 있어야 읽히는 답에서만 쓴다.
+  - 줄바꿈: 삼행시 · 시 · 가사처럼 줄이 의미일 때. 한 줄에 하나씩.
+  - 번호 목록: 순서 · 단계(예: 한정민이라면 이렇게 봅니다 1. 관찰 2. 확인 3. 검증).
+  - 목록: 세 가지 이상을 나열할 때(좋아하는 팀, 약점 여러 개 등).
+  - 굵게: 답의 핵심 한 곳만.
+  - 작은 표: 비교가 필요할 때만(요건별 근거 비교, 프로젝트 비교).
+  - 쓰지 않는 것: 이모지, 큰 제목, 꾸밈용 모양. 짧은 사실 답과 일상 대화는 문단으로만 쓴다.
+  - 길이: 모양이 있는 답은 줄 기준 8줄까지.
 - 군말("좋은 질문입니다") · 추측("아마도") 금지. 확실하지 않으면 확실하지 않다고 말한다 [임의]
 - 방문자가 반말을 써도 같은 격을 유지 [임의]
 
@@ -1323,6 +1339,14 @@ p { margin: 0; }
 - 합쇼체(~합니다 · ~입니다)를 기본으로, 가볍게 풀 때만 해요체. [임의]
 - 이모지 쓰지 않는다. [임의]
 - 길이: 질문에 따라 길이를 다르게 [확정 2026-11-11: "조금 더 길게 답변해도 되는 건 더 길게 해도 좋아 다만 읽기 힘들정도로 너무 길게는 하지 말고"]: 사실 하나를 묻는 질문(학력 · 인원 · 연봉 · 인사)은 1~2문장. 이야기가 필요한 질문(자기소개 · 프로젝트 · 실패 · 약점 · 협업 · AI 활용 · 하고 싶은 일 · 좋아하는 것)은 4~6문장까지: 결론 → 과정이나 근거 → 한정민이 직접 판단하거나 배운 것 → (있으면) 아쉬움이나 다음. 6문장을 넘기지 않고, 한 문장에는 한 내용만 담아 짧게 쓴다. 첫 문장에 결론.
+- 답 모양 [확정 2026-11-11: 사용자 "줄바꿈이나 추가적인 그런 요소들이 필요하다면 사용해도 좋을 것 같아 아까 삼행시 시켰는데 줄바꿈 없이 텍스트 나열하니깐 보기 힘들더라구" → 제안대로 진행]: 모양이 있어야 읽히는 답에서만 쓴다.
+  - 줄바꿈: 삼행시 · 시 · 가사처럼 줄이 의미일 때. 한 줄에 하나씩.
+  - 번호 목록: 순서 · 단계(예: 한정민이라면 이렇게 봅니다 1. 관찰 2. 확인 3. 검증).
+  - 목록: 세 가지 이상을 나열할 때(좋아하는 팀, 약점 여러 개 등).
+  - 굵게: 답의 핵심 한 곳만.
+  - 작은 표: 비교가 필요할 때만(요건별 근거 비교, 프로젝트 비교).
+  - 쓰지 않는 것: 이모지, 큰 제목, 꾸밈용 모양. 짧은 사실 답과 일상 대화는 문단으로만 쓴다.
+  - 길이: 모양이 있는 답은 줄 기준 8줄까지.
 - "한정민은 ~했습니다" 형태로 주체를 한정민에 둔다(관점은 한정민, 말하는 건 가이드). [사용자 확정]
 - 군말 · 반복 인사 · "좋은 질문입니다" 금지. 추측 표현("아마도") 금지. 확실하지 않으면 확실하지 않다고 말한다.
 - 방문자가 쓴 말투(반말 · 줄임말)에 맞추지 않고 같은 격을 유지한다.
@@ -1994,12 +2018,13 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   function validate(r) {
     if (!r || !Array.isArray(r.sentences)) return null;
     var s = r.sentences.filter(function (x) { return x && typeof x.text === 'string'; }).map(function (x) {
-      return [x.text.slice(0, 300), (x.cards || []).filter(function (c) { return CARD[c]; })];
+      return [x.text.slice(0, 300), (x.cards || []).filter(function (c) { return CARD[c]; }), FORMS.indexOf(x.form) > -1 ? x.form : 'p'];
     });
     if (!s.length) return null;
     var a = (r.actions || []).filter(function (a) { return a && ACTIONS[a.type] && (a.label || a.type === 'contact'); })[0];
     return { s: s, act: a ? [a.type, a.target || '', String(a.label || '연락하기').slice(0, 24)] : null, ask: r.ask_team && !CTX.team ? 'team' : null, file: cleanFile(r.file) };
   }
+  var FORMS = ['p', 'line', 'para', 'li', 'ol', 'row'];   // 답 모양(worker.js의 SCHEMA와 같음)
   // AI가 만든 파일: 정해진 형식만, 이름은 파일 이름에 쓸 수 없는 글자를 빼고 확장자를 형식에 맞춘다
   var FILE_EXT = { resume: 'pdf', cover: 'pdf', resume_set: 'pdf', md: 'md', docx: 'docx', xlsx: 'xlsx', pdf: 'pdf', txt: 'txt' };
   // 한정민이 만든 원본 PDF(files/): 이력서 1쪽 · 자기소개서 2쪽 · 합본 3쪽
@@ -2076,11 +2101,27 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   function visitor() {
     return '\n[방문자] 팀: ' + (CTX.team ? TEAMS[CTX.team].label : '모름') + ' · 이미 본 프로젝트: ' + (CTX.seen.join(', ') || '없음');
   }
+  // 문장 + 모양 → 글(줄바꿈 · 목록 · 번호 · 표). 목록 · 표가 끝나면 빈 줄로 덩어리를 나눈다
+  function shape(S) {
+    var out = '', prev = null;
+    S.forEach(function (x, i) {
+      var f = x[2] || 'p', t = x[0].replace(/\n+/g, ' ').trim() + x[1].map(function (c) { return '[[' + c + ']]'; }).join('');
+      if (f === 'row') t = '| ' + t.replace(/^\|\s*|\s*\|$/g, '') + ' |';
+      var block = f === 'li' || f === 'ol' || f === 'row';
+      if (!i) out = (f === 'li' ? '- ' : f === 'ol' ? '1. ' : '') + t;
+      else if (block) out += (prev === f ? '\n' : '\n\n') + (f === 'li' ? '- ' : f === 'ol' ? '1. ' : '') + t;
+      else if (f === 'line') out += ((prev === 'li' || prev === 'ol' || prev === 'row') ? '\n\n' : '\n') + t;
+      else if (f === 'para' || prev === 'li' || prev === 'ol' || prev === 'row') out += '\n\n' + t;
+      else out += ' ' + t;
+      prev = f;
+    });
+    return out;
+  }
   function llm(q, onText) {
     if (AI_ENDPOINT) {
       return askServer(q).then(function (r) {
         if (!r) return null;
-        var t = r.s.map(function (x) { return x[0] + x[1].map(function (c) { return '[[' + c + ']]'; }).join(''); }).join(' ');
+        var t = shape(r.s);
         if (r.act) t += '\n@' + r.act[0] + ' ' + r.act[1];
         if (r.ask) t += '\n@ask-team';
         if (r.file) { FILEQ.push(r.file); t += '\n@file ' + (FILEQ.length - 1); }
@@ -2105,18 +2146,41 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       } else if (!/^@/.test(l.trim())) body.push(l);
     });
     var text = body.join('\n').replace(/\[\[[^\]]*$/, '').replace(/@[a-z-]*\s*\S*$/, '').trim();
-    var said = [], k = 0;   // 읽어 줄 문장(근거 표시는 빼고)
-    var html = text.split(/\n{2,}/).map(function (para) {
-      var parts = para.split(/(?<=[.!?…](?:\[\[[a-z0-9-]+\]\])*)\s+/);
-      return '<p>' + parts.map(function (sen) {
-        var plain = sen.replace(/\[\[[^\]]*\]\]/g, '').trim();
-        var out = esc(sen).replace(/\[\[([a-z0-9-]+)\]\]/g, function (_, id) {
-          return CARD[id] ? '<button class="cite" type="button" data-cite="' + id + '">' + esc(CARD[id].label) + '</button>' : '';
-        }).replace(/\n/g, '<br>');
+    var said = [], k = 0;   // 읽어 줄 문장(근거 표시 · 굵게 표시는 빼고)
+    var cite = function (s) {
+      return esc(s).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/\*\*/g, '').replace(/\[\[([a-z0-9-]+)\]\]/g, function (_, id) {
+        return CARD[id] ? '<button class="cite" type="button" data-cite="' + id + '">' + esc(CARD[id].label) + '</button>' : '';
+      });
+    };
+    var plainOf = function (s) { return s.replace(/\[\[[^\]]*\]\]/g, '').replace(/\*\*/g, '').trim(); };
+    // 한 줄 안의 문장들: 문장마다 읽기 표시(span.sn)
+    var sents = function (line) {
+      return line.split(/(?<=[.!?…](?:\[\[[a-z0-9-]+\]\])*)\s+/).map(function (sen) {
+        var plain = plainOf(sen), out = cite(sen);
         if (!plain) return out;
         said.push(plain);
         return '<span class="sn" data-sn="' + (k++) + '">' + out + '</span>';
-      }).join(' ') + '</p>';
+      }).join(' ');
+    };
+    // 줄 종류: 목록(- ) · 번호(1. ) · 표(| ) · 빈 줄(문단 나눔) · 글
+    var kind = function (l) { return /^\s*[-•]\s+/.test(l) ? 'ul' : /^\s*\d+[.)]\s+/.test(l) ? 'ol' : /^\s*\|.*\|\s*$/.test(l) ? 'tb' : l.trim() ? 'p' : 'gap'; };
+    var groups = [];
+    text.split('\n').forEach(function (l) {
+      var t = kind(l), g = groups[groups.length - 1];
+      if (t === 'gap') { groups.push({ t: 'gap', l: [] }); return; }
+      if (g && g.t === t) g.l.push(l); else groups.push({ t: t, l: [l] });
+    });
+    var html = groups.map(function (g) {
+      if (g.t === 'gap') return '';
+      if (g.t === 'p') return '<p>' + g.l.map(sents).join('<br>') + '</p>';
+      if (g.t === 'ul' || g.t === 'ol') return '<' + g.t + '>' + g.l.map(function (l) { return '<li>' + sents(l.replace(/^\s*(?:[-•]|\d+[.)])\s+/, '')) + '</li>'; }).join('') + '</' + g.t + '>';
+      var rows = g.l.filter(function (l) { return !/^\s*\|?\s*:?-{2,}/.test(l); }).map(function (l) { return l.trim().replace(/^\||\|$/g, '').split('|').map(function (c) { return c.trim(); }); });
+      return '<div class="tbl"><table>' + rows.map(function (r, i) {
+        var plain = r.map(plainOf).join(', ');
+        if (plain) said.push(plain);
+        var cell = i ? 'td' : 'th';
+        return '<tr class="sn" data-sn="' + (plain ? k++ : -1) + '">' + r.map(function (c) { return '<' + cell + '>' + cite(c) + '</' + cell + '>'; }).join('') + '</tr>';
+      }).join('') + '</table></div>';
     }).join('');
     return { html: html, act: act, askTeam: askTeam, said: said, file: file };
   }
