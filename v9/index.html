@@ -2071,6 +2071,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     return { s: s, act: a ? [a.type, a.target || '', String(a.label || '연락하기').slice(0, 24)] : null, ask: ask, next: next,
       img: r.image && IMG[r.image] ? r.image : null, src: src, mail: mail, file: cleanFile(r.file) };
   }
+  var FORMS = ['p', 'line', 'para', 'li', 'ol', 'row'];   // 답 모양(worker.js의 SCHEMA와 같음)
   // AI가 만든 파일: 정해진 형식만, 이름은 파일 이름에 쓸 수 없는 글자를 빼고 확장자를 형식에 맞춘다
   var FILE_EXT = { resume: 'pdf', cover: 'pdf', resume_set: 'pdf', md: 'md', docx: 'docx', xlsx: 'xlsx', pdf: 'pdf', txt: 'txt' };
   // 한정민이 만든 원본 PDF(files/): 이력서 1쪽 · 자기소개서 2쪽 · 합본 3쪽
