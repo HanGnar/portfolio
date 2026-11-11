@@ -2105,13 +2105,15 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   function shape(S) {
     var out = '', prev = null;
     S.forEach(function (x, i) {
-      var f = x[2] || 'p', t = x[0].replace(/\n+/g, ' ').trim() + x[1].map(function (c) { return '[[' + c + ']]'; }).join('');
+      var f = x[2] || 'p', t = x[0].replace(/\n+/g, ' ').trim();
+      if (f === 'li' || f === 'ol') t = t.replace(/^\s*(?:[-•*]|\d+[.)])\s+/, '');   // AI가 글에 직접 쓴 번호 · 기호는 뺀다(화면이 붙인다)
+      if (f !== 'line') t += x[1].map(function (c) { return '[[' + c + ']]'; }).join('');   // 삼행시 · 시 줄에는 근거 링크를 달지 않는다
       if (f === 'row') t = '| ' + t.replace(/^\|\s*|\s*\|$/g, '') + ' |';
       var block = f === 'li' || f === 'ol' || f === 'row';
       if (!i) out = (f === 'li' ? '- ' : f === 'ol' ? '1. ' : '') + t;
       else if (block) out += (prev === f ? '\n' : '\n\n') + (f === 'li' ? '- ' : f === 'ol' ? '1. ' : '') + t;
       else if (f === 'line') out += ((prev === 'li' || prev === 'ol' || prev === 'row') ? '\n\n' : '\n') + t;
-      else if (f === 'para' || prev === 'li' || prev === 'ol' || prev === 'row') out += '\n\n' + t;
+      else if (f === 'para' || prev === 'li' || prev === 'ol' || prev === 'row' || prev === 'line') out += '\n\n' + t;
       else out += ' ' + t;
       prev = f;
     });
