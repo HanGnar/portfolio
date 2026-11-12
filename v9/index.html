@@ -3166,7 +3166,9 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   }
   /* 허기 캐릭터 상태(hugi/hugi.js가 늦게 실렸으면 그냥 넘어감). 이름은 허기_모션/기능정의.md 2-1 */
   var HG_END = null;
-  function hg(k) { if (window.HUGI) window.HUGI.set(k); if (window.HUGI_ORB) window.HUGI_ORB.set(k); }   // 질문창 옆 허기와 GNB 구슬 속 허기가 같은 상태
+  // GNB 구슬 속 작은 허기: 뛰는 동작은 구슬 밖으로 10~104px 나가서(11-13 측정) 뛰지 않는 비슷한 감정으로 바꿔 보낸다
+  var ORB_SUB = { praised: 'shy', happy: 'wow', cheer: 'wow', copyOk: 'wow', surprise: 'wow', jump: 'wow', hungry: 'flutter', nudge: 'flutter', answerDone: 'idle', notknow: 'doubt', walkR: 'idle', walkL: 'idle', secContact: 'wave', hello: 'wave' };
+  function hg(k) { if (window.HUGI) window.HUGI.set(k); if (window.HUGI_ORB) window.HUGI_ORB.set(ORB_SUB[k] || k); }   // 질문창 옆 허기와 GNB 구슬 속 허기가 같은 상태
   // 답의 감정(mood, LLM이 첫 글자와 함께 보냄) → 허기 반응. 반응 키를 돌려주고, 반응 없이 말하는 중이면 null.
   // [2026-11-13 사용자: 9-2.8 금지(화난 눈 · 눈물 · 졸기 · 하품 · 배고픔 동작)를 모두 풀고 기능정의 2-2 · 2-2-1(감정마다 짝 상태)을 따름] 상태 이름은 허기_모션/기능정의.md 2-2-1.
   // 값 19개: sure · think · calm은 표정 변화 없이 말하는 중(sure는 아래 규칙으로 안도 · 기쁨이 섞임, calm은 귀여운 반응 금지). 서버 mood 목록은 worker.js MOODS와 같게 둘 것.
