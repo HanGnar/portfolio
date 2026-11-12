@@ -2438,7 +2438,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     dropPending();
     var say = first && VOICE.ok && VOICE.auto && TTS_ENDPOINT ? VOICE.name : null;
     var ctl = new AbortController(); var t = setTimeout(function () { ctl.abort(); }, 90000);
-    var body = { q: q, stream: 1, history: HIST.slice(-8), team: CTX.team, seen: CTX.seen, say: say };
+    var body = { q: q, stream: 1, history: HIST.slice(-12), team: CTX.team, seen: CTX.seen, say: say };
     if (opt.doc) body.doc = opt.doc;
     if (opt.file) body.file = opt.file;
     if (opt.mode) body.mode = opt.mode;
@@ -2555,7 +2555,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       if (m) {
         if (m[1] === 'ask-team') askTeam = true;
         else if (m[1] === 'ask') ask = js(m[2], null);
-        else if (m[1] === 'next') nextq = js(m[2], []);
+        else if (m[1] === 'next') nextq = (js(m[2], []) || []).filter(function (x) { return !/(상세 ?보기|받기|이동|열기|목록 ?보기)\s*$/.test(String(x)); });   // 화면 행동 문구는 이어 묻기 버튼으로 쓰지 않는다(누르면 '이동할게요'만 답했음)
         else if (m[1] === 'img') img = IMG[m[2].trim()] ? m[2].trim() : null;
         else if (m[1] === 'src') src = js(m[2], []);
         else if (m[1] === 'mail') mail = js(m[2], null);
@@ -3132,7 +3132,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
         if (m && m !== SM.cur) {
           SM.cur = m;
           var own = !!lateKind(text || '', m);   // 이 문장 글이 모름 · 거절 패턴이면 곧 보정된다 → 설렘 같은 큰 반응을 먼저 걸지 않고 박자만 바꾼다
-          var k = SM.reacts < 2 && Date.now() > SM.lateUntil && !own ? hgPick(m) : null;   // 늦은 보정 반응이 막 나간 직후에도 덮어쓰지 않는다
+          var k = (SM.reacts < 2 || HG_PRIO.test(m)) && Date.now() > SM.lateUntil && !own ? hgPick(m) : null;   // 늦은 보정 반응이 막 나간 직후에도 덮어쓰지 않는다
           hgSpeak(m); if (k) { SM.reacts++; hgReact(k, m); }
         }
       } catch (e) {}
@@ -3150,9 +3150,10 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
         if (!m2) return;
         SM.fix[j] = m2; SM.moods[j] = m2; SM.cur = m2;
         var busy = /^(notknow|doubt|refuse|angry|sad)$/.test(HG_REACT_KEY) && Date.now() - HG_REACT_AT < 1500;   // 모름 · 거절 계열 반응이 막 나간 직후면 말하기만(앞 문장의 칭찬 같은 반응은 새 맥락의 반응으로 바꾼다)
-        var k = SM.reacts < 2 && !busy ? hgPick(m2) : null;
+        SM.lateUntil = Date.now() + 1500;   // 반응이 나갔든 건너뛰었든, 모름 · 거절 문장 직후에는 다음 문장의 큰 반응(설렘 등)을 걸지 않는다
+        var k = !busy ? hgPick(m2) : null;   // 우선 반응이라 한 답 큰 반응 한도(2번)에 걸리지 않고, 센 수에는 먼저 넣는다
         hgSpeak(m2);
-        if (k) { SM.reacts++; SM.lateUntil = Date.now() + 1500; hgReact(k, m2); }
+        if (k) { SM.reacts++; hgReact(k, m2); }
       } catch (e) {}
     };
     opt = Object.assign({}, opt || {}, { onMood: function (m) { smFirst(m); } });
@@ -3181,7 +3182,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       if (!real && AI_ENDPOINT) ERRED = true;   // 서버가 두 번 다 못 답해 미리 쓴 답으로 갈 때도 "오류 뒤 첫 성공"의 시작으로 본다
       if (!raw) raw = presetText(q);
       TURNS.push({ role: 'user', content: q }, { role: 'assistant', content: raw });
-      if (real) { HIST.push({ q: shown || q, a: parse(raw).said.join(' ') }); if (HIST.length > 8) HIST.shift(); }   // 못 받은 답(미리 쓴 답 · 끊김 안내)은 대화 기록에 넣지 않는다: 다음 답이 그쪽으로 끌려가지 않게
+      if (real) { HIST.push({ q: shown || q, a: parse(raw).said.join(' ') }); if (HIST.length > 12) HIST.shift(); }   // 못 받은 답(미리 쓴 답 · 끊김 안내)은 대화 기록에 넣지 않는다: 다음 답이 그쪽으로 끌려가지 않게
       SAVED.push({ q: q, shown: shown || '', raw: raw }); saveChat();
       if (SM.any) { HG_END = null; hgSafeIdle(1000); } else hgEnd(q, raw);   // 마무리: 1초 뒤 기본으로(반응이 재생 중이면 끝난 뒤)
       try { if (ERRED && real) { ERRED = false; if (!SM.any && !HG_END) hg('reconnect'); } } catch (e) {}   // 오류 뒤 첫 성공 답: 다시 연결됨(안도)
@@ -3211,8 +3212,9 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   var HG_ONCE = { wink: 1, cheer: 1 }, HG_USED = {}, HG_RECENT = [], HG_MOOD_PREV = null, HG_SURE_N = 0;   // 윙크 · 신남은 한 대화에 한 번, 바로 앞 두 번에 쓴 상태는 다시 고르지 않음
   var HG_LONG = /^(sleepy|hungry|dizzy)$/;   // 이 셋은 2.5초 안전장치를 걸지 않는다(졸림 · 배고픔 · 어지러움)
   // mood → 대표 반응 하나(없으면 null). 앞 두 번에 쓴 반응 · 한 대화 한 번(윙크 · 신남)을 피한다. 반응은 여기서 부르지 않고 키만 돌려준다
+  var HG_PRIO = /^(oops|alert|sad|angry)$/;   // 우선 반응: 모름 · 거절 · 오류 계열. 앞 두 번에 쓴 반응 피하기와 한 답 큰 반응 한도에 걸리지 않는다(앞 질문에서 notknow를 썼어도 이번 모름에는 다시 쓴다)
   function hgPick(m) {
-    var list = (MOOD_HG[m] || []).filter(function (k) { return HG_RECENT.indexOf(k) < 0 && !(HG_ONCE[k] && HG_USED[k]); });
+    var list = (MOOD_HG[m] || []).filter(function (k) { return (HG_PRIO.test(m) || HG_RECENT.indexOf(k) < 0) && !(HG_ONCE[k] && HG_USED[k]); });
     if (m === 'sure') {
       HG_SURE_N++;
       if (HG_MOOD_PREV === 'oops' || HG_MOOD_PREV === 'sad') list = ['relieved'];   // 앞에서 모르거나 미안했는데 이번엔 자료로 답하면 안도
