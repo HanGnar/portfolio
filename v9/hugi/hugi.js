@@ -1,4 +1,4 @@
-/* 허기 모션 — HPP_공유/브랜딩/허기_모션/index.html(2026-11-13 01:31 판)을 hugi_port.py로 옮김. 직접 고치지 말고 원본을 고친 뒤 다시 돌린다. */
+/* 허기 모션 — HPP_공유/브랜딩/허기_모션/index.html(2026-11-13 01:36 판)을 hugi_port.py로 옮김. 직접 고치지 말고 원본을 고친 뒤 다시 돌린다. */
 (function(){
 const HG_BASE=(document.currentScript&&document.currentScript.src||'').replace(/[^/]*$/,'')||'hugi/';
 const MARKUP='<div id="hg-stage"><div id="hg-shadow"></div><div id="hg-hugi" role="img" aria-label="허기"><svg id="hg-rig" viewBox="0 0 760 700" aria-hidden="true"><defs><clipPath id="hg-cL"><circle cx="337" cy="357" r="50.8"/></clipPath><clipPath id="hg-cR"><circle cx="418" cy="357" r="50.6"/></clipPath><clipPath id="hg-cA"><circle cx="337" cy="357" r="50.8"/><circle cx="418" cy="357" r="50.6"/></clipPath></defs><g id="hg-sq"><g id="hg-lk"><g id="hg-ac"><g id="hg-br"><g id="hg-pg"><g id="hg-bodies"></g><g id="hg-eyes"><g id="hg-vec"><circle cx="337" cy="357" r="52.3" fill="#FF6A22"/><circle cx="418" cy="357" r="52.1" fill="#FF6A22"/><circle cx="337" cy="357" r="50.5" fill="#FDFDFD"/><circle cx="418" cy="357" r="50.3" fill="#FDFDFD"/><g clip-path="url(#hg-cA)"><circle id="hg-pL" r="20.8" fill="#0A0A0A"/><circle id="hg-pR" r="20.9" fill="#0A0A0A"/></g><g clip-path="url(#hg-cL)"><g id="hg-lidL"><rect id="hg-lrL" x="240" width="200" fill="#FF7631"/><line id="hg-llL" stroke="#1B1B1B" stroke-width="6" stroke-linecap="round"/></g></g><g clip-path="url(#hg-cR)"><g id="hg-lidR"><rect id="hg-lrR" x="320" width="200" fill="#FF7631"/><line id="hg-llR" stroke="#1B1B1B" stroke-width="6" stroke-linecap="round"/></g></g></g></g></g></g></g></g></g><g id="hg-fx"></g></svg><div id="hg-bubble" aria-hidden="true"></div></div></div>';
@@ -327,18 +327,42 @@ const M={
    arms(tl,[[18,28,'power2.out'],[30,8],[46,28],[62,8],[78,28],[94,8],[110,20],[116,-60,'power3.out'],[124,6,'power2.out'],[134,-4],[150,0,SPR]],0);legs(tl,[[18,{sp:6,sy:1.25},'power2.out'],[40,{sp:3,sy:1.22}],[64,{sp:7,sy:1.26}],[88,{sp:3,sy:1.22}],[110,{sp:6,sy:1.25}],[116,{sp:20,sy:.85},'power3.out'],[124,{sp:-2,sy:1.1}],[150,{sp:0,sy:1},SPR]],0);
    shake(tl,LK,'x',18,3,10,3,.97);tl.call(()=>{pose('base',.2);face('base','vec');},null,115/60);tl.to({},{duration:.4},160/60);}},
 
- secProject:{g:'site',l:'프로젝트 구역 도착',sit:'스크롤해서 프로젝트 소개에 닿았을 때',mo:'눈이 반짝이며 양팔을 펴 떨고 몸을 들썩이며 별을 날립니다.',ui:'스크롤 위치 기준',
+ secProject:{g:'site',emo:'wow',l:'프로젝트 구역 도착',sit:'스크롤해서 프로젝트 소개에 닿았을 때',mo:'눈이 반짝이며 양팔을 펴 떨고 몸을 들썩이며 별을 날립니다.',ui:'스크롤 위치 기준',
   run(){M.wow.run();state='secProject';}},
  secResume:{g:'site',l:'이력 · 자소서 구역 도착',sit:'스크롤해서 이력 · 자기소개에 닿았을 때',mo:'위를 보며 고개를 기울이고, 한쪽 팔을 들어 올려 곰곰이 생각하는 모습입니다.',ui:'스크롤 위치 기준',
   run(){const tl=T({onComplete:toIdle});face('think','vec');look(.45,-.9);kf(tl,S,[[28,{rotation:4},'back.out(2)'],[56,{rotation:-3},'sine.inOut'],[84,{rotation:3},'sine.inOut'],[110,{rotation:-3},'sine.inOut'],[130,{rotation:0},'sine.out']]);arms(tl,flapFr(8,12,7),10,'R');tl.call(()=>pose('base',.5),null,2.1);}},
  secContact:{g:'site',l:'연락처 구역 도착',sit:'스크롤해서 연락하기에 닿았을 때',mo:'버튼 쪽으로 걸어가 한쪽 팔을 쭉 뻗어 가리키고 버튼이 두근두근 커집니다.',ui:'연락하기 버튼 근처',
   run(){const tl=T();face('base','vec');look(.9,.3);const e=hop(tl,0,26,90,{step:'R',arms:.4});tl.call(()=>{pose('point',.4);CTA.classList.remove('pulse');void CTA.offsetWidth;CTA.classList.add('pulse');say('궁금한 건 여기로 물어봐 주세요');},null,(e-16)/60);
    arms(tl,flapFr(6,14,6),e,'R');tl.call(()=>{pose('base',.5);look(-.9,.2);},null,(e+180)/60);const r1=hop(tl,e+200,20,-45,{step:'L',arms:.4});const r2=hop(tl,r1-18,20,-45,{step:'R',arms:.4});tl.call(()=>go('idle',1),null,(r2+12)/60);}},
- copyOk:{g:'site',l:'복사 · 전송 완료',sit:'연락처를 복사했거나 메시지를 보냈을 때',mo:'양팔을 번쩍 들고 눈이 반짝이며 별과 함께 크게 두 번 뜁니다.',ui:'복사 성공 알림 자리',
+ copyOk:{g:'site',emo:'cheer',l:'복사 · 전송 완료',sit:'연락처를 복사했거나 메시지를 보냈을 때',mo:'양팔을 번쩍 들고 눈이 반짝이며 별과 함께 크게 두 번 뜁니다.',ui:'복사 성공 알림 자리',
   run(){M.cheer.run();say('복사했어요!');later(()=>say(''),1700);}},
  ctaNudge:{g:'site',l:'버튼 눈여겨보기',sit:'오래 머물렀는데 연락하기를 누르지 않았을 때',mo:'버튼 쪽을 보며 한쪽 팔을 뻗어 가리키고, 세 번 살짝 부릅니다.',ui:'60초 머문 뒤 한 번만',
-  run(){const tl=T({onComplete:toIdle});face('point','vec');look(.9,.3);CTA.classList.remove('pulse');void CTA.offsetWidth;CTA.classList.add('pulse');for(let i=0;i<3;i++){kf(tl,S,[[8,Object.assign({rotation:6},SQ(1.04)),'sine.out'],[16,Object.assign({rotation:0},SQ(1)),'sine.in']],i*36);}arms(tl,flapFr(6,16,6),0,'R');tl.call(()=>pose('base',.5),null,1.8);tl.to({},{duration:.6},110/60);}}
+  run(){const tl=T({onComplete:toIdle});face('point','vec');look(.9,.3);CTA.classList.remove('pulse');void CTA.offsetWidth;CTA.classList.add('pulse');for(let i=0;i<3;i++){kf(tl,S,[[8,Object.assign({rotation:6},SQ(1.04)),'sine.out'],[16,Object.assign({rotation:0},SQ(1)),'sine.in']],i*36);}arms(tl,flapFr(6,16,6),0,'R');tl.call(()=>pose('base',.5),null,1.8);tl.to({},{duration:.6},110/60);}},
+
+ /* ---- 2026-11-13 감정마다 짝이 되는 상태 하나씩 (HPP3 임의 지정, 사용자 "임의적으로 지정해서 만들어") ----
+    sec = 상태 탭 안의 묶음 이름, emo = 이 상태에서 나오는 감정. 동작은 짝 감정을 그대로 씀.
+    신남 = 상황 탭 '복사 · 전송 완료', 눈 반짝 = 상황 탭 '프로젝트 구역 도착'이 이미 짝 */
+ answerDone:PS_('대답이 끝난 뒤','대답을 잘 마침','질문에 끝까지 답하고 방문자가 이해했다고 할 때','happy','대답 말풍선이 끝난 직후'),
+ showResult:PS_('대답이 끝난 뒤','성과 설명','프로젝트 결과 · 수치 · 배운 점을 설명할 때','proud','프로젝트 결과 카드를 보여 줄 때'),
+ refuse:PS_('대답이 끝난 뒤','답할 수 없는 질문','개인정보처럼 답하지 않기로 한 질문을 정중히 거절할 때','sad','거절 안내 말풍선'),
+ privateQ:PS_('대답이 끝난 뒤','사적인 질문','연애 · 외모처럼 사적인 질문을 가볍게 넘길 때','shy','가볍게 넘기는 대답'),
+ longPraise:PS_('방문자의 말에 반응','긴 칭찬 · 응원','진심이 담긴 긴 칭찬이나 응원 메시지를 받았을 때(짧은 칭찬은 칭찬받음)','moved','칭찬이 두 문장 이상일 때'),
+ interviewQ:PS_('방문자의 말에 반응','면접형 질문','약점 · 단점 · 실패 경험처럼 평가하는 질문을 받았을 때','nervous','대답을 시작하기 직전'),
+ corrected:PS_('방문자의 말에 반응','잘못 답했다는 지적','방문자가 허기의 대답이 틀렸다고 알려 줄 때','panic','정정하는 대답 직전'),
+ teased:PS_('방문자의 말에 반응','놀리는 말 반복','장난 · 놀리는 말이 두 번 넘게 이어질 때','sulky','장난 질문 응대'),
+ vagueQ:PS_('방문자의 말에 반응','애매한 질문','무엇을 묻는지 흐린 질문이라 되물어야 할 때','doubt','되묻는 말풍선 직전'),
+ goodbye:PS_('방문자의 말에 반응','마무리 인사','방문자가 고맙다 · 잘 봤다며 대화를 마칠 때','wink','대화 종료 인사'),
+ revisit:PS_('흐름 · 연결','다시 찾아온 방문자','예전에 들렀던 방문자가 다시 왔을 때 첫인사','flutter','재방문 첫 화면(처음 인사 대신)'),
+ nudge:PS_('흐름 · 연결','대화가 멈춤','대답 뒤 한동안 다음 질문이 없어 더 물어보라고 권할 때','hungry','대답 뒤 20초 정도 입력이 없을 때'),
+ reconnect:PS_('흐름 · 연결','다시 연결됨','오류가 난 뒤 다시 대답을 받아 왔을 때','relieved','오류 배지가 사라지는 순간'),
+ longIdle:PS_('흐름 · 연결','오래 기다림','방문자가 아무것도 하지 않고 오래 머물 때','sleepy','25초 이상 입력 · 움직임 없음'),
+ tapSpam:PS_('화면을 만질 때','같은 곳 연타','허기를 짧은 시간에 여러 번 눌렀을 때','angry','허기를 연달아 누를 때'),
+ shaken:PS_('화면을 만질 때','빙글빙글 흔들기','허기를 잡고 크게 흔들거나 던졌을 때','dizzy','잡고 흔든 뒤 놓을 때')
 };
+/* 짝 상태의 동작 설명은 짝 감정 설명을 그대로 씀 */
+Object.keys(M).forEach(k=>{const m=M[k];if(m.emo&&!m.mo)m.mo=M[m.emo].l+' 감정 — '+M[m.emo].mo;});
+function PS_(sec,l,sit,emo,ui){return{g:'ai',sec,l,sit,emo,ui,run(){M[emo].run();}};}
+function pairOf(k){const m=M[k];if(m.emo)return{t:'짝 감정',l:M[m.emo].l};const s=Object.keys(M).find(j=>M[j].emo===k);return s?{t:'나오는 상태',l:M[s].l}:null;}
 
 function go(k,quiet){
   if(drag||phys.on)return;

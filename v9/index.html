@@ -622,6 +622,9 @@ p { margin: 0; }
   .hero:not(.chat) .ask { margin-top: calc(clamp(24px, 4.5vh, 40px) + 48px); }
   .hero.chat .thread { padding-bottom: 92px; }
 }
+/* 질문창이 화면 밖으로 나가면 허기는 오른쪽 아래 구석으로 옮겨 따라다닌다(허기_모션 기능정의 3: 구석에 두고 필요할 때만 움직임). 프로젝트 상세(.detail, z 40)가 열리면 그 아래에 가려진다 */
+#hugi-root.hg-float { position: fixed; left: auto; right: max(8px, env(safe-area-inset-right, 0px)); bottom: calc(10px + env(safe-area-inset-bottom, 0px)); --hg-w: 72px; width: calc(var(--hg-w) * 1.7); height: calc(var(--hg-w) * 2.2); z-index: 30; }
+@media (max-width: 1080px) { #hugi-root.hg-float { --hg-w: 56px; } }
 </style>
 
 <header class="hdr" id="hdr">
@@ -3046,7 +3049,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   }
   function ask(q, shown, opt) {
     q = (q || '').trim(); if (!q || BUSY) return;
-    BUSY = true; closeSug(); closeVoices(); IN.value = ''; hasText(); stopVoice();
+    BUSY = true; nudgeStop(); closeSug(); closeVoices(); IN.value = ''; hasText(); stopVoice();
     openChat(); stick = true;
     TH.querySelectorAll('.ask-back').forEach(function (n) { n.remove(); });   // 지난 되묻기는 정리
     var me = document.createElement('p'); me.className = 'msg-q'; me.textContent = shown || q; TH.appendChild(me);
@@ -3060,40 +3063,49 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var done = function (raw) { var r = parse(raw); body.innerHTML = r.html; A._said = r.said; A.insertAdjacentHTML('beforeend', tail(r)); toBottom();
       if (VOICE.auto && VOICE.ok) speak(A, A.querySelector('[data-listen]')); };
     llm(q, paint, opt).then(function (raw) {
+      var real = !!raw;
+      if (!real && AI_ENDPOINT) ERRED = true;   // 서버가 두 번 다 못 답해 미리 쓴 답으로 갈 때도 "오류 뒤 첫 성공"의 시작으로 본다
       if (!raw) raw = presetText(q);
       TURNS.push({ role: 'user', content: q }, { role: 'assistant', content: raw });
       HIST.push({ q: shown || q, a: parse(raw).said.join(' ') }); if (HIST.length > 8) HIST.shift();
       SAVED.push({ q: q, shown: shown || '', raw: raw }); saveChat();
       if (moodGot) { HG_END = null; try { if (!(moodKey && window.HUGI && window.HUGI.state === moodKey)) hg('idle'); } catch (e) {} } else hgEnd(q, raw);
+      try { if (ERRED && real) { ERRED = false; if (!moodKey && !HG_END) hg('reconnect'); } } catch (e) {}   // 오류 뒤 첫 성공 답: 다시 연결됨(안도)
       done(raw);
     }).catch(function (e) {
       var code = e && e.code;
       if (code === 'not_granted' || code === 'sampling_disabled' || code === 'not_declared') { SAMPLE = null; done(presetText(q)); }
       else if (code === 'rate_limited') body.innerHTML = (e.text ? parse(e.text).html : '') + '<p class="meta">질문이 잠깐 몰렸어요. 조금 뒤에 다시 물어봐 주세요.</p>';
       else if (code !== 'cancelled') body.innerHTML = (e && e.text ? parse(e.text).html : '') + '<p class="meta">답하다가 연결이 끊겼어요. 한 번 더 물어봐 주세요.</p>';
+      if (!(code === 'cancelled' || code === 'not_granted' || code === 'sampling_disabled' || code === 'not_declared')) ERRED = true;
       hg(code === 'cancelled' || code === 'not_granted' || code === 'sampling_disabled' || code === 'not_declared' ? 'idle' : 'error');
-    }).finally(function () { BUSY = false; if (window.matchMedia('(hover: hover)').matches) IN.focus({ preventScroll: true }); });
+    }).finally(function () { BUSY = false; nudgeStart(); if (window.matchMedia('(hover: hover)').matches) IN.focus({ preventScroll: true }); });
   }
   /* 허기 캐릭터 상태(hugi/hugi.js가 늦게 실렸으면 그냥 넘어감). 이름은 허기_모션/기능정의.md 2-1 */
   var HG_END = null;
   function hg(k) { if (window.HUGI) window.HUGI.set(k); }
-  // 답의 감정(mood, LLM이 첫 글자와 함께 보냄) → 허기 반응. 반응 키를 돌려주고, 반응 없이 말하는 중이면 null. sad · angry는 사용자가 9-2.8 금지를 풀어 쓰도록 정함
-  // [2026-11-13 사용자 "대화 맥락에 맞게 캐릭터 시트의 감정 여러 개가 나오게"] mood 하나에 맞는 감정 여러 개 중 하나를 고른다(HPP3 허기_모션의 감정 이름).
-  // 배고픔(hungry)은 허기_캐릭터_정의 9-2.8(배고픔 동작 안 함)이라 쓰지 않고, sure · think · calm은 표정 변화 없이 말하는 중.
+  // 답의 감정(mood, LLM이 첫 글자와 함께 보냄) → 허기 반응. 반응 키를 돌려주고, 반응 없이 말하는 중이면 null.
+  // [2026-11-13 사용자: 9-2.8 금지(화난 눈 · 눈물 · 졸기 · 하품 · 배고픔 동작)를 모두 풀고 기능정의 2-2 · 2-2-1(감정마다 짝 상태)을 따름] 상태 이름은 허기_모션/기능정의.md 2-2-1.
+  // 값 19개: sure · think · calm은 표정 변화 없이 말하는 중(sure는 아래 규칙으로 안도 · 기쁨이 섞임, calm은 귀여운 반응 금지). 서버 mood 목록은 worker.js MOODS와 같게 둘 것.
   var MOOD_HG = {
-    welcome: ['happy', 'flutter', 'wave'], excited: ['flutter', 'wow'], proud: ['proud'], moved: ['moved'],
-    shy: ['praised', 'shy'], play: ['wink', 'cheer'], oops: ['notknow', 'panic', 'nervous'], alert: ['doubt'],
-    bye: ['wave'], sad: ['sad'], angry: ['angry']
+    welcome: ['happy', 'flutter', 'wave'], excited: ['flutter', 'wow'], proud: ['showResult'], moved: ['longPraise'],
+    shy: ['praised', 'shy'], private: ['privateQ'], nervous: ['interviewQ'], panic: ['corrected'], sulky: ['teased'], unsure: ['vagueQ'],
+    bye: ['goodbye', 'wave'], oops: ['notknow'], sad: ['refuse'], angry: ['angry'], alert: ['doubt'], play: ['wink', 'cheer']
   };
-  var HG_ONCE = { wink: 1, cheer: 1 }, HG_USED = {}, HG_RECENT = [], HG_MOOD_PREV = null;   // 윙크 · 신남은 한 대화에 한 번, 바로 앞 두 번에 쓴 감정은 다시 고르지 않음
+  var HG_ONCE = { wink: 1, cheer: 1 }, HG_USED = {}, HG_RECENT = [], HG_MOOD_PREV = null, HG_SURE_N = 0;   // 윙크 · 신남은 한 대화에 한 번, 바로 앞 두 번에 쓴 상태는 다시 고르지 않음
+  var HG_LONG = /^(sleepy|hungry|dizzy)$/;   // 이 셋은 2.5초 안전장치를 걸지 않는다(졸림 · 배고픔 · 어지러움)
   function hgMood(m) {
     var list = (MOOD_HG[m] || []).filter(function (k) { return HG_RECENT.indexOf(k) < 0 && !(HG_ONCE[k] && HG_USED[k]); });
-    if (m === 'sure' && (HG_MOOD_PREV === 'oops' || HG_MOOD_PREV === 'sad')) list = ['relieved'];   // 앞에서 모르거나 미안했는데 이번엔 자료로 답하면 안도
+    if (m === 'sure') {
+      HG_SURE_N++;
+      if (HG_MOOD_PREV === 'oops' || HG_MOOD_PREV === 'sad') list = ['relieved'];   // 앞에서 모르거나 미안했는데 이번엔 자료로 답하면 안도
+      else if (HG_SURE_N % 4 === 0 && HG_RECENT.indexOf('answerDone') < 0) list = ['answerDone'];   // 확실히 답했을 때 4번에 1번꼴로 기쁨(연속 금지)
+    }
     HG_MOOD_PREV = m;
     var k = list.length ? list[Math.floor(Math.random() * list.length)] : null;
     if (k) {
       HG_RECENT.push(k); if (HG_RECENT.length > 2) HG_RECENT.shift(); HG_USED[k] = 1; hg(k);
-      if (k === 'sad' || k === 'angry') setTimeout(function () { if (window.HUGI && window.HUGI.state === k) hg('idle'); }, 2500);   // 9-2.8: 한 번 크게 보이고 곧 기본으로
+      if (!HG_LONG.test(k)) setTimeout(function () { if (window.HUGI && window.HUGI.state === k) hg('idle'); }, 2500);   // 큰 반응은 한 번 보이고 최대 2.5초 뒤 기본으로(상태가 아직 같을 때만)
     } else hg('speaking');
     return k;
   }
@@ -3174,6 +3186,39 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   });
   restoreChat();   // 같은 탭에서 새로고침했으면 대화를 다시 그린다
 
+  /* 화면 이벤트 → 허기 반응(LLM을 거치지 않고 바로). 답 만드는 중 · 읽어 주기 중 · 모션 줄이기면 하지 않는다. 오래 기다림(longIdle → 졸림)은 hugi.js가 25초 무입력에 이미 처리한다 */
+  function hgCan() { return !!window.HUGI && !BUSY && !RM && !document.querySelector('.ans.speaking'); }
+  function hgEvent(k) { try { if (hgCan()) hg(k); } catch (e) {} }
+  var nudgeT = null, ERRED = false;
+  function nudgeStop() { clearTimeout(nudgeT); nudgeT = null; }
+  function nudgeStart() { nudgeStop(); nudgeT = setTimeout(function () { nudgeT = null; hgEvent('nudge'); }, 45000); }   // 답이 끝나고 45초 무입력이면 한 번(대화가 멈춤 → 배고픔)
+  IN.addEventListener('input', nudgeStop);
+  try {   // 다시 찾아옴: 저장된 대화가 있거나 이 브라우저에 온 적이 있으면 첫 인사 뒤에 한 번
+    var back = !!SAVED.length; try { back = back || localStorage.getItem('hg-visited') === '1'; localStorage.setItem('hg-visited', '1'); } catch (e) {}
+    if (back) setTimeout(function () { hgEvent('revisit'); }, 5000);
+  } catch (e) {}
+  if ('IntersectionObserver' in window) {   // 프로젝트 구역에 처음 들어올 때 한 번(대화 중이면 건너뜀)
+    var pj = $('#projects');
+    if (pj) { var pjIo = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { pjIo.disconnect(); hgEvent('secProject'); } }); }, { threshold: .35 }); pjIo.observe(pj); }
+    // 질문창이 화면 밖이면 허기를 오른쪽 아래 구석으로, 첫 화면으로 돌아오면 다시 질문창 옆으로(2026-11-13 v9 세션, 사용자 "알아서 해")
+    var hgRoot = $('#hugi-root');
+    if (hgRoot) {
+      var askIo = new IntersectionObserver(function (es) {
+        var away = !es[es.length - 1].isIntersecting;
+        if (away === hgRoot.classList.contains('hg-float')) return;
+        hgRoot.classList.toggle('hg-float', away);
+        window.dispatchEvent(new Event('resize'));   // hugi.js가 새 크기(--hg-w)를 다시 읽는다
+        if (!RM && hgRoot.animate) hgRoot.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 280, easing: 'cubic-bezier(.2, 0, 0, 1)' });
+      });
+      askIo.observe($('#ask'));
+      [['#about', 'secResume'], ['#contact', 'wave']].forEach(function (x) {   // 소개 구역은 곰곰이 생각, 맨 아래 연락처는 손 흔들기(구석에서 가리킬 버튼이 없어서)
+        var el = $(x[0]); if (!el) return;
+        var o = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { o.disconnect(); hgEvent(x[1]); } }); }, { threshold: .35 });
+        o.observe(el);
+      });
+    }
+  }
+
   /* ── 클릭 위임 ─────────────────────────────────────── */
   document.addEventListener('click', function (e) {
     var sn = e.target.closest('.ans.speaking .sn');
@@ -3192,7 +3237,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       var box = mb.closest('.mailbox'), subj = box.querySelector('[data-mail-subj]').value, txt = box.querySelector('[data-mail-body]').value;
       var to = ($('#email') && $('#email').dataset.copy) || '';
       if (mb.hasAttribute('data-mail-open')) { location.href = 'mailto:' + to + '?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(txt); return; }
-      var ok = function () { mb.textContent = '복사했어요'; setTimeout(function () { mb.textContent = '복사하기'; }, 1600); };
+      var ok = function () { hgEvent('copyOk'); mb.textContent = '복사했어요'; setTimeout(function () { mb.textContent = '복사하기'; }, 1600); };
       try { navigator.clipboard.writeText('받는 사람: ' + to + '\n제목: ' + subj + '\n\n' + txt).then(ok, function () { box.querySelector('[data-mail-body]').select(); }); } catch (err) { box.querySelector('[data-mail-body]').select(); }
       return;
     }
@@ -3210,7 +3255,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     else if (t.id === 'fit-reset') { ORDER = P.map(function (p) { return p.id; }); renderWorks(); $('#fit').hidden = true; }
     else if (t.id === 'email') {
       var sub = $('#email-sub');
-      var done = function (ok) { sub.textContent = ok ? '복사했어요' : '주소를 길게 눌러 복사해 주세요'; setTimeout(function () { sub.textContent = '누르면 복사돼요'; }, 1600); };
+      var done = function (ok) { if (ok) hgEvent('copyOk'); sub.textContent = ok ? '복사했어요' : '주소를 길게 눌러 복사해 주세요'; setTimeout(function () { sub.textContent = '누르면 복사돼요'; }, 1600); };
       try { navigator.clipboard.writeText(t.dataset.copy).then(function () { done(true); }, function () { done(false); }); } catch (err) { done(false); }
     }
   });
