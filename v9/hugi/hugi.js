@@ -1,4 +1,4 @@
-/* 허기 모션 — HPP_공유/브랜딩/허기_모션/index.html(2026-11-13 01:36 판)을 hugi_port.py로 옮김. 직접 고치지 말고 원본을 고친 뒤 다시 돌린다. */
+/* 허기 모션 — HPP_공유/브랜딩/허기_모션/index.html(2026-11-13 01:59 판)을 hugi_port.py로 옮김. 직접 고치지 말고 원본을 고친 뒤 다시 돌린다. */
 (function(){
 const HG_BASE=(document.currentScript&&document.currentScript.src||'').replace(/[^/]*$/,'')||'hugi/';
 const MARKUP='<div id="hg-stage"><div id="hg-shadow"></div><div id="hg-hugi" role="img" aria-label="허기"><svg id="hg-rig" viewBox="0 0 760 700" aria-hidden="true"><defs><clipPath id="hg-cL"><circle cx="337" cy="357" r="50.8"/></clipPath><clipPath id="hg-cR"><circle cx="418" cy="357" r="50.6"/></clipPath><clipPath id="hg-cA"><circle cx="337" cy="357" r="50.8"/><circle cx="418" cy="357" r="50.6"/></clipPath></defs><g id="hg-sq"><g id="hg-lk"><g id="hg-ac"><g id="hg-br"><g id="hg-pg"><g id="hg-bodies"></g><g id="hg-eyes"><g id="hg-vec"><circle cx="337" cy="357" r="52.3" fill="#FF6A22"/><circle cx="418" cy="357" r="52.1" fill="#FF6A22"/><circle cx="337" cy="357" r="50.5" fill="#FDFDFD"/><circle cx="418" cy="357" r="50.3" fill="#FDFDFD"/><g clip-path="url(#hg-cA)"><circle id="hg-pL" r="20.8" fill="#0A0A0A"/><circle id="hg-pR" r="20.9" fill="#0A0A0A"/></g><g clip-path="url(#hg-cL)"><g id="hg-lidL"><rect id="hg-lrL" x="240" width="200" fill="#FF7631"/><line id="hg-llL" stroke="#1B1B1B" stroke-width="6" stroke-linecap="round"/></g></g><g clip-path="url(#hg-cR)"><g id="hg-lidR"><rect id="hg-lrR" x="320" width="200" fill="#FF7631"/><line id="hg-llR" stroke="#1B1B1B" stroke-width="6" stroke-linecap="round"/></g></g></g></g></g></g></g></g></g><g id="hg-fx"></g></svg><div id="hg-bubble" aria-hidden="true"></div></div></div>';
@@ -406,7 +406,7 @@ function pullStretch(dt){
     tgt=46*Math.tanh(d/(w*.3));                                      // 바깥 면이 늘어나는 길이(그림 단위). 탄탄한 떡처럼 조금 버티며 늘어남
     if(d>2){let ta=Math.atan2(dy,dx)*180/Math.PI,da=((ta-PS.ang+540)%360)-180;PS.ang+=da*(1-Math.exp(-dt*3.5));}   // 방향을 바꾸면 불룩한 곳이 몸 둘레를 따라 천천히 옮겨 감
   }
-  const W=34,Z=.72;PS.v+=(-W*W*(PS.a-tgt)-2*Z*W*PS.v)*dt;PS.a+=PS.v*dt;   // 단단한 용수철: 출렁임 없이 한 번 살짝 튕기고 바로 돌아옴
+  const W=34,Z=.72,n=Math.ceil(dt/SUB),h=dt/n;for(let i=0;i<n;i++){PS.v+=(-W*W*(PS.a-tgt)-2*Z*W*PS.v)*h;PS.a+=PS.v*h;}   // 단단한 용수철: 출렁임 없이 한 번 살짝 튕기고 바로 돌아옴(1/240초씩 나눠 계산해 프레임이 늦어도 튀지 않음)
   PS.a=Math.max(0,Math.min(52,PS.a));
   if(PS.a<.4&&!drag){if(PS.on){PCG.g.style.display='none';PS.on=false;}return;}
   const la=PS.ang-(gsap.getProperty(S,'rotation')||0),cx=GEO.c[0],cy=GEO.c[1];   // 몸이 기울어 있으면 몸 그림 기준 방향으로
@@ -416,6 +416,8 @@ function pullStretch(dt){
   PCG.strips.forEach(st=>{st.el.setAttribute('transform','translate(0 '+(-PS.a*st.gw).toFixed(2)+')');st.im.setAttribute('transform',back);});
   if(!PS.on){PCG.g.style.display='';PS.on=true;}
 }
+/* 용수철 계산 단위: 프레임 간격을 1/240초 이하로 잘게 나눠 계산. 처음 몇 초처럼 프레임이 늦게 와도(30fps 이하) 값이 커지며 몸이 깨지지 않게 */
+const SUB=1/240;
 let fpsN=0,fpsT=performance.now();
 gsap.ticker.add((time,dtms)=>{
   const dt=Math.min(.05,(dtms||16.7)/1000)*gsap.globalTimeline.timeScale();
@@ -453,7 +455,7 @@ function poke(){clicks++;clearTimeout(clickT);clickT=setTimeout(()=>clicks=0,130
 /* ================= 만지기: 끌기 · 던지기 ================= */
 function bounds(){const w=ST.clientWidth,hw=H.offsetWidth*.5+6;return{minX:-(w/2-hw),maxX:w/2-hw,minY:-(ST.clientHeight-FLOOR+H.offsetWidth*.05-H.offsetHeight*.85)};}
 const pos={x:0,y:0,tx:0,ty:0};
-H.addEventListener('pointerdown',e=>{if(phys.on)return;e.preventDefault();rest();gsap.killTweensOf(Object.values(LI));state='drag';H.setPointerCapture(e.pointerId);H.classList.add('drag');
+H.addEventListener('pointerdown',e=>{if(phys.on)return;e.preventDefault();rest();gsap.killTweensOf(Object.values(LI));gsap.killTweensOf(H);   // 공중(인사 · 점프 중)에서 잡아도 땅으로 내려가던 움직임과 손을 따라가는 움직임이 싸우지 않게state='drag';H.setPointerCapture(e.pointerId);H.classList.add('drag');
   pos.x=pos.tx=gsap.getProperty(H,'x');pos.y=pos.ty=gsap.getProperty(H,'y');
   drag={ox:e.clientX-pos.x,oy:e.clientY-pos.y,lx:e.clientX,ly:e.clientY,t:performance.now(),vx:0,vy:0,moved:0,sx:e.clientX,sy:e.clientY,on:false,rx:pos.x,ry:pos.y,stuck:pos.y>-2};});
 H.addEventListener('pointermove',e=>{if(!drag)return;const b=bounds();const now=performance.now(),dt=Math.max(8,now-drag.t);
@@ -483,8 +485,7 @@ function limbSpring(dt){
     const sgn=(k==='aR'||k==='lR')?-1:1;let drag=isArm?(vx*.0075+sgn*vy*.0042):(vx*.0085+sgn*vy*.0030);      // 몸이 움직이는 반대쪽으로 끌려감(도)
     drag=isArm?Math.max(-18,Math.min(18,drag)):Math.max(-30,Math.min(30,drag));
     const target=cmd+drag;
-    const acc=-W0*W0*(st.th-target)-2*Z*W0*st.w;
-    st.w+=acc*dt;st.th+=st.w*dt;
+    const n=Math.ceil(dt/SUB),h=dt/n;for(let i=0;i<n;i++){st.w+=(-W0*W0*(st.th-target)-2*Z*W0*st.w)*h;st.th+=st.w*h;}
     if(Math.abs(st.th-cmd)>40){st.th=cmd+Math.sign(st.th-cmd)*40;st.w*=.5;}
     const sp=Math.min(1,Math.abs(st.w)/320);
     const skc=isArm?9:4,sk=Math.max(-skc,Math.min(skc,(isArm?-1:1)*st.w*.022));
@@ -557,5 +558,10 @@ function START(){let seen=false;try{seen=sessionStorage.getItem('hg-hello')==='1
 window.__hugiRig={LO,LI,LS,LG,PG,S,PS,pose,gsap,placeLimb,go,M,showEye,get state(){return state;}};
 /* ================= 시작 ================= */
 gsap.set([S,LK,AC,BR,PG],{svgOrigin:FEET});gsap.set(EGR,{svgOrigin:'377 357'});
-Promise.all([...Object.values(BEL),...Object.values(PEL)].map(el=>new Promise(r=>{const i=new Image();i.onload=i.onerror=r;i.src=el.getAttribute('href');}))).then(()=>setTimeout(START,300));
+/* 시작 준비: 쓰는 그림을 모두 미리 풀어(decode) 두고, 눈 표정 12장과 늘리기 조각을 아주 옅게 3프레임 그려 둔 뒤 인사를 시작.
+   처음 표정이 바뀌거나 처음 잡아당길 때 그림을 그제야 풀면서 멈칫하던 것을 없앰 */
+function warm(){const pe=Object.values(PEL);pe.forEach(el=>gsap.set(el,{opacity:.01}));PCG.g.style.display='';
+  return new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{pe.forEach(el=>{if(el!==PEL[eyeNow])gsap.set(el,{opacity:0});});if(!PS.on)PCG.g.style.display='none';r();}))));}
+const PRE=[...new Set([...$('#hg-rig').querySelectorAll('image')].map(e=>e.getAttribute('href')))];
+Promise.all(PRE.map(src=>{const i=new Image();i.src=src;return(i.decode?i.decode():new Promise(r=>{i.onload=i.onerror=r;})).catch(()=>{});})).then(warm).then(()=>setTimeout(START,300));
 })();
