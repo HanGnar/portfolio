@@ -3117,7 +3117,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     hg('thinking');
     // 문장별 감정 말하기: {m}(첫 문장 감정) · 문장마다 오는 mood · 최종 답의 sentences[i].mood로 문장이 처음 나타나는 순간 박자를 바꾼다.
     // 큰 반응은 첫 문장과 문장 사이에서만, 한 답에 최대 2번. 문장 중간에는 아무것도 바꾸지 않는다(HUGI.speak는 값만 섞음)
-    var SM = { any: false, first: false, cur: null, seen: 0, reacts: 0, moods: [], sents: null };
+    var SM = { any: false, first: false, cur: null, seen: 0, reacts: 0, moods: [], sents: null, done: {}, fix: {}, lateUntil: 0 };
     clearTimeout(HG_IDLE_T);
     var smFirst = function (m) {
       if (SM.first || !m) return; SM.first = SM.any = true; SM.cur = m;
@@ -3126,7 +3126,22 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var smSentence = function (i, m) {
       try {
         if (!SM.first) { if (i === 0 && m) smFirst(m); return; }
-        if (m && m !== SM.cur) { SM.cur = m; var k = SM.reacts < 2 ? hgPick(m) : null; hgSpeak(m); if (k) { SM.reacts++; hgReact(k, m); } }
+        if (m && m !== SM.cur) { SM.cur = m; var k = SM.reacts < 2 && Date.now() > SM.lateUntil ? hgPick(m) : null; hgSpeak(m); if (k) { SM.reacts++; hgReact(k, m); } }   // 늦은 보정 반응이 막 나간 직후에는 덮어쓰지 않는다
+      } catch (e) {}
+    };
+    // 늦은 보정: 서버 mood가 스트리밍 중에는 글과 어긋날 수 있어(모른다고 말하는데 sure), 문장이 끝난 순간 글을 보고 oops · alert로 바로잡는다(문장마다 한 번)
+    var LATE_OOPS = /(자료에 (없|적혀 있지 않|담겨 있지 않)|아직 (못|모르|배우지)|못 배웠|알지 못|잘 모르|직접 (여쭤|물어))/, LATE_ALERT = /(도와드리기 어려워요|따르지 않|바꿀 수 없)/;
+    var smLate = function (j, text, mood) {
+      if (SM.done[j]) return; SM.done[j] = 1;
+      try {
+        var m2 = LATE_OOPS.test(text) && ['oops', 'sad', 'private', 'calm'].indexOf(mood) < 0 ? 'oops'
+          : LATE_ALERT.test(text) && ['alert', 'angry', 'calm'].indexOf(mood) < 0 ? 'alert' : null;
+        if (!m2) return;
+        SM.fix[j] = m2; SM.moods[j] = m2; SM.cur = m2;
+        var busy = Date.now() - HG_REACT_AT < 1000;   // 반응이 막 시작된 직후(1초 안)면 말하기만 바꾸고 반응은 건너뜀. 더 오래 재생 중인 앞 문장의 반응은 새 맥락(모름 · 거절)의 반응으로 바꾼다
+        var k = SM.reacts < 2 && !busy ? hgPick(m2) : null;
+        hgSpeak(m2);
+        if (k) { SM.reacts++; SM.lateUntil = Date.now() + 1500; hgReact(k, m2); }
       } catch (e) {}
     };
     opt = Object.assign({}, opt || {}, { onMood: function (m) { smFirst(m); } });
@@ -3137,6 +3152,9 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
         if (list) for (var i = SM.seen; i < list.length; i++) { var m = list[i] && list[i].mood; SM.moods[i] = m || SM.moods[i - 1] || SM.cur; smSentence(i, m); }
         if (list) SM.seen = Math.max(SM.seen, list.length);
         if (r) { SM.moods = r.moods.slice(); SM.sents = r.s; }
+        var texts = p ? p.map(function (x) { return String((x && x.text) || ''); }) : (r && r.s ? r.s.map(function (x) { return String(x[0] || '').replace(/\[\[[^\]]*\]\]/g, ''); }) : null);
+        if (texts) { for (var j = 0; j <= (r ? texts.length - 1 : texts.length - 2); j++) smLate(j, texts[j], SM.moods[j]); }   // 끝난 문장만(쓰는 중인 마지막 문장은 제외, 최종 답이면 전부)
+        if (r) Object.keys(SM.fix).forEach(function (j) { SM.moods[j] = SM.fix[j]; });
         var st = window.HUGI && window.HUGI.state;
         if (st === 'idle' || st === 'thinking') hgSpeak(SM.cur || 'calm');   // 글자가 나오는데 말하는 중이 아니면 말하기 시작(상태를 갈아끼우지 않음)
       } catch (e) {} }
@@ -3193,11 +3211,11 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     return k;
   }
   // 허기에게: 말하기(묶음 박자) · 반응(대표 동작을 한 번 하고 말하는 중이었으면 그 감정 박자로 이어짐). 질문창 옆 허기와 구슬 속 허기가 같이. 옛 hugi.js면 기존 상태 호출로
-  var HG_IDLE_T = null, HG_REACT_UNTIL = 0;
+  var HG_IDLE_T = null, HG_REACT_UNTIL = 0, HG_REACT_AT = 0;
   function hgEach(fn) { [window.HUGI, window.HUGI_ORB].forEach(function (h) { if (h) { try { fn(h); } catch (e) {} } }); }
   function hgSpeak(m) { hgEach(function (h) { if (h.speak) h.speak(m); else h.set('speaking'); }); }
   function hgReact(k, m) {
-    HG_REACT_UNTIL = Date.now() + 2800;   // 반응이 끝나는 대략의 시각(이전에 idle을 걸어 반응을 끊지 않게)
+    HG_REACT_AT = Date.now(); HG_REACT_UNTIL = HG_REACT_AT + 2800;   // 반응이 끝나는 대략의 시각(이전에 idle을 걸어 반응을 끊지 않게)
     hgEach(function (h) { if (h.react) h.react(k, m); else h.set(k); });
   }
   function hgSafeIdle(delay) {
