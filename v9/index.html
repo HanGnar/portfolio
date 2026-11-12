@@ -2395,9 +2395,11 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
             while ((i = buf.indexOf('\n\n')) > -1) {
               ev = buf.slice(0, i).replace(/^data:\s*/, ''); buf = buf.slice(i + 2);
               var o = null; try { o = JSON.parse(ev); } catch (e) {}
+              if (o && o.m) { try { if (opt.onMood) opt.onMood(o.m); } catch (e) {} continue; }
               if (o && o.p) { if (onPart) onPart(o.p); continue; }
               if (o && 'a' in o) {
                 clearTimeout(t);
+                try { if (o.a && o.a.mood && opt.onMood) opt.onMood(o.a.mood); } catch (e) {}
                 if (o.a && say) VOICE.pending = { rd: rd, dec: dec, buf: buf }; else rd.cancel();
                 return o.a;
               }
@@ -3050,7 +3052,9 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     A.innerHTML = '<div class="body"><span class="dots" aria-label="생각하는 중"><i></i><i></i><i></i></span></div>'; TH.appendChild(A);
     var body = A.firstChild; if (TH) TH.scrollTo({ top: TH.scrollHeight, behavior: RM ? 'auto' : 'smooth' });
     hg('thinking');
-    var paint = function (raw) { var h = parse(raw).html; if (h) hg('speaking'); body.innerHTML = h || '<span class="dots" aria-label="생각하는 중"><i></i><i></i><i></i></span>'; toBottom(); };
+    var moodGot = false, moodKey = null;
+    opt = Object.assign({}, opt || {}, { onMood: function (m) { if (moodGot) return; moodGot = true; try { moodKey = hgMood(m); } catch (e) {} } });
+    var paint = function (raw) { var h = parse(raw).html; if (h && !(moodKey && window.HUGI && window.HUGI.state === moodKey)) hg('speaking'); body.innerHTML = h || '<span class="dots" aria-label="생각하는 중"><i></i><i></i><i></i></span>'; toBottom(); };
     var done = function (raw) { var r = parse(raw); body.innerHTML = r.html; A._said = r.said; A.insertAdjacentHTML('beforeend', tail(r)); toBottom();
       if (VOICE.auto && VOICE.ok) speak(A, A.querySelector('[data-listen]')); };
     llm(q, paint, opt).then(function (raw) {
@@ -3058,7 +3062,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       TURNS.push({ role: 'user', content: q }, { role: 'assistant', content: raw });
       HIST.push({ q: shown || q, a: parse(raw).said.join(' ') }); if (HIST.length > 8) HIST.shift();
       SAVED.push({ q: q, shown: shown || '', raw: raw }); saveChat();
-      hgEnd(q, raw);
+      if (moodGot) { HG_END = null; try { if (!(moodKey && window.HUGI && window.HUGI.state === moodKey)) hg('idle'); } catch (e) {} } else hgEnd(q, raw);
       done(raw);
     }).catch(function (e) {
       var code = e && e.code;
@@ -3071,6 +3075,26 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   /* 허기 캐릭터 상태(hugi/hugi.js가 늦게 실렸으면 그냥 넘어감). 이름은 허기_모션/기능정의.md 2-1 */
   var HG_END = null;
   function hg(k) { if (window.HUGI) window.HUGI.set(k); }
+  // 답의 감정(mood, LLM이 첫 글자와 함께 보냄) → 허기 반응. 반응 키를 돌려주고, 반응 없이 말하는 중이면 null. sad · angry는 사용자가 9-2.8 금지를 풀어 쓰도록 정함
+  // [2026-11-13 사용자 "대화 맥락에 맞게 캐릭터 시트의 감정 여러 개가 나오게"] mood 하나에 맞는 감정 여러 개 중 하나를 고른다(HPP3 허기_모션의 감정 이름).
+  // 배고픔(hungry)은 허기_캐릭터_정의 9-2.8(배고픔 동작 안 함)이라 쓰지 않고, sure · think · calm은 표정 변화 없이 말하는 중.
+  var MOOD_HG = {
+    welcome: ['happy', 'flutter', 'wave'], excited: ['flutter', 'wow'], proud: ['proud'], moved: ['moved'],
+    shy: ['praised', 'shy'], play: ['wink', 'cheer'], oops: ['notknow', 'panic', 'nervous'], alert: ['doubt'],
+    bye: ['wave'], sad: ['sad'], angry: ['angry']
+  };
+  var HG_ONCE = { wink: 1, cheer: 1 }, HG_USED = {}, HG_RECENT = [], HG_MOOD_PREV = null;   // 윙크 · 신남은 한 대화에 한 번, 바로 앞 두 번에 쓴 감정은 다시 고르지 않음
+  function hgMood(m) {
+    var list = (MOOD_HG[m] || []).filter(function (k) { return HG_RECENT.indexOf(k) < 0 && !(HG_ONCE[k] && HG_USED[k]); });
+    if (m === 'sure' && (HG_MOOD_PREV === 'oops' || HG_MOOD_PREV === 'sad')) list = ['relieved'];   // 앞에서 모르거나 미안했는데 이번엔 자료로 답하면 안도
+    HG_MOOD_PREV = m;
+    var k = list.length ? list[Math.floor(Math.random() * list.length)] : null;
+    if (k) {
+      HG_RECENT.push(k); if (HG_RECENT.length > 2) HG_RECENT.shift(); HG_USED[k] = 1; hg(k);
+      if (k === 'sad' || k === 'angry') setTimeout(function () { if (window.HUGI && window.HUGI.state === k) hg('idle'); }, 2500);   // 9-2.8: 한 번 크게 보이고 곧 기본으로
+    } else hg('speaking');
+    return k;
+  }
   function hgEnd(q, raw) {
     if (!window.HUGI) return;
     var k = /AI 연결이 잠시 어려워요/.test(raw) ? 'error'

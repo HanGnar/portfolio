@@ -1,4 +1,4 @@
-/* 허기 모션 — HPP_공유/브랜딩/허기_모션/index.html(2026-11-13 00:42 판)을 hugi_port.py로 옮김. 직접 고치지 말고 원본을 고친 뒤 다시 돌린다. */
+/* 허기 모션 — HPP_공유/브랜딩/허기_모션/index.html(2026-11-13 01:31 판)을 hugi_port.py로 옮김. 직접 고치지 말고 원본을 고친 뒤 다시 돌린다. */
 (function(){
 const HG_BASE=(document.currentScript&&document.currentScript.src||'').replace(/[^/]*$/,'')||'hugi/';
 const MARKUP='<div id="hg-stage"><div id="hg-shadow"></div><div id="hg-hugi" role="img" aria-label="허기"><svg id="hg-rig" viewBox="0 0 760 700" aria-hidden="true"><defs><clipPath id="hg-cL"><circle cx="337" cy="357" r="50.8"/></clipPath><clipPath id="hg-cR"><circle cx="418" cy="357" r="50.6"/></clipPath><clipPath id="hg-cA"><circle cx="337" cy="357" r="50.8"/><circle cx="418" cy="357" r="50.6"/></clipPath></defs><g id="hg-sq"><g id="hg-lk"><g id="hg-ac"><g id="hg-br"><g id="hg-pg"><g id="hg-bodies"></g><g id="hg-eyes"><g id="hg-vec"><circle cx="337" cy="357" r="52.3" fill="#FF6A22"/><circle cx="418" cy="357" r="52.1" fill="#FF6A22"/><circle cx="337" cy="357" r="50.5" fill="#FDFDFD"/><circle cx="418" cy="357" r="50.3" fill="#FDFDFD"/><g clip-path="url(#hg-cA)"><circle id="hg-pL" r="20.8" fill="#0A0A0A"/><circle id="hg-pR" r="20.9" fill="#0A0A0A"/></g><g clip-path="url(#hg-cL)"><g id="hg-lidL"><rect id="hg-lrL" x="240" width="200" fill="#FF7631"/><line id="hg-llL" stroke="#1B1B1B" stroke-width="6" stroke-linecap="round"/></g></g><g clip-path="url(#hg-cR)"><g id="hg-lidR"><rect id="hg-lrR" x="320" width="200" fill="#FF7631"/><line id="hg-llR" stroke="#1B1B1B" stroke-width="6" stroke-linecap="round"/></g></g></g></g></g></g></g></g></g><g id="hg-fx"></g></svg><div id="hg-bubble" aria-hidden="true"></div></div></div>';
@@ -119,6 +119,19 @@ function zzz(x,y){const tl=gsap.timeline({repeat:-1});for(let i=0;i<3;i++){const
 function orbit(x,y){const g=mk('g',{},FXA),st=[];for(let i=0;i<3;i++){st.push(mk('path',{d:'M0,-1 Q.14,-.14 1,0 Q.14,.14 0,1 Q-.14,.14 -1,0 Q-.14,-.14 0,-1Z',fill:Y},g));}
   const o={t:0},place=()=>{st.forEach((p,i)=>{const a=o.t+i*2.094,z=Math.sin(a);p.setAttribute('transform','translate('+(x+Math.cos(a)*128).toFixed(1)+' '+(y+z*26).toFixed(1)+') rotate('+(o.t*60%360).toFixed(1)+') scale('+(27+z*8).toFixed(2)+')');p.setAttribute('opacity',(.7+z*.3).toFixed(2));});};
   place();gsap.fromTo(g,{scale:0,svgOrigin:x+' '+y},{scale:1,duration:.3,ease:'back.out(2)'});gsap.to(o,{t:Math.PI*2,duration:1.3,repeat:-1,ease:'none',onUpdate:place});g._o=o;}
+/* 2026-11-13 감정 추가용 효과 — 모두 머리 오른쪽 위(EMO) 근처에서 나옴 */
+/* 김(숨 내쉬기 · 흥): 동그라미 셋이 오른쪽 위로 퍼지며 사라짐 */
+function puff(x,y,col){for(let i=0;i<3;i++){const c=mk('circle',{r:19-i*4,fill:col||'#C4B2A1'},FXA);gsap.set(c,{x:x+i*14,y:y-i*10,scale:0,opacity:.95,svgOrigin:'0 0'});
+  gsap.timeline({delay:i*.07,onComplete:()=>c.remove()}).to(c,{scale:1,duration:.18,ease:'back.out(2)'}).to(c,{x:x+34+i*24,y:y-28-i*16,scale:1.7,opacity:0,duration:.65,ease:'power1.out'});}}
+/* 두근거리는 하트: 제자리에서 두 번씩 쿵쿵 뛰고 사라짐(칭찬받음의 떠오르는 하트와 다름) */
+function heartBeat(x,y,s,n){const p=mk('path',{d:'M0,.35 C-.5,0 -.56,-.46 -.26,-.5 C-.09,-.53 0,-.41 0,-.3 C0,-.41 .09,-.53 .26,-.5 C.56,-.46 .5,0 0,.35Z',fill:'#FF7FA3'},FXA);gsap.set(p,{x,y,scale:0,svgOrigin:'0 0'});
+  const tl=gsap.timeline({onComplete:()=>p.remove()});tl.to(p,{scale:s,duration:.25,ease:'back.out(2.4)'});
+  for(let i=0;i<n;i++)tl.to(p,{scale:s*1.25,duration:.08,ease:'power2.out'}).to(p,{scale:s,duration:.12,ease:'power2.in'}).to(p,{scale:s*1.16,duration:.08,ease:'power2.out'}).to(p,{scale:s,duration:.26,ease:'power2.in'});
+  tl.to(p,{scale:0,opacity:0,duration:.25,ease:'power2.in'},'+=.1');}
+/* 꼬르륵: 짧은 물결선 두 줄이 부르르 떨다 사라짐 */
+function rumble(x,y){for(let i=0;i<2;i++){const p=mk('path',{d:'M0,0 q8,-10 16,0 t16,0 t16,0',fill:'none',stroke:GRAY,'stroke-width':8,'stroke-linecap':'round','stroke-linejoin':'round'},FXA);
+  gsap.set(p,{x:x+i*12,y:y+i*28,scale:0,svgOrigin:'0 0'});
+  gsap.timeline({delay:i*.12,onComplete:()=>p.remove()}).to(p,{scale:1.15,duration:.16,ease:'back.out(2)'}).to(p,{x:'+=6',duration:.05,yoyo:true,repeat:7,ease:'sine.inOut'}).to(p,{opacity:0,duration:.25});}}
 
 /* ================= 프레임 기반 움직임 도구 =================
    모든 움직임은 60fps 기준 프레임 번호로 키프레임을 적습니다. 예) [7,{...},'power2.out'] = 7번째 프레임까지 이 값으로. */
@@ -247,6 +260,53 @@ const M={
  dizzy:{g:'emo',l:'어지러움',sit:'빙글빙글 돌려졌을 때 · 연타',mo:'몸이 크게 기울어 흔들리고, 팔이 따로따로 휘청이며 발이 어긋나게 비틀거리고, 눈동자가 빙글빙글 돌며 별 세 개가 머리 위를 돕니다.',ui:'연타 장난 반응',
   run(){const tl=T({onComplete:toIdle});face('base','vec');gazeMode='orbit';orbit(381,146);shake(tl,S,'rotation',0,12,10,13,.9);arms(tl,flapFr(10,13,30,20),0,'L');arms(tl,flapFr(9,15,26,18),2,'R');
    const wf=[];for(let i=0;i<9;i++)wf.push([(i+1)*14,{sp:i%2?14:-10,y:i%2?-4:0},'sine.inOut']);wf.push([140,{sp:0}]);legs(tl,wf,0);tl.to({},{duration:1},2.3);}},
+ /* ---- 2026-11-13 추가 감정 8개 ---- */
+ moved:{g:'emo',l:'감동',sit:'진심이 담긴 칭찬 · 응원을 들었을 때',mo:'눈이 반짝이며 그렁그렁해지고, 팔을 몸 쪽으로 모은 채 몸이 천천히 부풀며 떨리다가 눈물 두 방울이 떨어집니다. 마지막엔 눈웃음을 짓습니다.',ui:'긴 칭찬 · 응원 메시지 뒤',
+  run(){const tl=T({onComplete:toIdle});face('rest','sparkle');
+   kf(tl,S,[[40,SQ(1.05),'sine.out'],[150,SQ(1.05),'none'],[175,SQ(1),'sine.inOut']]);shake(tl,S,'rotation',40,2.2,10,10,.95);
+   arms(tl,[[20,-24,'power2.out'],[150,-24,'none'],[175,0,'sine.inOut']],0);legs(tl,[[20,{sp:-6,sy:.97}],[150,{sp:-6,sy:.97},'none'],[175,{sp:0,sy:1}]],0);
+   later(()=>sweat(556,248),900);later(()=>sweat(572,260),1700);tl.call(()=>eyes('happy'),null,150/60);tl.to({},{duration:.5},175/60);}},
+ proud:{g:'emo',l:'뿌듯함',sit:'일을 잘 끝냈을 때 · 성과를 소개할 때',mo:'가슴을 펴듯 몸이 위로 쭉 늘어나며 살짝 젖혀지고, 눈웃음을 지으며 팔을 양옆으로 벌려 버티고, 고개를 두 번 끄덕입니다. 짧은 노란 강조선이 납니다.',ui:'프로젝트 결과 소개 · 완료 화면',
+  run(){const tl=T({onComplete:toIdle});face('out','happy');burstR({r2:62});
+   kf(tl,S,[[14,Object.assign({rotation:-4},SQ(1.09)),'back.out(1.6)'],[84,Object.assign({rotation:-4},SQ(1.09)),'none'],[100,Object.assign({rotation:0},SQ(1)),'sine.inOut']]);
+   kf(tl,BR,[[8,{y:7},'sine.out'],[16,{y:0},'sine.in'],[24,{y:7},'sine.out'],[32,{y:0},'sine.in']],34);
+   arms(tl,[[14,8,'back.out(2)'],[84,8,'none'],[100,0]],0);legs(tl,[[14,{sp:8,sy:1.06},'back.out(1.6)'],[84,{sp:8,sy:1.06},'none'],[100,{sp:0,sy:1}]],0);
+   tl.call(()=>pose('base',.4),null,90/60);tl.to({},{duration:.3},100/60);}},
+ hungry:{g:'emo',l:'배고픔',sit:'허기가 드러날 때 · 더 알고 싶은 게 생겼을 때',mo:'배가 꼬르륵하듯 몸이 쪼그라들며 부르르 떨리고, 팔이 배 쪽으로 처지고 눈이 반쯤 감깁니다. 잠시 뒤 무언가를 찾은 듯 눈이 반짝 커지며 몸을 펴고 한 번 뜁니다.',ui:'질문을 기다릴 때 · 더 보기 유도',
+  run(){const tl=T({onComplete:toIdle});face('rest','vec',{lid:.35});look(0,.7);
+   kf(tl,S,[[18,SQ(.9),'power2.out'],[26,SQ(.93),'sine.inOut'],[34,SQ(.89),'sine.inOut'],[44,SQ(.92),'sine.inOut'],[80,SQ(.9),'sine.inOut'],[88,SQ(1.06),'back.out(2)']]);
+   shake(tl,LK,'x',18,5,8,3,.85);tl.call(()=>rumble(560,246),null,18/60);shake(tl,LK,'x',56,4,6,3,.85);tl.call(()=>rumble(566,240),null,56/60);
+   arms(tl,[[18,-20,'power2.out'],[82,-22,'none'],[90,0,'power2.out']],0);legs(tl,[[18,{sp:-5,sy:.95}],[82,{sp:-5,sy:.95},'none'],[90,{sp:0,sy:1}]],0);
+   tl.call(()=>{face('up','wow');lookMouse();star4(586,206,30);},null,84/60);const e=hop(tl,92,46,0,{arms:.6});tl.call(()=>pose('base',.5),null,e/60);tl.to({},{duration:.3},e/60);}},
+ flutter:{g:'emo',l:'설렘',sit:'기다리던 질문 · 좋아하는 이야기가 나올 때',mo:'눈웃음을 지으며 몸을 좌우로 박자 있게 흔들고, 발뒤꿈치를 번갈아 들며 통통 들썩입니다. 머리 옆에 분홍 하트가 두근두근 뜁니다.',ui:'관심 주제 질문 · 다시 찾아온 방문자',
+  run(){const tl=T({onComplete:toIdle});face('base','happy');later(()=>heartBeat(588,214,58,3),150);
+   for(let i=0;i<4;i++){kf(tl,S,[[12,Object.assign({rotation:i%2?-6:6},SQ(1.04)),'sine.out'],[24,Object.assign({rotation:0},SQ(.98)),'sine.in']],i*24);
+    kf(tl,H,[[12,{y:-10},'sine.out'],[24,{y:0},'sine.in']],i*24);legs(tl,[[12,{y:-8,sy:1.08},'sine.out'],[24,{y:0,sy:1},'sine.in']],i*24,i%2?'R':'L');}
+   arms(tl,flapFr(8,12,10,8),0);kf(tl,S,[[6,SQ(1)]],96);tl.to({},{duration:.4},104/60);}},
+ nervous:{g:'emo',l:'긴장',sit:'중요한 질문 · 평가받는 느낌이 들 때',mo:'눈동자가 작아지며 좌우를 힐끗거리고, 팔을 몸에 붙이고 무릎을 모은 채 다리가 달달 떨립니다. 머리 옆으로 땀이 한 방울 흐릅니다.',ui:'면접형 질문 · 어려운 질문 직후',
+  run(){const tl=T({onComplete:toIdle});face('rest','vec',{pr:.62});look(-.8,0);
+   tl.call(()=>look(.8,0),null,.45).call(()=>look(-.8,0),null,.9).call(()=>look(0,.2),null,1.4);later(()=>sweat(560,236),700);
+   kf(tl,S,[[12,SQ(.95),'power2.out'],[110,SQ(.95),'none'],[124,SQ(1),'sine.inOut']]);shake(tl,LK,'x',0,2.5,28,4,.99);
+   arms(tl,[[12,-16,'power2.out'],[110,-16,'none'],[124,0]],0);
+   const lf=[];for(let i=0;i<14;i++)lf.push([8+i*7,{sp:i%2?-9:-5,y:i%2?-2:0},'sine.inOut']);lf.push([124,{sp:0,y:0}]);legs(tl,lf,0);
+   tl.call(()=>gsap.to(E,{pr:1,duration:.2}),null,112/60);tl.to({},{duration:.3},124/60);}},
+ panic:{g:'emo',l:'당황',sit:'실수했거나 예상 못 한 일에 허둥댈 때',mo:'눈이 휘둥그레지며 양팔을 번갈아 마구 휘젓고, 제자리에서 발을 동동 구르며 몸이 좌우로 흔들립니다. 땀방울이 연달아 튑니다.',ui:'잘못 연결된 링크 · 실수 사과 직전',
+  run(){const tl=T({onComplete:toIdle});face('up','surprised',{pd:.15});
+   arms(tl,flapFr(12,6,34,10),0,'L');arms(tl,flapFr(12,6,34,10),3,'R');shake(tl,S,'rotation',0,6,12,7,.93);
+   for(let i=0;i<10;i++)legs(tl,[[4,{y:-18},'power2.out'],[8,{y:0},'power2.in']],i*8,i%2?'R':'L');
+   [0,320,640].forEach((ms,i)=>later(()=>sweat(552+i*12,230+i*8),ms));tl.call(()=>pose('base',.4),null,84/60);tl.to({},{duration:.4},90/60);}},
+ sulky:{g:'emo',l:'삐짐',sit:'놀림을 받았거나 장난이 길어질 때',mo:'흥 하고 김을 내뿜으며 몸을 한쪽으로 기울이고, 눈을 반쯤 감고 딴 데를 봅니다. 팔은 아래로 붙이고 발끝으로 바닥을 톡톡 칩니다. 한 번 힐끗 돌아봤다가 다시 고개를 돌립니다.',ui:'연타 뒤 · 장난 반응',
+  run(){const tl=T({onComplete:toIdle});face('rest','vec',{lid:.45});look(-.95,-.1);puff(556,250);
+   kf(tl,S,[[14,{rotation:-6},'back.out(1.6)'],[150,{rotation:-6},'none'],[166,{rotation:0},'sine.inOut']]);
+   arms(tl,[[10,-14,'power2.out'],[150,-14,'none'],[166,0]],0);
+   for(let i=0;i<5;i++)legs(tl,[[6,{y:-10,sp:-4},'power2.out'],[11,{y:0,sp:0},'power2.in']],20+i*18,'R');
+   tl.call(()=>look(.7,0),null,100/60).call(()=>{look(-.95,-.1);puff(556,250);},null,124/60);tl.to({},{duration:.3},166/60);}},
+ relieved:{g:'emo',l:'안도',sit:'걱정하던 일이 잘 풀렸을 때',mo:'눈을 꼭 감고 숨을 크게 들이마시듯 몸이 부풀었다가, 후 하고 내쉬며 몸과 팔다리가 축 늘어지고 김이 퍼집니다. 그리고 눈웃음을 짓습니다.',ui:'오류가 풀린 뒤 · 다시 연결됐을 때',
+  run(){const tl=T({onComplete:toIdle});face('base','closed');
+   kf(tl,S,[[40,SQ(1.1),'sine.inOut'],[52,SQ(1.1),'none'],[80,SQ(.88),'power2.out'],[110,SQ(.92),'sine.inOut'],[130,SQ(1),'sine.inOut']]);
+   arms(tl,[[40,24,'sine.inOut'],[52,24,'none'],[80,-26,'power2.out'],[110,-20,'sine.inOut'],[130,0,'sine.inOut']],0);
+   legs(tl,[[40,{sy:1.06}],[52,{sy:1.06},'none'],[80,{sp:10,sy:.92},'power2.out'],[130,{sp:0,sy:1},'sine.inOut']],0);
+   tl.call(()=>puff(556,248),null,54/60).call(()=>eyes('happy'),null,96/60);tl.to({},{duration:.5},130/60);}},
 
  walkR:{g:'act',l:'오른쪽으로 걷기',sit:'버튼 · 안내 위치로 이동할 때',mo:'눈은 가는 쪽을 보며 발을 번갈아 내딛고, 팔을 흔들며 통통 튀어 이동합니다.',ui:'연락하기 같은 버튼 근처로 이동',
   run(){const tl=T({onComplete:toIdle});face('base','vec');look(.9,.2);let b=0;for(let i=0;i<3;i++)b=hop(tl,b,26,48,{step:i%2?'R':'L',arms:.5})-18;tl.to({},{duration:.5},(b+20)/60);}},
@@ -470,7 +530,7 @@ window.HUGI={
 if('IntersectionObserver' in window){new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)gsap.ticker.wake();else gsap.ticker.sleep();});}).observe(ST);}
 function START(){let seen=false;try{seen=sessionStorage.getItem('hg-hello')==='1';sessionStorage.setItem('hg-hello','1');}catch(e){}
   if(seen||RM)go('idle',1);else go('hello');}
-window.__hugiRig={LO,LI,LS,LG,PG,S,PS,pose,gsap,placeLimb};
+window.__hugiRig={LO,LI,LS,LG,PG,S,PS,pose,gsap,placeLimb,go,M,showEye,get state(){return state;}};
 /* ================= 시작 ================= */
 gsap.set([S,LK,AC,BR,PG],{svgOrigin:FEET});gsap.set(EGR,{svgOrigin:'377 357'});
 Promise.all([...Object.values(BEL),...Object.values(PEL)].map(el=>new Promise(r=>{const i=new Image();i.onload=i.onerror=r;i.src=el.getAttribute('href');}))).then(()=>setTimeout(START,300));
