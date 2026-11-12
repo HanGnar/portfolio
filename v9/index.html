@@ -3138,7 +3138,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       } catch (e) {}
     };
     // 늦은 보정: 서버 mood가 스트리밍 중에는 글과 어긋날 수 있어(모른다고 말하는데 sure), 문장이 끝난 순간 글을 보고 oops · alert로 바로잡는다(문장마다 한 번)
-    var LATE_OOPS = /(자료에 (없|적혀 있지 않|담겨 있지 않)|아직 (못|모르|배우지)|못 배웠|알지 못|잘 모르|직접 (여쭤|물어))/, LATE_ALERT = /(도와드리기 어려워요|따르지 않|바꿀 수 없)/;
+    var LATE_OOPS = /(자료에 (없|적혀 있지 않|담겨 있지 않)|아직 (못|모르|배우지|잘 몰)|못 배웠|알지 못|잘 (모르|몰라)|(몰라요|모르겠|모릅니|몰라서)|직접 (여쭤|물어))/, LATE_ALERT = /(도와드리기 어려워요|따르지 않|바꿀 수 없)/;
     var lateKind = function (text, mood) {
       return LATE_OOPS.test(text) && ['oops', 'sad', 'private', 'calm'].indexOf(mood) < 0 ? 'oops'
         : LATE_ALERT.test(text) && ['alert', 'angry', 'calm'].indexOf(mood) < 0 ? 'alert' : null;
@@ -3250,7 +3250,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     if (!window.HUGI) return;
     var k = /AI 연결이 잠시 어려워요|답이 안 와서 잠깐 끊겼어요/.test(raw) ? 'error'
       : /(고마|감사|대단|최고|멋지|멋있|잘하시|잘하네|귀엽|귀여|훌륭)/.test(q) ? 'praised'
-      : /(아직 (못|모르)|잘 모르|알지 못|자료에 없|직접 (여쭤|들으|물어))/.test(parse(raw).said.join(' ')) ? 'notknow' : 'idle';
+      : /(아직 (못|모르)|잘 (모르|몰라)|몰라요|모르겠|알지 못|자료에 없|직접 (여쭤|들으|물어))/.test(parse(raw).said.join(' ')) ? 'notknow' : 'idle';
     HG_END = k === 'praised' || k === 'notknow' ? k : null;   // 소리로 읽는 중이면 다 읽은 뒤에 반응
     hg(k);
   }
