@@ -2641,8 +2641,10 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
 
   // LLM이 없을 때만 쓰는 미리 쓴 답
   function presetText(q) {
-    var p = matchPreset(q);
-    if (!p) return '지금은 AI 연결이 잠시 어려워요. 한정민에게 직접 물어보시면 정확하게 답을 들으실 수 있어요.[[contact]]\n@contact';
+    // [2026-11-13 "질문에 맞는 답변을 안 할 때가 많다"] 낱말 하나만 겹쳐도 미리 써 둔 답을 내보내서(예: "손흥민 누구야" → '누구' → 한정민 소개) 엉뚱한 답이 됐다.
+    // 이제 미리 써 둔 답은 추천 질문을 그대로 눌렀을 때만 쓰고, 아니면 다시 물어봐 달라고 솔직하게 말한다.
+    var p = matchPreset(q); if (p && norm(p.q) !== norm(q)) p = null;
+    if (!p) return '답이 안 와서 잠깐 끊겼어요. 지금 질문이 몰린 것 같아요. 같은 질문을 한 번 더 보내 주세요.';
     var t = p.s.map(function (x) { return x[0] + x[1].map(function (c) { return '[[' + c + ']]'; }).join(''); }).join(' ');
     if (p.act) t += '\n@' + p.act[0] + ' ' + p.act[1];
     if (p.ask) t += '\n@ask-team';
@@ -3123,22 +3125,31 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       if (SM.first || !m) return; SM.first = SM.any = true; SM.cur = m;
       try { var k = hgPick(m); hgSpeak(m); if (k) { SM.reacts++; hgReact(k, m); } } catch (e) {}   // 말하기를 먼저 걸어야 반응이 끝난 뒤 그 박자로 이어진다
     };
-    var smSentence = function (i, m) {
+    var smSentence = function (i, m, text) {
       try {
+        if (SM.fix[i]) m = SM.fix[i];   // 늦은 보정이 이미 고친 문장은 고친 감정으로
         if (!SM.first) { if (i === 0 && m) smFirst(m); return; }
-        if (m && m !== SM.cur) { SM.cur = m; var k = SM.reacts < 2 && Date.now() > SM.lateUntil ? hgPick(m) : null; hgSpeak(m); if (k) { SM.reacts++; hgReact(k, m); } }   // 늦은 보정 반응이 막 나간 직후에는 덮어쓰지 않는다
+        if (m && m !== SM.cur) {
+          SM.cur = m;
+          var own = !!lateKind(text || '', m);   // 이 문장 글이 모름 · 거절 패턴이면 곧 보정된다 → 설렘 같은 큰 반응을 먼저 걸지 않고 박자만 바꾼다
+          var k = SM.reacts < 2 && Date.now() > SM.lateUntil && !own ? hgPick(m) : null;   // 늦은 보정 반응이 막 나간 직후에도 덮어쓰지 않는다
+          hgSpeak(m); if (k) { SM.reacts++; hgReact(k, m); }
+        }
       } catch (e) {}
     };
     // 늦은 보정: 서버 mood가 스트리밍 중에는 글과 어긋날 수 있어(모른다고 말하는데 sure), 문장이 끝난 순간 글을 보고 oops · alert로 바로잡는다(문장마다 한 번)
     var LATE_OOPS = /(자료에 (없|적혀 있지 않|담겨 있지 않)|아직 (못|모르|배우지)|못 배웠|알지 못|잘 모르|직접 (여쭤|물어))/, LATE_ALERT = /(도와드리기 어려워요|따르지 않|바꿀 수 없)/;
+    var lateKind = function (text, mood) {
+      return LATE_OOPS.test(text) && ['oops', 'sad', 'private', 'calm'].indexOf(mood) < 0 ? 'oops'
+        : LATE_ALERT.test(text) && ['alert', 'angry', 'calm'].indexOf(mood) < 0 ? 'alert' : null;
+    };
     var smLate = function (j, text, mood) {
       if (SM.done[j]) return; SM.done[j] = 1;
       try {
-        var m2 = LATE_OOPS.test(text) && ['oops', 'sad', 'private', 'calm'].indexOf(mood) < 0 ? 'oops'
-          : LATE_ALERT.test(text) && ['alert', 'angry', 'calm'].indexOf(mood) < 0 ? 'alert' : null;
+        var m2 = lateKind(text, mood);
         if (!m2) return;
         SM.fix[j] = m2; SM.moods[j] = m2; SM.cur = m2;
-        var busy = Date.now() - HG_REACT_AT < 1000;   // 반응이 막 시작된 직후(1초 안)면 말하기만 바꾸고 반응은 건너뜀. 더 오래 재생 중인 앞 문장의 반응은 새 맥락(모름 · 거절)의 반응으로 바꾼다
+        var busy = /^(notknow|doubt|refuse|angry|sad)$/.test(HG_REACT_KEY) && Date.now() - HG_REACT_AT < 1500;   // 모름 · 거절 계열 반응이 막 나간 직후면 말하기만(앞 문장의 칭찬 같은 반응은 새 맥락의 반응으로 바꾼다)
         var k = SM.reacts < 2 && !busy ? hgPick(m2) : null;
         hgSpeak(m2);
         if (k) { SM.reacts++; SM.lateUntil = Date.now() + 1500; hgReact(k, m2); }
@@ -3148,12 +3159,14 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var paint = function (raw, p, r) {
       var h = parse(raw).html;
       if (h) { try {
-        var list = p || (r && r.moods ? r.moods.map(function (x) { return { mood: x }; }) : null), prev = SM.cur;
-        if (list) for (var i = SM.seen; i < list.length; i++) { var m = list[i] && list[i].mood; SM.moods[i] = m || SM.moods[i - 1] || SM.cur; smSentence(i, m); }
-        if (list) SM.seen = Math.max(SM.seen, list.length);
+        var list = p || (r && r.moods ? r.moods.map(function (x) { return { mood: x }; }) : null);
         if (r) { SM.moods = r.moods.slice(); SM.sents = r.s; }
         var texts = p ? p.map(function (x) { return String((x && x.text) || ''); }) : (r && r.s ? r.s.map(function (x) { return String(x[0] || '').replace(/\[\[[^\]]*\]\]/g, ''); }) : null);
+        // 순서: ① 새 문장들의 mood를 채운다 ② 끝난 문장의 늦은 보정(모름 · 거절 반응)을 먼저 ③ 새 문장 자신의 처리(박자 · 반응)
+        if (list) for (var i = SM.seen; i < list.length; i++) { var m = list[i] && list[i].mood; if (!r) SM.moods[i] = m || SM.moods[i - 1] || SM.cur; }
         if (texts) { for (var j = 0; j <= (r ? texts.length - 1 : texts.length - 2); j++) smLate(j, texts[j], SM.moods[j]); }   // 끝난 문장만(쓰는 중인 마지막 문장은 제외, 최종 답이면 전부)
+        if (list) for (var i2 = SM.seen; i2 < list.length; i2++) smSentence(i2, list[i2] && list[i2].mood, texts && texts[i2]);
+        if (list) SM.seen = Math.max(SM.seen, list.length);
         if (r) Object.keys(SM.fix).forEach(function (j) { SM.moods[j] = SM.fix[j]; });
         var st = window.HUGI && window.HUGI.state;
         if (st === 'idle' || st === 'thinking') hgSpeak(SM.cur || 'calm');   // 글자가 나오는데 말하는 중이 아니면 말하기 시작(상태를 갈아끼우지 않음)
@@ -3168,7 +3181,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       if (!real && AI_ENDPOINT) ERRED = true;   // 서버가 두 번 다 못 답해 미리 쓴 답으로 갈 때도 "오류 뒤 첫 성공"의 시작으로 본다
       if (!raw) raw = presetText(q);
       TURNS.push({ role: 'user', content: q }, { role: 'assistant', content: raw });
-      HIST.push({ q: shown || q, a: parse(raw).said.join(' ') }); if (HIST.length > 8) HIST.shift();
+      if (real) { HIST.push({ q: shown || q, a: parse(raw).said.join(' ') }); if (HIST.length > 8) HIST.shift(); }   // 못 받은 답(미리 쓴 답 · 끊김 안내)은 대화 기록에 넣지 않는다: 다음 답이 그쪽으로 끌려가지 않게
       SAVED.push({ q: q, shown: shown || '', raw: raw }); saveChat();
       if (SM.any) { HG_END = null; hgSafeIdle(1000); } else hgEnd(q, raw);   // 마무리: 1초 뒤 기본으로(반응이 재생 중이면 끝난 뒤)
       try { if (ERRED && real) { ERRED = false; if (!SM.any && !HG_END) hg('reconnect'); } } catch (e) {}   // 오류 뒤 첫 성공 답: 다시 연결됨(안도)
@@ -3211,11 +3224,11 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     return k;
   }
   // 허기에게: 말하기(묶음 박자) · 반응(대표 동작을 한 번 하고 말하는 중이었으면 그 감정 박자로 이어짐). 질문창 옆 허기와 구슬 속 허기가 같이. 옛 hugi.js면 기존 상태 호출로
-  var HG_IDLE_T = null, HG_REACT_UNTIL = 0, HG_REACT_AT = 0;
+  var HG_IDLE_T = null, HG_REACT_UNTIL = 0, HG_REACT_AT = 0, HG_REACT_KEY = '';
   function hgEach(fn) { [window.HUGI, window.HUGI_ORB].forEach(function (h) { if (h) { try { fn(h); } catch (e) {} } }); }
   function hgSpeak(m) { hgEach(function (h) { if (h.speak) h.speak(m); else h.set('speaking'); }); }
   function hgReact(k, m) {
-    HG_REACT_AT = Date.now(); HG_REACT_UNTIL = HG_REACT_AT + 2800;   // 반응이 끝나는 대략의 시각(이전에 idle을 걸어 반응을 끊지 않게)
+    HG_REACT_AT = Date.now(); HG_REACT_KEY = k; HG_REACT_UNTIL = HG_REACT_AT + 2800;   // 반응이 끝나는 대략의 시각(이전에 idle을 걸어 반응을 끊지 않게)
     hgEach(function (h) { if (h.react) h.react(k, m); else h.set(k); });
   }
   function hgSafeIdle(delay) {
@@ -3235,7 +3248,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   }
   function hgEnd(q, raw) {
     if (!window.HUGI) return;
-    var k = /AI 연결이 잠시 어려워요/.test(raw) ? 'error'
+    var k = /AI 연결이 잠시 어려워요|답이 안 와서 잠깐 끊겼어요/.test(raw) ? 'error'
       : /(고마|감사|대단|최고|멋지|멋있|잘하시|잘하네|귀엽|귀여|훌륭)/.test(q) ? 'praised'
       : /(아직 (못|모르)|잘 모르|알지 못|자료에 없|직접 (여쭤|들으|물어))/.test(parse(raw).said.join(' ')) ? 'notknow' : 'idle';
     HG_END = k === 'praised' || k === 'notknow' ? k : null;   // 소리로 읽는 중이면 다 읽은 뒤에 반응
