@@ -1,15 +1,71 @@
-/* 허기 모션 — HPP_공유/브랜딩/허기_모션/index.html(2026-11-13 01:59 판)을 hugi_port.py로 옮김. 직접 고치지 말고 원본을 고친 뒤 다시 돌린다. */
+/* 허기 모션 — HPP_공유/브랜딩/허기_모션/index.html(2026-11-13 02:54 판)을 hugi_port.py로 옮김. 직접 고치지 말고 원본을 고친 뒤 다시 돌린다.
+   한 페이지에 허기를 여러 개 띄울 수 있다:
+     window.HUGI_MAKE(rootEl, opts) → { set(k), typing(), state, fit() }
+       opts.prefix  복사본 안 id 앞머리(기본 'hg' → #hg-stage · #hg-hugi · #hg-shadow · #hg-rig · #hg-bubble · clipPath #hg-cL… #hg-pc0~29)
+       opts.hello   false면 첫인사 없이 바로 대기(idle). 기본 true(탭마다 한 번, sessionStorage 'hg-hello')
+       opts.bubble  false면 말풍선을 만들지 않고 말하기를 하지 않음. 기본 true
+       fit()        rootEl의 CSS 변수 --hg-w를 다시 읽어 크기를 맞춤(창 크기가 바뀌면 저절로 함)
+     공통 class: .hugi-stage · .hugi-shadow · .hugi-char · .hugi-svg · .hugi-bubble
+   불러오면 저절로 만든다: #hugi-root → window.HUGI(prefix 'hg') · #hugi-orb → window.HUGI_ORB(prefix 'ho', 첫인사 · 말풍선 없음).
+   gsap.ticker는 페이지에 하나라, 보이는 허기가 하나도 없을 때만 쉰다. GSAP 다음에 <script defer>로 싣는다. */
 (function(){
 const HG_BASE=(document.currentScript&&document.currentScript.src||'').replace(/[^/]*$/,'')||'hugi/';
-const MARKUP='<div id="hg-stage"><div id="hg-shadow"></div><div id="hg-hugi" role="img" aria-label="허기"><svg id="hg-rig" viewBox="0 0 760 700" aria-hidden="true"><defs><clipPath id="hg-cL"><circle cx="337" cy="357" r="50.8"/></clipPath><clipPath id="hg-cR"><circle cx="418" cy="357" r="50.6"/></clipPath><clipPath id="hg-cA"><circle cx="337" cy="357" r="50.8"/><circle cx="418" cy="357" r="50.6"/></clipPath></defs><g id="hg-sq"><g id="hg-lk"><g id="hg-ac"><g id="hg-br"><g id="hg-pg"><g id="hg-bodies"></g><g id="hg-eyes"><g id="hg-vec"><circle cx="337" cy="357" r="52.3" fill="#FF6A22"/><circle cx="418" cy="357" r="52.1" fill="#FF6A22"/><circle cx="337" cy="357" r="50.5" fill="#FDFDFD"/><circle cx="418" cy="357" r="50.3" fill="#FDFDFD"/><g clip-path="url(#hg-cA)"><circle id="hg-pL" r="20.8" fill="#0A0A0A"/><circle id="hg-pR" r="20.9" fill="#0A0A0A"/></g><g clip-path="url(#hg-cL)"><g id="hg-lidL"><rect id="hg-lrL" x="240" width="200" fill="#FF7631"/><line id="hg-llL" stroke="#1B1B1B" stroke-width="6" stroke-linecap="round"/></g></g><g clip-path="url(#hg-cR)"><g id="hg-lidR"><rect id="hg-lrR" x="320" width="200" fill="#FF7631"/><line id="hg-llR" stroke="#1B1B1B" stroke-width="6" stroke-linecap="round"/></g></g></g></g></g></g></g></g></g><g id="hg-fx"></g></svg><div id="hg-bubble" aria-hidden="true"></div></div></div>';
-const ROOT=document.getElementById('hugi-root');if(!ROOT||!window.gsap)return;ROOT.innerHTML=MARKUP;const $=s=>ROOT.querySelector(s);const FLOOR=0;
+const M_HEAD='<div id="hg-stage" class="hugi-stage"><div id="hg-shadow" class="hugi-shadow"></div><div id="hg-hugi" class="hugi-char" role="img" aria-label="허기"><svg id="hg-rig" class="hugi-svg" viewBox="0 0 760 700" aria-hidden="true"><defs><clipPath id="hg-cL"><circle cx="337" cy="357" r="50.8"/></clipPath><clipPath id="hg-cR"><circle cx="418" cy="357" r="50.6"/></clipPath><clipPath id="hg-cA"><circle cx="337" cy="357" r="50.8"/><circle cx="418" cy="357" r="50.6"/></clipPath></defs><g id="hg-sq"><g id="hg-lk"><g id="hg-ac"><g id="hg-br"><g id="hg-pg"><g id="hg-bodies"></g><g id="hg-eyes"><g id="hg-vec"><circle cx="337" cy="357" r="52.3" fill="#FF6A22"/><circle cx="418" cy="357" r="52.1" fill="#FF6A22"/><circle cx="337" cy="357" r="50.5" fill="#FDFDFD"/><circle cx="418" cy="357" r="50.3" fill="#FDFDFD"/><g clip-path="url(#hg-cA)"><circle id="hg-pL" r="20.8" fill="#0A0A0A"/><circle id="hg-pR" r="20.9" fill="#0A0A0A"/></g><g clip-path="url(#hg-cL)"><g id="hg-lidL"><rect id="hg-lrL" x="240" width="200" fill="#FF7631"/><line id="hg-llL" stroke="#1B1B1B" stroke-width="6" stroke-linecap="round"/></g></g><g clip-path="url(#hg-cR)"><g id="hg-lidR"><rect id="hg-lrR" x="320" width="200" fill="#FF7631"/><line id="hg-llR" stroke="#1B1B1B" stroke-width="6" stroke-linecap="round"/></g></g></g></g></g></g></g></g></g><g id="hg-fx"></g></svg>',M_BUB='<div id="hg-bubble" class="hugi-bubble" aria-hidden="true"></div>',M_TAIL='</div></div>';
+function MK(P,bub){return (M_HEAD+(bub?M_BUB:'')+M_TAIL).replace(/(id="|url\(#)hg-/g,'$1'+P+'-');}
+const VIS=new Set();   // 지금 화면에 보이는 허기 무대들(모든 복사본이 함께 씀)
+let gsapSet=false;
+function HUGI_MAKE(ROOT,opts){
+if(!ROOT||!window.gsap)return null;
+opts=opts||{};const P=opts.prefix||'hg',HELLO=opts.hello!==false,BUBBLE=opts.bubble!==false;
+if(!gsapSet){gsapSet=true;gsap.defaults({overwrite:'auto'});gsap.ticker.lagSmoothing(0);}   // 프레임이 밀려도 동작 속도를 억지로 줄이지 않음
+ROOT.innerHTML=MK(P,BUBBLE);const $=s=>ROOT.querySelector(s.replace(/#([\w-]+)/g,'#'+P+'-$1'));const FLOOR=0;
 const NS='http://www.w3.org/2000/svg';
-const H=$('#hg-hugi'),S=$('#hg-sq'),LK=$('#hg-lk'),AC=$('#hg-ac'),EGR=$('#hg-eyes'),BR=$('#hg-br'),PG=$('#hg-pg'),FX=$('#hg-fx'),SH=$('#hg-shadow'),ST=$('#hg-stage'),BUB=$('#hg-bubble'),CTA=document.createElement('i'),INFO=null;
+const H=$('#hugi'),S=$('#sq'),LK=$('#lk'),AC=$('#ac'),EGR=$('#eyes'),BR=$('#br'),PG=$('#pg'),FX=$('#fx'),SH=$('#shadow'),ST=$('#stage'),BUB=$('#bubble'),CTA=document.createElement('i'),INFO=null;
 const RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
 const Y='#FFC21A',BEIGE='#E3CDB5',BLUE='#7FD0F5',GRAY='#B8A292';
 const FEET='380 665';                      // 몸이 눌리고 늘어나는 기준점(발 바닥)
-gsap.defaults({overwrite:'auto'});
-gsap.ticker.lagSmoothing(0);               // 프레임이 밀려도 동작 속도를 억지로 줄이지 않음
+
+/* ================= 말하는 박자 값 표 (2026-11-13, 처음 값은 임의 초안) =================
+   말하는 중의 움직임은 이 표의 숫자만 바꿔서 고칩니다. 한 줄 = 한 묶음.
+   beat  박자: 한 번 들썩이는 데 걸리는 프레임(1/60초) [가장 빠름, 가장 느림]. 작을수록 빠름
+   up    뜸: 들썩일 때 몸이 위로 늘어나는 정도(1.06 = 6%). base와 곱해서 1.10을 넘지 않음
+   base  몸높이: 말하는 동안 몸의 기본 높이(1 = 그대로, .93 = 7% 웅크림). .85 아래로 내려가지 않음
+   arm   팔: 박자마다 팔을 드는 각도 범위 [최소, 최대](도) · armB 팔기준: 팔의 기본 각도(음수 = 처짐)
+   rot   흔들: 박자마다 좌우로 기우는 정도(도, 무작위) · side 좌우: 박자마다 번갈아 기우는 정도(도)
+   rest  쉼: 박자 사이에 멈추는 프레임(끊어 말하기) · nod 끄덕: 박자마다 작게 끄덕일 확률(0~1)
+   wave  소리 물결: [크기, 진하기, 몇 박마다 한 번] · col 물결 색
+   eyes  눈: 번갈아 쓰는 눈 표정 · look 시선: [좌우, 위아래](-1~1, null이면 마우스를 따라봄) · lid 눈꺼풀(0~1, 정면 눈일 때)
+   dy    내려앉기: 몸이 아래로 내려앉는 정도(그림 단위) · pose 자세: 팔다리 기본 자세
+   (감정별 줄에만 쓰는 칸, 없으면 0)
+   rot0  계속 기운 각도(도, 의심의 갸웃) · armR 오른팔만 더 드는 각도(도) · hop 박자마다 뛰는 높이(px) · shake 박자마다 몸이 떨리는 폭
+   stomp 1이면 박자마다 발을 번갈아 구름 · fidget 1이면 발끝을 번갈아 비빔 · droop 몇 박에 한 번 꾸벅이다 깨는지
+   fx    가끔 나오는 효과(tear 눈물 · burst 빨간 강조선 · heart 하트 · z · star 별 · sweat 땀) · fxN 몇 박마다 한 번 */
+const SPEAK={
+ bright:{l:'밝음',    beat:[6,9],   up:1.06,  base:1,   arm:[14,36], armB:4,   rot:3,   side:0,   rest:0, nod:0,   wave:[1.1,1,1],  col:'#FFC21A', eyes:['happy','vec'], look:null,      lid:0,   dy:0, pose:'base'},
+ calm:  {l:'차분',    beat:[10,14], up:1.025, base:1,   arm:[2,8],   armB:0,   rot:1.2, side:0,   rest:0, nod:.3,  wave:[.8,.75,2], col:'#FFC21A', eyes:['vec'],          look:null,      lid:0,   dy:0, pose:'base'},
+ sunk:  {l:'가라앉음', beat:[13,17], up:1.015, base:.93, arm:[0,4],   armB:-18, rot:1,   side:0,   rest:0, nod:.15, wave:[.7,.4,3],  col:'#E8C77A', eyes:['vec'],          look:[0,.75],   lid:.3,  dy:6, pose:'rest'},
+ firm:  {l:'단호',    beat:[5,6],   up:1.03,  base:.97, arm:[3,9],   armB:-6,  rot:0,   side:0,   rest:6, nod:.5,  wave:[.85,.9,2], col:'#FFB01A', eyes:['vec'],          look:[0,.1],    lid:.18, dy:3, pose:'base'},
+ shy:   {l:'수줍음',   beat:[9,12],  up:1.02,  base:.95, arm:[0,6],   armB:-14, rot:0,   side:2.5, rest:0, nod:0,   wave:[.7,.7,2],  col:'#FFB3C4', eyes:['shy','vec'],    look:[-.6,.45], lid:0,   dy:2, pose:'rest'},
+ /* 감정별 말하기 8개(2026-11-13 사용자 "슬픔, 화남, 부끄러움, 졸림처럼 더 다양한 감정의 말하는 모션") */
+ sob:      {l:'슬픔',    beat:[15,19], up:1.012, base:.9,  arm:[0,3],   armB:-26, rot:.8,  side:0,   rest:4, nod:0,   wave:[.6,.35,4], col:'#9CC7E8', eyes:['sad'],          look:[0,.8],    lid:0,   dy:9, pose:'rest', fx:'tear', fxN:4},
+ mad:      {l:'화남',    beat:[5,6],   up:1.035, base:.96, arm:[0,5],   armB:-10, rot:0,   side:0,   rest:3, nod:.2,  wave:[.9,1,1],   col:'#FF6A3D', eyes:['angry'],        look:[0,0],     lid:0,   dy:2, pose:'rest', stomp:1, shake:2.5, fx:'burst', fxN:5},
+ blush:    {l:'부끄러움', beat:[10,13], up:1.018, base:.94, arm:[0,4],   armB:-20, rot:0,   side:3.5, rest:0, nod:0,   wave:[.65,.6,3], col:'#FF9DB5', eyes:['shy'],          look:[-.5,.5],  lid:0,   dy:3, pose:'rest', fidget:1, fx:'heart', fxN:6},
+ drowsy:   {l:'졸림',    beat:[18,24], up:1.01,  base:.95, arm:[0,3],   armB:-16, rot:.5,  side:0,   rest:6, nod:0,   wave:[.55,.35,4],col:'#9FA8C9', eyes:['vec'],          look:[0,.5],    lid:.5,  dy:4, pose:'rest', droop:5, fx:'z', fxN:5},
+ hype:     {l:'신남',    beat:[5,7],   up:1.07,  base:1,   arm:[24,44], armB:6,   rot:3.5, side:0,   rest:0, nod:0,   wave:[1.2,1,1],  col:'#FFC21A', eyes:['sparkle','happy'],look:null,    lid:0,   dy:0, pose:'up',   hop:9, fx:'star', fxN:3},
+ flustered:{l:'당황',    beat:[4,6],   up:1.03,  base:.98, arm:[10,40], armB:8,   rot:3,   side:0,   rest:0, nod:0,   wave:[.8,.8,2],  col:'#7FD0F5', eyes:['surprised','vec'],look:null,   lid:0,   dy:0, pose:'base', shake:1.5, fx:'sweat', fxN:4},
+ skeptic:  {l:'의심',    beat:[11,15], up:1.02,  base:1,   arm:[0,4],   armB:0,   rot:.8,  side:0,   rest:2, nod:.15, wave:[.75,.7,2], col:'#FFC21A', eyes:['doubt'],        look:[-.4,-.6], lid:0,   dy:0, pose:'base', rot0:-5, armR:30},
+ touched:  {l:'감동',    beat:[11,14], up:1.03,  base:1.02,arm:[0,5],   armB:-22, rot:0,   side:0,   rest:0, nod:0,   wave:[.8,.8,2],  col:'#FFD66B', eyes:['sparkle','happy'],look:[0,-.3], lid:0,   dy:0, pose:'rest', shake:.8, fx:'tear', fxN:6}
+};
+/* 어느 감정 · 상태 · mood가 어느 묶음으로 말하는지. 짝 상태(answerDone 등)는 짝 감정을 따라감. 표에 없으면 차분 */
+const SPEAK_OF={
+ happy:'bright',flutter:'bright',proud:'bright',wow:'bright',wink:'bright',hungry:'bright',cheer:'hype',   // 감정 18개
+ nervous:'calm',relieved:'calm',dizzy:'calm',doubt:'skeptic',sleepy:'drowsy',
+ sad:'sob',panic:'flustered',angry:'mad',shy:'blush',moved:'touched',sulky:'shy',
+ hello:'bright',wave:'bright',praised:'shy',notknow:'sunk',error:'sunk',surprise:'calm',                     // AI 상태 · 행동
+ welcome:'bright',excited:'hype',play:'bright',bye:'bright',sure:'calm',think:'calm',calm:'calm',unsure:'skeptic',oops:'sunk',alert:'firm',private:'blush'   // v9 mood(LLM이 고르는 값)
+};
+
+
 
 /* ================= 그림 ================= */
 /* 팔다리 = 원본 시트의 동그란 혹 4개. 몸 둘레를 따라 미끄러지며 움직이고(몸 중심 기준 회전 + 가장자리 거리 보정), 늘 몸 가장자리에 반쯤 묻혀 있음 */
@@ -22,11 +78,11 @@ const BEL={},PEL={},LO={},LI={},LS={};
 /* 팔다리는 몸 뒤에 붙어 있는 4개의 조각. 바깥 그룹(LO)은 자세, 안쪽 그룹(LI)은 움직임을 맡아 서로 더해집니다 */
 /* 몸 뒤 받침: 팔다리와 몸이 만나는 자리 뒤에 몸 색을 깔아 팔다리가 움직여도 틈이 비치지 않게 */
 const LG={};
-Object.keys(NUB).forEach(k=>{const d=NUB[k],g=document.createElementNS(NS,'g');const e=img(HG_BASE+''+d.f,d.x,d.y,d.w,d.h);e.style.opacity=1;g.appendChild(e);$('#hg-bodies').appendChild(g);LG[k]=g;BEL[k]=e;
+Object.keys(NUB).forEach(k=>{const d=NUB[k],g=document.createElementNS(NS,'g');const e=img(HG_BASE+''+d.f,d.x,d.y,d.w,d.h);e.style.opacity=1;g.appendChild(e);$('#bodies').appendChild(g);LG[k]=g;BEL[k]=e;
   LO[k]={rotation:0};LI[k]={rotation:0,x:0,y:0,scaleX:1,scaleY:1};LS[k]={rotation:0,scaleY:1,skewX:0};});
-{const e=img(HG_BASE+'body_core.png',0,0,760,700);e.style.opacity=1;$('#hg-bodies').appendChild(e);BEL.body=e;}
-PATCH.forEach(k=>{const e=img(HG_BASE+'eye_'+k+'.png',FACE.x,FACE.y,FACE.w,FACE.h);$('#hg-eyes').appendChild(e);PEL[k]=e;});
-const VEC=$('#hg-vec');VEC.style.opacity=1;
+{const e=img(HG_BASE+'body_core.png',0,0,760,700);e.style.opacity=1;$('#bodies').appendChild(e);BEL.body=e;}
+PATCH.forEach(k=>{const e=img(HG_BASE+'eye_'+k+'.png',FACE.x,FACE.y,FACE.w,FACE.h);$('#eyes').appendChild(e);PEL[k]=e;});
+const VEC=$('#vec');VEC.style.opacity=1;
 let poseNow='base',eyeNow='vec';
 /* 표정 · 자세가 바뀔 때 몸이 먼저 살짝 반응해서, 그림이 바뀌는 순간을 움직임 뒤로 가려 줍니다 */
 function accent(amt){amt=amt||1;gsap.timeline({overwrite:false}).to(AC,{scaleY:1-.045*amt,scaleX:1+.02*amt,duration:5/60,ease:'power2.out',svgOrigin:FEET,overwrite:'auto'}).to(AC,{scaleY:1,scaleX:1,duration:22/60,ease:SPR,svgOrigin:FEET,overwrite:false});}
@@ -54,18 +110,18 @@ const EC={L:[337,357],R:[418,357],pL:[340.4,356.7],pR:[415.3,356.7]};
 const tg={x:0,y:0};let gazeMode='mouse',sacc={x:0,y:0},orbitT=0,mx=null,my=null,lastMove=0;
 function look(x,y){gazeMode='fixed';tg.x=x;tg.y=y;}
 function lookMouse(){gazeMode='mouse';}
-const pLe=$('#hg-pL'),pRe=$('#hg-pR');
+const pLe=$('#pL'),pRe=$('#pR');
 function renderEyes(){
   const gx=E.gx*31,gy=E.gy*29;
   pLe.setAttribute('cx',EC.pL[0]+gx);pLe.setAttribute('cy',EC.pL[1]+gy);pLe.setAttribute('r',20.8*E.pr);
   pRe.setAttribute('cx',EC.pR[0]+gx);pRe.setAttribute('cy',EC.pR[1]+gy);pRe.setAttribute('r',20.9*E.pr);
   [['L',EC.L,1],['R',EC.R,-1]].forEach(([k,c,sg])=>{
     const bottom=c[1]-53+E.lid*(106+6);           // 눈꺼풀 아래 선
-    const rect=$('#hg-lr'+k),line=$('#hg-ll'+k);
+    const rect=$('#lr'+k),line=$('#ll'+k);
     rect.setAttribute('y',c[1]-160);rect.setAttribute('height',Math.max(0,bottom-(c[1]-160)));
     const ly=Math.min(bottom,c[1]+44);line.setAttribute('x1',c[0]-60);line.setAttribute('x2',c[0]+60);line.setAttribute('y1',ly);line.setAttribute('y2',ly);
     line.style.opacity=Math.min(1,E.lid*8);
-    $('#hg-lid'+k).setAttribute('transform','rotate('+(sg*E.tilt)+' '+c[0]+' '+c[1]+')');
+    $('#lid'+k).setAttribute('transform','rotate('+(sg*E.tilt)+' '+c[0]+' '+c[1]+')');
   });
 }
 function blink(){if(RM||E.lid>.05||eyeNow!=='vec'||!/^(idle|listening|speaking|thinking|poke)$/.test(state))return;
@@ -77,12 +133,12 @@ window.addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY;lastMove=per
 
 /* ================= 효과(시트와 같은 색의 단순한 선) ================= */
 function mk(tag,at,parent){const e=document.createElementNS(NS,tag);for(const k in at)e.setAttribute(k,at[k]);(parent||FX).appendChild(e);return e;}
-const FXB=document.createElementNS(NS,'g');FXB.id='hg-fxb';S.parentNode.insertBefore(FXB,S);
+const FXB=document.createElementNS(NS,'g');FXB.id=P+'-fxb';S.parentNode.insertBefore(FXB,S);
 /* 잡아 늘리기 층: 몸 전체(팔다리 포함)를 감싸, 잡고 당기는 방향으로 늘림 */
-const PL=document.createElementNS(NS,'g');PL.id='hg-pl';S.parentNode.insertBefore(PL,S);PL.appendChild(S);
+const PL=document.createElementNS(NS,'g');PL.id=P+'-pl';S.parentNode.insertBefore(PL,S);PL.appendChild(S);
 /* 머리 쪽 효과(강조선 · 물음표 · 별 · 땀 · 점 · 로딩 · z)는 모두 머리 오른쪽 위 한 점(EMO, 몸 별 무늬 쪽)에서 나오고,
    이 층이 매 프레임 그 점을 따라가 몸이 눌리거나 기울어도 머리에 붙어 있음 */
-const EMO=[539,253];const FXA=document.createElementNS(NS,'g');FXA.id='hg-fxa';FX.parentNode.insertBefore(FXA,FX.nextSibling);
+const EMO=[539,253];const FXA=document.createElementNS(NS,'g');FXA.id=P+'-fxa';FX.parentNode.insertBefore(FXA,FX.nextSibling);
 function followFx(){const sx=gsap.getProperty(S,'scaleX')||1,sy=gsap.getProperty(S,'scaleY')||1,rot=(gsap.getProperty(S,'rotation')||0)*Math.PI/180,py=gsap.getProperty(PG,'y')||0;
   const lx=(EMO[0]-380)*sx,ly=-(665-(EMO[1]+py))*sy,ax=380+lx*Math.cos(rot)-ly*Math.sin(rot),ay=665+lx*Math.sin(rot)+ly*Math.cos(rot);
   FXA.setAttribute('transform','translate('+(ax-EMO[0]).toFixed(2)+' '+(ay-EMO[1]).toFixed(2)+')');}
@@ -105,8 +161,8 @@ function dots(x,y,k){k=k||1;for(let i=0;i<3;i++){const c=mk('circle',{r:10,fill:
    듣는 중 = 머리 쪽으로 들어오는 하늘색 물결 / 말하는 중 = 바깥으로 퍼지는 노란 물결 / 생각 중 = 점 세 개 / 불러오는 중 = 도는 점
    모르는 질문 = 물음표 / 칭찬 = 하트 / 오류 = 빨간 경고 배지 / 놀람 · 인사 = 강조선 */
 function arcD(r){const a0=-80*Math.PI/180,a1=-10*Math.PI/180,cx=EMO[0],cy=EMO[1];return 'M'+(cx+r*Math.cos(a0)).toFixed(1)+','+(cy+r*Math.sin(a0)).toFixed(1)+' A'+r+','+r+' 0 0 1 '+(cx+r*Math.cos(a1)).toFixed(1)+','+(cy+r*Math.sin(a1)).toFixed(1);}
-function wavePulse(dir,col){const rs=dir>0?[30,50,70]:[70,50,30];rs.forEach((r,i)=>{const a=mk('path',{d:arcD(r),fill:'none',stroke:col,'stroke-width':10,'stroke-linecap':'round',opacity:0},FXA);
-  gsap.timeline({delay:i*.09,onComplete:()=>a.remove()}).to(a,{opacity:1,duration:.12,ease:'sine.out'}).to(a,{opacity:0,duration:.3,ease:'sine.in'},'+=.06');});}
+function wavePulse(dir,col,k,op){k=k||1;op=op==null?1:op;const rs=dir>0?[30,50,70]:[70,50,30];rs.forEach((r,i)=>{const a=mk('path',{d:arcD(r*k),fill:'none',stroke:col,'stroke-width':10*Math.min(1,k),'stroke-linecap':'round',opacity:0},FXA);
+  gsap.timeline({delay:i*.09,onComplete:()=>a.remove()}).to(a,{opacity:op,duration:.12,ease:'sine.out'}).to(a,{opacity:0,duration:.3,ease:'sine.in'},'+=.06');});}
 function listenWaves(){wavePulse(-1,BLUE);const t=setInterval(()=>{if(state!=='listening'){clearInterval(t);return;}wavePulse(-1,BLUE);},1300);timers.push(t);}
 function heart(x,y,s){const p=mk('path',{d:'M0,.35 C-.5,0 -.56,-.46 -.26,-.5 C-.09,-.53 0,-.41 0,-.3 C0,-.41 .09,-.53 .26,-.5 C.56,-.46 .5,0 0,.35Z',fill:'#FF7FA3'},FXA);gsap.set(p,{x,y,scale:0,svgOrigin:'0 0'});
   gsap.timeline({onComplete:()=>p.remove()}).to(p,{scale:s,duration:.3,ease:'back.out(2.4)'}).to(p,{y:y-34,duration:.9,ease:'sine.out'},'<').to(p,{opacity:0,scale:s*.8,duration:.3,ease:'power1.in'},'-=.25');}
@@ -182,9 +238,67 @@ function rest(keepBubble){
   clearFx();if(!keepBubble)say('');lookMouse();
 }
 const T=v=>{main=gsap.timeline(Object.assign({delay:.06},v||{}));return main;};
-function say(t){if(!t){BUB.classList.remove('on');return;}BUB.textContent=t;BUB.classList.add('on');}
-function typeSay(t,ms){let i=0;BUB.classList.add('on');BUB.textContent='';const it=setInterval(()=>{i++;BUB.textContent=t.slice(0,i);if(i>=t.length)clearInterval(it);},ms||34);timers.push(it);}
+function say(t){if(!BUB)return;if(!t){BUB.classList.remove('on');return;}BUB.textContent=t;BUB.classList.add('on');}
+function typeSay(t,ms){if(!BUB)return;let i=0;BUB.classList.add('on');BUB.textContent='';const it=setInterval(()=>{i++;BUB.textContent=t.slice(0,i);if(i>=t.length)clearInterval(it);},ms||34);timers.push(it);}
 const toIdle=()=>go('idle',1);
+
+/* ================= 말하는 박자 엔진 (값은 맨 위 SPEAK 표) =================
+   박자마다 표의 값을 읽어 한 번씩 들썩임. 말하는 중에 묶음이 바뀌면 처음부터 다시 하지 않고 값만 0.35초에 걸쳐 섞음.
+   감정 대표 동작(react)은 동작이 실제로 끝나는 순간 그 감정의 묶음 박자로 바로 이어짐(대기로 떨어지지 않음) */
+let speakG='calm',speakReq=null,reactTo=null,spkN=0;
+const SC={};                                                       // 지금 쓰는 값(섞이는 동안의 중간값)
+function spkVals(g){const t=SPEAK[g];return{b0:t.beat[0],b1:t.beat[1],up:t.up,base:t.base,a0:t.arm[0],a1:t.arm[1],armB:t.armB,rot:t.rot,side:t.side,rest:t.rest,nod:t.nod,wk:t.wave[0],wo:t.wave[1],we:t.wave[2],dy:t.dy,rot0:t.rot0||0,armR:t.armR||0,hop:t.hop||0,shake:t.shake||0};}
+function speakGroup(x){if(SPEAK[x])return x;if(SPEAK_OF[x])return SPEAK_OF[x];const m=M[x];return(m&&m.emo&&SPEAK_OF[m.emo])||'calm';}
+/* 감정 · 상태 이름으로 묶음 찾기(감정 이름이 먼저: 'shy'는 묶음 이름이기도 하지만 감정 부끄러움으로 읽음) */
+function emoGroup(k){const m=M[k];return SPEAK_OF[k]||(m&&m.emo&&SPEAK_OF[m.emo])||speakGroup(k);}
+function spkLook(g,d){const t=SPEAK[g];gsap.to(E,{lid:t.lid,pr:1,tilt:0,duration:d||.3,ease:'sine.inOut',overwrite:'auto'});if(t.look)look(t.look[0],t.look[1]);else lookMouse();if(!t.eyes.includes(eyeNow))eyes(t.eyes[0]);}
+function spkBlend(g,d){speakG=g;const v=spkVals(g);if(d&&!RM)gsap.to(SC,Object.assign({duration:d,ease:'sine.inOut',overwrite:true},v));else{gsap.killTweensOf(SC);Object.assign(SC,v);}
+  SC.col=SPEAK[g].col;pose(SPEAK[g].pose,d||.3);gsap.killTweensOf(PG,'y');spkLook(g,d);}   // 몸 내려앉기는 박자가 맡음(자세와 두 움직임이 겹쳐 툭 떨어지지 않게)
+let spkFirst=0;
+/* 가끔 나오는 효과(머리 오른쪽 위 한 점) */
+function spkFx(n){if(n==='tear'){sweat(556,248);gsap.fromTo(BR,{y:0},{y:4,duration:.05,yoyo:true,repeat:3,ease:'sine.inOut',overwrite:false});}   // 훌쩍
+  else if(n==='burst')burstR({n:2,col:'#FF4A1C',r1:20,r2:58,w:11});else if(n==='heart')heart(586,212,50);else if(n==='star')star4(588,204,22);else if(n==='sweat')sweat(562,232);
+  else if(n==='z'){const t=glyph('z',560,222,60,'#8C95B8');gsap.timeline({onComplete:()=>t.remove()}).to(t,{scale:1,x:604,y:168,duration:1.1,ease:'power1.out'}).to(t,{opacity:0,duration:.35},'-=.35');}}
+function spkTick(){if(state!=='speaking'||RM)return;const c=SC,t=SPEAK[speakG],R=(a,b)=>a+Math.random()*(b-a),d=R(c.b0,c.b1)/60*(spkFirst-->0?1.7:1),sd=(spkN++%2)?1:-1,F=Math.max(2,Math.round(d*60));
+  let rot=(Math.random()-.5)*2*c.rot+sd*c.side+c.rot0,dy=c.dy,ez=c.rest>0?'power3.out':'sine.out';
+  if(t.droop){const k=(spkN%t.droop)/(t.droop-1);rot+=7*k;dy+=7*k;gsap.to(E,{lid:.38+.47*k,duration:d*2,ease:'sine.inOut',overwrite:'auto'});if(k===0)ez='power3.out';}   // 졸림: 꾸벅 기울다가 퍼뜩 깸
+  main=gsap.timeline({onComplete:spkTick});
+  main.to(S,Object.assign({rotation:rot,duration:d,ease:ez,overwrite:false},SQ(Math.min(1.1,c.base*c.up))))
+      .to(S,Object.assign({duration:d,ease:'sine.in',overwrite:false},SQ(Math.max(.85,c.base*.985))));
+  if(c.rest>.5)main.to({},{duration:c.rest/60});                  // 단호: 박자 사이를 끊어 말함
+  if(t.stomp)legs(main,[[Math.round(F*.55),{y:-16,sp:sd*5},'power2.out'],[F,{y:0,sp:0},'power3.in']],0,sd>0?'L':'R');            // 화남: 발을 번갈아 쿵
+  else if(t.fidget)legs(main,[[F,{sp:sd*9},'sine.inOut'],[F*2,{sp:0},'sine.inOut']],0);                                            // 부끄러움: 발끝 비비기
+  else main.to([LI.lL,LI.lR],{scaleY:1+(c.up-1)*.7,duration:d,ease:'sine.out',overwrite:false},0).to([LI.lL,LI.lR],{scaleY:1,duration:d,ease:'sine.in',overwrite:false},d);
+  main.to(LI.aL,{rotation:c.armB+R(c.a0,c.a1),duration:d*2,ease:'sine.inOut',overwrite:false},0).to(LI.aR,{rotation:-(c.armB+c.armR+R(c.a0,c.a1)),duration:d*2,ease:'sine.inOut',overwrite:false},d*.5)
+      .to(PG,{y:dy,duration:d*2,ease:'sine.inOut',overwrite:false},0);
+  if(c.hop>.5){const h=c.hop*(H.offsetWidth||260)/260;main.to(H,{y:-h,duration:d,ease:'sine.out',overwrite:false},0).to(H,{y:0,duration:d,ease:'sine.in',overwrite:false},d);}   // 신남: 작게 통통
+  if(c.shake>.1)main.fromTo(LK,{x:-c.shake},{x:c.shake,duration:.04,repeat:5,yoyo:true,ease:'sine.inOut',overwrite:false},0).to(LK,{x:0,duration:.04,overwrite:false},.24);   // 떨림
+  if(t.fx&&spkN%t.fxN===0)spkFx(t.fx);
+  if(Math.random()<c.nod)gsap.fromTo(BR,{y:0},{y:5,duration:.08,yoyo:true,repeat:1,ease:'sine.inOut',overwrite:false});   // 작은 끄덕
+  if(spkN%Math.max(1,Math.round(c.we))===0)wavePulse(1,c.col,c.wk,c.wo);}
+function spkFlip(){if(state!=='speaking')return;const t=SPEAK[speakG];                   // 문장 중간에는 눈과 시선만 바꿈
+  if(t.eyes.length>1){const nx=eyeNow===t.eyes[0]?t.eyes[1]:t.eyes[0];eyes(nx);if(speakG==='shy'){if(nx==='vec')look(0,-.25);else look(t.look[0],t.look[1]);}}   // 수줍음: 눈을 피했다가 올려 봄
+  later(spkFlip,1800+Math.random()*1400);}
+function speakStart(g){state='speaking';spkFirst=1;spkBlend(g,0);   // 첫 박자는 천천히 들어가 앞 동작에서 튀지 않게
+ if(RM)return;spkTick();later(spkFlip,1600+Math.random()*1000);}
+/* 감정 대표 동작이 실제로 끝나는 시점: 뒤에 붙은 빈 기다림({} 트윈)은 빼고 계산 */
+function busyEnd(tl){let e=0;tl.getChildren(false,true,false).forEach(c=>{const t=c.targets?c.targets():[];const empty=t.length===1&&t[0]&&t[0].constructor===Object&&!Object.keys(t[0]).length;if(!empty)e=Math.max(e,c.endTime());});return e;}
+function fadeFx(d){const old=[FX,FXA,FXB].flatMap(g=>[...g.children]);if(old.length)gsap.to(old,{opacity:0,duration:d,overwrite:'auto',onComplete:()=>old.forEach(e=>{gsap.killTweensOf(e);if(e._o)gsap.killTweensOf(e._o);e.remove();})});}
+function spkResume(g){if(main){main.kill();main=null;}timers.forEach(t=>{clearTimeout(t);clearInterval(t)});timers=[];   // rest()처럼 제자리로 되돌리지 않고, 지금 자세에서 바로 박자로 넘어감
+  fadeFx(.3);gsap.to(LK,{x:0,duration:.2,overwrite:'auto'});const y=gsap.getProperty(H,'y');if(y<0&&!phys.on)gsap.to(H,{y:0,duration:Math.min(.3,Math.abs(y)/800+.12),ease:'power2.in'});
+  speakStart(g);}
+/* 말하기: 묶음 이름(bright · calm · sunk · firm · shy)이나 감정 · mood 이름. 말하는 중이면 값만 섞고, 아니면 그 묶음으로 말하기 시작 */
+function speak(x){const g=speakGroup(x);
+  if(drag||phys.on){speakReq=g;return;}
+  if(reactTo){reactTo.g=g;return;}                                  // 감정 대표 동작 중이면 끝난 뒤 이 묶음으로
+  if(state==='speaking'){if(g!==speakG){spkBlend(g,.35);showInfo('speaking');}return;}
+  speakReq=g;go('speaking');}
+/* 감정 반응: 감정 대표 동작을 한 번 → 말하는 중이었으면 끝나는 순간 그 감정의 묶음 박자로 이어짐(x로 묶음을 정할 수도 있음) */
+function react(k,x){if(!M[k]||drag||phys.on)return;const cont=state==='speaking'||!!reactTo,g=x?speakGroup(x):emoGroup(k);
+  go(k);if(!cont)return;
+  const tl=main,me=reactTo={k,g},end=()=>{if(reactTo!==me)return;reactTo=null;spkResume(me.g);};
+  const e=tl?busyEnd(tl):NaN;
+  if(tl&&isFinite(e)&&e<8){tl.eventCallback('onComplete',null);tl.call(end,null,Math.max(e*.6,e-.3));}else later(end,2400);}   // 동작 끝의 잦아드는 꼬리(약 0.3초)에 박자를 겹쳐 시작해 멈춘 순간이 없게
 
 /* ================= 동작 목록 ================= */
 const M={
@@ -204,12 +318,8 @@ const M={
   run(){face('think','vec');look(.45,-.9);dots(552,208);main=gsap.timeline({delay:.06});kf(main,S,[[16,{rotation:-3},'sine.out']]);main.to(S,{rotation:3,duration:1.1,yoyo:true,repeat:-1,ease:'sine.inOut',overwrite:false},16/60);
    main.to(LI.aR,{rotation:-14,duration:.28,yoyo:true,repeat:-1,ease:'sine.inOut',overwrite:false},.3).to(LI.lL,{rotation:7,y:-3,duration:.3,yoyo:true,repeat:-1,repeatDelay:.3,ease:'sine.inOut',overwrite:false},.4).to(LI.lR,{rotation:-7,y:-3,duration:.3,yoyo:true,repeat:-1,repeatDelay:.3,ease:'sine.inOut',overwrite:false},.7);
    later(()=>{clearFx();main&&main.kill();pose('rest',.4);gsap.to(Object.values(LI),{rotation:0,y:0,duration:.3,overwrite:true});gsap.to(S,Object.assign({rotation:0,duration:.35,ease:'power2.inOut'},SQ(.78)));face('rest','vec',{lid:.45});look(0,.5);dots(552,208,1.8);say('조금만 기다려 주세요…');},3500);}},
- speaking:{g:'ai',l:'말하는 중',sit:'대답 글자가 나오는 동안',mo:'입이 없어서 말하는 박자로 몸이 통통 뜨고, 말하듯 팔을 번갈아 들썩입니다. 눈은 가끔 깜빡이며 웃는 눈과 정면을 오가고, 말하는 박자에 맞춰 노란 소리 물결이 바깥으로 퍼집니다.',ui:'대답이 나오는 말풍선 · 대화창',
-  run(){face('base','happy');const R=(a,b)=>a+Math.random()*(b-a);const tick=()=>{if(state!=='speaking')return;const d=(7+Math.random()*6)/60;
-    main=gsap.timeline({onComplete:tick}).to(S,Object.assign({rotation:(Math.random()-.5)*3,duration:d,ease:'sine.out'},SQ(1.04))).to(S,Object.assign({duration:d,ease:'sine.in'},SQ(.985)));
-    main.to([LI.lL,LI.lR],{scaleY:1.03,duration:d,ease:'sine.out',overwrite:false},0).to([LI.lL,LI.lR],{scaleY:1,duration:d,ease:'sine.in',overwrite:false},d).to(LI.aL,{rotation:R(4,30),duration:d*2,ease:'sine.inOut',overwrite:false},0).to(LI.aR,{rotation:-R(4,30),duration:d*2,ease:'sine.inOut',overwrite:false},d*.5);
-    if((PS.tk=(PS.tk||0)+1)%2===1)wavePulse(1,Y);};tick();
-   const flip=()=>{if(state!=='speaking')return;eyes(eyeNow==='happy'?'vec':'happy');later(flip,2200+Math.random()*1400);};later(flip,2400);}},
+ speaking:{g:'ai',l:'말하는 중',sit:'대답 글자가 나오는 동안',mo:'입이 없어서 말하는 박자로 몸이 들썩이고 팔이 번갈아 움직이며, 머리 오른쪽 위에서 소리 물결이 퍼집니다. 박자는 감정에 따라 밝음 · 차분 · 가라앉음 · 단호 · 수줍음 5묶음 중 하나(기본 차분)이고, 값은 코드 맨 위 SPEAK 표에 있습니다.',ui:'대답이 나오는 말풍선 · 대화창',
+  run(){speakStart(speakReq||'calm');speakReq=null;}},
  notknow:{g:'ai',l:'모르는 질문',sit:'범위 밖이거나 근거가 없는 질문',mo:'고개를 갸웃하며 양팔을 들어 어깨를 으쓱하고 물음표를 띄운 뒤, 연락하기 버튼 쪽으로 걸어가 팔로 가리킵니다.',ui:'범위 밖 질문 응대 → 연락하기 안내',
   run(){const tl=T({onComplete:toIdle});face('base','vec');look(-.5,-.85);pop('?',592,212,108,1.4);
    kf(tl,S,[[12,{rotation:-7},'back.out(2)'],[70,{rotation:-7},'none'],[84,{rotation:0},'power2.inOut']]);
@@ -362,11 +472,13 @@ const M={
 /* 짝 상태의 동작 설명은 짝 감정 설명을 그대로 씀 */
 Object.keys(M).forEach(k=>{const m=M[k];if(m.emo&&!m.mo)m.mo=M[m.emo].l+' 감정 — '+M[m.emo].mo;});
 function PS_(sec,l,sit,emo,ui){return{g:'ai',sec,l,sit,emo,ui,run(){M[emo].run();}};}
+/* 이 감정 · 상태가 말할 때 쓰는 묶음 이름(표시용) */
+function spkLabel(k){if(k==='speaking')return SPEAK[speakReq||speakG].l;const m=M[k];if(SPEAK_OF[k]||(m&&m.emo))return SPEAK[emoGroup(k)].l;return '';}
 function pairOf(k){const m=M[k];if(m.emo)return{t:'짝 감정',l:M[m.emo].l};const s=Object.keys(M).find(j=>M[j].emo===k);return s?{t:'나오는 상태',l:M[s].l}:null;}
 
 function go(k,quiet){
   if(drag||phys.on)return;
-  rest(quiet);state=k;
+  reactTo=null;rest(quiet);state=k;
   if(!quiet)showInfo(k);
   M[k].run();
 }
@@ -389,13 +501,13 @@ const PS={a:0,v:0,ang:-90,on:false};
 /* 사파리 · 모바일에서도 똑같이 보이게 필터를 쓰지 않음. 몸 정수리 가장자리(털 포함)를 잘라 둔 조각을 세로 띠 14개로 나눠 몸 뒤에 숨겨 두고,
    당기면 가운데 띠는 많이 · 바깥 띠는 조금 밀어내 가장자리가 동그랗게 불룩해짐. 당기는 방향에 맞춰 몸 둘레를 따라 돌려 놓음 */
 const CAP={n:30,hw:150};
-const PCG=(()=>{const g=document.createElementNS(NS,'g');g.style.display='none';const defs=$('#hg-rig defs'),cx=GEO.c[0],cy=GEO.c[1],sw=CAP.hw*2/CAP.n,strips=[];
-  for(let i=0;i<CAP.n;i++){const x0=cx-CAP.hw+i*sw,cp=document.createElementNS(NS,'clipPath');cp.id='hg-pc'+i;const r=document.createElementNS(NS,'rect');
+const PCG=(()=>{const g=document.createElementNS(NS,'g');g.style.display='none';const defs=$('#rig defs'),cx=GEO.c[0],cy=GEO.c[1],sw=CAP.hw*2/CAP.n,strips=[];
+  for(let i=0;i<CAP.n;i++){const x0=cx-CAP.hw+i*sw,cp=document.createElementNS(NS,'clipPath');cp.id=P+'-pc'+i;const r=document.createElementNS(NS,'rect');
     r.setAttribute('x',(x0-.7).toFixed(2));r.setAttribute('y',cy-470);r.setAttribute('width',(sw+1.4).toFixed(2));r.setAttribute('height',410);cp.appendChild(r);defs.appendChild(cp);
-    const sg=document.createElementNS(NS,'g');sg.setAttribute('clip-path','url(#hg-pc'+i+')');const inner=document.createElementNS(NS,'g');
+    const sg=document.createElementNS(NS,'g');sg.setAttribute('clip-path','url(#'+P+'-pc'+i+')');const inner=document.createElementNS(NS,'g');
     const im=img(HG_BASE+'body_core.png',0,0,760,700);im.style.opacity=1;inner.appendChild(im);sg.appendChild(inner);g.appendChild(sg);
     const t=(x0+sw/2-cx)/CAP.hw;strips.push({el:inner,im,gw:Math.pow(Math.max(0,1-t*t),2)});}   // 넓고 둥근 언덕 모양, 양끝은 0(움직이지 않음)
-  const bd=$('#hg-bodies');bd.insertBefore(g,bd.firstChild);return{g,strips};})();
+  const bd=$('#bodies');bd.insertBefore(g,bd.firstChild);return{g,strips};})();
 function pullStretch(dt){
   if(RM)return;
   const w=H.offsetWidth||260;let tgt=0;
@@ -544,24 +656,34 @@ fitSize();window.addEventListener('resize',fitSize);
 const IN=document.getElementById('ask-input');let typingT=null;
 function nod(){if(state==='listening')wavePulse(-1,BLUE);gsap.fromTo(BR,{y:0},{y:H.offsetHeight*.012*2,duration:.07,yoyo:true,repeat:1,ease:'sine.inOut',overwrite:false});}
 const KEEP=/^(listening|thinking|speaking|error|loading)$/;   // 이어지는 상태는 같은 이름이 다시 와도 처음부터 다시 하지 않음
-window.HUGI={
+const API={
   set(k){if(!M[k])return;if(k===state&&(k==='idle'||KEEP.test(k)))return;go(k);},
   typing(){touch();if(/^(thinking|speaking)$/.test(state))return;
     if(state!=='listening')go('listening');else nod();
     clearTimeout(typingT);typingT=setTimeout(()=>{if(state==='listening'&&!(IN&&IN.value.trim()))go('idle');},3000);},
-  get state(){return state;}
+  get state(){return state;},
+  fit(){fitSize();}
 };
-/* 화면 밖에 있으면 매 프레임 계산을 쉬게 함 */
-if('IntersectionObserver' in window){new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)gsap.ticker.wake();else gsap.ticker.sleep();});}).observe(ST);}
-function START(){let seen=false;try{seen=sessionStorage.getItem('hg-hello')==='1';sessionStorage.setItem('hg-hello','1');}catch(e){}
+/* 화면 밖에 있으면 매 프레임 계산을 쉬게 함. gsap.ticker는 페이지에 하나라, 보이는 복사본이 하나도 없을 때만 쉬고 하나라도 보이면 깨움 */
+if('IntersectionObserver' in window){new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)VIS.add(ST);else VIS.delete(ST);});
+  if(VIS.size)gsap.ticker.wake();else gsap.ticker.sleep();}).observe(ST);}
+function START(){if(!HELLO){go('idle',1);return;}
+  let seen=false;try{seen=sessionStorage.getItem('hg-hello')==='1';sessionStorage.setItem('hg-hello','1');}catch(e){}
   if(seen||RM)go('idle',1);else go('hello');}
-window.__hugiRig={LO,LI,LS,LG,PG,S,PS,pose,gsap,placeLimb,go,M,showEye,get state(){return state;}};
+API._rig={LO,LI,LS,LG,PG,S,PS,pose,gsap,placeLimb,go,M,showEye,speak,react,SPEAK,SC,get state(){return state;},get speakG(){return speakG;}};
+/* 말하는 박자 API: HUGI.speak(묶음 · 감정 · mood 이름), HUGI.react(감정, 묶음). v9에서는 이미 있는 window.HUGI(set · typing · state)에 붙음 */
+Object.assign(API,{speak,react,speakGroup,emoGroup});
 /* ================= 시작 ================= */
 gsap.set([S,LK,AC,BR,PG],{svgOrigin:FEET});gsap.set(EGR,{svgOrigin:'377 357'});
 /* 시작 준비: 쓰는 그림을 모두 미리 풀어(decode) 두고, 눈 표정 12장과 늘리기 조각을 아주 옅게 3프레임 그려 둔 뒤 인사를 시작.
    처음 표정이 바뀌거나 처음 잡아당길 때 그림을 그제야 풀면서 멈칫하던 것을 없앰 */
 function warm(){const pe=Object.values(PEL);pe.forEach(el=>gsap.set(el,{opacity:.01}));PCG.g.style.display='';
   return new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{pe.forEach(el=>{if(el!==PEL[eyeNow])gsap.set(el,{opacity:0});});if(!PS.on)PCG.g.style.display='none';r();}))));}
-const PRE=[...new Set([...$('#hg-rig').querySelectorAll('image')].map(e=>e.getAttribute('href')))];
+const PRE=[...new Set([...$('#rig').querySelectorAll('image')].map(e=>e.getAttribute('href')))];
 Promise.all(PRE.map(src=>{const i=new Image();i.src=src;return(i.decode?i.decode():new Promise(r=>{i.onload=i.onerror=r;})).catch(()=>{});})).then(warm).then(()=>setTimeout(START,300));
+return API;
+}
+window.HUGI_MAKE=HUGI_MAKE;
+const a=HUGI_MAKE(document.getElementById('hugi-root'),{prefix:'hg'});if(a){window.HUGI=a;window.__hugiRig=a._rig;}
+const b=HUGI_MAKE(document.getElementById('hugi-orb'),{prefix:'ho',hello:false,bubble:false});if(b)window.HUGI_ORB=b;
 })();

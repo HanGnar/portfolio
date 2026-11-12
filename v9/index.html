@@ -64,11 +64,49 @@ p { margin: 0; }
 .hdr { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: transparent; border-bottom: 1px solid transparent; transition: background .2s, border-color .2s; }
 .hdr.on { background: var(--md-surface); border-bottom-color: var(--md-outline-variant); }
 .hdr .wrap { display: flex; align-items: center; height: 64px; gap: 28px; }
-.logo { font-size: 18px; color: var(--md-on-surface); text-decoration: none; margin-right: auto; }
+.logo { font-size: 18px; color: var(--md-on-surface); text-decoration: none; }
 .logo b { font-weight: 700; }
-.nav { display: flex; gap: 28px; }
-.nav a { color: var(--md-on-surface-variant); text-decoration: none; font-size: 15px; }
-.nav a:hover { color: var(--md-on-surface); }
+/* GNB [2026-11-13 사용자 시안]: 흰 동그란 버튼 ① 홈(AI 대화) ② AI 음성 ③ 메뉴(사이드 탭: 프로젝트 구성) ④ 허기가 들어간 AI 구슬 */
+.gnb { display: flex; align-items: center; gap: 12px; }
+.gbtn { width: 48px; height: 48px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--md-on-surface) 6%, transparent); background: var(--md-surface); color: var(--md-on-surface);
+  display: grid; place-items: center; cursor: pointer; box-shadow: 0 2px 10px rgba(0, 0, 0, .06); transition: transform .15s var(--md-ease), box-shadow .2s, background-color .2s; -webkit-tap-highlight-color: transparent; }
+.gbtn:hover { box-shadow: 0 4px 16px rgba(0, 0, 0, .10); }
+.gbtn:active { transform: scale(.94); }
+.gbtn:focus-visible { outline: 2px solid var(--md-primary); outline-offset: 2px; }
+.gbtn .ms { font-size: 24px; }
+.gbtn[aria-pressed="true"] { color: var(--md-primary); }
+.gpill { width: 72px; }
+.gpill i { display: block; width: 24px; height: 2px; border-radius: 2px; background: currentColor; box-shadow: 0 7px 0 currentColor; transform: translateY(-3.5px); }
+.gorb { position: relative; width: 56px; height: 56px; border-radius: 50%; overflow: hidden; flex: none; isolation: isolate; -webkit-tap-highlight-color: transparent;
+  background: radial-gradient(circle at 32% 26%, #ffffff 0 10%, #eef0f3 26%, #c9ccd3 52%, #9a9ea8 74%, #dfe1e6 100%);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .16), inset 0 -8px 14px rgba(40, 44, 54, .28), inset 0 5px 10px rgba(255, 255, 255, .9); }
+.gorb::before { content: ""; position: absolute; inset: 0; border-radius: 50%; z-index: 3; pointer-events: none;   /* 구슬 가장자리의 무지갯빛 */
+  background: conic-gradient(from 200deg, transparent 0 55%, rgba(255, 120, 160, .35) 62%, rgba(255, 220, 120, .35) 68%, rgba(120, 220, 255, .35) 74%, transparent 82%);
+  -webkit-mask: radial-gradient(circle, transparent 60%, #000 72%); mask: radial-gradient(circle, transparent 60%, #000 72%); }
+.gorb::after { content: ""; position: absolute; inset: 0; border-radius: 50%; z-index: 4; pointer-events: none;   /* 허기 앞의 유리 반사 */
+  background: radial-gradient(ellipse 46% 30% at 34% 20%, rgba(255, 255, 255, .85), rgba(255, 255, 255, 0) 70%), radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0) 62%, rgba(255, 255, 255, .35) 100%); }
+#hugi-orb { --hg-w: 38px; position: absolute; left: 0; right: 0; top: 0; bottom: 7px; z-index: 2; }
+.side-scrim { position: fixed; inset: 0; z-index: 45; background: rgba(0, 0, 0, .32); }
+.side { position: fixed; top: 0; right: 0; bottom: 0; z-index: 46; width: min(360px, 88vw); background: var(--md-surface); color: var(--md-on-surface); border-radius: 20px 0 0 20px;
+  box-shadow: -8px 0 32px rgba(0, 0, 0, .16); display: flex; flex-direction: column; padding: calc(16px + env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) calc(20px + env(safe-area-inset-bottom, 0px)) 20px; overflow-y: auto; overscroll-behavior: contain; }
+.side-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.side-top .gbtn { width: 40px; height: 40px; box-shadow: none; }
+.side h3 { font-size: 13px; font-weight: 500; color: var(--md-on-surface-variant); margin: 18px 0 6px; letter-spacing: .02em; }
+.side .row { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 0 12px; border-radius: 12px; color: var(--md-on-surface); text-decoration: none; font-size: 16px; background: none; border: 0; text-align: left; cursor: pointer; }
+.side .row:hover { background: var(--md-surface-container); }
+.side .row .ms { font-size: 20px; color: var(--md-on-surface-variant); }
+.side details { border-radius: 12px; }
+.side summary { list-style: none; display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 0 12px; border-radius: 12px; cursor: pointer; }
+.side summary::-webkit-details-marker { display: none; }
+.side summary:hover { background: var(--md-surface-container); }
+.side summary .nm { flex: 1; min-width: 0; font-size: 16px; font-weight: 500; }
+.side summary .tg { font-size: 12px; color: var(--md-on-surface-variant); }
+.side summary .ms { font-size: 20px; color: var(--md-on-surface-variant); transition: transform .2s; }
+.side details[open] summary .ms { transform: rotate(180deg); }
+.side .secs { display: flex; flex-direction: column; padding: 2px 0 8px 12px; }
+.side .secs button { text-align: left; background: none; border: 0; padding: 9px 12px; border-radius: 10px; font-size: 14px; color: var(--md-on-surface-variant); cursor: pointer; }
+.side .secs button:hover { background: var(--md-surface-container); color: var(--md-on-surface); }
+.side .secs .all { color: var(--md-primary); font-weight: 500; }
 
 /* 히어로: Gemini 첫 화면처럼 가운데 한 줄 + 흰 질문창, 뒤에 은은한 파란 빛
  * 노트북마다 화면 높이가 달라서(약 630~900) 글자 · 간격은 화면 폭과 높이 중 작은 쪽에 맞춘다. 내용은 가운데보다 살짝 위. */
@@ -305,7 +343,7 @@ p { margin: 0; }
 
 @media (max-width: 860px) {
   :root { --sp-sec: 80px; --sp-head: 28px; }
-  .nav { display: none; }
+  .gnb { gap: 8px; } .gbtn { width: 44px; height: 44px; } .gpill { width: 64px; } .gorb { width: 52px; height: 52px; } #hugi-orb { --hg-w: 35px; bottom: 6px; }
   .row, .about, .caps, .lists, .dsec .items { grid-template-columns: minmax(0, 1fr); }
   .row { gap: 16px; }
   .about .imgbox { max-width: 200px; }
@@ -610,15 +648,15 @@ p { margin: 0; }
 }
 /* 허기(HUGI) 캐릭터 — 움직임은 hugi/hugi.js(HPP3 모션 HPP_공유/브랜딩/허기_모션을 hugi_port.py로 옮김). 질문창 옆에 서서 AI 상태(듣는 중 · 생각 중 · 말하는 중 · 모르는 질문 · 칭찬 · 오류)를 보여 준다 */
 #hugi-root { --hg-w: 96px; position: absolute; left: calc(100% + 8px); bottom: 0; width: calc(var(--hg-w) * 1.7); height: calc(var(--hg-w) * 2.3); z-index: 1; pointer-events: none; }
-#hg-stage { position: absolute; inset: 0; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
-#hg-hugi { --w: 96px; position: absolute; left: 50%; bottom: calc(var(--w) * -.05); width: var(--w); height: calc(var(--w) * .921); margin-left: calc(var(--w) / -2); cursor: grab; touch-action: none; will-change: transform; pointer-events: auto; }
-#hg-hugi.drag { cursor: grabbing; }
-#hg-shadow { --w: 96px; position: absolute; left: 50%; bottom: calc(var(--w) * -.05); width: calc(var(--w) * .66); height: calc(var(--w) * .08); margin-left: calc(var(--w) * -.33); pointer-events: none; opacity: 0; will-change: transform, opacity; background: radial-gradient(closest-side, rgba(92, 46, 14, .26), rgba(92, 46, 14, .15) 45%, rgba(92, 46, 14, .05) 75%, rgba(92, 46, 14, 0)); }
-#hg-shadow::after { content: ""; position: absolute; left: 18%; right: 18%; top: 12%; bottom: 42%; border-radius: 50%; opacity: var(--c, 0); background: radial-gradient(closest-side, rgba(70, 32, 8, .32), rgba(70, 32, 8, 0)); }
-#hg-rig { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
-#hg-bubble { position: absolute; right: -8px; bottom: 100%; margin-bottom: -4px; width: max-content; max-width: 200px; padding: 8px 12px; border-radius: 14px; background: var(--md-surface); color: var(--md-on-surface); border: 1px solid var(--md-outline-variant); box-shadow: 0 4px 14px rgba(0, 0, 0, .08); font-size: 13px; line-height: 1.45; word-break: keep-all; opacity: 0; transition: opacity .18s; pointer-events: none; }
-#hg-bubble.on { opacity: 1; }
-#hg-bubble::after { content: ""; position: absolute; top: 100%; right: calc(var(--w) / 2 + 2px); border: 6px solid transparent; border-top-color: var(--md-surface); }
+.hugi-stage { position: absolute; inset: 0; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+.hugi-char { --w: 96px; position: absolute; left: 50%; bottom: calc(var(--w) * -.05); width: var(--w); height: calc(var(--w) * .921); margin-left: calc(var(--w) / -2); cursor: grab; touch-action: none; will-change: transform; pointer-events: auto; }
+.hugi-char.drag { cursor: grabbing; }
+.hugi-shadow { --w: 96px; position: absolute; left: 50%; bottom: calc(var(--w) * -.05); width: calc(var(--w) * .66); height: calc(var(--w) * .08); margin-left: calc(var(--w) * -.33); pointer-events: none; opacity: 0; will-change: transform, opacity; background: radial-gradient(closest-side, rgba(92, 46, 14, .26), rgba(92, 46, 14, .15) 45%, rgba(92, 46, 14, .05) 75%, rgba(92, 46, 14, 0)); }
+.hugi-shadow::after { content: ""; position: absolute; left: 18%; right: 18%; top: 12%; bottom: 42%; border-radius: 50%; opacity: var(--c, 0); background: radial-gradient(closest-side, rgba(70, 32, 8, .32), rgba(70, 32, 8, 0)); }
+.hugi-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.hugi-bubble { position: absolute; right: -8px; bottom: 100%; margin-bottom: -4px; width: max-content; max-width: 200px; padding: 8px 12px; border-radius: 14px; background: var(--md-surface); color: var(--md-on-surface); border: 1px solid var(--md-outline-variant); box-shadow: 0 4px 14px rgba(0, 0, 0, .08); font-size: 13px; line-height: 1.45; word-break: keep-all; opacity: 0; transition: opacity .18s; pointer-events: none; }
+.hugi-bubble.on { opacity: 1; }
+.hugi-bubble::after { content: ""; position: absolute; top: 100%; right: calc(var(--w) / 2 + 2px); border: 6px solid transparent; border-top-color: var(--md-surface); }
 @media (max-width: 1080px) {   /* 질문창 옆에 자리가 없으면 질문창 오른쪽 끝 위에 작게 선다 */
   #hugi-root { --hg-w: 64px; left: auto; right: 4px; bottom: 100%; width: calc(var(--hg-w) * 1.9); height: calc(var(--hg-w) * 1.8); }
   .hero:not(.chat) .ask { margin-top: calc(clamp(24px, 4.5vh, 40px) + 48px); }
@@ -632,14 +670,24 @@ p { margin: 0; }
 
 <header class="hdr" id="hdr">
   <div class="wrap">
-    <a class="logo" href="#top" data-top>헝그리<b>한정민</b></a>
-    <nav class="nav" aria-label="섹션">
-      <a href="#projects" data-scroll="projects">프로젝트</a>
-      <a href="#about" data-scroll="about">소개</a>
-      <a href="#contact" data-scroll="contact">연락처</a>
+    <nav class="gnb" aria-label="주요 메뉴">
+      <button class="gbtn" id="g-home" type="button" data-top aria-label="홈(AI 대화)" title="홈"><span class="ms" aria-hidden="true">home</span></button>
+      <button class="gbtn" id="g-voice" type="button" aria-pressed="false" aria-label="AI 음성으로 답 읽어 주기" title="AI 음성 꺼짐"><span class="ms" aria-hidden="true">volume_off</span></button>
+      <button class="gbtn gpill" id="g-menu" type="button" aria-expanded="false" aria-controls="side" aria-label="메뉴 열기" title="메뉴"><i aria-hidden="true"></i></button>
+      <div class="gorb" id="g-ai" role="img" aria-label="AI 비서 허기"><div id="hugi-orb" aria-hidden="true"></div></div>
     </nav>
   </div>
 </header>
+<div class="side-scrim" id="side-scrim" hidden></div>
+<aside class="side" id="side" hidden aria-label="메뉴">
+  <div class="side-top"><a class="logo" href="#top" data-top>헝그리<b>한정민</b></a><button class="gbtn" type="button" id="side-x" aria-label="메뉴 닫기"><span class="ms" aria-hidden="true">close</span></button></div>
+  <button class="row" type="button" data-top><span class="ms" aria-hidden="true">home</span>홈 · AI 대화</button>
+  <h3>프로젝트</h3>
+  <div id="side-pj"></div>
+  <h3>한정민</h3>
+  <button class="row" type="button" data-scroll="about"><span class="ms" aria-hidden="true">person</span>소개</button>
+  <button class="row" type="button" data-scroll="contact"><span class="ms" aria-hidden="true">mail</span>연락처</button>
+</aside>
 
 <main id="top">
   <section class="hero" id="hero" aria-labelledby="hero-title">
@@ -658,7 +706,7 @@ p { margin: 0; }
           </div>
           <button class="attach" id="attach" type="button" aria-label="채용 공고 파일 붙이기(PDF · 이미지)" title="채용 공고 파일 붙이기(PDF · 이미지)"><span class="ms" aria-hidden="true">attach_file</span></button>
           <input id="attach-file" type="file" accept="application/pdf,image/png,image/jpeg,image/webp" hidden>
-          <button class="auto" id="auto-read" type="button" aria-pressed="false" aria-label="답 읽어 주기" title="답 읽어 주기 꺼짐"><span class="ms" aria-hidden="true">volume_off</span></button>
+          <button class="auto" id="auto-read" type="button" hidden aria-pressed="false" aria-label="답 읽어 주기" title="답 읽어 주기 꺼짐"><span class="ms" aria-hidden="true">volume_off</span></button>
           <button class="send" type="submit" aria-label="질문 보내기"><span class="ms" aria-hidden="true">arrow_upward</span></button>
         </form>
         <ul class="sug" id="sug" role="listbox" hidden></ul>
@@ -2340,10 +2388,13 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   // 서버 답 검사: 없는 근거 · 목록 밖 동작은 버린다
   function validate(r) {
     if (!r || !Array.isArray(r.sentences)) return null;
-    var s = r.sentences.filter(function (x) { return x && typeof x.text === 'string'; }).map(function (x) {
+    var okS = r.sentences.filter(function (x) { return x && typeof x.text === 'string'; });
+    var s = okS.map(function (x) {
       return [x.text.slice(0, 300), (x.cards || []).filter(function (c) { return CARD[c]; }), FORMS.indexOf(x.form) > -1 ? x.form : 'p'];
     });
     if (!s.length) return null;
+    var moods = [], mc = null;   // 문장별 감정(생략되면 직전과 같음). 허용 목록 밖 값은 버린다
+    okS.forEach(function (x) { if (x.mood && MOOD_OK.indexOf(x.mood) > -1) mc = x.mood; moods.push(mc); });
     var a = (r.actions || []).filter(function (a) { return a && ACTIONS[a.type] && (a.label || a.type === 'contact'); })[0];
     var str = function (x, n) { return String(x || '').replace(/\s+/g, ' ').trim().slice(0, n); };
     var ask = null;
@@ -2355,10 +2406,11 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var next = ask ? [] : (Array.isArray(r.next) ? r.next : []).map(function (o) { return str(o, 40); }).filter(Boolean).slice(0, 3);
     var src = (Array.isArray(r.sources) ? r.sources : []).filter(function (x) { return x && /^https:\/\//.test(x.url); }).slice(0, 2).map(function (x) { return { title: str(x.title, 60), url: String(x.url) }; });
     var mail = r.mail && (r.mail.subject || r.mail.body) ? { subject: str(r.mail.subject, 200), body: String(r.mail.body || '').slice(0, 3000) } : null;
-    return { s: s, act: a ? [a.type, a.target || '', String(a.label || '연락하기').slice(0, 24)] : null, ask: ask, next: next,
+    return { s: s, moods: moods, act: a ? [a.type, a.target || '', String(a.label || '연락하기').slice(0, 24)] : null, ask: ask, next: next,
       img: r.image && IMG[r.image] ? r.image : null, src: src, mail: mail, file: cleanFile(r.file) };
   }
   var FORMS = ['p', 'line', 'para', 'li', 'ol', 'row'];   // 답 모양(worker.js의 SCHEMA와 같음)
+  var MOOD_OK = ['welcome', 'sure', 'think', 'oops', 'shy', 'play', 'calm', 'alert', 'bye', 'sad', 'angry', 'proud', 'moved', 'excited', 'nervous', 'panic', 'sulky', 'unsure', 'private'];   // worker.js MOODS와 같게
   // AI가 만든 파일: 정해진 형식만, 이름은 파일 이름에 쓸 수 없는 글자를 빼고 확장자를 형식에 맞춘다
   var FILE_EXT = { resume: 'pdf', cover: 'pdf', resume_set: 'pdf', md: 'md', docx: 'docx', xlsx: 'xlsx', pdf: 'pdf', txt: 'txt' };
   // 한정민이 만든 원본 PDF(files/): 이력서 1쪽 · 자기소개서 2쪽 · 합본 3쪽
@@ -2482,10 +2534,10 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   function llm(q, onText, opt) {
     if (AI_ENDPOINT) {
       return askServer(q, opt, function (p) {   // 흘러나오는 문장: 모양까지 그대로 그린다
-        onText(shape(p.map(function (x) { return [String(x.text || ''), [], FORMS.indexOf(x.form) > -1 ? x.form : 'p']; })));
+        onText(shape(p.map(function (x) { return [String(x.text || ''), [], FORMS.indexOf(x.form) > -1 ? x.form : 'p']; })), p);
       }).then(function (r) {
         if (!r) return null;
-        var t = toRaw(r); onText(t); return t;
+        var t = toRaw(r); onText(t, null, r); return t;
       });
     }
     if (!SAMPLE) return Promise.resolve(null);
@@ -2747,11 +2799,13 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   }
   if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
   function speakText(t) { return t.replace(/·/g, ',').replace(/→/g, '').replace(/\s+/g, ' ').trim(); }
-  function mark(A, i) { if (!A) return; A.querySelectorAll('.sn.reading').forEach(function (n) { n.classList.remove('reading'); }); if (i > -1) { var n = A.querySelector('.sn[data-sn="' + i + '"]'); if (n) n.classList.add('reading'); } }
+  function mark(A, i) { if (!A) return; if (i > -1) { try { var mm = A._moods && A._moods[i]; if (mm) hgSpeak(mm); } catch (e) {} }   // 읽는 문장의 감정으로 말하기
+    A.querySelectorAll('.sn.reading').forEach(function (n) { n.classList.remove('reading'); }); if (i > -1) { var n = A.querySelector('.sn[data-sn="' + i + '"]'); if (n) n.classList.add('reading'); } }
   function setBtn(b, on) {
     if (!b) return; b.classList.toggle('on', on); b.querySelector('.ms').textContent = on ? 'stop_circle' : 'volume_up'; b.querySelector('.lt').textContent = on ? '멈추기' : '듣기';
     var A = b.closest('.ans'); if (A) A.classList.toggle('speaking', on);
-    if (on) hg('speaking'); else if (!BUSY) { hg(HG_END || 'idle'); HG_END = null; }   // 답을 소리로 읽는 동안 허기도 말하는 중, 다 읽으면 미뤄 둔 반응(칭찬 · 모름)
+    if (on) { clearTimeout(HG_IDLE_T); var m0 = A && A._moods && A._moods[0]; if (m0) hgSpeak(m0); else hg('speaking'); }   // 답을 소리로 읽는 동안 허기도 말하는 중(첫 문장의 감정으로)
+    else if (!BUSY) { if (HG_END) { hg(HG_END); HG_END = null; } else hgSafeIdle(0); }   // 다 읽으면 미뤄 둔 반응(칭찬 · 모름), 없으면 기본으로
   }
   function seekTo(A, i) {
     if (VOICE.play && VOICE.play.A === A) VOICE.play.seek(i);
@@ -2956,6 +3010,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   }
   function setAuto(on) {
     VOICE.auto = on; try { localStorage.setItem('hj-read', on ? '1' : '0'); } catch (e) {}
+    var g = $('#g-voice'); if (g) { g.setAttribute('aria-pressed', String(on)); g.querySelector('.ms').textContent = on ? 'volume_up' : 'volume_off'; g.title = on ? 'AI 음성 켜짐' : 'AI 음성 꺼짐'; }
     var b = $('#auto-read'); if (b) { b.setAttribute('aria-pressed', String(on)); b.querySelector('.ms').textContent = on ? 'volume_up' : 'volume_off'; b.title = on ? '답 읽어 주기 켜짐' : '답 읽어 주기 꺼짐'; }
     if (!on) stopVoice();
   }
@@ -3060,10 +3115,35 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     A.innerHTML = '<div class="body"><span class="dots" aria-label="생각하는 중"><i></i><i></i><i></i></span></div>'; TH.appendChild(A);
     var body = A.firstChild; if (TH) TH.scrollTo({ top: TH.scrollHeight, behavior: RM ? 'auto' : 'smooth' });
     hg('thinking');
-    var moodGot = false, moodKey = null;
-    opt = Object.assign({}, opt || {}, { onMood: function (m) { if (moodGot) return; moodGot = true; try { moodKey = hgMood(m); } catch (e) {} } });
-    var paint = function (raw) { var h = parse(raw).html; if (h && !(moodKey && window.HUGI && window.HUGI.state === moodKey)) hg('speaking'); body.innerHTML = h || '<span class="dots" aria-label="생각하는 중"><i></i><i></i><i></i></span>'; toBottom(); };
+    // 문장별 감정 말하기: {m}(첫 문장 감정) · 문장마다 오는 mood · 최종 답의 sentences[i].mood로 문장이 처음 나타나는 순간 박자를 바꾼다.
+    // 큰 반응은 첫 문장과 문장 사이에서만, 한 답에 최대 2번. 문장 중간에는 아무것도 바꾸지 않는다(HUGI.speak는 값만 섞음)
+    var SM = { any: false, first: false, cur: null, seen: 0, reacts: 0, moods: [], sents: null };
+    clearTimeout(HG_IDLE_T);
+    var smFirst = function (m) {
+      if (SM.first || !m) return; SM.first = SM.any = true; SM.cur = m;
+      try { var k = hgPick(m); hgSpeak(m); if (k) { SM.reacts++; hgReact(k, m); } } catch (e) {}   // 말하기를 먼저 걸어야 반응이 끝난 뒤 그 박자로 이어진다
+    };
+    var smSentence = function (i, m) {
+      try {
+        if (!SM.first) { if (i === 0 && m) smFirst(m); return; }
+        if (m && m !== SM.cur) { SM.cur = m; var k = SM.reacts < 2 ? hgPick(m) : null; hgSpeak(m); if (k) { SM.reacts++; hgReact(k, m); } }
+      } catch (e) {}
+    };
+    opt = Object.assign({}, opt || {}, { onMood: function (m) { smFirst(m); } });
+    var paint = function (raw, p, r) {
+      var h = parse(raw).html;
+      if (h) { try {
+        var list = p || (r && r.moods ? r.moods.map(function (x) { return { mood: x }; }) : null), prev = SM.cur;
+        if (list) for (var i = SM.seen; i < list.length; i++) { var m = list[i] && list[i].mood; SM.moods[i] = m || SM.moods[i - 1] || SM.cur; smSentence(i, m); }
+        if (list) SM.seen = Math.max(SM.seen, list.length);
+        if (r) { SM.moods = r.moods.slice(); SM.sents = r.s; }
+        var st = window.HUGI && window.HUGI.state;
+        if (st === 'idle' || st === 'thinking') hgSpeak(SM.cur || 'calm');   // 글자가 나오는데 말하는 중이 아니면 말하기 시작(상태를 갈아끼우지 않음)
+      } catch (e) {} }
+      body.innerHTML = h || '<span class="dots" aria-label="생각하는 중"><i></i><i></i><i></i></span>'; toBottom();
+    };
     var done = function (raw) { var r = parse(raw); body.innerHTML = r.html; A._said = r.said; A.insertAdjacentHTML('beforeend', tail(r)); toBottom();
+      try { if (SM.sents && SM.moods.length) A._moods = moodsForSaid(SM.sents, SM.moods, r.said.length); } catch (e) {}   // 읽는 문장마다 그 문장의 감정으로 말하게
       if (VOICE.auto && VOICE.ok) speak(A, A.querySelector('[data-listen]')); };
     llm(q, paint, opt).then(function (raw) {
       var real = !!raw;
@@ -3072,8 +3152,8 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       TURNS.push({ role: 'user', content: q }, { role: 'assistant', content: raw });
       HIST.push({ q: shown || q, a: parse(raw).said.join(' ') }); if (HIST.length > 8) HIST.shift();
       SAVED.push({ q: q, shown: shown || '', raw: raw }); saveChat();
-      if (moodGot) { HG_END = null; try { if (!(moodKey && window.HUGI && window.HUGI.state === moodKey)) hg('idle'); } catch (e) {} } else hgEnd(q, raw);
-      try { if (ERRED && real) { ERRED = false; if (!moodKey && !HG_END) hg('reconnect'); } } catch (e) {}   // 오류 뒤 첫 성공 답: 다시 연결됨(안도)
+      if (SM.any) { HG_END = null; hgSafeIdle(1000); } else hgEnd(q, raw);   // 마무리: 1초 뒤 기본으로(반응이 재생 중이면 끝난 뒤)
+      try { if (ERRED && real) { ERRED = false; if (!SM.any && !HG_END) hg('reconnect'); } } catch (e) {}   // 오류 뒤 첫 성공 답: 다시 연결됨(안도)
       done(raw);
     }).catch(function (e) {
       var code = e && e.code;
@@ -3086,7 +3166,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   }
   /* 허기 캐릭터 상태(hugi/hugi.js가 늦게 실렸으면 그냥 넘어감). 이름은 허기_모션/기능정의.md 2-1 */
   var HG_END = null;
-  function hg(k) { if (window.HUGI) window.HUGI.set(k); }
+  function hg(k) { if (window.HUGI) window.HUGI.set(k); if (window.HUGI_ORB) window.HUGI_ORB.set(k); }   // 질문창 옆 허기와 GNB 구슬 속 허기가 같은 상태
   // 답의 감정(mood, LLM이 첫 글자와 함께 보냄) → 허기 반응. 반응 키를 돌려주고, 반응 없이 말하는 중이면 null.
   // [2026-11-13 사용자: 9-2.8 금지(화난 눈 · 눈물 · 졸기 · 하품 · 배고픔 동작)를 모두 풀고 기능정의 2-2 · 2-2-1(감정마다 짝 상태)을 따름] 상태 이름은 허기_모션/기능정의.md 2-2-1.
   // 값 19개: sure · think · calm은 표정 변화 없이 말하는 중(sure는 아래 규칙으로 안도 · 기쁨이 섞임, calm은 귀여운 반응 금지). 서버 mood 목록은 worker.js MOODS와 같게 둘 것.
@@ -3097,7 +3177,8 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   };
   var HG_ONCE = { wink: 1, cheer: 1 }, HG_USED = {}, HG_RECENT = [], HG_MOOD_PREV = null, HG_SURE_N = 0;   // 윙크 · 신남은 한 대화에 한 번, 바로 앞 두 번에 쓴 상태는 다시 고르지 않음
   var HG_LONG = /^(sleepy|hungry|dizzy)$/;   // 이 셋은 2.5초 안전장치를 걸지 않는다(졸림 · 배고픔 · 어지러움)
-  function hgMood(m) {
+  // mood → 대표 반응 하나(없으면 null). 앞 두 번에 쓴 반응 · 한 대화 한 번(윙크 · 신남)을 피한다. 반응은 여기서 부르지 않고 키만 돌려준다
+  function hgPick(m) {
     var list = (MOOD_HG[m] || []).filter(function (k) { return HG_RECENT.indexOf(k) < 0 && !(HG_ONCE[k] && HG_USED[k]); });
     if (m === 'sure') {
       HG_SURE_N++;
@@ -3106,11 +3187,31 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     }
     HG_MOOD_PREV = m;
     var k = list.length ? list[Math.floor(Math.random() * list.length)] : null;
-    if (k) {
-      HG_RECENT.push(k); if (HG_RECENT.length > 2) HG_RECENT.shift(); HG_USED[k] = 1; hg(k);
-      if (!HG_LONG.test(k)) setTimeout(function () { if (window.HUGI && window.HUGI.state === k) hg('idle'); }, 2500);   // 큰 반응은 한 번 보이고 최대 2.5초 뒤 기본으로(상태가 아직 같을 때만)
-    } else hg('speaking');
+    if (k) { HG_RECENT.push(k); if (HG_RECENT.length > 2) HG_RECENT.shift(); HG_USED[k] = 1; }
     return k;
+  }
+  // 허기에게: 말하기(묶음 박자) · 반응(대표 동작을 한 번 하고 말하는 중이었으면 그 감정 박자로 이어짐). 질문창 옆 허기와 구슬 속 허기가 같이. 옛 hugi.js면 기존 상태 호출로
+  var HG_IDLE_T = null, HG_REACT_UNTIL = 0;
+  function hgEach(fn) { [window.HUGI, window.HUGI_ORB].forEach(function (h) { if (h) { try { fn(h); } catch (e) {} } }); }
+  function hgSpeak(m) { hgEach(function (h) { if (h.speak) h.speak(m); else h.set('speaking'); }); }
+  function hgReact(k, m) {
+    HG_REACT_UNTIL = Date.now() + 2800;   // 반응이 끝나는 대략의 시각(이전에 idle을 걸어 반응을 끊지 않게)
+    hgEach(function (h) { if (h.react) h.react(k, m); else h.set(k); });
+  }
+  function hgSafeIdle(delay) {
+    clearTimeout(HG_IDLE_T);
+    HG_IDLE_T = setTimeout(function () { hg('idle'); }, Math.max(delay || 0, HG_REACT_UNTIL - Date.now()));
+  }
+  // 문장마다 읽기 번호(said)가 한 줄 안에서 마침표로 더 나뉘므로, 문장별 감정을 읽기 문장 번호에 맞춰 늘린다(길이가 안 맞으면 비율로)
+  function moodsForSaid(sents, moods, n) {
+    var out = [];
+    sents.forEach(function (x, i) {
+      var c = x[2] === 'row' ? 1 : Math.max(1, x[0].replace(/\[\[[^\]]*\]\]/g, '').trim().split(/(?<=[.!?…])\s+/).length);
+      for (var j = 0; j < c; j++) out.push(moods[i] || moods[i - 1] || null);
+    });
+    if (!out.length || !n) return [];
+    if (out.length !== n) { var o2 = []; for (var i = 0; i < n; i++) o2.push(out[Math.min(out.length - 1, Math.floor(i * out.length / n))]); out = o2; }
+    return out;
   }
   function hgEnd(q, raw) {
     if (!window.HUGI) return;
@@ -3150,7 +3251,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   }
   IN.addEventListener('focus', function () { if (!$('#hero').classList.contains('chat')) openSug(); });
   function hasText() { $('#ask-form').classList.toggle('has', !!IN.value.trim() || !!(PENDING && !PENDING.bad)); }
-  IN.addEventListener('input', function () { hasText(); openSug(); if (window.HUGI && !BUSY) window.HUGI.typing(); });
+  IN.addEventListener('input', function () { hasText(); openSug(); if (window.HUGI && !BUSY) window.HUGI.typing(); if (window.HUGI_ORB && !BUSY) window.HUGI_ORB.typing(); });
   IN.addEventListener('keydown', function (e) {
     if (e.key === 'ArrowDown') { e.preventDefault(); if (SUG.hidden) openSug(); moveSug(1); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); moveSug(-1); }
@@ -3230,7 +3331,10 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     if (sn && !e.target.closest('[data-cite]') && VOICE.btn && VOICE.btn.closest('.ans') === sn.closest('.ans')) { seekTo(sn.closest('.ans'), +sn.dataset.sn); return; }
     var lb = e.target.closest('[data-listen]');
     if (lb) { var A = lb.closest('.ans'); if (VOICE.btn === lb) stopVoice(); else speak(A, lb); return; }
-    if (e.target.closest('#auto-read')) { setAuto(!VOICE.auto); return; }
+    if (e.target.closest('#auto-read') || e.target.closest('#g-voice')) { setAuto(!VOICE.auto); return; }
+    if (e.target.closest('#g-menu')) { sideOpen(true); return; }
+    if (e.target.closest('#side-x') || e.target.closest('#side-scrim')) { sideOpen(false); return; }
+    if (e.target.closest('#side') && e.target.closest('[data-open],[data-scroll],[data-top]')) sideOpen(false);   // 메뉴에서 고르면 닫고 이동
     if (e.target.closest('#vchip')) { if (VM.hidden) openVoices(); else closeVoices(); return; }
     var vo = e.target.closest('.vopt'); if (vo) { chooseVoice(vo.dataset.voice, vo); return; }
     var fb = e.target.closest('[data-file]'); if (fb) { saveFile(FILEQ[+fb.dataset.file], fb); return; }
@@ -3248,7 +3352,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     }
     var t = e.target.closest('[data-open],[data-close],[data-cite],[data-act],[data-team],[data-q],[data-f],[data-scroll],[data-top],#fit-reset,#email');
     if (!t || t.closest('#sug')) return;
-    if (t.dataset.open) { e.preventDefault(); openDetail(t.dataset.open); }
+    if (t.dataset.open) { e.preventDefault(); openDetail(t.dataset.open, t.dataset.sec); }
     else if (t.hasAttribute('data-close')) closeDetail();
     else if (t.dataset.cite) goCard(t.dataset.cite);
     else if (t.dataset.act) ACTIONS[t.dataset.act](t.dataset.t);
@@ -3264,10 +3368,24 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       try { navigator.clipboard.writeText(t.dataset.copy).then(function () { done(true); }, function () { done(false); }); } catch (err) { done(false); }
     }
   });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !D.hidden) closeDetail(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('#side').hidden) { sideOpen(false); return; } if (e.key === 'Escape' && !D.hidden) closeDetail(); });
+  // 사이드 탭(GNB ③): 프로젝트마다 구성(섹션)을 펼쳐 바로 그 칸으로 간다
+  $('#side-pj').innerHTML = P.map(function (p) {
+    return '<details><summary><span class="nm">' + esc(p.name) + '</span><span class="tg">' + esc((p.tags || []).slice(0, 2).join(' · ')) + '</span><span class="ms" aria-hidden="true">expand_more</span></summary>' +
+      '<div class="secs"><button type="button" class="all" data-open="' + p.id + '">전체 보기</button>' +
+      K.sections.map(function (s) { return '<button type="button" data-open="' + p.id + '" data-sec="' + s.id + '">' + esc(s.name) + '</button>'; }).join('') + '</div></details>';
+  }).join('');
+  var sideBack = null;
+  function sideOpen(on) {
+    var sd = $('#side'), sc = $('#side-scrim'), mb = $('#g-menu');
+    if (on === !sd.hidden) return;
+    sd.hidden = sc.hidden = !on; mb.setAttribute('aria-expanded', String(on));
+    if (on) { sideBack = document.activeElement; if (!RM) { sd.animate([{ transform: 'translateX(100%)' }, { transform: 'none' }], { duration: 320, easing: 'cubic-bezier(.2, 0, 0, 1)' }); sc.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200 }); } $('#side-x').focus(); }
+    else if (sideBack && sideBack.focus) sideBack.focus({ preventScroll: true });
+  }
   window.addEventListener('scroll', function () { $('#hdr').classList.toggle('on', window.scrollY > 8); }, { passive: true });
 
-  if (!VOICE.ok) $('#auto-read').hidden = true; else setAuto(VOICE.auto);
+  if (!VOICE.ok) { $('#auto-read').hidden = true; $('#g-voice').hidden = true; } else setAuto(VOICE.auto);
   renderVoices();
   function fromHash() { var h = location.hash.slice(1); if (BY[h]) openDetail(h); else if (!h) closeDetail(); }
   window.addEventListener('hashchange', fromHash); fromHash();
