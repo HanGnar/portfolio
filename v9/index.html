@@ -62,8 +62,9 @@ p { margin: 0; }
 
 /* 헤더 */
 .hdr { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: transparent; border-bottom: 1px solid transparent; transition: background .2s, border-color .2s; }
-.hdr.on { background: var(--md-surface); border-bottom-color: var(--md-outline-variant); }
-.hdr .wrap { display: flex; align-items: center; height: 64px; gap: 28px; }
+.hdr, .hdr.on { background: transparent; border-bottom-color: transparent; }   /* 11-13 사용자: 상단 바는 지우고 버튼만 남김 */
+.hdr .wrap { display: flex; align-items: center; justify-content: center; height: 72px; gap: 28px; }   /* 버튼 가운데 정렬 */
+.hdr { pointer-events: none; } .hdr .gnb { pointer-events: auto; }
 .logo { font-size: 18px; color: var(--md-on-surface); text-decoration: none; }
 .logo b { font-weight: 700; }
 /* GNB [2026-11-13 사용자 시안]: 흰 동그란 버튼 ① 홈(AI 대화) ② AI 음성 ③ 메뉴(사이드 탭: 프로젝트 구성) ④ 허기가 들어간 AI 구슬 */
@@ -77,15 +78,15 @@ p { margin: 0; }
 .gbtn[aria-pressed="true"] { color: var(--md-primary); }
 .gpill { width: 72px; }
 .gpill i { display: block; width: 24px; height: 2px; border-radius: 2px; background: currentColor; box-shadow: 0 7px 0 currentColor; transform: translateY(-3.5px); }
-.gorb { position: relative; width: 56px; height: 56px; border-radius: 50%; overflow: hidden; flex: none; isolation: isolate; -webkit-tap-highlight-color: transparent;
-  background: radial-gradient(circle at 32% 26%, #ffffff 0 10%, #eef0f3 26%, #c9ccd3 52%, #9a9ea8 74%, #dfe1e6 100%);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, .16), inset 0 -8px 14px rgba(40, 44, 54, .28), inset 0 5px 10px rgba(255, 255, 255, .9); }
-.gorb::before { content: ""; position: absolute; inset: 0; border-radius: 50%; z-index: 3; pointer-events: none;   /* 구슬 가장자리의 무지갯빛 */
+.gorb { position: relative; width: 72px; height: 48px; border-radius: 999px; overflow: hidden; flex: none; isolation: isolate; -webkit-tap-highlight-color: transparent;
+  background: radial-gradient(ellipse 70% 90% at 32% 22%, #ffffff 0 12%, #eef0f3 30%, #c9ccd3 58%, #9a9ea8 82%, #dfe1e6 100%);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .10), inset 0 -6px 12px rgba(40, 44, 54, .24), inset 0 4px 8px rgba(255, 255, 255, .9); }
+.gorb::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 2px; z-index: 3; pointer-events: none;   /* 구슬 가장자리의 무지갯빛 */
   background: conic-gradient(from 200deg, transparent 0 55%, rgba(255, 120, 160, .35) 62%, rgba(255, 220, 120, .35) 68%, rgba(120, 220, 255, .35) 74%, transparent 82%);
-  -webkit-mask: radial-gradient(circle, transparent 60%, #000 72%); mask: radial-gradient(circle, transparent 60%, #000 72%); }
-.gorb::after { content: ""; position: absolute; inset: 0; border-radius: 50%; z-index: 4; pointer-events: none;   /* 허기 앞의 유리 반사 */
-  background: radial-gradient(ellipse 46% 30% at 34% 20%, rgba(255, 255, 255, .85), rgba(255, 255, 255, 0) 70%), radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0) 62%, rgba(255, 255, 255, .35) 100%); }
-#hugi-orb { --hg-w: 38px; position: absolute; left: 0; right: 0; top: 0; bottom: 7px; z-index: 2; }
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+.gorb::after { content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: 4; pointer-events: none;   /* 허기 앞의 유리 반사 */
+  background: radial-gradient(ellipse 40% 28% at 30% 18%, rgba(255, 255, 255, .85), rgba(255, 255, 255, 0) 70%), radial-gradient(ellipse 60% 70% at 50% 50%, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, .3) 100%); }
+#hugi-orb { --hg-w: 34px; position: absolute; left: 0; right: 0; top: 0; bottom: 5px; z-index: 2; }
 .side-scrim { position: fixed; inset: 0; z-index: 45; background: rgba(0, 0, 0, .32); }
 .side { position: fixed; top: 0; right: 0; bottom: 0; z-index: 46; width: min(360px, 88vw); background: var(--md-surface); color: var(--md-on-surface); border-radius: 20px 0 0 20px;
   box-shadow: -8px 0 32px rgba(0, 0, 0, .16); display: flex; flex-direction: column; padding: calc(16px + env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) calc(20px + env(safe-area-inset-bottom, 0px)) 20px; overflow-y: auto; overscroll-behavior: contain; }
@@ -343,7 +344,7 @@ p { margin: 0; }
 
 @media (max-width: 860px) {
   :root { --sp-sec: 80px; --sp-head: 28px; }
-  .gnb { gap: 8px; } .gbtn { width: 44px; height: 44px; } .gpill { width: 64px; } .gorb { width: 52px; height: 52px; } #hugi-orb { --hg-w: 35px; bottom: 6px; }
+  .gnb { gap: 8px; } .gbtn { width: 44px; height: 44px; } .gpill { width: 64px; } .gorb { width: 64px; height: 44px; } #hugi-orb { --hg-w: 31px; bottom: 4px; }
   .row, .about, .caps, .lists, .dsec .items { grid-template-columns: minmax(0, 1fr); }
   .row { gap: 16px; }
   .about .imgbox { max-width: 200px; }
