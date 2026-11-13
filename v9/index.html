@@ -72,44 +72,75 @@ p { margin: 0; }
 .gnb { display: flex; align-items: center; gap: 8px; }
 .gbtn { width: 40px; height: 40px; border-radius: 999px; border: 1px solid rgba(0, 0, 0, .06); background: rgba(255, 255, 255, .8); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px); color: var(--md-on-surface);
   display: grid; place-items: center; cursor: pointer; box-shadow: 0 8px 24px -12px rgba(0, 0, 0, .18); transition: transform .2s cubic-bezier(0, 0, .2, 1), box-shadow .2s cubic-bezier(0, 0, .2, 1), background-color .2s cubic-bezier(0, 0, .2, 1); -webkit-tap-highlight-color: transparent; }
-@media (hover: hover) { .gbtn:hover { background-color: #fff; box-shadow: 0 10px 28px -10px rgba(0, 0, 0, .3); transform: scale(1.04); }
-  .gorb:hover { box-shadow: 0 10px 28px -10px rgba(0, 0, 0, .3), inset 0 -6px 12px rgba(40, 44, 54, .24), inset 0 4px 8px rgba(255, 255, 255, .9); transform: scale(1.04); } }
-.gbtn:active, .gorb:active { transform: scale(.96); }
+@media (hover: hover) { .gbtn:hover { background-color: #fff; box-shadow: 0 10px 28px -10px rgba(0, 0, 0, .3); transform: scale(1.04); } }
+.gbtn:active { transform: scale(.96); }
 .gbtn:focus-visible { outline: 2px solid var(--md-primary); outline-offset: 2px; }
 .gbtn .ms { font-size: 19px; }
 .gbtn[aria-pressed="true"] { color: var(--md-primary); }
 .gpill { width: 56px; }
 .gpill i { display: block; width: 18px; height: 1.5px; border-radius: 2px; background: currentColor; box-shadow: 0 5.5px 0 currentColor; transform: translateY(-2.75px); }
-.gorb { position: relative; width: 56px; height: 40px; cursor: pointer; transition: transform .2s cubic-bezier(0, 0, .2, 1), box-shadow .2s cubic-bezier(0, 0, .2, 1); border-radius: 999px; overflow: hidden; flex: none; isolation: isolate; -webkit-tap-highlight-color: transparent;
-  background: radial-gradient(ellipse 70% 90% at 32% 22%, #ffffff 0 12%, #eef0f3 30%, #c9ccd3 58%, #9a9ea8 82%, #dfe1e6 100%);
-  box-shadow: 0 8px 24px -12px rgba(0, 0, 0, .18), inset 0 -6px 12px rgba(40, 44, 54, .24), inset 0 4px 8px rgba(255, 255, 255, .9); }
-.gorb::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 2px; z-index: 3; pointer-events: none;   /* 구슬 가장자리의 무지갯빛 */
-  background: conic-gradient(from 200deg, transparent 0 55%, rgba(255, 120, 160, .35) 62%, rgba(255, 220, 120, .35) 68%, rgba(120, 220, 255, .35) 74%, transparent 82%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
-.gorb::after { content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: 4; pointer-events: none;   /* 허기 앞의 유리 반사 */
-  background: radial-gradient(ellipse 40% 28% at 30% 18%, rgba(255, 255, 255, .85), rgba(255, 255, 255, 0) 70%), radial-gradient(ellipse 60% 70% at 50% 50%, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, .3) 100%); }
-#hugi-orb { --hg-w: 28px; position: absolute; left: 0; right: 0; top: 0; bottom: 4px; z-index: 2; }
-.side-scrim { position: fixed; inset: 0; z-index: 45; background: rgba(0, 0, 0, .32); }
-.side { position: fixed; top: 0; right: 0; bottom: 0; z-index: 46; width: min(360px, 88vw); background: var(--md-surface); color: var(--md-on-surface); border-radius: 20px 0 0 20px;
-  box-shadow: -8px 0 32px rgba(0, 0, 0, .16); display: flex; flex-direction: column; padding: calc(16px + env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) calc(20px + env(safe-area-inset-bottom, 0px)) 20px; overflow-y: auto; overscroll-behavior: contain; }
-.side-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.side-top .gbtn { width: 40px; height: 40px; box-shadow: none; }
-.side h3 { font-size: 13px; font-weight: 500; color: var(--md-on-surface-variant); margin: 18px 0 6px; letter-spacing: .02em; }
-.side .row { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 0 12px; border-radius: 12px; color: var(--md-on-surface); text-decoration: none; font-size: 16px; background: none; border: 0; text-align: left; cursor: pointer; }
-.side .row:hover { background: var(--md-surface-container); }
-.side .row .ms { font-size: 20px; color: var(--md-on-surface-variant); }
-.side details { border-radius: 12px; }
-.side summary { list-style: none; display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 0 12px; border-radius: 12px; cursor: pointer; }
+/* HBTN-CSS-BEGIN */
+/* 허기 알약 버튼: 허기 몸을 가로로 늘린 알약이 그대로 버튼(11-13). 크기 · 비율은 rig.js 값 표의 pill에서(여기 크기는 JS가 덮음) */
+.hbtn { position: relative; width: 64px; height: 42px; flex: none; padding: 0; margin: 0; border: 0; background: none; cursor: pointer; display: block; border-radius: 999px;
+  touch-action: none; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; color: inherit; }
+.hb-svg { position: absolute; left: 50%; top: 50%; overflow: visible; display: block; pointer-events: none; will-change: transform; }
+.hb-sh { position: absolute; left: 50%; bottom: -2px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 50%, rgba(70, 36, 12, .30), rgba(70, 36, 12, 0) 70%); transform-origin: 50% 50%; }
+.hbtn:focus { outline: none; }
+.hbtn:focus-visible { outline: 2px solid var(--md-primary, #0b57d0); outline-offset: 2px; border-radius: 999px; }
+/* HBTN-CSS-END */
+/* 메뉴 판(11-13 사용자 "메뉴 탭 인터렉션 따라 하기", 레퍼런스 adamperlis.com 값): 화면 위 가운데에서 내려오며 커지는 큰 판.
+   열기: 판 투명 0→1 · 96%→100% · 8px 위→제자리 0.5초 / 항목은 10px 위에서 0.4초, 0.04초씩 차례로 / 허기가 AI 버튼에서 날아와 커짐.
+   닫기: 아래 항목부터 6px 올라가며 사라지고 판이 96%로 줄며 사라짐(0.45초). GNB 버튼은 판 위에 남고 메뉴 버튼 두 줄이 X로 바뀐다. */
+:root { --m-ease: cubic-bezier(.16, 1, .3, 1); }
+.side-scrim { position: fixed; inset: 0; z-index: 45; background: rgba(22, 22, 21, .10); opacity: 0; transition: opacity .3s ease-out; }
+.side { position: fixed; z-index: 46; top: max(12px, env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); bottom: max(12px, env(safe-area-inset-bottom, 0px)); left: max(12px, env(safe-area-inset-left, 0px));
+  border-radius: 28px; background: var(--md-surface); color: var(--md-on-surface); box-shadow: 0 30px 80px -24px rgba(0, 0, 0, .35), 0 0 0 1px rgba(0, 0, 0, .06);
+  overflow-y: auto; overscroll-behavior: contain; transform-origin: 50% 0; opacity: 0; transform: translateY(-8px) scale(.96); transition: opacity .5s var(--m-ease), transform .5s var(--m-ease); }
+@media (min-width: 640px) { .side { top: 16px; right: 16px; bottom: 16px; left: 16px; } }
+.side.on, .side-scrim.on { opacity: 1; transform: none; }
+.side.out { transition-duration: .3s; transition-delay: .14s; transition-timing-function: cubic-bezier(.4, 0, 1, 1); }
+.side-scrim.out { transition-delay: .14s; }
+html.m-open { overflow: hidden; }
+html.m-open .hdr { z-index: 50; }
+html.m-open .gbtn { -webkit-backdrop-filter: none; backdrop-filter: none; }
+.mnav { width: fit-content; max-width: 100%; min-height: 100%; margin: 0 auto; padding: 120px 24px 32px; display: flex; flex-direction: column; justify-content: space-between; gap: 32px; }
+.mhead { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 12px; }
+.mhugi { position: relative; width: 88px; height: 88px; flex: none; }
+#hugi-menu { --hg-w: 60px; position: absolute; inset: 0; pointer-events: none; }
+.mline { color: var(--md-on-surface-variant); font-size: 15px; margin-bottom: 12px; }
+.mlist { list-style: none; margin: 0; padding: 0; }
+.mrow, .side summary { display: inline-flex; align-items: baseline; gap: 12px; padding: 8px 0; background: none; border: 0; cursor: pointer; text-align: left; font: inherit; font-size: 28px; line-height: 1.2; word-break: keep-all; color: var(--md-on-surface-variant);
+  transform-origin: 0 50%; transition: color .15s, scale .15s; -webkit-tap-highlight-color: transparent; }
+.side summary { list-style: none; }
 .side summary::-webkit-details-marker { display: none; }
-.side summary:hover { background: var(--md-surface-container); }
-.side summary .nm { flex: 1; min-width: 0; font-size: 16px; font-weight: 500; }
-.side summary .tg { font-size: 12px; color: var(--md-on-surface-variant); }
-.side summary .ms { font-size: 20px; color: var(--md-on-surface-variant); transition: transform .2s; }
+.mrow .no, .side summary .no { font-size: 13px; color: color-mix(in srgb, var(--md-on-surface-variant) 60%, transparent); font-variant-numeric: tabular-nums; min-width: 1.5em; }
+.side summary .tg { font-size: 13px; color: color-mix(in srgb, var(--md-on-surface-variant) 70%, transparent); }
+.side summary .ms { font-size: 20px; align-self: center; color: var(--md-on-surface-variant); transition: transform .2s; }
 .side details[open] summary .ms { transform: rotate(180deg); }
-.side .secs { display: flex; flex-direction: column; padding: 2px 0 8px 12px; }
-.side .secs button { text-align: left; background: none; border: 0; padding: 9px 12px; border-radius: 10px; font-size: 14px; color: var(--md-on-surface-variant); cursor: pointer; }
-.side .secs button:hover { background: var(--md-surface-container); color: var(--md-on-surface); }
-.side .secs .all { color: var(--md-primary); font-weight: 500; }
+@media (hover: hover) { .mrow:hover, .side summary:hover { color: var(--md-on-surface); } }
+.mrow:active, .side summary:active { scale: .98; }
+.mrow[aria-current="page"], .side details[open] summary { color: var(--md-on-surface); }
+.mrow:focus-visible, .side summary:focus-visible, .mfoot a:focus-visible, .mfoot button:focus-visible, .side .secs button:focus-visible { outline: 2px solid var(--md-primary); outline-offset: 2px; border-radius: 6px; }
+.side .secs { display: flex; flex-wrap: wrap; gap: 2px 16px; padding: 0 0 12px calc(1.5em * 13 / 15 + 12px); max-width: 520px; }
+.side .secs button { background: none; border: 0; padding: 4px 0; font: inherit; font-size: 15px; color: var(--md-on-surface-variant); cursor: pointer; transition: color .15s; }
+@media (hover: hover) { .side .secs button:hover { color: var(--md-on-surface); } }
+.side .secs .all { color: var(--md-primary); }
+.mfoot { display: flex; flex-wrap: wrap; gap: 8px 24px; color: var(--md-on-surface-variant); font-size: 15px; }
+.mfoot a, .mfoot button { display: inline-block; background: none; border: 0; padding: 0; font: inherit; color: inherit; text-decoration: none; cursor: pointer; transition: color .15s, scale .15s; }
+@media (hover: hover) { .mfoot a:hover, .mfoot button:hover { color: var(--md-on-surface); } }
+.mfoot a:active, .mfoot button:active { scale: .97; }
+.side .mi { opacity: 0; transform: translateY(-10px); }
+.side.on .mi { opacity: 1; transform: none; transition: opacity .4s var(--m-ease), transform .4s var(--m-ease); transition-delay: calc(80ms + var(--i, 0) * 40ms); }
+.side.out .mi { opacity: 0; transform: translateY(-6px); transition: opacity .2s ease-in, transform .2s ease-in; transition-delay: calc((var(--n, 1) - 1 - var(--i, 0)) * 18ms); }
+/* 메뉴 버튼: 두 줄 → X(0.3초) */
+.gpill i { position: relative; width: 18px; height: 7px; background: none !important; box-shadow: none !important; transform: none !important; }
+.gpill i::before, .gpill i::after { content: ""; position: absolute; left: 0; right: 0; height: 1.5px; border-radius: 2px; background: currentColor; transition: transform .3s cubic-bezier(.4, 0, .2, 1); }
+.gpill i::before { top: 0; } .gpill i::after { bottom: 0; }
+.gpill[aria-expanded="true"] i::before { transform: translateY(2.75px) rotate(45deg); }
+.gpill[aria-expanded="true"] i::after { transform: translateY(-2.75px) rotate(-45deg); }
+@media (max-width: 639px) { .mnav { padding: 96px 20px 28px; } .mrow, .side summary { font-size: 22px; padding: 6px 0; } .side summary .tg { display: none; } .mline { margin-bottom: 8px; } .mhugi { width: 72px; height: 72px; } #hugi-menu { --hg-w: 50px; } }
+@media (prefers-reduced-motion: reduce) { .side, .side-scrim, .side .mi, .side.on .mi, .side.out .mi, .gpill i::before, .gpill i::after { transition: none !important; } }
 
 /* 히어로: Gemini 첫 화면처럼 가운데 한 줄 + 흰 질문창, 뒤에 은은한 파란 빛
  * 노트북마다 화면 높이가 달라서(약 630~900) 글자 · 간격은 화면 폭과 높이 중 작은 쪽에 맞춘다. 내용은 가운데보다 살짝 위. */
@@ -677,19 +708,22 @@ p { margin: 0; }
       <button class="gbtn" id="g-home" type="button" data-top aria-label="홈(AI 대화)" title="홈"><span class="ms" aria-hidden="true">home</span></button>
       <button class="gbtn" id="g-voice" type="button" aria-pressed="false" aria-label="AI 음성으로 답 읽어 주기" title="AI 음성 꺼짐"><span class="ms" aria-hidden="true">volume_off</span></button>
       <button class="gbtn gpill" id="g-menu" type="button" aria-expanded="false" aria-controls="side" aria-label="메뉴 열기" title="메뉴"><i aria-hidden="true"></i></button>
-      <div class="gorb" id="g-ai" role="img" aria-label="AI 비서 허기"><div id="hugi-orb" aria-hidden="true"></div></div>
+      <button class="hbtn" id="g-ai" type="button" aria-label="허기에게 물어보기" title="허기에게 물어보기"></button>
     </nav>
   </div>
 </header>
 <div class="side-scrim" id="side-scrim" hidden></div>
 <aside class="side" id="side" hidden aria-label="메뉴">
-  <div class="side-top"><a class="logo" href="#top" data-top>헝그리<b>한정민</b></a><button class="gbtn" type="button" id="side-x" aria-label="메뉴 닫기"><span class="ms" aria-hidden="true">close</span></button></div>
-  <button class="row" type="button" data-top><span class="ms" aria-hidden="true">home</span>홈 · AI 대화</button>
-  <h3>프로젝트</h3>
-  <div id="side-pj"></div>
-  <h3>한정민</h3>
-  <button class="row" type="button" data-scroll="about"><span class="ms" aria-hidden="true">person</span>소개</button>
-  <button class="row" type="button" data-scroll="contact"><span class="ms" aria-hidden="true">mail</span>연락처</button>
+  <nav class="mnav" aria-label="사이트 메뉴">
+    <div>
+      <div class="mhead mi"><div class="mhugi"><div id="hugi-menu" aria-hidden="true"></div></div><p class="mline">어디부터 볼까요?</p></div>
+      <ol class="mlist" id="side-pj"></ol>
+    </div>
+    <div class="mfoot mi">
+      <button type="button" id="side-mail" data-mail="jungmin2209@naver.com">jungmin2209@naver.com</button>
+      <a href="files/hanjungmin_resume.pdf" target="_blank" rel="noopener">이력서 PDF ↗</a>
+    </div>
+  </nav>
 </aside>
 
 <main id="top">
@@ -3370,8 +3404,9 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var lb = e.target.closest('[data-listen]');
     if (lb) { var A = lb.closest('.ans'); if (VOICE.btn === lb) stopVoice(); else speak(A, lb); return; }
     if (e.target.closest('#auto-read') || e.target.closest('#g-voice')) { setAuto(!VOICE.auto); return; }
-    if (e.target.closest('#g-menu')) { sideOpen(true); return; }
-    if (e.target.closest('#side-x') || e.target.closest('#side-scrim')) { sideOpen(false); return; }
+    if (e.target.closest('#g-menu')) { sideOpen(!$('#side').classList.contains('on')); return; }   // 열려 있으면 X로 닫기
+    if (e.target.closest('#side-mail')) { var mb2 = e.target.closest('#side-mail'), ad = mb2.dataset.mail, sh = function (t) { mb2.textContent = t; setTimeout(function () { mb2.textContent = ad; }, 1600); }; try { navigator.clipboard.writeText(ad).then(function () { sh('복사했어요'); hgEvent('copyOk'); }, function () { sh(ad); }); } catch (err) { sh(ad); } return; }
+    if (e.target.closest('#side-scrim')) { sideOpen(false); return; }
     if (e.target.closest('#side') && e.target.closest('[data-open],[data-scroll],[data-top]')) sideOpen(false);   // 메뉴에서 고르면 닫고 이동
     if (e.target.closest('#vchip')) { if (VM.hidden) openVoices(); else closeVoices(); return; }
     var vo = e.target.closest('.vopt'); if (vo) { chooseVoice(vo.dataset.voice, vo); return; }
@@ -3406,20 +3441,53 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       try { navigator.clipboard.writeText(t.dataset.copy).then(function () { done(true); }, function () { done(false); }); } catch (err) { done(false); }
     }
   });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('#side').hidden) { sideOpen(false); return; } if (e.key === 'Escape' && !D.hidden) closeDetail(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && $('#side').classList.contains('on')) { sideOpen(false); return; } if (e.key === 'Escape' && !D.hidden) closeDetail(); });
   // 사이드 탭(GNB ③): 프로젝트마다 구성(섹션)을 펼쳐 바로 그 칸으로 간다
-  $('#side-pj').innerHTML = P.map(function (p) {
-    return '<details><summary><span class="nm">' + esc(p.name) + '</span><span class="tg">' + esc((p.tags || []).slice(0, 2).join(' · ')) + '</span><span class="ms" aria-hidden="true">expand_more</span></summary>' +
-      '<div class="secs"><button type="button" class="all" data-open="' + p.id + '">전체 보기</button>' +
-      K.sections.map(function (s) { return '<button type="button" data-open="' + p.id + '" data-sec="' + s.id + '">' + esc(s.name) + '</button>'; }).join('') + '</div></details>';
-  }).join('');
+  (function () {
+    var no = 0, pad = function () { no += 1; return (no < 10 ? '0' : '') + no; };
+    var h = '<li class="mi"><button class="mrow" type="button" data-top aria-current="page"><span class="no">' + pad() + '</span><span>홈 · AI 대화</span></button></li>';
+    h += P.map(function (p) {
+      return '<li class="mi"><details><summary><span class="no">' + pad() + '</span><span class="nm">' + esc(p.name) + '</span><span class="tg">' + esc((p.tags || []).slice(0, 2).join(' · ')) + '</span><span class="ms" aria-hidden="true">expand_more</span></summary>' +
+        '<div class="secs"><button type="button" class="all" data-open="' + p.id + '">전체 보기</button>' +
+        K.sections.map(function (s) { return '<button type="button" data-open="' + p.id + '" data-sec="' + s.id + '">' + esc(s.name) + '</button>'; }).join('') + '</div></details></li>';
+    }).join('');
+    h += '<li class="mi"><button class="mrow" type="button" data-scroll="about"><span class="no">' + pad() + '</span><span>소개</span></button></li>';
+    h += '<li class="mi"><button class="mrow" type="button" data-scroll="contact"><span class="no">' + pad() + '</span><span>연락처</span></button></li>';
+    $('#side-pj').innerHTML = h;
+    var mis = Array.prototype.slice.call(document.querySelectorAll('#side .mi')); mis.forEach(function (el, i) { el.style.setProperty('--i', i); el.style.setProperty('--n', mis.length); });
+  })();
   var sideBack = null;
+  var sideT = 0, HM = null;
+  function sideFly(open) {   // 허기: AI 버튼 자리 ↔ 메뉴 맨 위(0.45초). 메뉴 허기는 처음 열 때 한 번 만든다
+    var el = $('#hugi-menu'), from = $('#g-ai'); if (!el) return;
+    if (!HM && window.HUGI_MAKE) { try { HM = window.HUGI_MAKE(el, { prefix: 'hm', hello: false, bubble: false }); } catch (e) { HM = null; } }
+    if (RM || !from || !el.animate) { if (open && HM) try { HM.set('wave'); } catch (e) {} return; }
+    var a = from.getBoundingClientRect(), b = el.getBoundingClientRect(); if (!b.width) return;
+    var k = Math.max(.2, a.height / b.height), dx = (a.left + a.width / 2) - (b.left + b.width / 2), dy = (a.top + a.height / 2) - (b.top + b.height / 2);
+    var far = { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + k + ')', opacity: .9 }, home = { transform: 'none', opacity: 1 };
+    var an = el.animate(open ? [far, home] : [home, far], { duration: open ? 450 : 300, easing: open ? 'cubic-bezier(.22, 1, .36, 1)' : 'cubic-bezier(.4, 0, 1, 1)', fill: open ? 'none' : 'forwards' });
+    if (open) an.onfinish = function () { if (HM) try { HM.set('wave'); } catch (e) {} };
+    else an.onfinish = function () { an.cancel(); };
+  }
   function sideOpen(on) {
-    var sd = $('#side'), sc = $('#side-scrim'), mb = $('#g-menu');
-    if (on === !sd.hidden) return;
-    sd.hidden = sc.hidden = !on; mb.setAttribute('aria-expanded', String(on));
-    if (on) { sideBack = document.activeElement; if (!RM) { sd.animate([{ transform: 'translateX(100%)' }, { transform: 'none' }], { duration: 320, easing: 'cubic-bezier(.2, 0, 0, 1)' }); sc.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200 }); } $('#side-x').focus(); }
-    else if (sideBack && sideBack.focus) sideBack.focus({ preventScroll: true });
+    var sd = $('#side'), sc = $('#side-scrim'), mb = $('#g-menu'), isOn = sd.classList.contains('on');
+    if (on === isOn) return;
+    clearTimeout(sideT);
+    mb.setAttribute('aria-expanded', String(on)); mb.setAttribute('aria-label', on ? '메뉴 닫기' : '메뉴 열기'); mb.title = on ? '닫기' : '메뉴';
+    if (on) {
+      sideBack = document.activeElement;
+      sd.classList.remove('out'); sc.classList.remove('out');
+      sd.hidden = sc.hidden = false; sd.scrollTop = 0; document.documentElement.classList.add('m-open');
+      void sd.offsetWidth;   // 처음 상태를 한 번 그린 뒤 .on을 붙여야 움직임이 보인다
+      sd.classList.add('on'); sc.classList.add('on');
+      sideFly(true);
+    } else {
+      document.documentElement.classList.remove('m-open');
+      sd.classList.remove('on'); sc.classList.remove('on'); sd.classList.add('out'); sc.classList.add('out');
+      sideFly(false);
+      sideT = setTimeout(function () { sd.hidden = sc.hidden = true; sd.classList.remove('out'); sc.classList.remove('out'); Array.prototype.forEach.call(document.querySelectorAll('#side details[open]'), function (d) { d.open = false; }); }, RM ? 0 : 470);
+      if (sideBack && sideBack.focus && sideBack !== mb) sideBack.focus({ preventScroll: true });
+    }
   }
   window.addEventListener('scroll', function () { $('#hdr').classList.toggle('on', window.scrollY > 8); }, { passive: true });
 
@@ -3430,4 +3498,386 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
 })();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+<script>
+/* 허기 버튼(11-13): GNB의 AI 자리를 허기 몸이 꽉 채우는 눌림 · 변형 버튼으로. 원본 허기 좌표를 쓰는 가벼운 리그(GSAP 없음 · 새 그림 없음).
+   기존 window.HUGI_ORB(set · typing · speak · react)와 같은 이름으로 받아서 AI 상태 · 감정 연결(hg · hgEach)은 그대로 쓴다. 값은 아래 V · SP · EMO 표에서 고친다. */
+/* 허기 버튼(HUGIBTN): 허기 몸 자체가 버튼. 원본 허기 좌표(viewBox 760x700, 몸 중심 381,410 · 반지름 ≈231, 눈 두 개, 혹 4개)를 그대로 쓰고
+   움직임은 스프링으로 계산한다(GSAP 없이 · SVG 필터 없이 · 이미 있는 그림만). 값은 맨 위 표 한 곳에서 고친다. */
+(function (global) {
+  'use strict';
+  var NS = 'http://www.w3.org/2000/svg';
+  var CX = 381, CY = 410;                           // 몸 중심(원본 GEO.c)
+  var BODY_D = 462, VB_Y = 165, VB_H = 520;           // 몸 지름 · 보이는 세로 범위(그림 단위)
+  var FACE = { x: 190, y: 240, w: 380, h: 280 };    // 눈 그림 자리(원본 FACE)
+  var NUB = { aL: { f: 'nub_armL.png', x: 84, y: 314, w: 99, h: 118 }, aR: { f: 'nub_armR.png', x: 575, y: 309, w: 101, h: 116 },
+              lL: { f: 'nub_legL.png', x: 182, y: 551, w: 136, h: 118 }, lR: { f: 'nub_legR.png', x: 442, y: 559, w: 131, h: 107 } };
+  var EYES = ['happy', 'sad', 'angry', 'wow', 'doubt', 'wink', 'shy', 'squint', 'closed', 'sparkle', 'hop', 'surprised'];
+
+  /* ───────── 값 표(여기만 고치면 움직임이 바뀐다) ───────── */
+  var V = {
+    press:   { sx: 1.09, sy: .80, k: 520, z: .80 },       // 누르는 동안: 납작 · 가로로 더 퍼짐(알약이라 옆 버튼과 안 겹치게 9%)
+    hold:    { sx: 1.10, sy: 1.12 },                      // 길게 눌렀을 때 부풀기
+    hover:   { s: 1.05, arm: 16 },                         // 올렸을 때 부풀기 · 팔 들기
+    release: { k: 260, z: .36 },                           // 놓을 때 젤리 복귀(작은 z = 더 튕김)
+    base:    { k: 230, z: .62 },
+    drag:    { max: .12, give: 56, cancelR: 96 },          // 끌 때 늘어남 최대 12% · 늘어나는 기준 거리(px) · 취소 반지름(px)
+    near:    { r: 150, lean: 2.4, tilt: 3.5 },            // 마우스가 이 거리 안이면 눈이 따라보고 알약이 그쪽으로 기움
+    breath:  { amp: .012, period: 3.4 },
+    /* 알약(11-13 사용자 "알약버튼으로"): 크기와 비율은 여기서. 몸 지름 462 단위 기준이라 가로 배율 = 가로 ÷ 세로 */
+    pill:    { desktop: [64, 42], mobile: [58, 40], mq: '(max-width: 860px)', reach: 62, cap: 70 },   // 알약 가로 · 세로(px) / 모바일 기준 / 혹이 몸 밖으로 나오는 폭 / 가운데만 늘어나는 폭(그림 단위, 끝 둥근 부분은 그대로)
+    eye:     { scale: 1.18, gap: 1.6 },                  // 눈 크기 배율 · 두 눈 간격 배율(원래 간격 81 단위). 눈 그림은 늘리지 않고 크기만 키움
+    wobble:  { sx: .010, sk: 1.1, tx: .5 },              // 숨 쉬듯 알약이 좌우로 아주 작게 출렁(젤리)
+    click:   { sx: 1.8, sy: .8 },                        // 클릭 순간 길게 늘었다 돌아오는 "꿀럭"(속도 값, 클수록 많이 늘어남)
+    blink:   [3000, 6000], glance: [7000, 13000],
+    longMs: 600, tapWindow: 1300, emoMs: 2300, dizzyMs: 1700, angryMs: 1300
+  };
+  /* 말하는 박자(허기 SPEAK 표에서 단추에 필요한 것만) beat=박자 프레임[빠름,느림] up=뜸 arm=팔 각도 eyes=번갈아 쓰는 눈 look=시선 dy=내려앉기(px) */
+  var SP = {
+    calm: { beat: [10, 14], up: 1.025, arm: [2, 8], eyes: ['vec'], look: null, dy: 0 },
+    bright: { beat: [6, 9], up: 1.06, arm: [14, 36], eyes: ['happy', 'vec'], look: null, dy: 0 },
+    sunk: { beat: [13, 17], up: 1.015, arm: [0, 4], eyes: ['vec'], look: [0, .75], dy: .7 },
+    firm: { beat: [5, 6], up: 1.03, arm: [3, 9], eyes: ['vec'], look: [0, .1], dy: .3 },
+    shy: { beat: [9, 12], up: 1.02, arm: [0, 6], eyes: ['shy', 'vec'], look: [-.6, .45], dy: .3 },
+    sob: { beat: [15, 19], up: 1.012, arm: [0, 3], eyes: ['sad'], look: [0, .8], dy: 1 },
+    mad: { beat: [5, 6], up: 1.035, arm: [0, 5], eyes: ['angry'], look: [0, 0], dy: .3, shake: 1 },
+    blush: { beat: [10, 13], up: 1.018, arm: [0, 4], eyes: ['shy'], look: [-.5, .5], dy: .4 },
+    drowsy: { beat: [18, 24], up: 1.01, arm: [0, 3], eyes: ['closed'], look: [0, .5], dy: .5 },
+    hype: { beat: [5, 7], up: 1.07, arm: [24, 44], eyes: ['sparkle', 'happy'], look: null, dy: 0, hop: 1 },
+    flustered: { beat: [4, 6], up: 1.03, arm: [10, 40], eyes: ['surprised', 'vec'], look: null, dy: 0, shake: 1 },
+    skeptic: { beat: [11, 15], up: 1.02, arm: [0, 4], eyes: ['doubt'], look: [-.4, -.6], dy: 0, rot0: -5 },
+    touched: { beat: [11, 14], up: 1.03, arm: [0, 5], eyes: ['sparkle', 'happy'], look: [0, -.3], dy: 0 }
+  };
+  /* 감정/상태 → 눈 그림과 몸짓. 2.3초 뒤 기본으로. hold=true면 다른 상태가 올 때까지 */
+  var EMO = {
+    happy: { eye: 'happy', bounce: 1 }, cheer: { eye: 'hop', bounce: 2 }, hop: { eye: 'hop', bounce: 2 }, jump: { eye: 'hop', bounce: 2 },
+    wow: { eye: 'wow', swell: .06 }, sparkle: { eye: 'sparkle', swell: .04 }, surprise: { eye: 'surprised', swell: .08 }, surprised: { eye: 'surprised', swell: .08 },
+    sad: { eye: 'sad', sink: 1 }, refuse: { eye: 'sad', sink: 1 }, error: { eye: 'sad', sink: 1 },
+    angry: { eye: 'angry', shake: 1 }, mad: { eye: 'angry', shake: 1 },
+    shy: { eye: 'shy', shrink: 1, look: [-.6, .4] }, praised: { eye: 'shy', shrink: 1, look: [-.6, .4] }, blush: { eye: 'shy', shrink: 1, look: [-.6, .4] }, privateQ: { eye: 'shy', shrink: 1, look: [-.6, .4] },
+    wink: { eye: 'wink' }, goodbye: { eye: 'wink' }, doubt: { eye: 'doubt', tilt: -6 }, vagueQ: { eye: 'doubt', tilt: -6 },
+    notknow: { eye: 'doubt', tilt: -6, shrug: 1 }, flutter: { eye: 'happy', sway: 1 }, revisit: { eye: 'happy', sway: 1 },
+    proud: { eye: 'happy', swell: .06, arms: 1 }, showResult: { eye: 'happy', swell: .06, arms: 1 }, answerDone: { eye: 'happy', bounce: 1 },
+    moved: { eye: 'sparkle', tremble: 1 }, longPraise: { eye: 'sparkle', tremble: 1 }, hungry: { eye: 'sparkle', sway: 1 }, nudge: { eye: 'sparkle', sway: 1 },
+    relieved: { eye: 'closed', sink: 1, then: 'happy' }, reconnect: { eye: 'closed', sink: 1, then: 'happy' },
+    nervous: { eye: 'surprised', tremble: 1 }, interviewQ: { eye: 'surprised', tremble: 1 }, panic: { eye: 'surprised', shake: 1 }, corrected: { eye: 'surprised', shake: 1 },
+    sulky: { eye: 'squint', turn: 1 }, teased: { eye: 'squint', turn: 1 }, wave: { eye: 'happy', wave: 1 }, hello: { eye: 'happy', wave: 1 }, secContact: { eye: 'happy', wave: 1 },
+    sleepy: { eye: 'closed', sink: 1, hold: 1 }, sleeping: { eye: 'closed', sink: 1, hold: 1 }, longIdle: { eye: 'closed', sink: 1, hold: 1 },
+    dizzy: { dizzy: 1 }, shaken: { dizzy: 1 }, tapSpam: { eye: 'angry', shake: 1 }
+  };
+
+  function el(tag, attrs, parent) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+  function img(href, x, y, w, h, parent) { var e = el('image', { x: x, y: y, width: w, height: h }, parent); e.setAttribute('href', href); e.setAttributeNS('http://www.w3.org/1999/xlink', 'href', href); return e; }
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function Sp(x) { return { x: x, v: 0, t: x, k: V.base.k, z: V.base.z }; }
+
+  function make(btn, opt) {
+    opt = opt || {};
+    var src = opt.src || function (n) { return 'hugi/' + n; };
+    var RM = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    btn.innerHTML = '';
+    var sh = document.createElement('span'); sh.className = 'hb-sh'; btn.appendChild(sh);
+    var svg = el('svg', { 'class': 'hb-svg', 'aria-hidden': 'true', focusable: 'false' });
+    btn.appendChild(svg);
+    var defs = el('defs', {}, svg);
+    var EC = CX, EY = 357;                                           // 눈 중심(알약 가운데)
+    var clipL = el('clipPath', { id: 'hbcL' }, defs), clipR = el('clipPath', { id: 'hbcR' }, defs), clipA = el('clipPath', { id: 'hbcA' }, defs);
+    var ccL = el('circle', {}, clipL), ccR = el('circle', {}, clipR), ccA1 = el('circle', {}, clipA), ccA2 = el('circle', {}, clipA);
+    var hl = el('clipPath', { id: 'hbhL' }, defs); el('rect', { x: 150, y: 180, width: 230, height: 400 }, hl);   // 눈 그림 왼쪽 · 오른쪽 절반(두 눈 간격을 벌리려고 나눔)
+    var hr = el('clipPath', { id: 'hbhR' }, defs); el('rect', { x: 380, y: 180, width: 230, height: 400 }, hr);
+    var G = {}, OUT = {};
+    function limb(k, parent) { var o = el('g', {}, parent); OUT[k] = o; var g = el('g', {}, o); G[k] = g; var n = NUB[k]; img(src(n.f), n.x, n.y, n.w, n.h, g); }
+    var legs = el('g', {}, svg); limb('lL', legs); limb('lR', legs);                       // 다리 혹: 아래, 몸 뒤
+    var bodyG = el('g', {}, svg), sMid = el('g', {}, bodyG), sL = el('g', {}, bodyG), sR = el('g', {}, bodyG);   // 몸: 세 조각(끝 · 가운데 · 끝)으로 나눠 가운데만 늘림 = 알약 실루엣
+    var rM = el('rect', { y: 0, height: 700 }, el('clipPath', { id: 'hbsM' }, defs)), rL = el('rect', { y: 0, height: 700 }, el('clipPath', { id: 'hbsL' }, defs)), rR = el('rect', { y: 0, height: 700 }, el('clipPath', { id: 'hbsR' }, defs));
+    [[sMid, 'hbsM'], [sL, 'hbsL'], [sR, 'hbsR']].forEach(function (a) { img(src('body_core.png'), 0, 0, 760, 700, el('g', { 'clip-path': 'url(#' + a[1] + ')' }, a[0])); });
+    var arms = el('g', {}, svg); limb('aL', arms); limb('aR', arms);                       // 팔 혹: 양 끝, 몸 앞
+    var face = el('g', {}, svg);
+    var vec = el('g', {}, face);
+    var ringL = el('circle', { fill: '#FF6A22' }, vec), ringR = el('circle', { fill: '#FF6A22' }, vec);
+    var whL = el('circle', { fill: '#FDFDFD' }, vec), whR = el('circle', { fill: '#FDFDFD' }, vec);
+    var pc = el('g', { 'clip-path': 'url(#hbcA)' }, vec);
+    var pL = el('circle', { fill: '#0A0A0A' }, pc), pR = el('circle', { fill: '#0A0A0A' }, pc);
+    var lidL = el('g', { 'clip-path': 'url(#hbcL)' }, vec), lidR = el('g', { 'clip-path': 'url(#hbcR)' }, vec);
+    var lrL = el('rect', { fill: '#FF7631' }, lidL), llL = el('line', { stroke: '#1B1B1B', 'stroke-width': 6, 'stroke-linecap': 'round', opacity: 0 }, lidL);
+    var lrR = el('rect', { fill: '#FF7631' }, lidR), llR = el('line', { stroke: '#1B1B1B', 'stroke-width': 6, 'stroke-linecap': 'round', opacity: 0 }, lidR);
+    var PEL = {}, PWL = {}, PWR = {};
+    EYES.forEach(function (k) {
+      var o = el('g', {}, face); o.style.opacity = 0; PEL[k] = o;
+      var a = el('g', {}, o); PWL[k] = a; img(src('eye_' + k + '.png'), FACE.x, FACE.y, FACE.w, FACE.h, el('g', { 'clip-path': 'url(#hbhL)' }, a));
+      var b = el('g', {}, o); PWR[k] = b; img(src('eye_' + k + '.png'), FACE.x, FACE.y, FACE.w, FACE.h, el('g', { 'clip-path': 'url(#hbhR)' }, b));
+    });
+    var geo = { w: 64, h: 42, u: .0909, kx: 1.52, ds: 0, half: 0, es: 1, xl: 0, xr: 0, ER: 50.5 };
+    function layout() {
+      var mq = window.matchMedia && matchMedia(V.pill.mq).matches, d = mq ? V.pill.mobile : V.pill.desktop, w = d[0], h = d[1];
+      var u = h / BODY_D, kx = w / h, ds = (kx - 1) * 231, half = 231 * kx + V.pill.reach, es = V.eye.scale, g = 81 * V.eye.gap;
+      geo = { w: w, h: h, u: u, kx: kx, ds: ds, half: half, es: es, xl: EC - g / 2, xr: EC + g / 2, ER: 50.5 * es };
+      btn.style.width = w + 'px'; btn.style.height = h + 'px';
+      svg.setAttribute('viewBox', (CX - half) + ' ' + VB_Y + ' ' + (2 * half) + ' ' + VB_H);
+      svg.style.width = (2 * half * u) + 'px'; svg.style.height = (VB_H * u) + 'px'; svg.style.marginLeft = (-half * u) + 'px'; svg.style.marginTop = (-(CY - VB_Y) * u) + 'px';
+      var w0 = V.pill.cap, ov = 3, sm = 1 + ds / w0;
+      rM.setAttribute('x', CX - w0); rM.setAttribute('width', 2 * w0); sMid.setAttribute('transform', 'translate(' + CX + ' 0) scale(' + sm + ' 1) translate(' + (-CX) + ' 0)');
+      rL.setAttribute('x', 0); rL.setAttribute('width', CX - w0 + ov); sL.setAttribute('transform', 'translate(' + (-ds) + ' 0)');
+      rR.setAttribute('x', CX + w0 - ov); rR.setAttribute('width', 760 - (CX + w0 - ov)); sR.setAttribute('transform', 'translate(' + ds + ' 0)');
+      OUT.aL.setAttribute('transform', 'translate(' + (-ds) + ' 0)'); OUT.lL.setAttribute('transform', 'translate(' + (-ds) + ' 0)');
+      OUT.aR.setAttribute('transform', 'translate(' + ds + ' 0)'); OUT.lR.setAttribute('transform', 'translate(' + ds + ' 0)');
+      sh.style.width = (w * .74) + 'px'; sh.style.height = (h * .17) + 'px'; sh.style.marginLeft = (-w * .37) + 'px';
+      function c(e, x, r) { e.setAttribute('cx', x); e.setAttribute('cy', EY); e.setAttribute('r', r); }
+      c(ringL, geo.xl, 52.3 * es); c(ringR, geo.xr, 52.1 * es); c(whL, geo.xl, 50.5 * es); c(whR, geo.xr, 50.3 * es);
+      c(ccL, geo.xl, 50.8 * es); c(ccR, geo.xr, 50.6 * es); c(ccA1, geo.xl, 50.8 * es); c(ccA2, geo.xr, 50.6 * es);
+      pL.setAttribute('r', 20.8 * es); pR.setAttribute('r', 20.9 * es);
+      lrL.setAttribute('x', geo.xl - 60 * es); lrL.setAttribute('width', 120 * es); lrR.setAttribute('x', geo.xr - 60 * es); lrR.setAttribute('width', 120 * es);
+      llL.setAttribute('x1', geo.xl - 45 * es); llL.setAttribute('x2', geo.xl + 45 * es); llR.setAttribute('x1', geo.xr - 45 * es); llR.setAttribute('x2', geo.xr + 45 * es);
+      var dp = (g - 81 * es) / 2, base = 'translate(' + EC + ' ' + EY + ') scale(' + es + ') translate(' + (-EC) + ' ' + (-EY) + ')';
+      EYES.forEach(function (k) { PWL[k].setAttribute('transform', 'translate(' + (-dp) + ' 0) ' + base); PWR[k].setAttribute('transform', 'translate(' + dp + ' 0) ' + base); });
+      C = {};
+    }
+
+    /* 스프링들 */
+    var S = { sx: Sp(1), sy: Sp(1), tx: Sp(0), ty: Sp(0), rot: Sp(0), sk: Sp(0), aL: Sp(0), aR: Sp(0), lL: Sp(0), lR: Sp(0), lx: Sp(0), ly: Sp(0), bu: Sp(0) };
+    var eyeNow = 'vec', lid = 0, lidT = 0, blinkT = 0, nextBlink = performance.now() + rnd(1200, 2500), nextGlance = performance.now() + rnd(V.glance[0], V.glance[1]);
+    var mode = 'idle', persist = { mode: 'idle', group: 'calm' }, emo = null, emoUntil = 0, relT = 0;
+    var ptr = { x: -9999, y: -9999, has: false, down: false, id: null, dx: 0, dy: 0, sx: 0, sy: 0, moved: false, cancelled: false, inside: false };
+    var pressMode = false, held = false, longT = 0, lastTap = 0, taps = 0, specialUntil = 0, special = '';
+    var spk = { next: 0, flip: 0, eyeFlip: 0 };
+    var visible = true, running = false, last = 0, t0 = performance.now(), originX = 50, originY = 88, kick = 0;
+
+    function setEye(n) {
+      if (n === eyeNow) return; eyeNow = n;
+      vec.style.display = n === 'vec' ? '' : 'none';
+      EYES.forEach(function (k) { PEL[k].style.opacity = k === n ? 1 : 0; });
+    }
+    function setSpring(k, tgt, kk, z) { var s = S[k]; s.t = tgt; if (kk) { s.k = kk; s.z = z; } }
+    function tuneAll(kk, z) { for (var k in S) { S[k].k = kk; S[k].z = z; } }
+    function wake() { if (!running && visible && !document.hidden) { running = true; last = performance.now(); requestAnimationFrame(frame); } }
+
+    /* ── 한 프레임: 목표 계산 → 스프링 → 그리기 ── */
+    function targets(now) {
+      var T = { sx: 1, sy: 1, tx: 0, ty: 0, rot: 0, sk: 0, aL: 0, aR: 0, lL: 0, lR: 0, lx: 0, ly: 0, bu: 0 };
+      var eye = 'vec', look = null, lidForce = null;
+      var breathe = RM ? 0 : Math.sin((now - t0) / 1000 * 2 * Math.PI / V.breath.period);
+      T.sy += V.breath.amp * breathe; T.sx -= V.breath.amp * .5 * breathe;
+      T.aL += -3 * breathe; T.aR += 3 * breathe;
+      if (!RM) { var wob = (now - t0) / 1000; T.sx += V.wobble.sx * Math.sin(wob * 2 * Math.PI / 2.7 + 1); T.sk += V.wobble.sk * Math.sin(wob * 2 * Math.PI / 2.3); T.tx += V.wobble.tx * Math.sin(wob * 2 * Math.PI / 3.1); }
+
+      var m = mode;
+      if (m === 'thinking' && !RM) { look = [Math.sin((now - t0) / 1000 * 2.6) * .55, -.8]; T.rot += Math.sin((now - t0) / 1000 * 2.6) * 2.5; T.sy -= .02; }
+      else if (m === 'thinking') look = [0, -.8];
+      else if (m === 'listening') { look = [.15, .65]; T.ty += 1; T.rot += 1.5; }
+      else if (m === 'speaking' && !RM) {
+        var g = SP[persist.group] || SP.calm;
+        if (now >= spk.next) {
+          var fr = rnd(g.beat[0], g.beat[1]) / 60 * 1000; spk.next = now + fr; spk.flip = spk.flip ? 0 : 1;
+          if (g.hop && spk.flip) { S.ty.v -= 70; }
+          if (g.shake) { S.tx.v += (spk.flip ? 1 : -1) * 28; }
+          if (++spk.eyeFlip % 4 === 0 && g.eyes.length > 1) spk.eyes = spk.eyes === g.eyes[0] ? g.eyes[1] : g.eyes[0];
+        }
+        eye = (spk.eyes || g.eyes[0]);
+        T.sy = 1 + (spk.flip ? 1.7 : 0) * (g.up - 1) + V.breath.amp * breathe; T.sx = 1 - (spk.flip ? .8 : 0) * (g.up - 1);
+        T.ty += g.dy; T.rot += (g.rot0 || 0) * .4 + (spk.flip ? 1 : -1) * 1.6;
+        var a = (g.arm[0] + (spk.flip ? g.arm[1] : g.arm[0])) / 2.6; T.aL += spk.flip ? -a : 0; T.aR += spk.flip ? 0 : a; T.sk += (spk.flip ? 1 : -1) * 3; T.bu = spk.flip ? 1 : -1;   // 양끝이 번갈아 부풀며 통통
+        look = g.look;
+      } else if (m === 'speaking') { var g2 = SP[persist.group] || SP.calm; eye = g2.eyes[0]; look = g2.look; }
+
+      if (emo && now < emoUntil) {
+        var E = emo, p = 1 - (emoUntil - now) / V.emoMs;     // 0→1
+        eye = E.eye || eye; if (E.look) look = E.look;
+        if (E.bounce) T.sy += Math.max(0, Math.sin(p * Math.PI * 2 * E.bounce)) * .10 * (1 - p), T.sx -= Math.max(0, Math.sin(p * Math.PI * 2 * E.bounce)) * .05 * (1 - p);
+        if (E.swell) { var s = Math.sin(Math.min(1, p * 1.6) * Math.PI); T.sx += E.swell * s; T.sy += E.swell * s; }
+        if (E.sink) { T.sy -= .10 * Math.sin(Math.min(1, p * 1.4) * Math.PI); T.sx += .05 * Math.sin(Math.min(1, p * 1.4) * Math.PI); T.ty += 1.3; T.aL += 12; T.aR -= 12; }
+        if (E.shrink) { T.sx -= .06; T.sy -= .04; T.rot += -4; T.aL += -8; T.aR += 8; }
+        if (E.shake && !RM) { T.tx += Math.sin((now - t0) / 1000 * 2 * Math.PI * 14) * 1.2 * (1 - p); }
+        if (E.tremble && !RM) { T.tx += Math.sin((now - t0) / 1000 * 2 * Math.PI * 16) * .6; }
+        if (E.tilt) T.rot += E.tilt;
+        if (E.sway && !RM) { T.rot += Math.sin((now - t0) / 1000 * 2 * Math.PI * 1.6) * 5; T.tx += Math.sin((now - t0) / 1000 * 2 * Math.PI * 1.6) * 1.2; }
+        if (E.shrug) { T.aL -= 22; T.aR += 22; T.sy -= .03; }
+        if (E.arms) { T.aL -= 30; T.aR += 30; }
+        if (E.wave && !RM) { T.aR += 38 + Math.sin((now - t0) / 1000 * 2 * Math.PI * 4) * 18; }
+        if (E.turn) { T.rot += 6; T.sx -= .03; look = [.9, .1]; }
+      }
+      if (emo && now >= emoUntil) { if (emo.then) { emo = { eye: emo.then, bounce: 1 }; emoUntil = now + 1200; } else emo = null; }
+
+      /* 특별 동작: 어지러움 · 화남 · 놀람 */
+      if (special && now < specialUntil) {
+        var q = (now - (specialUntil - (special === 'dizzy' ? V.dizzyMs : V.angryMs))) / 1000;
+        if (special === 'dizzy') { var d = 1 - q / (V.dizzyMs / 1000); eye = 'vec'; look = [Math.cos(q * 9) * .8, Math.sin(q * 9) * .8]; T.rot += Math.sin(q * 11) * 10 * d; T.tx += Math.sin(q * 7) * 1.4 * d; T.aL += Math.sin(q * 11) * 12; T.aR += Math.sin(q * 11 + 1.5) * 12; }
+        else if (special === 'angry') { eye = 'angry'; T.tx += Math.sin(q * 90) * 1.3; T.sx += .05; T.sy -= .03; T.aL -= 20; T.aR += 20; }
+      } else if (special) special = '';
+
+      /* 누르는 동안 */
+      if (pressMode) {
+        if (held) { eye = 'surprised'; T.sx = V.hold.sx; T.sy = V.hold.sy; T.aL -= 30; T.aR += 30; }
+        else {
+          eye = 'squint'; T.sx = V.press.sx; T.sy = V.press.sy; T.aL += 18; T.aR -= 18; T.lL += 6; T.lR -= 6;
+          var p2 = clamp(ptr.sx / 24, -1, 1); T.rot += p2 * 6; T.sk += -p2 * 3; T.tx += p2 * 1;
+          if (ptr.moved) {                            // 끌기: 포인터 쪽으로 늘어남(최대 12%)
+            var ax = clamp(Math.abs(ptr.dx) / V.drag.give, 0, 1) * V.drag.max, ay = clamp(Math.abs(ptr.dy) / V.drag.give, 0, 1) * V.drag.max;
+            T.sx = 1 + (ax - ay * .6) + .0; T.sy = 1 + (ay - ax * .6);
+            T.tx = clamp(ptr.dx * .2, -4.5, 4.5); T.ty = clamp(ptr.dy * .24, -5, 5); T.rot = clamp(ptr.dx * .17, -9, 9); T.sk = clamp(-ptr.dx * .13, -8, 8);   // 알약은 길어서 이동 · 회전을 줄이고 휘어짐(기울임)으로 보임
+            eye = 'vec'; look = [clamp(ptr.dx / 30, -1, 1), clamp(ptr.dy / 30, -1, 1)];
+          }
+        }
+        lidForce = null;
+      } else if (!RM && ptr.has && ptr.inside && !special) {       // 올렸을 때
+        T.sx *= V.hover.s; T.sy *= V.hover.s; T.aL -= V.hover.arm; T.aR += V.hover.arm;
+      }
+
+      /* 마우스 따라보기(눌러서 끌 때 · 말하기 · 감정 시선은 그대로 두고, 아무 시선도 없을 때만) */
+      if (!look && ptr.has && !RM && !pressMode) {
+        var r = btn.getBoundingClientRect(), bx = r.left + r.width / 2, by = r.top + r.height / 2, vx = ptr.x - bx, vy = ptr.y - by, dist = Math.sqrt(vx * vx + vy * vy);
+        if (dist < V.near.r * 1.6) {
+          var k = clamp(1 - Math.max(0, dist - 24) / (V.near.r * 1.6), 0, 1), nx = vx / (dist || 1), ny = vy / (dist || 1);
+          look = [clamp(vx / 36, -1, 1) * .95, clamp(vy / 36, -1, 1) * .95];
+          T.tx += nx * V.near.lean * k; T.ty += ny * V.near.lean * .6 * k; T.rot += nx * V.near.tilt * k;
+        }
+      } else if (!look && !pressMode && !RM && now > 0 && glance.until > now) look = glance.v;
+      if (RM) { for (var rk in T) T[rk] = (rk === 'sx' || rk === 'sy') ? 1 : 0; look = null; }   // 모션 줄이기: 몸은 가만히 · 눈 그림만 바뀜
+      if (look) { T.lx = look[0]; T.ly = look[1]; }
+      return { T: T, eye: eye };
+    }
+    var glance = { until: 0, v: [0, 0] };
+
+    var C = {};   // 마지막으로 그린 값(같으면 DOM을 건드리지 않음)
+    function put(node, key, name, val) { if (C[key] !== val) { C[key] = val; node.setAttribute(name, val); } }
+    var skip = 0;
+    function frame(now) {
+      if (!running) return;
+      var calm = mode === 'idle' && !emo && !special && !pressMode && !(ptr.has && ptr.inside) && !RM;
+      if (calm && ++skip % 2) { requestAnimationFrame(frame); return; }   // 가만히 숨만 쉴 때는 30프레임
+      var dt = Math.min(.05, (now - last) / 1000); last = now;
+      /* 깜빡임 · 슬쩍 보기 */
+      if (!RM) {
+        if (now > nextBlink && !pressMode && !special) { blinkT = now; nextBlink = now + rnd(V.blink[0], V.blink[1]); if (Math.random() < .2) nextBlink = now + 260; }
+        if (now > nextGlance) { nextGlance = now + rnd(V.glance[0], V.glance[1]); if (mode === 'idle' && !emo && !ptr.has) { var inp = document.getElementById('ask-input'); var rr = btn.getBoundingClientRect(); var ir = inp && inp.getBoundingClientRect(); var vx = ir ? ir.left + ir.width / 2 - (rr.left + rr.width / 2) : 0, vy = ir ? ir.top - (rr.top + rr.height / 2) : 60; var n = Math.sqrt(vx * vx + vy * vy) || 1; glance.v = [clamp(vx / n, -1, 1) * .8, clamp(vy / n, -.2, 1) * .8]; glance.until = now + 1300; } }
+      }
+      var R = targets(now);
+      var T = R.T;
+      for (var key in S) S[key].t = T[key];
+      /* 스프링 계산(1/120초씩) */
+      var steps = Math.max(1, Math.round(dt * 120)), h = dt / steps, moving = false;
+      for (var i = 0; i < steps; i++) for (var k in S) { var s = S[k], w = Math.sqrt(s.k), a = s.k * (s.t - s.x) - 2 * s.z * w * s.v; s.v += a * h; s.x += s.v * h; }
+      for (var k2 in S) { var s2 = S[k2]; if (Math.abs(s2.x - s2.t) > .0008 || Math.abs(s2.v) > .01) moving = true; }
+      /* 눈 */
+      var eyeName = R.eye;
+      var bt = now - blinkT, bl = bt < 150 ? Math.sin(bt / 150 * Math.PI) : 0;
+      if (eyeName === 'vec') setEye('vec'); else setEye(eyeName);
+      if (eyeNow === 'vec') {
+        var lx = S.lx.x, ly = S.ly.x, off = 24 * geo.es;
+        put(pL, 'pLx', 'cx', (geo.xl + lx * off).toFixed(1)); put(pL, 'pLy', 'cy', (357 + ly * off).toFixed(1)); put(pR, 'pRx', 'cx', (geo.xr + lx * off).toFixed(1)); put(pR, 'pRy', 'cy', (357 + ly * off).toFixed(1));
+        var lv = clamp(bl, 0, 1);
+        if (Math.abs(lv - lid) > .002) { lid = lv; var hh = lid * 2 * geo.ER, yy = 357 - geo.ER;
+          lrL.setAttribute('y', yy); lrL.setAttribute('height', hh); lrR.setAttribute('y', yy); lrR.setAttribute('height', hh);
+          var ly2 = yy + hh; [llL, llR].forEach(function (L) { L.setAttribute('y1', ly2); L.setAttribute('y2', ly2); L.setAttribute('opacity', lid > .05 ? 1 : 0); }); }
+      }
+      put(face, 'face', 'transform', 'translate(' + (S.lx.x * 6).toFixed(1) + ' ' + (S.ly.x * 5).toFixed(1) + ')');
+      /* 몸 */
+      var tx = S.tx.x + S.bu.x * (S.sx.x - 1) * geo.w * .5, ty = S.ty.x;
+      svg.style.transformOrigin = originX + '% ' + originY + '%';
+      var tr = 'translate(' + tx.toFixed(2) + 'px,' + ty.toFixed(2) + 'px) rotate(' + S.rot.x.toFixed(2) + 'deg) skewX(' + S.sk.x.toFixed(2) + 'deg) scale(' + S.sx.x.toFixed(3) + ',' + S.sy.x.toFixed(3) + ')';
+      if (C.tr !== tr) { C.tr = tr; svg.style.transform = tr; }
+      ['aL', 'aR', 'lL', 'lR'].forEach(function (k) { put(G[k], k, 'transform', 'rotate(' + S[k].x.toFixed(1) + ' ' + CX + ' ' + CY + ')'); });
+      var sht = 'scaleX(' + clamp(S.sx.x, .8, 1.3).toFixed(2) + ') scaleY(' + clamp(2 - S.sy.x, .7, 1.3).toFixed(2) + ')'; if (C.sh !== sht) { C.sh = sht; sh.style.transform = sht; var so = clamp(.9 - S.ty.x * .05, .4, 1).toFixed(2); sh.style.opacity = so; }
+      var alive = moving || !RM || pressMode || special || emo || mode !== 'idle';
+      if (alive && visible && !document.hidden) requestAnimationFrame(frame); else running = false;
+    }
+
+    /* ── 외부에서 부르는 것(허기 HUGI와 같은 이름) ── */
+    function startEmo(k) { var E = EMO[k]; if (!E) return false; if (E.dizzy) { special = 'dizzy'; specialUntil = performance.now() + V.dizzyMs; wake(); return true; }
+      emo = E; emoUntil = performance.now() + (E.hold ? 1e9 : V.emoMs); wake(); return true; }
+    var api = {
+      set: function (k) {
+        if (k === 'idle') { mode = 'idle'; persist.mode = 'idle'; if (!emo || !emo.hold) { /* 감정은 끝까지 */ } else emo = null; if (emo && emo.hold) emo = null; wake(); return; }
+        if (k === 'thinking') { mode = 'thinking'; persist.mode = mode; emo = null; wake(); return; }
+        if (k === 'listening') { mode = 'listening'; persist.mode = mode; wake(); return; }
+        if (k === 'speaking') { mode = 'speaking'; persist.mode = mode; spk.eyes = null; wake(); return; }
+        if (k === 'loading') { mode = 'thinking'; wake(); return; }
+        startEmo(k);
+      },
+      typing: function () { if (mode === 'idle' || mode === 'listening') { mode = 'listening'; S.sy.v -= .9; clearTimeout(api._tt); api._tt = setTimeout(function () { if (mode === 'listening') { mode = 'idle'; wake(); } }, 2500); wake(); } },
+      speak: function (m) { var g = 'calm'; try { g = (window.HUGI && window.HUGI.speakGroup) ? window.HUGI.speakGroup(m) : (SP[m] ? m : 'calm'); } catch (e) {} if (!SP[g]) g = SP[m] ? m : 'calm'; persist.group = g; if (mode !== 'speaking') { mode = 'speaking'; persist.mode = mode; spk.eyes = null; } wake(); },
+      react: function (k, m) { if (!startEmo(k) && mode !== 'speaking') return; if (m && mode === 'speaking') api.speak(m); },
+      get state() { return special || (emo && emo.eye) || mode; },
+      _rig: { S: S, V: V }
+    };
+
+    /* ── 포인터 · 키보드 ── */
+    function setOrigin(e) { var r = btn.getBoundingClientRect(); var px = (e.clientX - r.left) / r.width; originX = clamp(100 - (px * 100 - 50) * 1.0 - 0, 20, 80) ; originY = 88; ptr.sx = (e.clientX - (r.left + r.width / 2)); }
+    function pressStart(e) {
+      pressMode = true; held = false; ptr.moved = false; ptr.cancelled = false; ptr.dx = ptr.dy = 0;
+      if (e) { setOrigin(e); ptr.sx0 = e.clientX; ptr.sy0 = e.clientY; } else { originX = 50; ptr.sx = 0; }
+      tuneAll(V.press.k, V.press.z); clearTimeout(longT);
+      longT = setTimeout(function () { if (pressMode && !ptr.moved) { held = true; tuneAll(300, .45); wake(); } }, V.longMs);
+      wake();
+    }
+    function pressEnd(commit) {
+      if (!pressMode) return; var wasHeld = held; pressMode = false; held = false; clearTimeout(longT); originX = 50;
+      tuneAll(V.release.k, V.release.z); kick = performance.now();
+      if (commit && !wasHeld) { S.sx.v += V.click.sx; S.sy.v -= V.click.sy; }   // 클릭: 알약이 한 번 길게 늘었다 돌아옴(꿀럭)
+      else if (!wasHeld) { S.sy.v += .55; S.sx.v -= .22; }
+      setTimeout(function () { tuneAll(V.base.k, V.base.z); }, 800);
+      if (commit) {
+        var now = performance.now(); taps = (now - lastTap < V.tapWindow) ? taps + 1 : 1; lastTap = now;
+        if (taps >= 8) { special = 'angry'; specialUntil = now + V.angryMs; taps = 0; }
+        else if (taps === 4) { special = 'dizzy'; specialUntil = now + V.dizzyMs; }
+      }
+      wake();
+    }
+    btn.addEventListener('pointerdown', function (e) {
+      if (e.button !== undefined && e.button !== 0) return;
+      ptr.down = true; ptr.id = e.pointerId; ptr.x = e.clientX; ptr.y = e.clientY; ptr.has = true; ptr.inside = true;
+      try { btn.setPointerCapture(e.pointerId); } catch (x) {}
+      pressStart(e);
+    });
+    btn.addEventListener('pointermove', function (e) {
+      ptr.x = e.clientX; ptr.y = e.clientY; ptr.has = true; ptr.inside = true;
+      if (ptr.down && pressMode) {
+        ptr.dx = e.clientX - ptr.sx0; ptr.dy = e.clientY - ptr.sy0;
+        var r = btn.getBoundingClientRect(), d = Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2));
+        if (!ptr.moved && Math.hypot(ptr.dx, ptr.dy) > 6) { ptr.moved = true; held = false; clearTimeout(longT); tuneAll(240, .55); }
+        if (d > V.drag.cancelR) { ptr.cancelled = true; ptr.down = false; pressEnd(false); }
+      }
+      wake();
+    });
+    function up(e) { if (!ptr.down) return; ptr.down = false; try { btn.releasePointerCapture(e.pointerId); } catch (x) {} var r = btn.getBoundingClientRect(); var inside = e.clientX >= r.left - 6 && e.clientX <= r.right + 6 && e.clientY >= r.top - 6 && e.clientY <= r.bottom + 6; var committed = inside && !ptr.cancelled; ptr.suppress = !committed || ptr.moved && Math.hypot(ptr.dx, ptr.dy) > 24; pressEnd(committed); }
+    btn.addEventListener('pointerup', function (e) { up(e); if (e.pointerType === 'touch') { ptr.has = false; ptr.inside = false; } });
+    btn.addEventListener('pointercancel', function () { if (ptr.down) { ptr.down = false; pressEnd(false); } });
+    btn.addEventListener('pointerenter', function (e) { ptr.has = true; ptr.inside = true; ptr.x = e.clientX; ptr.y = e.clientY; wake(); });
+    btn.addEventListener('pointerleave', function () { ptr.inside = false; wake(); });
+    window.addEventListener('pointermove', function (e) { if (e.pointerType === 'touch') return; ptr.x = e.clientX; ptr.y = e.clientY; ptr.has = true; ptr.inside = (e.target === btn || btn.contains(e.target)); if (visible) wake(); }, { passive: true });
+    window.addEventListener('blur', function () { ptr.has = false; ptr.inside = false; });
+    document.documentElement.addEventListener('pointerleave', function () { ptr.has = false; ptr.inside = false; });
+    btn.addEventListener('keydown', function (e) { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { pressStart(null); } });
+    btn.addEventListener('keyup', function (e) { if (e.key === ' ' || e.key === 'Enter') { pressEnd(true); } });
+    btn.addEventListener('blur', function () { if (pressMode && !ptr.down) pressEnd(false); });
+    btn.addEventListener('click', function (e) {
+      if (ptr.suppress) { ptr.suppress = false; e.preventDefault(); e.stopImmediatePropagation(); return; }
+      if (opt.onActivate) opt.onActivate(e);
+    }, true);
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; if (visible) wake(); }).observe(btn);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) wake(); });
+    layout();
+    if (window.matchMedia) { var mql = matchMedia(V.pill.mq); if (mql.addEventListener) mql.addEventListener('change', layout); else if (mql.addListener) mql.addListener(layout); }
+    setEye('vec'); eyeNow = 'x'; setEye('vec');
+    wake();
+    return api;
+  }
+  global.HUGIBTN_MAKE = make;
+  global.HUGIBTN_EYES = EYES;
+})(window);
+
+(function () {
+  var btn = document.getElementById('g-ai'); if (!btn || !window.HUGIBTN_MAKE) return;
+  var RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.HUGI_ORB = HUGIBTN_MAKE(btn, {
+    src: function (n) { return 'hugi/' + n; },
+    onActivate: function () {   // 클릭: 질문창으로. 첫 화면이 아니면 질문창이 보이게 가져오고, 질문창 옆 허기가 손을 흔든다(답하는 중이면 방해하지 않음)
+      var IN = document.getElementById('ask-input'); if (!IN) return;
+      var r = IN.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > window.innerHeight) { try { IN.scrollIntoView({ block: 'center', behavior: RM ? 'auto' : 'smooth' }); } catch (e) {} }
+      try { IN.focus({ preventScroll: true }); } catch (e) {}
+      try { if (window.HUGI && !/^(thinking|speaking)$/.test(window.HUGI.state || '')) window.HUGI.set('wave'); } catch (e) {}
+    }
+  });
+})();
+</script>
 <script src="hugi/hugi.js" defer></script>
