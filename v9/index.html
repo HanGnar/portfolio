@@ -2,6 +2,17 @@
 <meta charset="utf-8">
 <script>/* 11-14 인트로: 첫 방문이면 검색창과 허기만 보이게 첫 그림 전에 class를 붙인다. 재방문(hg-hello) · 저장된 대화 · 상세 주소면 인트로 없이 원래 화면(허기는 질문창 옆과 AI 버튼 속 둘 다) */
 (function () { var R = document.documentElement, seen = false, saved = false;
+  /* 11-14 사용자 "새로 고침하면 내용 유지 말고 첫 화면으로(허기가 떨어지며 인사하는 것부터)": 새로 고침이면 이 탭의 대화 · 인사 기록 · 주소 뒤 #상세 · 스크롤 위치를 비운다(음성 · 보기 방식 같은 설정은 그대로) */
+  try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch (e) {}   // 브라우저가 예전 스크롤 자리로 되돌리지 않게
+  try {
+    var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+    var reload = nav ? nav.type === 'reload' : (performance.navigation && performance.navigation.type === 1);
+    if (reload) {
+      sessionStorage.removeItem('hg-hello'); sessionStorage.removeItem('hj-chat-v1');
+      if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+      window.scrollTo(0, 0); window.addEventListener('load', function () { window.scrollTo(0, 0); setTimeout(function () { window.scrollTo(0, 0); }, 60); });
+    }
+  } catch (e) {}
   try { seen = sessionStorage.getItem('hg-hello') === '1'; saved = !!sessionStorage.getItem('hj-chat-v1'); } catch (e) {}
   if (!seen && !saved && !location.hash) R.classList.add('hg-intro', 'hg-intro-t', 'm-hugi-gone', 'm-hugi-out'); })();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">   <!-- 2026-11-13: 없어서 휴대폰이 데스크톱 폭(980px)으로 줄여 보여 줬음 -->
