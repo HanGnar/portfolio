@@ -5256,29 +5256,33 @@ body { background: var(--ds-bg); color: var(--ds-label); font-family: var(--ds-f
 .ask.open .askbox { box-shadow: inset 0 0 0 1px var(--ds-glass-edge), 0 0 0 1px var(--ds-glass-line) !important; }   /* 목록과 붙을 때는 그림자를 목록에만 */
 .askbox:focus-within { box-shadow: inset 0 0 0 1px var(--ds-glass-edge), 0 0 0 1px var(--ds-glass-line), var(--ds-shadow-hi) !important; }   /* 입력 중 바깥 선 없음(사용자 11-15), 그림자만 조금 짙게 */
 .ask.open .askbox:focus-within { box-shadow: inset 0 0 0 1px var(--ds-glass-edge), 0 0 0 1px var(--ds-glass-line) !important; }
-.sug li.on, .sug li:hover { background: color-mix(in srgb, var(--ds-label) 6%, transparent); }
+.sug li.on, .sug li:hover { background: var(--ds-hover); }   /* 대화 영역 시트 --hover와 같은 값(11-15 heroix) */
 
 /* 보내기: 강조색 대신 검정 채움 */
 .send { background: var(--ds-ink); color: var(--ds-on-ink); }
 
 /* 쫀득한 누름: 누를 때 0.12초에 줄고, 놓으면 0.42초 동안 살짝 넘쳤다 제자리 */
-.gbtn, .send, .attach, .vchip, .nextq button, .ask-back .opts .pick {
-  transition: transform var(--ds-d3) var(--ds-spring), box-shadow var(--ds-d2) var(--ds-ease-out), background-color var(--ds-d2) var(--ds-ease-out), opacity var(--ds-d2) var(--ds-ease-out), translate .36s var(--ds-ease-out) !important; }
-@media (hover: hover) { .gbtn:hover, .nextq button:hover, .ask-back .opts .pick:hover { transform: scale(1.04); box-shadow: inset 0 0 0 1px var(--ds-glass-edge), 0 0 0 1px var(--ds-glass-line), var(--ds-shadow-hi) !important; } }
-.gbtn:active, .nextq button:active, .ask-back .opts .pick:active, .vchip:active, .attach:active { transform: scale(.94, .92) !important; transition-duration: var(--ds-d1) !important; transition-timing-function: var(--ds-ease-out) !important; }
-.askbox.has .send:active { transform: scale(.88) !important; transition-duration: var(--ds-d1) !important; }
-.gbtn:focus-visible, .send:focus-visible, .attach:focus-visible, .vchip:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--ds-focus), var(--ds-shadow) !important; }
+.gbtn, .send, .attach, .vchip, .listen, .nextq button, .ask-back .opts .pick {
+  transition: transform var(--ds-d3) var(--ds-spring), box-shadow var(--ds-d2) var(--ds-ease-out), background-color var(--ds-d2) var(--ds-ease-out), color var(--ds-d2) var(--ds-ease-out), border-color var(--ds-d2) var(--ds-ease-out), opacity var(--ds-d2) var(--ds-ease-out), translate .36s var(--ds-ease-out) !important; }
+@media (hover: hover) { .gbtn:not(:disabled):hover, .nextq button:not(:disabled):hover, .ask-back .opts .pick:not(:disabled):hover { box-shadow: inset 0 0 0 1px var(--ds-glass-edge), 0 0 0 1px var(--ds-glass-line), var(--ds-shadow-hi) !important; } }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .gbtn:not(:disabled):hover, .nextq button:not(:disabled):hover, .ask-back .opts .pick:not(:disabled):hover, .askbox.has .send:hover { transform: var(--ds-lift); } }
+/* 누름(쫀득): 누르는 순간 0.12초 ease-out으로 .95 · .93(세로가 더 눌림) → 놓으면 기본 전환(0.42초 spring)으로 살짝 넘쳤다 제자리 */
+@media (prefers-reduced-motion: no-preference) {
+  .gbtn:not(:disabled):active, .nextq button:not(:disabled):active, .ask-back .opts .pick:not(:disabled):active, .vchip:not(:disabled):active, .attach:not(:disabled):active, .listen:not(:disabled):active, .askbox.has .send:active { transform: var(--ds-press) !important; } }
+.gbtn:active, .nextq button:active, .ask-back .opts .pick:active, .vchip:active, .attach:active, .listen:active, .askbox.has .send:active { transition-duration: var(--ds-d1) !important; transition-timing-function: var(--ds-ease-out) !important; }
 
 /* 기준 보기(시안 검토용, 사이트에는 없음) */
 .ds-spec { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 90; height: 36px; padding: 0 16px; border: 0; border-radius: 999px; cursor: pointer;
   font: 500 15px/1 var(--ds-font); color: var(--ds-label); background: var(--ds-glass); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
   box-shadow: inset 0 0 0 1px var(--ds-glass-edge), 0 0 0 1px var(--ds-glass-line), var(--ds-shadow); transition: transform var(--ds-d3) var(--ds-spring); }
-.ds-spec:active { transform: scale(.94, .92); transition-duration: var(--ds-d1); }
+@media (prefers-reduced-motion: no-preference) { .ds-spec:active { transform: var(--ds-press); } }
+.ds-spec:active { transition-duration: var(--ds-d1); transition-timing-function: var(--ds-ease-out); }
 .ds-spec[aria-pressed="true"] { background: var(--ds-ink); color: var(--ds-on-ink); }
 .ds-tag { position: absolute; z-index: 95; pointer-events: none; white-space: nowrap; font: 600 11px/1.3 var(--ds-font); letter-spacing: .02em; color: var(--ds-label); background: var(--ds-bg);
   padding: 2px 6px; border-radius: 6px; box-shadow: 0 0 0 1px var(--ds-label-3); transform: translate(-50%, -100%); }
 
-@media (prefers-reduced-motion: reduce) { .gbtn, .send, .attach, .vchip, .nextq button, .ds-spec { transition-duration: 1ms !important; } }
+@media (prefers-reduced-motion: reduce) { .gbtn, .send, .attach, .vchip, .listen, .nextq button, .ask-back .opts .pick, .ds-spec { transition-duration: 1ms !important; } }
 
 /* ── 11-15 사용자 요청 4가지 ── */
 /* ① 대화를 시작한 뒤(.hero.chat)에는 질문창에서 추천 목록을 띄우지 않음: 답 아래 추천 버튼과 겹치고 대화를 가림 */
@@ -5295,8 +5299,9 @@ body { background: var(--ds-bg); color: var(--ds-label); font-family: var(--ds-f
 
 /* ③ 첨부 · 마이크: 내비게이션 버튼과 같은 반응(올리면 유리 바탕 + 그림자 + 1.04배, 누르면 줄었다 쫀득하게 복귀) */
 .attach { background: transparent; box-shadow: none; }
-@media (hover: hover) { .attach:hover { background: var(--ds-glass) !important; -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
-  box-shadow: inset 0 0 0 1px var(--ds-glass-edge), 0 0 0 1px var(--ds-glass-line), var(--ds-shadow-hi) !important; transform: scale(1.04); color: var(--ds-label); } }
+@media (hover: hover) { .attach:not(:disabled):hover, .vchip:not(:disabled):hover, .listen:not(:disabled):hover { background: var(--ds-glass) !important; -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: inset 0 0 0 1px var(--ds-glass-edge), 0 0 0 1px var(--ds-glass-line), var(--ds-shadow-hi) !important; color: var(--ds-label); } }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) { .attach:not(:disabled):hover, .askbox > .attach:not(:disabled):hover, .vchip:not(:disabled):hover, .listen:not(:disabled):hover { transform: var(--ds-lift); } }   /* 첨부 · 마이크 · 목소리 칩 · 듣기: 같은 유리 올림(11-15 heroix로 칩 · 듣기 더함) */
 
 /* ④ 아이콘 밀려나기는 사이트 방식(오른쪽에 보내기 자리를 비우고 아이콘을 translate)을 그대로 씀 */
 @media (prefers-reduced-motion: reduce) { .askbox, .ask.open .askbox, .send { transition-duration: 1ms !important; transition-delay: 0s !important; } }
@@ -5361,9 +5366,70 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 /* 모바일 질문창 폭: 대화 영역 시안과 같게 좌우 16px 여백 */
 @media (max-width: 640px) { .hero .ask { width: calc(100% + 8px); margin-left: -4px; margin-right: -4px; } }
 
+/* ── 11-15 인터랙션 상세(heroix): 누를 수 있는 것 모두 올림 · 누름 · 놓음 · 초점 · 비활성을 같은 토큰으로 ──
+   사용자 "인터랙션들 상세하게 … 오류 안 나게, 끊기는 거 없게, 부드럽게 쫀득하게". 값은 공통기준 7장 + 대화 영역 시트(초점 고리 · 목록 올림)가 기준.
+   사이트 규칙은 지우지 않고 같은 세기의 선택자를 뒤에 두어 값만 바꿈(허기 버튼 몸 움직임 · 인트로 · 질문창 동작은 그대로). */
+:root { --ds-hover: rgba(0, 0, 0, .035); --ds-ring: var(--ds-label-3); --ds-press: scale(.95, .93); --ds-lift: scale(1.04); --ds-disabled: .4; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ds-hover: rgba(255, 255, 255, .05); } }
+:root[data-theme="dark"] { --ds-hover: rgba(255, 255, 255, .05); }
+
+/* 탭할 때 브라우저 기본 회색 덮개 없앰(누름은 크기로만 보임) */
+.gbtn, .hbtn, .attach, .auto, .send, .vchip, .vopt, .sug li, .listen, .nextq button, .ask-back .opts .pick, .ans .next .link, .mrow, .side summary, .mfoot a, .mfoot button, .side .secs button, .ds-spec { -webkit-tap-highlight-color: transparent; }
+
+/* 초점 고리: 키보드로 옮길 때만, 대화 영역 시트와 같은 2px 3단계 글자색 · 바깥 2px(전환 없이 바로) */
+.gbtn:focus-visible, .hbtn:focus-visible, .askbox > .attach:focus-visible, .askbox > .auto:focus-visible, .send:focus-visible, .vchip:focus-visible, .listen:focus-visible,
+.nextq button:focus-visible, .ask-back .opts .pick:focus-visible, .ans .next .link:focus-visible, .ds-spec:focus-visible,
+.mrow:focus-visible, .side summary:focus-visible, .mfoot a:focus-visible, .mfoot button:focus-visible, .side .secs button:focus-visible { outline: 2px solid var(--ds-ring); outline-offset: 2px; }
+.vopt:focus-visible { outline: 2px solid var(--ds-ring); outline-offset: -2px; }   /* 목록 줄은 안쪽 고리(목록 둥근 모서리 밖으로 안 나감) */
+
+/* 목록 줄(추천 목록 · 목소리 고르기): 올림 · 키보드 선택 같은 옅은 회색(--ds-hover), 0.24초 ease-out */
+.vopt { transition: background-color var(--ds-d2) var(--ds-ease-out); }
+.vopt:hover, .vopt:focus-visible { background: var(--ds-hover); }
+
+/* 목소리 칩 · 듣기: 사이트의 회색 6% 올림 대신 첨부 · 마이크와 같은 유리 올림(위 ③). 열린 칩은 회색 유지 */
+.vchip[aria-expanded="true"] { background: var(--ds-hover); }
+
+/* 보내기: 올리면 1.04배(위), 누르면 .95 · .93 → 놓으면 spring */
+
+/* 답 아래 글 링크(다음 할 일 · 받기 · 메일): 누르면 .97로 살짝 눌렸다 spring으로 복귀, 밑줄 색 0.24초 */
+.ans .next .link { transition: color var(--ds-d2) var(--ds-ease-out), text-decoration-color var(--ds-d2) var(--ds-ease-out), transform var(--ds-d3) var(--ds-spring); }
+@media (prefers-reduced-motion: no-preference) { .ans .next .link:not(:disabled):active { transform: scale(.97); transition-duration: var(--ds-d1); transition-timing-function: var(--ds-ease-out); } }
+
+/* 메뉴 항목: 글자색 0.24초 ease-out, 누름은 사이트 크기(.98 · .97) 그대로 두고 곡선만 쫀득하게(누를 때 0.12초 ease-out → 놓으면 0.42초 spring) */
+.mrow, .side summary, .mfoot a, .mfoot button, .side .secs button { transition: color var(--ds-d2) var(--ds-ease-out), scale var(--ds-d3) var(--ds-spring); }
+.mrow:active, .side summary:active, .mfoot a:active, .mfoot button:active, .side .secs button:active { transition-duration: var(--ds-d1); transition-timing-function: var(--ds-ease-out); }
+.side .secs button:active { scale: .97; }
+
+/* 시트 도구 '기준 보기'도 같은 반응 */
+@media (hover: hover) { .ds-spec:hover { box-shadow: inset 0 0 0 1px var(--ds-glass-edge), 0 0 0 1px var(--ds-glass-line), var(--ds-shadow-hi); } }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) { .ds-spec:hover { transform: var(--ds-lift); } .ds-spec:hover:active { transform: var(--ds-press); } }
+.ds-spec { transition: transform var(--ds-d3) var(--ds-spring), box-shadow var(--ds-d2) var(--ds-ease-out), background-color var(--ds-d2) var(--ds-ease-out), color var(--ds-d2) var(--ds-ease-out); }
+
+/* 비활성: 투명도 .4 · 기본 화살표 · 올림 · 누름 없음(첨부 파일 받는 중 .6 · 기다림 표시는 사이트 값 그대로) */
+.gbtn:disabled, .attach:disabled, .auto:disabled, .send:disabled, .vchip:disabled, .listen:disabled, .nextq button:disabled, .ask-back .opts .pick:disabled,
+.ans .next .link:not(.file):disabled, .mrow:disabled, .mfoot button:disabled, .side .secs button:disabled, .ds-spec:disabled { opacity: var(--ds-disabled); cursor: default; }
+.gbtn:disabled:hover, .gbtn:disabled:active, .askbox > .attach:disabled:hover, .askbox > .attach:disabled:active, .mrow:disabled:active { transform: none; scale: none; }
+
+/* 손가락(올림 없는 기기): 사이트의 올림 규칙 중 hover 조건 밖에 있는 것이 누른 뒤 남지 않게 원래 값으로 */
+@media (hover: none) {
+  .sug li:hover:not(.on) { background: transparent; }
+  .vopt:hover:not(:focus-visible) { background: transparent; }
+  .vchip:hover:not([aria-expanded="true"]) { background: transparent; color: var(--md-on-surface-variant); }
+  .listen:hover:not(.on) { background: transparent; color: var(--md-on-surface-variant); }
+  .ans .next .link:hover, .link:hover { text-decoration-color: var(--md-outline-variant); }
+}
+
+/* 동작 줄이기: 크기 변화 없이 색 · 그림자 · 투명도만(사이트의 올림 1.04 · 누름 .96 · .92 · .98 · .97도 같은 세기 선택자로 끔) */
+@media (prefers-reduced-motion: reduce) {
+  .gbtn:hover, .gbtn:active, .askbox > .attach:hover, .askbox > .attach:active, .askbox > .auto:hover, .askbox > .auto:active, .askbox.has .send:active, .askbox.has .send:hover { transform: none; }
+  .mrow:active, .side summary:active, .mfoot a:active, .mfoot button:active, .side .secs button:active { scale: none; }
+}
+
 </style>
 <button class="ds-spec" id="ds-spec" type="button" aria-pressed="false">기준 보기</button>
 <script>(function(){
+  /* 사파리(iOS)는 문서에 touchstart 듣기가 있어야 :active(누름)가 보임 — 빈 듣기(passive), 사이트에 옮길 때도 이 한 줄만 */
+  document.addEventListener('touchstart',function(){},{passive:true});
   var b=document.getElementById('ds-spec'),on=false,tags=[];
   var T=[['.gnb','유리 원형 40 · 알약 56 · 누름 94%→넘침→100%'],['#ask .askbox','유리 알약 52~60 · Body 17 · 안내 글 3단계 색'],['#intro-typed','Footnote 13 · 400 · 보조색'],['#sug','유리 목록 · Callout 15'],['#thread .msg-q','Body 17 · 회색 채움']];
   function clear(){tags.forEach(function(t){t.remove();});tags=[];}
