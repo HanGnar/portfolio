@@ -489,7 +489,7 @@ function showInfo(k){}
 /* 그림자: 몸이 바닥에서 얼마나 떴는지(높이)에 따라 진하기 · 크기를 정함. 닿아 있을 때만 또렷하고, 몸이 눌리면 옆으로 넓어짐 */
 function placeShadow(){
   const w=H.offsetWidth||260,hx=gsap.getProperty(H,'x'),hy=gsap.getProperty(H,'y'),h=Math.max(0,-hy);
-  const g=Math.exp(-h/(w*.075));                                   // 땅에 닿음 1 → 몸 높이의 약 1/5만 떠도 거의 사라짐
+  const g=(drag||hy>1)?0:Math.exp(-h/(w*.075));                                   // 땅에 닿음 1 → 몸 높이의 약 1/5만 떠도 거의 사라짐
   const sq=gsap.getProperty(S,'scaleX')||1;                         // 착지 때 몸이 눌려 넓어지면 그림자도 넓어짐
   const sx=sq*(1+(1-g)*.35),sy=1+(1-g)*.25;
   SH.style.transform='translateX('+hx.toFixed(1)+'px) scale('+sx.toFixed(3)+','+sy.toFixed(3)+')';
