@@ -1,4 +1,4 @@
-/* 허기 모션 — HPP_공유/브랜딩/허기_모션/index.html(2026-11-13 03:01 판)을 hugi_port.py로 옮김. 직접 고치지 말고 원본을 고친 뒤 다시 돌린다.
+/* 허기 모션 — HPP_공유/브랜딩/허기_모션/index.html(2026-11-15 00:51 판)을 hugi_port.py로 옮김. 직접 고치지 말고 원본을 고친 뒤 다시 돌린다.
    한 페이지에 허기를 여러 개 띄울 수 있다:
      window.HUGI_MAKE(rootEl, opts) → { set(k), typing(), state, fit() }
        opts.prefix  복사본 안 id 앞머리(기본 'hg' → #hg-stage · #hg-hugi · #hg-shadow · #hg-rig · #hg-bubble · clipPath #hg-cL… #hg-pc0~29)
@@ -18,6 +18,8 @@ function HUGI_MAKE(ROOT,opts){
 if(!ROOT||!window.gsap)return null;
 opts=opts||{};const P=opts.prefix||'hg',HELLO=opts.hello!==false,BUBBLE=opts.bubble!==false;
 if(!gsapSet){gsapSet=true;gsap.defaults({overwrite:'auto'});gsap.ticker.lagSmoothing(0);}   // 프레임이 밀려도 동작 속도를 억지로 줄이지 않음
+let HG_READY=false;
+const SPK={aL:{th:0,w:0},aR:{th:0,w:0},lL:{th:0,w:0},lR:{th:0,w:0}};let hPrev=null;
 ROOT.innerHTML=MK(P,BUBBLE);const $=s=>ROOT.querySelector(s.replace(/#([\w-]+)/g,'#'+P+'-$1'));const FLOOR=0;
 const NS='http://www.w3.org/2000/svg';
 const H=$('#hugi'),S=$('#sq'),LK=$('#lk'),AC=$('#ac'),EGR=$('#eyes'),BR=$('#br'),PG=$('#pg'),FX=$('#fx'),SH=$('#shadow'),ST=$('#stage'),BUB=$('#bubble'),CTA=document.createElement('i'),INFO=null;
@@ -533,7 +535,7 @@ function pullStretch(dt){
 /* 용수철 계산 단위: 프레임 간격을 1/240초 이하로 잘게 나눠 계산. 처음 몇 초처럼 프레임이 늦게 와도(30fps 이하) 값이 커지며 몸이 깨지지 않게 */
 const SUB=1/240;
 let fpsN=0,fpsT=performance.now();
-gsap.ticker.add((time,dtms)=>{
+gsap.ticker.add((time,dtms)=>{if(!HG_READY)return;
   const dt=Math.min(.05,(dtms||16.7)/1000)*gsap.globalTimeline.timeScale();
   let tx=tg.x,ty=tg.y;
   if(gazeMode==='mouse'&&mx!==null){const r=H.getBoundingClientRect();const ex=r.left+r.width*(377/760),ey=r.top+r.height*(357/700);
@@ -571,8 +573,7 @@ function bounds(){const w=ST.clientWidth,hw=H.offsetWidth*.5+6,minY=-(ST.clientH
 function fbounds(){const r=ST.getBoundingClientRect(),cx=r.left+r.width/2,hw=H.offsetWidth*.5+4,fb=r.bottom+H.offsetWidth*.05;return{minX:hw-cx,maxX:innerWidth-hw-cx,minY:Math.min(0,H.offsetHeight+4-fb),maxY:Math.max(0,innerHeight-fb-4)};}
 function walkHome(){homeT=null;if(drag||phys.on||RM)return;if(!(state==='idle'||state==='land')){if(Math.abs(gsap.getProperty(H,'x'))>8&&!/^(walk|fall|drag)/.test(state))homeT=setTimeout(walkHome,700);return;}const x=gsap.getProperty(H,'x');if(Math.abs(x)<=8){if(Math.abs(x)>.5)gsap.to(H,{x:0,duration:.35,ease:'sine.inOut'});return;}rest(true);const dir=x>0?-1:1;state=dir<0?'walkL':'walkR';homing=true;const tl=T({onComplete:()=>{homing=false;gsap.set(H,{x:0});toIdle();}});face('base','vec');look(dir*.9,.2);const k=moveK(),n=Math.max(1,Math.min(5,Math.ceil(Math.abs(x)/(48*k))));let b=0;for(let i=0;i<n;i++)b=hop(tl,b,26,-x/n/k,{step:(i%2)===(dir<0?1:0)?'L':'R',arms:.5})-18;}
 const pos={x:0,y:0,tx:0,ty:0};
-H.addEventListener('pointerdown',e=>{if(phys.on)return;e.preventDefault();clearTimeout(homeT);homeT=null;rest();homing=false;gsap.killTweensOf(Object.values(LI));gsap.killTweensOf(H);   // 공중(인사 · 점프 중)에서 잡아도 땅으로 내려가던 움직임과 손을 따라가는 움직임이 싸우지 않게
-  state='drag';H.setPointerCapture(e.pointerId);H.classList.add('drag');
+H.addEventListener('pointerdown',e=>{if(phys.on)return;e.preventDefault();clearTimeout(homeT);homeT=null;rest();homing=false;gsap.killTweensOf(Object.values(LI));gsap.killTweensOf(H);/* 공중(인사 · 점프 중)에서 잡아도 땅으로 내려가던 움직임과 손을 따라가는 움직임이 싸우지 않게 */state='drag';H.setPointerCapture(e.pointerId);H.classList.add('drag');
   pos.x=pos.tx=gsap.getProperty(H,'x');pos.y=pos.ty=gsap.getProperty(H,'y');
   drag={ox:e.clientX-pos.x,oy:e.clientY-pos.y,lx:e.clientX,ly:e.clientY,t:performance.now(),vx:0,vy:0,moved:0,sx:e.clientX,sy:e.clientY,on:false,rx:pos.x,ry:pos.y,stuck:pos.y>-2};});
 H.addEventListener('pointermove',e=>{if(!drag)return;const b=fbounds();const now=performance.now(),dt=Math.max(8,now-drag.t);
@@ -589,8 +590,6 @@ function dangle(vx,vy,dt){const sp=Math.min(1,Math.hypot(vx,vy)/1800),t=performa
   [[LI.aL,10+sp*24+fl,1],[LI.aR,-(10+sp*24-fl),1],[LI.lL,lg+sp*8,1+sp*.12],[LI.lR,lg-sp*8,1+sp*.12]].forEach(([g,r,sy])=>{const cr=gsap.getProperty(g,'rotation'),cs=gsap.getProperty(g,'scaleY');gsap.set(g,{rotation:cr+(r-cr)*k,scaleY:cs+(sy-cs)*k});});}
 /* 팔다리 스프링: 정해진 동작(자세 + 키프레임)을 그대로 따라가지 않고 용수철처럼 조금 늦게 따라오며 넘쳤다 가라앉음.
    몸이 움직이는 방향의 반대로 끌리고, 빠르게 움직일 때는 길어지고 끝이 휘어서 딱딱하지 않고 말랑하게 보임 */
-const SPK={aL:{th:0,w:0},aR:{th:0,w:0},lL:{th:0,w:0},lR:{th:0,w:0}};
-let hPrev=null;
 function limbSpring(dt){
   const hx=gsap.getProperty(H,'x'),hy=gsap.getProperty(H,'y');
   let vx=0,vy=0;if(hPrev){vx=(hx-hPrev[0])/dt;vy=(hy-hPrev[1])/dt;}hPrev=[hx,hy];
@@ -687,6 +686,7 @@ function warm(){const pe=Object.values(PEL);pe.forEach(el=>gsap.set(el,{opacity:
   return new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{pe.forEach(el=>{if(el!==PEL[eyeNow])gsap.set(el,{opacity:0});});if(!PS.on)PCG.g.style.display='none';r();}))));}
 const PRE=[...new Set([...$('#rig').querySelectorAll('image')].map(e=>e.getAttribute('href')))];
 Promise.all(PRE.map(src=>{const i=new Image();i.src=src;return(i.decode?i.decode():new Promise(r=>{i.onload=i.onerror=r;})).catch(()=>{});})).then(warm).then(()=>setTimeout(START,300));
+HG_READY=true;
 return API;
 }
 window.HUGI_MAKE=HUGI_MAKE;

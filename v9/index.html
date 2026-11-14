@@ -785,6 +785,16 @@ html.hg-intro-wait #hugi-root { visibility: hidden; }
 html.hg-intro-a #ask-form { opacity: 0; }   /* 11-14 검색창은 허기 인사와 함께 점 → 알약으로 등장(introAsk) */
 html.hg-intro-away #hugi-root { visibility: hidden; }   /* 인트로 중 메뉴를 연 동안 가운데 허기는 메뉴 허기 자리에 가 있음 */   /* 그림 준비 동안 서 있는 모습이 먼저 보였다가 하늘로 순간 이동하던 것 막음 → 인사 동작(하늘에서 시작)부터 보임 */
 .hero .ask { transition: transform .6s cubic-bezier(.16, 1, .3, 1); }
+/* 11-15 모바일 키보드(사용자 "검색창 누르면 히어로에서 벗어남"): 폰에서 키보드가 뜨면 페이지는 그대로 두고 질문창만 키보드 바로 위로 올림(Gemini처럼).
+ * transform은 인트로가 쓰고 있어서 겹치지 않게 translate 속성을 쓴다. 올라간 동안 추천 목록은 위로 펼침. 데스크톱(마우스)은 그대로 */
+@media (pointer: coarse) and (max-width: 820px) {
+  .hero .ask { transition: transform .6s cubic-bezier(.16, 1, .3, 1), translate .28s cubic-bezier(.22, 1, .36, 1); }
+  .ask.kb { z-index: 8; }
+  .ask.kb.open .askbox { border-radius: 0 0 calc(var(--bar) / 2) calc(var(--bar) / 2); }
+  .ask.kb .sug { top: auto; bottom: 100%; border-radius: calc(var(--bar) / 2) calc(var(--bar) / 2) 0 0; box-shadow: 0 -10px 24px rgba(31, 75, 150, .10); display: flex; flex-direction: column-reverse; }
+  .ask.kb .sug::before { display: none; }
+}
+@media (pointer: coarse) and (max-width: 820px) and (prefers-reduced-motion: reduce) { .hero .ask { transition: transform .6s cubic-bezier(.16, 1, .3, 1); } }
 html.hg-intro .hero .ask { transform: translateY(min(13vh, 128px)); }   /* 11-15 사용자: 진짜 조금만 더 아래로(+16px) */   /* 사용자: 검색창과 허기를 조금 더 아래로 */
 html.hg-intro { overflow: hidden; }
 html.hg-intro #vpick { display: none; }
@@ -3415,8 +3425,8 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     if (SUG.hidden) { SUG.hidden = false; void SUG.offsetHeight; }   // 첫 프레임을 접힌 상태로 그린 뒤 펼침
     SUG.classList.add('show'); ASK.classList.add('open'); IN.setAttribute('aria-expanded', 'true');
     // 화면 높이가 낮은 노트북에서도 목록이 화면 안에 들어오게
-    var chat = $('#hero').classList.contains('chat'), r = ASK.getBoundingClientRect();
-    SUG.style.maxHeight = Math.max(160, chat ? r.top - 80 : window.innerHeight - SUG.getBoundingClientRect().top - 16) + 'px';
+    var chat = $('#hero').classList.contains('chat') || ASK.classList.contains('kb'), r = ASK.getBoundingClientRect();   // kb: 폰 키보드 위로 올라간 동안은 위로 펼침
+    SUG.style.maxHeight = Math.max(160, chat ? (ASK._kbTop != null ? ASK._kbTop : r.top) - 80 : window.innerHeight - SUG.getBoundingClientRect().top - 16) + 'px';
   }
   function sugOpen() { return !SUG.hidden && SUG.classList.contains('show'); }
   function closeSug() {
@@ -3439,6 +3449,59 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   });
   SUG.addEventListener('mousedown', function (e) { var li = e.target.closest('[data-q]'); if (li) { e.preventDefault(); ask(li.dataset.q); } });
   document.addEventListener('click', function (e) { if (!ASK.contains(e.target)) closeSug(); });
+  (function () {   // 11-15 모바일 키보드: 검색창을 눌러도 히어로에 머물고, 질문창만 키보드 바로 위로 부드럽게 올렸다 내림(Gemini처럼). 폰(손가락 · 폭 820 이하)만
+    var MQ = window.matchMedia('(pointer: coarse) and (max-width: 820px)'), vv = window.visualViewport, H = $('#hero'), B = document.body;
+    var GAP = 10, lockY = null, shift = 0, raf = 0, fake = null;
+    function on() { return MQ.matches; }
+    function view() { return fake || { h: vv ? vv.height : innerHeight, top: vv ? vv.offsetTop : 0 }; }
+    // 페이지 스크롤 고정: 브라우저가 입력칸을 보이게 하려고 페이지를 끌어올리는 것을 막고, 끝나면 원래 자리로
+    function lock() {
+      if (lockY != null) return; lockY = window.scrollY;
+      B.style.position = 'fixed'; B.style.top = -lockY + 'px'; B.style.left = '0'; B.style.right = '0'; B.style.width = '100%';
+    }
+    function unlock() {
+      if (lockY == null) return; var y = lockY; lockY = null;
+      B.style.position = B.style.top = B.style.left = B.style.right = B.style.width = '';
+      window.scrollTo(0, y);
+    }
+    function curShift() { var t = getComputedStyle(ASK).translate; var m = t && t !== 'none' ? t.split(' ') : []; return m.length > 1 ? parseFloat(m[1]) || 0 : 0; }
+    function update() {
+      raf = 0;
+      if (!on() || document.activeElement !== IN) { set(0); return; }
+      var v = view(), kb = Math.max(0, innerHeight - v.h - v.top);
+      if (kb < 80) { set(0); return; }   // 키보드가 아니라 주소창 높이 변화 정도면 그대로
+      var r = ASK.getBoundingClientRect(), base = r.bottom - curShift();   // 올리기 전 원래 자리(지금 움직이는 중이어도)
+      set(Math.min(0, (v.top + v.h - GAP) - base), r.top - curShift());
+    }
+    function set(s, baseTop) {
+      s = Math.round(s); var up = s < 0 || (on() && document.activeElement === IN && Math.max(0, innerHeight - view().h - view().top) >= 80);
+      var changed = up !== ASK.classList.contains('kb') || s !== shift;
+      ASK.classList.toggle('kb', up);
+      ASK._kbTop = up && baseTop != null ? baseTop + s : null;
+      if (s !== shift) { shift = s; ASK.style.translate = s ? '0 ' + s + 'px' : ''; }
+      if (changed && sugOpen()) {   // 열린 추천 목록을 올라간 자리에 맞춰 위로 다시 펼침(내려올 땐 원래 자리 기준으로 아래 높이를 다시 잼)
+        openSug();
+        if (!up && !H.classList.contains('chat')) SUG.style.maxHeight = Math.max(160, innerHeight - (SUG.getBoundingClientRect().top - curShift()) - 16) + 'px';
+      }
+    }
+    var t0 = null;
+    IN.addEventListener('touchstart', function (e) { var p = e.touches[0]; t0 = p ? [p.clientX, p.clientY] : null; }, { passive: true });
+    function req() { if (!raf) raf = requestAnimationFrame(update); }
+    if (vv) { vv.addEventListener('resize', req); vv.addEventListener('scroll', function () { if (lockY != null && on() && window.scrollY) window.scrollTo(0, 0); req(); }); }
+    // 손가락으로 누를 때: 브라우저 기본 포커스(자동 스크롤)를 막고 스크롤 없이 직접 포커스
+    IN.addEventListener('touchend', function (e) {
+      if (!on() || document.activeElement === IN) return;
+      var p = e.changedTouches[0]; if (!t0 || !p || Math.abs(p.clientX - t0[0]) > 10 || Math.abs(p.clientY - t0[1]) > 10) return;   // 끌어서 스크롤한 것이면 그대로
+      e.preventDefault(); lock(); try { IN.focus({ preventScroll: true }); } catch (x) { IN.focus(); }
+    }, { passive: false });
+    IN.addEventListener('focus', function () { if (!on()) return; lock(); req(); setTimeout(req, 350); });
+    IN.addEventListener('blur', function () { if (lockY == null && !shift) return; set(0); unlock(); });
+    // 대화가 시작되면(히어로 → 대화 화면) 맨 위 기준으로 고정을 바꿈
+    new MutationObserver(function () { if (lockY != null && H.classList.contains('chat')) { lockY = 0; B.style.top = '0px'; } req(); }).observe(H, { attributes: true, attributeFilter: ['class'] });
+    window.addEventListener('resize', req);
+    // 검수용: 헤드리스 브라우저엔 키보드가 없어서 키보드 높이를 흉내 냄. __kbSim(336) 올림, __kbSim(0) 내림
+    window.__kbSim = function (k) { fake = k ? { h: innerHeight - k, top: 0 } : null; update(); };
+  })();
   var PENDING = null;   // 붙인 파일 { name, mime, data(base64) }
   function showAtt() {
     var box = $('#att');
