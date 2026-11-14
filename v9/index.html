@@ -1,5 +1,9 @@
 <!-- 배포: GitHub(HanGnar/portfolio v9) push 시 GitHub Pages와 Vercel(hungry-hanjungmin.vercel.app)이 같은 파일로 함께 갱신 -->
 <meta charset="utf-8">
+<script>/* 11-14 인트로: 첫 방문이면 검색창과 허기만 보이게 첫 그림 전에 class를 붙인다. 재방문(hg-hello) · 저장된 대화 · 상세 주소면 인트로 없이 허기는 AI 버튼 안 */
+(function () { var R = document.documentElement, seen = false, saved = false;
+  try { seen = sessionStorage.getItem('hg-hello') === '1'; saved = !!sessionStorage.getItem('hj-chat-v1'); } catch (e) {}
+  if (!seen && !saved && !location.hash) R.classList.add('hg-intro', 'hg-intro-t', 'm-hugi-gone', 'm-hugi-out'); else R.classList.add('hg-docked'); })();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">   <!-- 2026-11-13: 없어서 휴대폰이 데스크톱 폭(980px)으로 줄여 보여 줬음 -->
 <title>헝그리한정민</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -708,6 +712,20 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
 /* 질문창이 화면 밖으로 나가면 허기는 오른쪽 아래 구석으로 옮겨 따라다닌다(허기_모션 기능정의 3: 구석에 두고 필요할 때만 움직임). 프로젝트 상세(.detail, z 40)가 열리면 그 아래에 가려진다 */
 #hugi-root.hg-float { position: fixed; left: auto; right: max(8px, env(safe-area-inset-right, 0px)); bottom: calc(10px + env(safe-area-inset-bottom, 0px)); --hg-w: 72px; width: calc(var(--hg-w) * 1.7); height: calc(var(--hg-w) * 2.2); z-index: 30; }
 @media (max-width: 1080px) { #hugi-root.hg-float { --hg-w: 56px; } }
+/* 11-14 인트로(첫 방문): 검색창과 허기만. 상단 홈 · 소리 · 메뉴 · AI 버튼(폭 0) · 아래 구역은 첫 그림부터 숨김. 첫 질문을 보내면 허기가 AI 버튼으로 들어가며 나타남 */
+.gbtn { transition: transform .2s cubic-bezier(0, 0, .2, 1), box-shadow .2s cubic-bezier(0, 0, .2, 1), background-color .2s cubic-bezier(0, 0, .2, 1), opacity .4s cubic-bezier(.28, .11, .32, 1), visibility 0s; }
+html.hg-intro #g-home, html.hg-intro #g-voice, html.hg-intro #g-menu { opacity: 0; visibility: hidden; transition: none; }
+html.hg-intro { overflow: hidden; }
+html.hg-intro #vpick { display: none; }
+html.hg-intro main > section:not(#hero), html.hg-intro footer { visibility: hidden; }
+html.hg-intro #hugi-root { --hg-w: 125px; left: 50%; right: auto; margin-left: calc(var(--hg-w) * -.85); bottom: calc(100% + 106px); width: calc(var(--hg-w) * 1.7); height: calc(var(--hg-w) * 2.3); }
+html.hg-intro #hg-bubble { display: none !important; }   /* 인트로에서만 말풍선 끔(인사는 아래 타이핑 글로) */
+html.hg-docked #hugi-root { visibility: hidden; }   /* 허기는 AI 버튼 안 */
+.intro-typed { display: none; position: absolute; left: 50%; bottom: calc(100% + 24px); transform: translateX(-50%); width: min(560px, calc(100vw - 48px)); height: 60px; text-align: center; font-size: 13px; line-height: 20px; font-weight: 300; color: var(--md-on-surface-variant); letter-spacing: .01em; pointer-events: none; }
+.intro-typed div { min-height: 20px; word-break: keep-all; }
+html.hg-intro-t .intro-typed { display: block; }
+@media (max-width: 1080px) { html.hg-intro #hugi-root { --hg-w: 100px; } }
+@media (max-width: 480px) { .intro-typed { height: 80px; } html.hg-intro #hugi-root { bottom: calc(100% + 126px); } }   /* 좁은 화면은 셋째 줄이 두 줄로 접혀 높이 80px 고정 */
 </style>
 
 <header class="hdr" id="hdr">
@@ -735,15 +753,14 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
 </aside>
 
 <main id="top">
-  <section class="hero" id="hero" aria-labelledby="hero-title">
+  <section class="hero" id="hero" aria-label="헝그리한정민 포트폴리오 AI 대화">
     <div class="wrap">
-      <h1 id="hero-title">질문하는 기획자에게, 질문해 보세요.</h1>
       <div class="thread" id="thread" aria-live="polite"></div>
 
       <div class="ask" id="ask">
         <form class="askbox" id="ask-form" role="search" autocomplete="off">
-          <label class="sr" for="ask-input">헝그리한정민에게 물어보기</label>
-          <input id="ask-input" type="text" maxlength="8000" placeholder="헝그리한정민에게 물어보기"
+          <label class="sr" for="ask-input">헝그리한정민에 대해 물어보기</label>
+          <input id="ask-input" type="text" maxlength="8000" placeholder="헝그리한정민에 대해 물어보기"
                  role="combobox" aria-expanded="false" aria-controls="sug" aria-autocomplete="list">
           <div class="vpick" id="vpick">
             <button class="vchip" id="vchip" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="vmenu" aria-label="목소리 고르기"><span class="ms vi" aria-hidden="true">record_voice_over</span><span class="vname"></span><span class="ms caret-i" aria-hidden="true">expand_more</span></button>
@@ -756,6 +773,7 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
         </form>
         <ul class="sug" id="sug" role="listbox" hidden></ul>
         <div class="att" id="att" hidden></div>
+        <div class="intro-typed" id="intro-typed"><div></div><div></div><div></div></div>
         <div id="hugi-root" aria-hidden="true"></div>
       </div>
 
@@ -3156,6 +3174,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   function ask(q, shown, opt) {
     q = (q || '').trim(); if (!q || BUSY) return;
     BUSY = true; nudgeStop(); closeSug(); closeVoices(); IN.value = ''; hasText(); stopVoice();
+    introDock();   // 11-14 첫 질문이면 허기가 AI 버튼으로 들어가며 인트로 끝
     openChat(); stick = true;
     TH.querySelectorAll('.ask-back').forEach(function (n) { n.remove(); });   // 지난 되묻기는 정리
     var me = document.createElement('p'); me.className = 'msg-q'; me.textContent = shown || q; TH.appendChild(me);
@@ -3661,9 +3680,71 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       flyAn.onfinish = function () { var f = flyAn; flyAn = null; R2.classList.remove('m-hugi-out'); dock(); try { f.cancel(); } catch (e) {} R2.classList.remove('m-calm'); };
     }
   }
+  /* 11-14 인트로: 첫인사 타이핑 · 건너뛰기 · 첫 질문 때 허기가 AI 버튼으로(dockFly 'in' — 메뉴 닫기와 같은 길 · 도착 교체 · 알약 늘어남) */
+  var introAn = null, introT = 0, introTy = [];
+  var INTRO_L = ['오..! 안녕하세요.', '저는 허기라고 해요. 한정민 님이 저를 만들었어요.', '이제부터 이 포트폴리오 안내는 제가 도와드릴 거예요. 어디부터 볼까요?'];
+  function introType() {
+    var box = $('#intro-typed'); if (!box) return; var rows = box.children;
+    if (RM) { INTRO_L.forEach(function (t, i) { rows[i].textContent = t; }); return; }
+    var at = 0;
+    INTRO_L.forEach(function (t, i) { for (var n = 1; n <= t.length; n++) (function (n) { introTy.push(setTimeout(function () { rows[i].textContent = t.slice(0, n); }, at + n * 42)); })(n); at += t.length * 42 + 300; });
+  }
+  if (document.documentElement.classList.contains('hg-intro')) {
+    (function wait(k) {   // 허기가 떨어져 인사(hello)를 시작하면 0.9초 뒤 타이핑
+      var H = window.HUGI, st = H && H.state;
+      if (st === 'hello') introTy.push(setTimeout(introType, 900)); else if ((st && st !== 'hello' && k > 3) || k > 40) introType(); else introTy.push(setTimeout(function () { wait(k + 1); }, 100));
+    })(0);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') introSkip(); });
+    document.addEventListener('click', function (e) { if (!e.target.closest('.ask, .hdr, #hugi-root, .sug')) introSkip(); });
+  }
+  function introStopType() { introTy.forEach(clearTimeout); introTy = []; }
+  function introSkip() {   // Esc · 빈 곳 클릭: 이동 없이 바로 일반 화면(허기는 AI 버튼 안)
+    var R2 = document.documentElement; if (!R2.classList.contains('hg-intro')) return;
+    introStopType(); R2.classList.remove('hg-intro', 'hg-intro-t', 'm-hugi-out', 'm-hugi-gone'); R2.classList.add('hg-docked');
+  }
+  function introEnd() {   // 날아가는 중이면 끝 상태로
+    if (!introAn && !introT) return;
+    var R2 = document.documentElement; clearTimeout(introT); introT = 0;
+    if (introAn) { introAn.onfinish = null; introAn = null; }
+    R2.classList.add('hg-docked'); R2.classList.remove('m-hugi-out', 'm-hugi-morph'); btnRound(false);
+  }
+  function introDock() {
+    var R2 = document.documentElement; if (!R2.classList.contains('hg-intro')) return;
+    var root = $('#hugi-root'), btn = $('#g-ai'), typ = $('#intro-typed'); introStopType();
+    if (typ && !RM && typ.animate) typ.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, fill: 'forwards' }).onfinish = function () { R2.classList.remove('hg-intro-t'); }; else R2.classList.remove('hg-intro-t');
+    var ch = root && root.querySelector('.hugi-char');
+    if (RM || !ch || !btn || !root.animate) { introSkip(); return; }
+    // 쉬는 자리(움직이는 모양이 아닌 배치) 기준 발밑 · 몸 중심 · 몸 지름
+    var b = ch.getBoundingClientRect(), c = root.getBoundingClientRect(), sg = ch.offsetParent.getBoundingClientRect();
+    var b0 = { left: sg.left + ch.offsetLeft, top: sg.top + ch.offsetTop, width: ch.offsetWidth, height: ch.offsetHeight }; b0.bottom = b0.top + b0.height;
+    var hw = getComputedStyle(root).getPropertyValue('--hg-w');
+    document.body.appendChild(root);   // 질문창이 아래로 미끄러져도 허기는 제자리에서 출발
+    root.style.cssText = 'position:fixed;inset:auto;margin:0;z-index:60;will-change:transform;--hg-w:' + hw + ';left:' + c.left + 'px;top:' + c.top + 'px;width:' + c.width + 'px;height:' + c.height + 'px;';
+    // AI 버튼 최종 자리(알약 최종 폭)를 먼저 잰 뒤, 폭 0에서 벌어지기 시작
+    var vis = function () { var v = btn.querySelector('svg'); return (v || btn).getBoundingClientRect(); };
+    btn.style.transition = 'none'; R2.classList.remove('hg-intro', 'm-hugi-gone'); void btn.offsetWidth;
+    var a = vis(), bw = btn.getBoundingClientRect().width; R2.style.setProperty('--gai-w', bw + 'px');
+    R2.classList.add('m-hugi-gone'); void btn.offsetWidth; btn.style.transition = ''; void btn.offsetWidth; R2.classList.remove('m-hugi-gone');
+    var Pb = btnPill(), Rh = Pb ? Pb.h : 42, Dc = b0.width * 462 / 760, spill = Rh / Dc;
+    var bodyC = function (r) { return { x: r.left + r.width * .5013, y: r.top + r.height * .5864 }; };
+    var pc = { x: a.left + a.width / 2, y: a.top + a.height * 245 / 520 }, mc = bodyC(b), O = { x: b0.left + b0.width / 2, y: b0.bottom }, oc = { x: bodyC(b0).x - O.x, y: bodyC(b0).y - O.y };
+    root.style.transformOrigin = (O.x - c.left) + 'px ' + (O.y - c.top) + 'px';
+    var arcH = Math.max(0, Math.min(10, pc.y - Rh / 2 - 4));
+    var sim = dockFly({ dir: 'in', c0: mc, c1: pc, s0: b.width / b0.width, s1: spill, O: O, oc: oc, A: .12, T: .5, arc: arcH, yFirst: false, visible0: true, pull: 10, crouch: .82, kick: 3, fade: .06 });
+    try { if (window.HUGI) window.HUGI.set('wow'); } catch (e) {}
+    introAn = root.animate(sim.kf, { duration: sim.dur, easing: 'linear', fill: 'forwards' });
+    R2.classList.add('m-hugi-morph'); btnRound(true);
+    var hd = sim.hand, P1 = btnPill();
+    introT = setTimeout(function () {   // 도착 순간: 같은 크기의 둥근 버튼 그림이 이어받고 눌렸다 쭉 늘어나 알약
+      introT = 0; R2.classList.remove('m-hugi-out'); btnKick(1.2, -2.2);
+      if (P1) btnWidth(P1.h, P1.W, 480, true, function () { R2.classList.remove('m-hugi-morph'); }); else R2.classList.remove('m-hugi-morph');
+    }, hd ? hd.t * 1000 : sim.dur - 60);
+    introAn.onfinish = function () { introAn = null; R2.classList.add('hg-docked'); };   // 애니메이션은 마지막 모양으로 둔 채 숨김(취소하면 상자가 제자리로 튐)
+  }
   function sideOpen(on) {
     var sd = $('#side'), sc = $('#side-scrim'), mb = $('#g-menu'), isOn = sd.classList.contains('on');
     if (on === isOn) return;
+    introEnd();
     clearTimeout(sideT);
     mb.setAttribute('aria-expanded', String(on)); mb.setAttribute('aria-label', on ? '메뉴 닫기' : '메뉴 열기'); mb.title = on ? '닫기' : '메뉴';
     if (on) {
