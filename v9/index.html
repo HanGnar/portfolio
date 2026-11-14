@@ -114,6 +114,25 @@ p { margin: 0; }
 .hbtn.hb-talking .hb-talk path:nth-child(3) { animation-delay: calc(var(--talk-dur, .9s) * .32); }
 @keyframes hbTalk { 0%, 100% { opacity: .22; } 32% { opacity: 1; } 62% { opacity: .22; } }
 @media (prefers-reduced-motion: reduce) { .hbtn.hb-talking .hb-talk path { animation: none; opacity: .9; } .hb-talk { transition: opacity .18s ease; transform: none; } }
+/* AI 상태 아이콘(11-15 사용자: "AI 상태별로도 그런 모션이랑 아이콘 시스템"). 말하는 중과 같은 자리 · 같은 등장. 대기는 아이콘 없음.
+   입력 중 = 점 세 개가 차례로 떠오름(방문자 말을 듣는 중) · 생각 중 = 작은 원에서 큰 원으로 차례로 차오르는 생각 풍선 */
+.hb-listen, .hb-think { position: absolute; right: -9px; top: -9px; width: 16px; height: 16px; pointer-events: none;
+  opacity: 0; transform: scale(.6); transform-origin: 0% 100%; transition: opacity .18s ease, transform .22s cubic-bezier(.34, 1.56, .64, 1); }
+.hb-listen { color: var(--listen-col, #4C9BE8); }
+.hb-think { color: var(--think-col, #9A86D8); }
+.hb-listen svg, .hb-think svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.hb-listen circle, .hb-think circle { fill: currentColor; opacity: .3; transform-box: fill-box; transform-origin: 50% 50%; }
+.hbtn.hb-listening .hb-listen, .hbtn.hb-thinking .hb-think { opacity: 1; transform: scale(1); }
+.hbtn.hb-listening .hb-listen circle { animation: hbListen 1.05s ease-in-out infinite; }
+.hbtn.hb-listening .hb-listen circle:nth-child(2) { animation-delay: .15s; }
+.hbtn.hb-listening .hb-listen circle:nth-child(3) { animation-delay: .3s; }
+.hbtn.hb-thinking .hb-think circle { animation: hbThink 1.5s ease-in-out infinite; }
+.hbtn.hb-thinking .hb-think circle:nth-child(2) { animation-delay: .25s; }
+.hbtn.hb-thinking .hb-think circle:nth-child(3) { animation-delay: .5s; }
+.hbtn.hb-key .hb-listen { transform: scale(1.15); transition-duration: .06s; }
+@keyframes hbListen { 0%, 60%, 100% { opacity: .3; transform: translateY(0); } 25% { opacity: 1; transform: translateY(-1.6px); } }
+@keyframes hbThink { 0%, 100% { opacity: .3; transform: scale(.85); } 35% { opacity: 1; transform: scale(1); } 70% { opacity: .3; transform: scale(.85); } }
+@media (prefers-reduced-motion: reduce) { .hbtn.hb-listening .hb-listen circle, .hbtn.hb-thinking .hb-think circle { animation: none; opacity: .9; } .hb-listen, .hb-think { transition: opacity .18s ease; transform: none; } }
 /* HBTN-CSS-END */
 /* 메뉴 판(11-13 사용자 "메뉴 탭 인터렉션 따라 하기", 레퍼런스 adamperlis.com 값): 화면 위 가운데에서 내려오며 커지는 큰 판.
    열기: 판 투명 0→1 · 96%→100% · 8px 위→제자리 0.5초 / 항목은 10px 위에서 0.4초, 0.04초씩 차례로 / 허기가 AI 버튼에서 날아와 커짐.
@@ -346,11 +365,23 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
 .send { transition: opacity .18s var(--md-ease), transform .3s var(--ease-out), background-color .2s; }
 .askbox:not(.has) .send { transform: scale(.6); }
 .send:active { transform: scale(.92); }
-.sug:not([hidden]) { animation: sugDown .22s var(--ease-out); }
-.hero.chat .sug:not([hidden]) { animation-name: sugUp; }
+/* 검색어 제안 목록: 레이아웃은 그대로 두고 clip-path · transform · opacity만 움직임(열림 .32초 위→아래, 항목 .03초 간격, 닫힘 .18초) */
+.sug { --sug-ez: cubic-bezier(.22, 1, .36, 1); opacity: 0; pointer-events: none; clip-path: inset(0 -48px 100% -48px);
+  transition: clip-path .18s cubic-bezier(.4, 0, 1, 1), opacity .18s cubic-bezier(.4, 0, 1, 1); will-change: clip-path, opacity; }
+.sug.show { opacity: 1; pointer-events: auto; clip-path: inset(0 -48px -48px -48px); transition: clip-path .32s var(--sug-ez), opacity .2s var(--sug-ez); }
+.hero.chat .sug { clip-path: inset(100% -48px 0 -48px); }
+.hero.chat .sug.show { clip-path: inset(-48px -48px 0 -48px); }
+.sug li { opacity: 0; transform: translateY(8px); }
+.hero.chat .sug li { transform: translateY(-8px); }
+.sug.show li { opacity: 1; transform: none; transition: opacity .28s var(--sug-ez) calc(var(--i, 0) * 30ms), transform .32s var(--sug-ez) calc(var(--i, 0) * 30ms), background-color .15s; }
+@media (prefers-reduced-motion: reduce) {
+  .sug, .sug.show, .hero.chat .sug, .hero.chat .sug.show { clip-path: none; will-change: opacity; transition: opacity .18s ease !important; }
+  .sug li, .hero.chat .sug li { transform: none !important; }
+  .sug li, .sug.show li { transition: opacity .18s ease !important; transition-delay: 0s !important; }
+}
 @keyframes sugDown { from { opacity: 0; transform: translateY(-6px); } }
 @keyframes sugUp { from { opacity: 0; transform: translateY(6px); } }
-.sug li { transition: background-color .15s; }
+.sug li { transition: opacity .12s cubic-bezier(.4, 0, 1, 1), transform .12s cubic-bezier(.4, 0, 1, 1), background-color .15s; }
 .thread { animation: fadeIn .4s ease both; }
 .msg-q { animation: qIn .36s var(--ease-out) both; transform-origin: 100% 100%; }
 @keyframes qIn { from { opacity: 0; transform: translateY(12px) scale(.96); } }
@@ -752,16 +783,16 @@ html.hg-intro-wait #hugi-root { visibility: hidden; }
 html.hg-intro-a #ask-form { opacity: 0; }   /* 11-14 검색창은 허기 인사와 함께 점 → 알약으로 등장(introAsk) */
 html.hg-intro-away #hugi-root { visibility: hidden; }   /* 인트로 중 메뉴를 연 동안 가운데 허기는 메뉴 허기 자리에 가 있음 */   /* 그림 준비 동안 서 있는 모습이 먼저 보였다가 하늘로 순간 이동하던 것 막음 → 인사 동작(하늘에서 시작)부터 보임 */
 .hero .ask { transition: transform .6s cubic-bezier(.16, 1, .3, 1); }
-html.hg-intro .hero .ask { transform: translateY(min(9vh, 88px)); }   /* 사용자: 검색창과 허기를 조금 더 아래로 */
+html.hg-intro .hero .ask { transform: translateY(min(11.5vh, 112px)); }   /* 11-15 사용자: 아주 조금만 더 아래로(+24px) */   /* 사용자: 검색창과 허기를 조금 더 아래로 */
 html.hg-intro { overflow: hidden; }
 html.hg-intro #vpick { display: none; }
 html.hg-intro main > section:not(#hero), html.hg-intro footer { visibility: hidden; }
-html.hg-intro #hugi-root { --hg-w: 125px; left: 50%; right: auto; margin-left: calc(var(--hg-w) * -.85); bottom: calc(100% + 106px); width: calc(var(--hg-w) * 1.7); height: calc(var(--hg-w) * 2.3); }
+html.hg-intro #hugi-root { --hg-w: 136px; left: 50%; right: auto; margin-left: calc(var(--hg-w) * -.85); bottom: calc(100% + 106px); width: calc(var(--hg-w) * 1.7); height: calc(var(--hg-w) * 2.3); }
 html.hg-intro #hg-bubble { display: none !important; }   /* 인트로에서만 말풍선 끔(인사는 아래 타이핑 글로) */
 .intro-typed { display: none; position: absolute; left: 50%; bottom: calc(100% + 24px); transform: translateX(-50%); width: min(560px, calc(100vw - 48px)); height: 60px; text-align: center; font-size: 13px; line-height: 20px; font-weight: 300; color: var(--md-on-surface-variant); letter-spacing: .01em; pointer-events: none; }
 .intro-typed div { min-height: 20px; word-break: keep-all; }
 html.hg-intro-t .intro-typed { display: block; }
-@media (max-width: 1080px) { html.hg-intro #hugi-root { --hg-w: 100px; } }
+@media (max-width: 1080px) { html.hg-intro #hugi-root { --hg-w: 109px; } }   /* 11-15 사용자: 아주 조금 더 크게 */
 @media (max-width: 480px) { .intro-typed { height: 80px; } html.hg-intro #hugi-root { bottom: calc(100% + 126px); } }   /* 좁은 화면은 셋째 줄이 두 줄로 접혀 높이 80px 고정 */
 </style>
 
@@ -3373,14 +3404,22 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var v = norm(IN.value);
     var list = PRESETS.filter(function (p) { return !v || norm(p.q).indexOf(v) > -1 || p.keys.some(function (k) { return v.indexOf(k) > -1; }); });
     if (!list.length) { closeSug(); return; }
-    sel = -1;
-    SUG.innerHTML = list.map(function (p, i) { return '<li role="option" id="sug-' + i + '" data-q="' + esc(p.q) + '">' + esc(p.q) + '</li>'; }).join('');
-    SUG.hidden = false; ASK.classList.add('open'); IN.setAttribute('aria-expanded', 'true');
+    sel = -1; IN.removeAttribute('aria-activedescendant');
+    // 같은 목록이면 다시 그리지 않음(다시 열거나 닫히는 중에 열 때 항목이 처음부터 다시 나타나며 끊기지 않게)
+    var html = list.map(function (p, i) { return '<li role="option" id="sug-' + i + '" data-q="' + esc(p.q) + '" style="--i:' + Math.min(i, 8) + '">' + esc(p.q) + '</li>'; }).join('');
+    if (SUG._html !== html) { SUG.innerHTML = html; SUG._html = html; }
+    else SUG.querySelectorAll('.on').forEach(function (li) { li.classList.remove('on'); });
+    clearTimeout(SUG._t);
+    if (SUG.hidden) { SUG.hidden = false; void SUG.offsetHeight; }   // 첫 프레임을 접힌 상태로 그린 뒤 펼침
+    SUG.classList.add('show'); ASK.classList.add('open'); IN.setAttribute('aria-expanded', 'true');
     // 화면 높이가 낮은 노트북에서도 목록이 화면 안에 들어오게
     var chat = $('#hero').classList.contains('chat'), r = ASK.getBoundingClientRect();
     SUG.style.maxHeight = Math.max(160, chat ? r.top - 80 : window.innerHeight - SUG.getBoundingClientRect().top - 16) + 'px';
   }
-  function closeSug() { SUG.hidden = true; ASK.classList.remove('open'); IN.setAttribute('aria-expanded', 'false'); IN.removeAttribute('aria-activedescendant'); }
+  function sugOpen() { return !SUG.hidden && SUG.classList.contains('show'); }
+  function closeSug() {
+    if (SUG.classList.contains('show')) { SUG.classList.remove('show'); clearTimeout(SUG._t); SUG._t = setTimeout(function () { if (!SUG.classList.contains('show')) SUG.hidden = true; }, 220); }
+    ASK.classList.remove('open'); IN.setAttribute('aria-expanded', 'false'); IN.removeAttribute('aria-activedescendant'); }
   function moveSug(d) {
     var items = SUG.querySelectorAll('[role=option]'); if (!items.length) return;
     sel = (sel + d + items.length) % items.length;
@@ -3391,10 +3430,10 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   function hasText() { $('#ask-form').classList.toggle('has', !!IN.value.trim() || !!(PENDING && !PENDING.bad)); }
   IN.addEventListener('input', function () { hasText(); openSug(); if (window.HUGI && !BUSY) window.HUGI.typing(); if (window.HUGI_ORB && !BUSY) window.HUGI_ORB.typing(); });
   IN.addEventListener('keydown', function (e) {
-    if (e.key === 'ArrowDown') { e.preventDefault(); if (SUG.hidden) openSug(); moveSug(1); }
+    if (e.key === 'ArrowDown') { e.preventDefault(); if (!sugOpen()) openSug(); moveSug(1); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); moveSug(-1); }
     else if (e.key === 'Escape') closeSug();
-    else if (e.key === 'Enter' && sel > -1 && !SUG.hidden) { e.preventDefault(); ask(SUG.querySelectorAll('[role=option]')[sel].dataset.q); }
+    else if (e.key === 'Enter' && sel > -1 && sugOpen()) { e.preventDefault(); ask(SUG.querySelectorAll('[role=option]')[sel].dataset.q); }
   });
   SUG.addEventListener('mousedown', function (e) { var li = e.target.closest('[data-q]'); if (li) { e.preventDefault(); ask(li.dataset.q); } });
   document.addEventListener('click', function (e) { if (!ASK.contains(e.target)) closeSug(); });
@@ -3920,6 +3959,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     wobble:  { sx: .010, sk: 1.1, tx: .5 },              // 숨 쉬듯 알약이 좌우로 아주 작게 출렁(젤리)
     click:   { sx: 1.8, sy: .8 },                        // 클릭 순간 길게 늘었다 돌아오는 "꿀럭"(속도 값, 클수록 많이 늘어남)
     talk:    { nod: .012, dur: [.65, 1.3] },          // 말하는 중: 박자마다 세로로 1.2%만 끄덕 · 아이콘 한 바퀴 시간(초) 범위
+    state:   { thinkRot: 1.0, thinkSink: .015, listenRot: .8, listenDy: .8, keyMs: 120 },   // 생각 중 기울기(도) · 내려앉기 / 입력 중 기울기 · 내려앉기(px) · 글자 칠 때 아이콘이 톡 커지는 시간(ms)
     blink:   [3000, 6000], glance: [7000, 13000],
     longMs: 600, tapWindow: 1300, emoMs: 2300, dizzyMs: 1700, angryMs: 1300
   };
@@ -3975,6 +4015,12 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var talk = document.createElement('span'); talk.className = 'hb-talk'; talk.setAttribute('aria-hidden', 'true');   // 말하는 중 아이콘: 버튼 오른쪽 위 소리 물결 세 줄
     talk.innerHTML = '<svg viewBox="0 0 16 16"><path d="M2.87 9.08A5 5 0 0 1 6.92 13.13"/><path d="M3.56 5.14A9 9 0 0 1 10.86 12.43"/><path d="M4.26 1.2A13 13 0 0 1 14.8 11.74"/></svg>';
     btn.appendChild(talk);
+    var listen = document.createElement('span'); listen.className = 'hb-listen'; listen.setAttribute('aria-hidden', 'true');   // 입력 중 아이콘: 점 세 개
+    listen.innerHTML = '<svg viewBox="0 0 16 16"><circle cx="3" cy="10" r="1.7"/><circle cx="8" cy="10" r="1.7"/><circle cx="13" cy="10" r="1.7"/></svg>';
+    btn.appendChild(listen);
+    var think = document.createElement('span'); think.className = 'hb-think'; think.setAttribute('aria-hidden', 'true');   // 생각 중 아이콘: 생각 풍선(작은 원 → 큰 원)
+    think.innerHTML = '<svg viewBox="0 0 16 16"><circle cx="2.6" cy="13.4" r="1.3"/><circle cx="6.4" cy="9.6" r="2"/><circle cx="11.6" cy="4.4" r="3.6"/></svg>';
+    btn.appendChild(think);
     var defs = el('defs', {}, svg);
     var EC = CX, EY = 357;                                           // 눈 중심(알약 가운데)
     var clipL = el('clipPath', { id: 'hbcL' }, defs), clipR = el('clipPath', { id: 'hbcR' }, defs), clipA = el('clipPath', { id: 'hbcA' }, defs);
@@ -4057,9 +4103,9 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       if (!RM) { var wob = (now - t0) / 1000; T.sx += V.wobble.sx * Math.sin(wob * 2 * Math.PI / 2.7 + 1); T.sk += V.wobble.sk * Math.sin(wob * 2 * Math.PI / 2.3); T.tx += V.wobble.tx * Math.sin(wob * 2 * Math.PI / 3.1); }
 
       var m = mode;
-      if (m === 'thinking' && !RM) { look = [Math.sin((now - t0) / 1000 * 2.6) * .55, -.8]; T.rot += Math.sin((now - t0) / 1000 * 2.6) * 2.5; T.sy -= .02; }
+      if (m === 'thinking' && !RM) { var th = (now - t0) / 1000 * 2.6; look = [Math.sin(th) * .55, -.8]; T.rot += Math.sin(th) * V.state.thinkRot; T.sy -= V.state.thinkSink; }   // 생각 중: 눈은 위를 두리번, 몸은 아주 살짝 기울기만(아이콘이 생각 중을 알림)
       else if (m === 'thinking') look = [0, -.8];
-      else if (m === 'listening') { look = [.15, .65]; T.ty += 1; T.rot += 1.5; }
+      else if (m === 'listening') { look = [.15, .65]; T.ty += V.state.listenDy; T.rot += V.state.listenRot; }   // 입력 중: 질문창 쪽을 보며 살짝 기울어 귀 기울이기
       else if (m === 'speaking' && !RM) {
         var g = SP[persist.group] || SP.calm;
         if (now >= spk.next) {
@@ -4172,6 +4218,9 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       var sht = 'scaleX(' + clamp(S.sx.x, .8, 1.3).toFixed(2) + ') scaleY(' + clamp(2 - S.sy.x, .7, 1.3).toFixed(2) + ')'; if (C.sh !== sht) { C.sh = sht; sh.style.transform = sht; var so = clamp(.9 - S.ty.x * .05, .4, 1).toFixed(2); sh.style.opacity = so; }
       var talkOn = mode === 'speaking';                               // 말하는 중 아이콘
       if (C.talk !== talkOn) { C.talk = talkOn; btn.classList.toggle('hb-talking', talkOn); }
+      var lisOn = mode === 'listening', thkOn = mode === 'thinking';  // 입력 중 · 생각 중 아이콘(대기는 없음)
+      if (C.lis !== lisOn) { C.lis = lisOn; btn.classList.toggle('hb-listening', lisOn); }
+      if (C.thk !== thkOn) { C.thk = thkOn; btn.classList.toggle('hb-thinking', thkOn); }
       if (talkOn && C.talkG !== persist.group) { C.talkG = persist.group; var tg = SP[persist.group] || SP.calm;
         btn.style.setProperty('--talk-col', tg.col || '#F29D0B'); btn.style.setProperty('--talk-dur', clamp((tg.beat[0] + tg.beat[1]) / 2 / 60 * 6, V.talk.dur[0], V.talk.dur[1]).toFixed(2) + 's'); }
       var alive = moving || !RM || pressMode || special || emo || mode !== 'idle';
@@ -4190,7 +4239,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
         if (k === 'loading') { mode = 'thinking'; wake(); return; }
         startEmo(k);
       },
-      typing: function () { if (mode === 'idle' || mode === 'listening') { mode = 'listening'; S.sy.v -= .9; clearTimeout(api._tt); api._tt = setTimeout(function () { if (mode === 'listening') { mode = 'idle'; wake(); } }, 2500); wake(); } },
+      typing: function () { if (mode === 'idle' || mode === 'listening') { mode = 'listening'; S.sy.v -= .9; btn.classList.add('hb-key'); clearTimeout(api._kt); api._kt = setTimeout(function () { btn.classList.remove('hb-key'); }, V.state.keyMs); clearTimeout(api._tt); api._tt = setTimeout(function () { if (mode === 'listening') { mode = 'idle'; wake(); } }, 2500); wake(); } },
       speak: function (m) { var g = 'calm'; try { g = (window.HUGI && window.HUGI.speakGroup) ? window.HUGI.speakGroup(m) : (SP[m] ? m : 'calm'); } catch (e) {} if (!SP[g]) g = SP[m] ? m : 'calm'; persist.group = g; if (mode !== 'speaking') { mode = 'speaking'; persist.mode = mode; spk.eyes = null; } wake(); },
       react: function (k, m) { if (!startEmo(k) && mode !== 'speaking') return; if (m && mode === 'speaking') api.speak(m); },
       get state() { return special || (emo && emo.eye) || mode; },
