@@ -112,6 +112,9 @@ html.m-open .hdr, html.m-calm .hdr { z-index: 50; }   /* 11-14: 닫는 동안에
 html.m-hugi-out #g-ai { opacity: 0; pointer-events: none; }   /* 허기가 버튼에서 빠져나간 동안 버튼은 안 보임 */
 #g-ai { transition: width .5s cubic-bezier(.22, 1, .36, 1), margin .5s cubic-bezier(.22, 1, .36, 1), opacity .06s linear; }
 html.m-hugi-gone #g-ai { width: 0 !important; margin-left: -8px; }
+/* 11-14 사용자 "버튼이 판 위 가장자리에 걸쳐 어색" → 레퍼런스처럼 메뉴가 열리면 버튼 줄이 32px 내려와 판 안에 앉음(열 때 0.6초 길게 감속 · 닫을 때 0.35초) */
+.gnb { transition: transform .35s cubic-bezier(.4, 0, .2, 1); }
+html.m-shift .gnb { transform: translateY(32px); transition: transform .6s cubic-bezier(.16, 1, .3, 1); }
 html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 그림이 둥글게 ↔ 알약으로 바뀌는 동안 자리 폭은 그대로 */   /* 11-14 사용자: 버튼 자리가 줄어 남은 버튼 셋이 가운데로 모인다(간격 8px까지 없앰) */
 .mline { color: var(--md-on-surface-variant); font-size: 15px; margin-bottom: 12px; }
 .mlist { list-style: none; margin: 0; padding: 0; }
@@ -3546,7 +3549,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     hmMake(); clearTimeout(goneT); clearTimeout(launchT);
     if (R2.classList.contains('m-hugi-morph')) { btnRound(false); R2.classList.remove('m-hugi-morph'); }
     if (flyAn) { try { flyAn.onfinish = null; flyAn.cancel(); } catch (e) {} flyAn = null; var sl0 = $('#side .mhugi'); if (sl0 && el.parentNode !== sl0) { sl0.appendChild(el); el.style.cssText = ''; } }
-    if (RM || !btn || !el.animate) { R2.classList.toggle('m-hugi-out', open); R2.classList.toggle('m-hugi-gone', open); if (open && HM) try { HM.set('wave'); } catch (e) {} return; }
+    if (RM || !btn || !el.animate) { R2.classList.toggle('m-hugi-out', open); R2.classList.toggle('m-hugi-gone', open); R2.classList.toggle('m-shift', open); if (open && HM) try { HM.set('wave'); } catch (e) {} return; }
     var aEnd = null;
     var vis = function () { var v = btn.querySelector('svg'); return (v || btn).getBoundingClientRect(); };   // 11-14: 버튼 상자가 아니라 버튼 속 허기 그림(팔 · 다리 포함)에 맞춘다 — 상자(64×42)와 그림(77×51) 크기가 달라 바꿔 넣을 때 툭 커졌음
     if (open) { sideFly.home = { r: vis(), w: innerWidth, bw: btn.getBoundingClientRect().width }; R2.style.setProperty('--gai-w', sideFly.home.bw + 'px'); }
@@ -3573,7 +3576,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
         scale: function (ph, tf) { return ph === 'crouch' ? k0 : (ph === 'air' && tf < T ? k0 + (1 - k0) * Math.pow(tf / T, 1.6) : 1); } });
       R2.classList.add('m-hugi-morph'); var P0 = btnPill(); if (P0) btnWidth(P0.W, P0.h, A * 1000, false); btnKick(.6, -1.2);
       launchT = setTimeout(function () { R2.classList.add('m-hugi-out'); if (HM) try { HM.set('wow'); } catch (e) {} }, A * 1000);
-      goneT = setTimeout(function () { btnRound(false); R2.classList.remove('m-hugi-morph'); R2.classList.add('m-hugi-gone'); }, A * 1000 + 90);   // 버튼이 다 사라진 뒤에 알약 폭으로 되돌리고 자리를 줄임(보이는 동안 되돌리면 툭 커졌음)   // 허기가 떠난 뒤 버튼 셋이 가운데로
+      goneT = setTimeout(function () { btnRound(false); R2.classList.remove('m-hugi-morph'); R2.classList.add('m-hugi-gone', 'm-shift'); }, A * 1000 + 90);   // 허기가 떠난 뒤 버튼 셋이 가운데로 모이며 아래로 내려옴   // 버튼이 다 사라진 뒤에 알약 폭으로 되돌리고 자리를 줄임(보이는 동안 되돌리면 툭 커졌음)   // 허기가 떠난 뒤 버튼 셋이 가운데로
       flyAn = el.animate(sim.kf, { duration: sim.dur, easing: 'linear' });
       flyAn.onfinish = function () { flyAn = null; dock(); if (HM) try { HM.set('wave'); } catch (e) {} };
     } else {
@@ -3605,7 +3608,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       sideFly(true);   // 판이 움직이기 전에 허기 자리를 재야 해서 .on보다 먼저
       sd.classList.add('on'); sc.classList.add('on');
     } else {
-      document.documentElement.classList.remove('m-open');
+      document.documentElement.classList.remove('m-open', 'm-shift');   // 버튼 줄은 바로 제자리로(허기가 돌아오기 전에 도착)
       sd.classList.remove('on'); sc.classList.remove('on'); sd.classList.add('out'); sc.classList.add('out');
       sideFly(false);
       sideT = setTimeout(function () { sd.hidden = sc.hidden = true; sd.classList.remove('out'); sc.classList.remove('out'); document.documentElement.classList.remove('m-hugi-out', 'm-hugi-gone', 'm-calm'); Array.prototype.forEach.call(document.querySelectorAll('#side details[open]'), function (d) { d.open = false; }); }, RM ? 0 : 1000);
