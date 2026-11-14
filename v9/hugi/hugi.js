@@ -573,7 +573,7 @@ function bounds(){const w=ST.clientWidth,hw=H.offsetWidth*.5+6,minY=-(ST.clientH
 function fbounds(){const r=ST.getBoundingClientRect(),cx=r.left+r.width/2,hw=H.offsetWidth*.5+4,fb=r.bottom+H.offsetWidth*.05;return{minX:hw-cx,maxX:innerWidth-hw-cx,minY:Math.min(0,H.offsetHeight+4-fb),maxY:Math.max(0,innerHeight-fb-4)};}
 function walkHome(){homeT=null;if(drag||phys.on||RM)return;if(!(state==='idle'||state==='land')){if(Math.abs(gsap.getProperty(H,'x'))>8&&!/^(walk|fall|drag)/.test(state))homeT=setTimeout(walkHome,700);return;}const x=gsap.getProperty(H,'x');if(Math.abs(x)<=8){if(Math.abs(x)>.5)gsap.to(H,{x:0,duration:.35,ease:'sine.inOut'});return;}rest(true);const dir=x>0?-1:1;state=dir<0?'walkL':'walkR';homing=true;const tl=T({onComplete:()=>{homing=false;gsap.set(H,{x:0});toIdle();}});face('base','vec');look(dir*.9,.2);const k=moveK(),n=Math.max(1,Math.min(5,Math.ceil(Math.abs(x)/(48*k))));let b=0;for(let i=0;i<n;i++)b=hop(tl,b,26,-x/n/k,{step:(i%2)===(dir<0?1:0)?'L':'R',arms:.5})-18;}
 const pos={x:0,y:0,tx:0,ty:0};
-H.addEventListener('pointerdown',e=>{if(phys.on)return;e.preventDefault();clearTimeout(homeT);homeT=null;rest();homing=false;gsap.killTweensOf(Object.values(LI));gsap.killTweensOf(H);/* 공중(인사 · 점프 중)에서 잡아도 땅으로 내려가던 움직임과 손을 따라가는 움직임이 싸우지 않게 */state='drag';H.setPointerCapture(e.pointerId);H.classList.add('drag');
+H.addEventListener('pointerdown',e=>{if(phys.on||drag||(e.pointerType!=='touch'&&e.button!==0))return;e.preventDefault();clearTimeout(homeT);homeT=null;rest();homing=false;gsap.killTweensOf(Object.values(LI));gsap.killTweensOf(H);/* 공중(인사 · 점프 중)에서 잡아도 땅으로 내려가던 움직임과 손을 따라가는 움직임이 싸우지 않게 */state='drag';H.setPointerCapture(e.pointerId);H.classList.add('drag');
   pos.x=pos.tx=gsap.getProperty(H,'x');pos.y=pos.ty=gsap.getProperty(H,'y');
   drag={ox:e.clientX-pos.x,oy:e.clientY-pos.y,lx:e.clientX,ly:e.clientY,t:performance.now(),vx:0,vy:0,moved:0,sx:e.clientX,sy:e.clientY,on:false,rx:pos.x,ry:pos.y,stuck:pos.y>-2};});
 H.addEventListener('pointermove',e=>{if(!drag)return;const b=fbounds();const now=performance.now(),dt=Math.max(8,now-drag.t);
@@ -584,7 +584,7 @@ H.addEventListener('pointermove',e=>{if(!drag)return;const b=fbounds();const now
 function release(){if(!drag)return;const d=drag;drag=null;H.classList.remove('drag');
   if(d.moved<=6){state='idle';poke();return;}
   phys.on=true;phys.x=pos.x;phys.y=pos.y;phys.vx=Math.max(-1600,Math.min(1600,d.vx));phys.vy=Math.max(-1600,Math.min(1600,d.vy));phys.hit=0;phys.under=pos.y>0;state='fall';face('base','hop');lookMouse();}
-H.addEventListener('pointerup',release);H.addEventListener('pointercancel',release);
+H.addEventListener('pointerup',release);H.addEventListener('pointercancel',release);H.addEventListener('lostpointercapture',release);addEventListener('pointerup',release,true);addEventListener('pointercancel',release,true);addEventListener('blur',release);addEventListener('contextmenu',release,true);addEventListener('pointermove',e=>{if(drag&&e.pointerType!=='touch'&&e.buttons===0)release();},true);
 function dangle(vx,vy,dt){const sp=Math.min(1,Math.hypot(vx,vy)/1800),t=performance.now()/1000,fl=Math.sin(t*18)*10*sp,k=1-Math.exp(-(dt||.016)*14);
   const lg=Math.max(-32,Math.min(32,vx*.02));
   [[LI.aL,10+sp*24+fl,1],[LI.aR,-(10+sp*24-fl),1],[LI.lL,lg+sp*8,1+sp*.12],[LI.lR,lg-sp*8,1+sp*.12]].forEach(([g,r,sy])=>{const cr=gsap.getProperty(g,'rotation'),cs=gsap.getProperty(g,'scaleY');gsap.set(g,{rotation:cr+(r-cr)*k,scaleY:cs+(sy-cs)*k});});}

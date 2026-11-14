@@ -41,6 +41,16 @@
   --md-ease: cubic-bezier(.2, 0, 0, 1); --ease-out: cubic-bezier(.05, .7, .1, 1); --ease-in: cubic-bezier(.3, 0, .8, .15);
   --sp-sec: 112px; --sp-head: 40px;
   --wrap: 1080px;
+  /* 2026-11-15 디자인 시트 → 웹 1차(HPP3): 공통 부품 토큰(디자인시스템/ds/components.css 값 그대로, --ui- 이름이라 사이트 토큰과 안 겹침). 히어로 · 대화 화면 규칙만 부른다 */
+  --ui-glass: rgba(255, 255, 255, .80); --ui-glass-edge: rgba(255, 255, 255, .70); --ui-glass-line: rgba(0, 0, 0, .06); --ui-glass-blur: blur(24px) saturate(180%);
+  --ui-glass-sh: 0 8px 24px -12px rgba(0, 0, 0, .18); --ui-glass-sh-hi: 0 12px 30px -12px rgba(0, 0, 0, .28);
+  --ui-ease-out: cubic-bezier(.22, 1, .36, 1); --ui-spring: cubic-bezier(.34, 1.56, .64, 1); --ui-d1: 120ms; --ui-d2: 240ms; --ui-d3: 420ms; --ui-d4: 640ms;
+  --ui-press: scale(.95, .93); --ui-lift: scale(1.04); --ui-ib-lift: scale(1.06);
+  --ui-nav-icon: 18px; --ui-ask-ib-icon: 20px; --ui-ib-color: #8E8E93; --ui-ib-color-hi: #1D1D1F; --ui-send: 44px; --ui-send-icon: 18px; --ui-send-bg: #1D1D1F; --ui-send-fg: #FFFFFF;
+  --ui-chip-h: 36px; --ui-chip-pl: 12px; --ui-chip-pr: 15px; --ui-chip-icon: 14px; --ui-chip-gap: 6px; --ui-chip-row-gap: 8px;
+  --ui-bubble-bg: #ECECF0; --ui-bubble-r: 22px 22px 8px 22px; --ui-bubble-pad: 10px 18px; --ui-ans-gap: 12px; --ui-ans-list-gap: 8px;
+  /* 대화 영역 시트 색(3단계 글자 · 읽는 문장 · 올림 바탕 · 스크롤 막대) */
+  --ui-label-3: #8E8E93; --ui-read: rgba(0, 0, 0, .055); --ui-hover: rgba(0, 0, 0, .035); --ui-scroll: rgba(0, 0, 0, .22); --ui-scroll-hi: rgba(0, 0, 0, .38);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -48,6 +58,9 @@
     --md-surface: #131314; --md-on-surface: #E8E8E8; --md-on-surface-variant: #A3A7AD;
     --md-surface-container: #1C1D1F; --md-surface-container-high: #26282A; --md-outline-variant: #2E3033;
     --md-highlight: #FDD663; --md-on-highlight: #1F1F1F; --img: #26282A; --hero-bg: #131314; --glow: rgba(66, 133, 244, .22); --mk: rgba(253, 214, 99, .32); --md-shadow: rgba(0, 0, 0, .5); color-scheme: dark;
+    --ui-glass: rgba(44, 44, 48, .72); --ui-glass-edge: rgba(255, 255, 255, .10); --ui-glass-line: rgba(255, 255, 255, .08); --ui-glass-sh: 0 8px 24px -12px rgba(0, 0, 0, .7); --ui-glass-sh-hi: 0 12px 30px -12px rgba(0, 0, 0, .8);
+    --ui-ib-color: #76767B; --ui-ib-color-hi: #F5F5F7; --ui-send-bg: #F5F5F7; --ui-send-fg: #1D1D1F; --ui-bubble-bg: #2A2A2D;
+    --ui-label-3: #76767B; --ui-read: rgba(255, 255, 255, .10); --ui-hover: rgba(255, 255, 255, .05); --ui-scroll: rgba(255, 255, 255, .24); --ui-scroll-hi: rgba(255, 255, 255, .40);
   }
 }
 :root[data-theme="dark"] {
@@ -55,6 +68,9 @@
   --md-surface: #131314; --md-on-surface: #E8E8E8; --md-on-surface-variant: #A3A7AD;
   --md-surface-container: #1C1D1F; --md-surface-container-high: #26282A; --md-outline-variant: #2E3033;
   --md-highlight: #FDD663; --md-on-highlight: #1F1F1F; --img: #26282A; --hero-bg: #131314; --glow: rgba(66, 133, 244, .22); --mk: rgba(253, 214, 99, .32); --md-shadow: rgba(0, 0, 0, .5); color-scheme: dark;
+  --ui-glass: rgba(44, 44, 48, .72); --ui-glass-edge: rgba(255, 255, 255, .10); --ui-glass-line: rgba(255, 255, 255, .08); --ui-glass-sh: 0 8px 24px -12px rgba(0, 0, 0, .7); --ui-glass-sh-hi: 0 12px 30px -12px rgba(0, 0, 0, .8);
+  --ui-ib-color: #76767B; --ui-ib-color-hi: #F5F5F7; --ui-send-bg: #F5F5F7; --ui-send-fg: #1D1D1F; --ui-bubble-bg: #2A2A2D;
+  --ui-label-3: #76767B; --ui-read: rgba(255, 255, 255, .10); --ui-hover: rgba(255, 255, 255, .05); --ui-scroll: rgba(255, 255, 255, .24); --ui-scroll-hi: rgba(255, 255, 255, .40);
 }
 
 * { box-sizing: border-box; }
@@ -85,12 +101,14 @@ p { margin: 0; }
 /* GNB [2026-11-13 사용자 시안]: 흰 동그란 버튼 ① 홈(AI 대화) ② AI 음성 ③ 메뉴(사이드 탭: 프로젝트 구성) ④ 허기가 들어간 AI 구슬 */
 /* 11-13 레퍼런스(adamperlis.com) 값: 40px 버튼 · 흰색 80% + 뒤 흐림 24px · 얇은 테두리 · 아래로 퍼지는 옅은 그림자, 올리면 1.04배, 누르면 0.96배 */
 .gnb { display: flex; align-items: center; gap: 8px; }
-.gbtn { width: 40px; height: 40px; border-radius: 999px; border: 1px solid rgba(0, 0, 0, .06); background: rgba(255, 255, 255, .8); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px); color: var(--md-on-surface);
-  display: grid; place-items: center; cursor: pointer; box-shadow: 0 8px 24px -12px rgba(0, 0, 0, .18); transition: transform .2s cubic-bezier(0, 0, .2, 1), box-shadow .2s cubic-bezier(0, 0, .2, 1), background-color .2s cubic-bezier(0, 0, .2, 1); -webkit-tap-highlight-color: transparent; }
-@media (hover: hover) { .gbtn:hover { background-color: #fff; box-shadow: 0 10px 28px -10px rgba(0, 0, 0, .3); transform: scale(1.04); } }
-.gbtn:active { transform: scale(.96); }
+/* 11-15 시트 4단계: 유리 재질 토큰(--ui-glass, 어두운 화면 값 있음 → 어두운 화면에서 흰 원 위 흰 아이콘이던 것 고침). 선은 테두리 대신 그림자 고리 */
+.gbtn { width: 40px; height: 40px; border-radius: 999px; border: 1px solid transparent; background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); color: var(--md-on-surface);
+  display: grid; place-items: center; cursor: pointer; box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh); transition: transform var(--ui-d3) var(--ui-spring), box-shadow var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out); -webkit-tap-highlight-color: transparent; }
+@media (hover: hover) { .gbtn:hover { box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh-hi); transform: var(--ui-lift); } }
+.gbtn:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }   /* 누름 0.12초 → 놓으면 0.42초 spring(쫀득) */
 .gbtn:focus-visible { outline: 2px solid var(--md-primary); outline-offset: 2px; }
-.gbtn .ms { font-size: 19px; }
+.gbtn .ms { font-size: var(--ui-nav-icon); }
+@media (pointer: coarse) { .gbtn { position: relative; } .gbtn::after { content: ""; position: absolute; inset: -3px; border-radius: inherit; } }   /* 손가락 화면: 보이는 40은 그대로, 누름 영역 44 */
 .gbtn[aria-pressed="true"] { color: var(--md-primary); }
 .gpill { width: 56px; }
 .gpill i { display: block; width: 18px; height: 1.5px; border-radius: 2px; background: currentColor; box-shadow: 0 5.5px 0 currentColor; transform: translateY(-2.75px); }
@@ -210,8 +228,8 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
   -webkit-mask-image: linear-gradient(transparent, #000 36px); mask-image: linear-gradient(transparent, #000 36px); }
 .hero.chat .thread::before { content: ""; margin-top: auto; }
 .hero.chat .ask { margin-top: 0; }
-.msg-q { align-self: flex-end; max-width: 80%; padding: 10px 18px; border-radius: 22px 22px 6px 22px; background: var(--md-surface-container-high); font-size: 16px; line-height: 1.55; word-break: keep-all; }
-.thread-end { align-self: center; font-size: 14px; color: var(--md-on-surface-variant); }
+.msg-q { align-self: flex-end; max-width: 80%; padding: var(--ui-bubble-pad); border-radius: var(--ui-bubble-r); background: var(--ui-bubble-bg); font-size: 17px; line-height: 1.7; letter-spacing: -.012em; word-break: keep-all; overflow-wrap: break-word; }   /* 11-15 시트 2단계: 질문 말풍선 Body · 오른쪽 아래만 8 */
+.thread-end { align-self: center; font-size: 13px; line-height: 1.5; letter-spacing: -.004em; color: var(--md-on-surface-variant); }   /* Footnote */
 .ask { position: relative; width: 100%; max-width: 640px; margin-top: clamp(24px, 4.5vh, 40px); }
 .askbox { display: flex; align-items: center; gap: 10px; height: var(--bar); padding: 0 8px 0 24px; border-radius: var(--md-full); background: var(--md-surface);
   box-shadow: 0 1px 3px rgba(0, 0, 0, .05), 0 8px 24px rgba(31, 75, 150, .10); }
@@ -226,8 +244,8 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
 @media (max-width: 480px) {   /* 폰: 첨부 · 마이크가 들어가며 안내 글이 잘려서, 비어 있을 때는 보내기 자리를 접고 간격을 줄임(글을 쓰면 보내기가 펼쳐짐) */
   .askbox { gap: 2px; padding-left: 18px; --sg: 2px; }
 }
-.send { width: calc(var(--bar) - 16px); height: calc(var(--bar) - 16px); border-radius: var(--md-full); background: var(--md-primary); color: var(--md-on-primary); display: grid; place-items: center; transition: opacity .15s; }
-.send .ms { font-size: 20px; }
+.send { width: var(--ui-send); height: var(--ui-send); border-radius: var(--md-full); background: var(--ui-send-bg); color: var(--ui-send-fg); display: grid; place-items: center; transition: opacity .15s; }   /* 11-15 시트 5단계: 보내기 44 · 검정 채움(어두운 화면은 밝은 채움) */
+.send .ms { font-size: var(--ui-send-icon); }
 .askbox:not(.has) .send { opacity: 0; pointer-events: none; }
 .hero.chat .ask.open .askbox { border-radius: 0 0 calc(var(--bar) / 2) calc(var(--bar) / 2); }
 .hero.chat .sug { top: auto; bottom: var(--bar); border-radius: calc(var(--bar) / 2) calc(var(--bar) / 2) 0 0; box-shadow: 0 -10px 24px rgba(31, 75, 150, .10); display: flex; flex-direction: column-reverse; }
@@ -239,24 +257,39 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
 .sug li.on, .sug li:hover { background: color-mix(in srgb, var(--md-on-surface) 5%, transparent); }
 
 /* 답변: 상자 없이 글로 */
-.ans { width: 100%; }
-.ans .body { display: grid; gap: 10px; font-size: 17px; line-height: 1.75; }
-.ans .body ul, .ans .body ol { margin: 0; padding-left: 1.4em; display: grid; gap: 4px; }
-.ans .body li::marker { color: var(--md-on-surface-variant); }
+.ans { width: 100%; word-break: keep-all; overflow-wrap: break-word; }   /* 11-15 시트 1단계: 한글은 낱말 단위로 줄바꿈("풀었 / 어요" 막음), 긴 주소는 상자 안에서 끊김 */
+.ans .body { display: grid; gap: var(--ui-ans-gap); font-size: 17px; line-height: 1.7; letter-spacing: -.012em; }   /* Body 17 · 400 · 1.7 · -1.2%, 문단 사이 12 */
+.ans .body ul, .ans .body ol { margin: 0; padding-left: 0; list-style: none; display: grid; gap: var(--ui-ans-list-gap); }
+.ans .body li { position: relative; padding-left: 22px; }
+.ans .body ul > li::before { content: ""; position: absolute; left: 8px; top: calc(.85em - 2px); width: 4px; height: 4px; border-radius: 50%; background: var(--ui-label-3); }   /* 점 가운데 = 첫 줄 가운데 */
+.ans .body ol { counter-reset: ui-n; }
+.ans .body ol > li { counter-increment: ui-n; }
+.ans .body ol > li::before { content: counter(ui-n); position: absolute; left: 0; top: calc((17px * 1.7 - 18px) / 2); width: 18px; height: 18px; border-radius: 50%; background: var(--ui-bubble-bg); color: var(--md-on-surface-variant); font-size: 11px; font-weight: 600; line-height: 18px; letter-spacing: 0; text-align: center; }
 .ans .body strong { font-weight: 600; }
 .ans .body .tbl { overflow-x: auto; }
 .ans .body table { border-collapse: collapse; font-size: 15px; line-height: 1.55; min-width: 100%; }
 .ans .body th, .ans .body td { text-align: left; vertical-align: top; padding: 8px 12px; border-bottom: 1px solid var(--md-outline-variant); }
 .ans .body th { font-weight: 600; color: var(--md-on-surface-variant); }
-.ans .body tr.sn.reading td { background: var(--md-surface-container-high); }
+.ans .body tr.sn.reading { background: none; box-shadow: none; }
+.ans .body tr.sn.reading td { background: var(--ui-read); }   /* 표 줄은 칸 바탕만(줄 그림자는 표에서 어긋남) */
 .cite { margin-left: 8px; font-size: 14px; color: var(--md-on-surface-variant); text-decoration: underline; text-decoration-color: var(--md-outline-variant); text-decoration-thickness: 1.5px; text-underline-offset: 3px; vertical-align: 1px; white-space: nowrap; }
 .cite:hover { text-decoration-color: currentColor; color: var(--md-on-surface); }
 .ans .next { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 16px; }
 .ans .next .file { display: inline-flex; align-items: center; gap: 6px; }
-.nextq { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-.nextq button, .ask-back .opts .pick { padding: 8px 14px; border-radius: var(--md-full); border: 1px solid var(--md-outline-variant); background: var(--md-surface); font-size: 14px; line-height: 1.3; color: var(--md-on-surface); text-align: left; transition: background-color .2s, border-color .2s; }
-.nextq button:hover, .ask-back .opts .pick:hover { background: var(--md-surface-container); border-color: var(--md-outline); }
-.ans .src { margin-top: 10px; font-size: 13px; color: var(--md-on-surface-variant); }
+.nextq { display: flex; flex-wrap: wrap; gap: var(--ui-chip-row-gap); margin-top: 14px; }
+/* 11-15 시트 2단계: 다음 질문 · 되묻기 고르기 = 유리 알약(높이 최소 36, 두 줄이면 늘어남), Callout 15 · 500. 다음 질문은 앞에 화살표 14(대화 영역 칩) */
+.nextq button, .ask-back .opts .pick, .ask-back .opts .link { position: relative; display: inline-flex; align-items: center; gap: var(--ui-chip-gap); min-height: var(--ui-chip-h); padding: 4px var(--ui-chip-pr); border-radius: var(--md-full); border: 0;
+  background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh);
+  font-size: 15px; font-weight: 500; line-height: 1.45; letter-spacing: -.008em; color: var(--md-on-surface); text-align: left; text-decoration: none;
+  transition: transform var(--ui-d3) var(--ui-spring), box-shadow var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out); -webkit-tap-highlight-color: transparent; }
+.nextq button { padding-left: var(--ui-chip-pl); }
+.nextq button::before { content: ""; flex: none; width: var(--ui-chip-icon); height: var(--ui-chip-icon); background: var(--ui-label-3);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14m-5-5 5 5-5 5'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14m-5-5 5 5-5 5'/%3E%3C/svg%3E") center / contain no-repeat; }
+@media (hover: hover) { .nextq button:hover, .ask-back .opts .pick:hover, .ask-back .opts .link:hover { box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh-hi); transform: var(--ui-lift); } }
+.nextq button:active, .ask-back .opts .pick:active, .ask-back .opts .link:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }   /* 누름 0.12초 → 놓으면 0.42초 spring */
+@media (pointer: coarse) { .nextq button::after, .ask-back .opts .pick::after, .ask-back .opts .link::after { content: ""; position: absolute; inset: -4px 0; } }   /* 손가락 화면: 보이는 크기는 그대로, 누름 영역만 위아래 4씩(36 → 44) */
+.ans .src { margin-top: 10px; font-size: 13px; line-height: 1.5; letter-spacing: -.004em; color: var(--md-on-surface-variant); }   /* Footnote */
 .ans .src a { color: inherit; }
 .ans .shot { margin: 14px 0 0; }
 .ans .shot button { display: block; width: 100%; max-width: 520px; padding: 0; border: 0; border-radius: 12px; overflow: hidden; background: var(--md-surface-container); }
@@ -277,9 +310,10 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
 .ans .next .file .ms { font-size: 20px; }
 .ans .next .file:disabled { opacity: .6; cursor: progress; }
 .ans .ask-back { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--md-outline-variant); }
-.ans .ask-back p { font-weight: 700; }
-.ans .opts { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 16px; }
-.ans .opts .skip { color: var(--md-on-surface-variant); }
+.ans .ask-back p { font-weight: 600; line-height: 1.5; letter-spacing: -.012em; }   /* Headline(굵기는 600까지, 700은 큰 제목만) */
+.ans .opts { margin-top: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: var(--ui-chip-row-gap); font-size: 16px; }
+.ans .opts .skip { position: relative; min-height: var(--ui-chip-h); padding: 0 8px; font-size: 15px; color: var(--md-on-surface-variant); }
+@media (pointer: coarse) { .ans .opts .skip::after { content: ""; position: absolute; inset: -4px 0; } }
 .caret::after { content: "▍"; margin-left: 2px; animation: blink 1s steps(1) infinite; color: var(--md-on-surface-variant); }
 @keyframes blink { 50% { opacity: 0; } }
 
@@ -362,25 +396,31 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
 .askbox:focus-within { box-shadow: 0 1px 3px rgba(0, 0, 0, .05), 0 12px 32px rgba(31, 75, 150, .16); }
 .send { transition: opacity .18s var(--md-ease), transform .3s var(--ease-out), background-color .2s; }
 .askbox:not(.has) .send { transform: scale(.6); }
-.send:active { transform: scale(.92); }
+.send:active { transform: var(--ui-press); }
 /* 11-15 사용자: 검색창 아래 모서리는 목록 펼침과 같은 곡선 · 같은 시간으로 줄고(.32초), 닫힐 때도 목록과 같은 .18초로 되돌아옴 */
-.askbox { border-radius: calc(var(--bar) / 2); transition: box-shadow .3s var(--md-ease), border-radius .18s cubic-bezier(.4, 0, 1, 1), transform .3s var(--md-ease); }   /* 999px가 아닌 실제 반경(높이의 절반)에서 줄여야 첫 프레임부터 모서리가 목록과 같이 줄어듦 */
-.ask.open .askbox { transition: box-shadow .3s var(--md-ease), border-radius .32s cubic-bezier(.22, 1, .36, 1), transform .3s var(--md-ease); }
+.askbox { border-radius: calc(var(--bar) / 2); transition: box-shadow .3s var(--md-ease), border-radius .28s cubic-bezier(.22, 1, .36, 1) .12s, transform .3s var(--md-ease); }   /* 11-15 시트 6단계: 닫을 때는 목록이 접힌 뒤(.12초 뒤) .28초에 둥글어짐 */   /* 999px가 아닌 실제 반경(높이의 절반)에서 줄여야 첫 프레임부터 모서리가 목록과 같이 줄어듦 */
+.ask.open .askbox { transition: box-shadow .3s var(--md-ease), border-radius .14s cubic-bezier(.22, 1, .36, 1) 0s, transform .3s var(--md-ease); }   /* 열 때는 목록이 내려오기 전에 .14초로 각짐 */
 /* 11-15 사용자: 보내기 자리를 오른쪽에 미리 비워 두고(입력칸 폭 고정), 글이 없을 땐 첨부 · 마이크가 그 자리까지 밀려 오른쪽 끝에 붙음 → 글을 쓰면 왼쪽으로 밀려나며 보내기가 작게→원래 크기로 나타남. translate만 써서 레이아웃이 움직이지 않음 */
-.askbox { --sw: calc(var(--bar) - 16px); --sg: 10px; position: relative; padding-right: calc(8px + var(--sw) + var(--sg)); }
+.askbox { --sw: var(--ui-send); --sg: 10px; position: relative; padding-right: calc(8px + var(--sw) + var(--sg)); }
 .askbox .send { position: absolute; right: 8px; top: 50%; margin-top: calc(var(--sw) / -2); }
 .askbox > .attach, .askbox > .auto { translate: calc(var(--sw) + var(--sg)) 0; }
 .askbox.has > .attach, .askbox.has > .auto { translate: 0 0; }
 .askbox > input { margin-right: calc(-1 * (var(--sw) + var(--sg))); transition: margin-right .28s cubic-bezier(.22, 1, .36, 1); }   /* 비어 있을 땐 아이콘이 비운 자리까지 안내 글을 씀(폰에서 안내 글 잘림 방지), 글을 쓰면 아이콘과 같이 줄어 겹치지 않음 */
 .askbox.has > input { margin-right: 0; }
 /* 첨부 · 마이크 버튼: 상단 메뉴 버튼(.gbtn)과 같은 반응 — 올리면 흰 바탕 · 얇은 테두리 · 그림자 · 1.04배, 누르면 0.96배 */
-.askbox > .attach, .askbox > .auto { border: 1px solid transparent; background-color: rgba(255, 255, 255, 0); -webkit-tap-highlight-color: transparent;
-  transition: transform .2s cubic-bezier(0, 0, .2, 1), box-shadow .2s cubic-bezier(0, 0, .2, 1), background-color .2s cubic-bezier(0, 0, .2, 1), border-color .2s cubic-bezier(0, 0, .2, 1), color .2s, translate .28s cubic-bezier(.22, 1, .36, 1); }
-@media (hover: hover) { .askbox > .attach:hover, .askbox > .auto:hover { background-color: rgba(255, 255, 255, .8); border-color: rgba(0, 0, 0, .06); box-shadow: 0 10px 28px -10px rgba(0, 0, 0, .3); transform: scale(1.04); } }
-.askbox > .attach:active, .askbox > .auto:active { transform: scale(.96); }
-.askbox > .mic[aria-pressed="true"] { background-color: color-mix(in srgb, var(--md-primary) 12%, transparent); }
+/* 11-15 시트 5단계: 첨부 · 마이크 = 투명 아이콘 버튼(아이콘 #8E8E93 · 20). 올리면(마우스만) 유리가 떠오르며 1.06배, 누르면 쫀득. 듣는 중 마이크 색은 그대로 */
+.askbox > .attach, .askbox > .auto { border: 1px solid transparent; background-color: rgba(255, 255, 255, 0); color: var(--ui-ib-color); -webkit-tap-highlight-color: transparent;
+  transition: transform var(--ui-d3) var(--ui-spring), box-shadow var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out), border-color var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out), translate .28s cubic-bezier(.22, 1, .36, 1); }
+.askbox > .attach .ms, .askbox > .auto .ms { font-size: var(--ui-ask-ib-icon); }
+@media (hover: hover) { .askbox > .attach:hover, .askbox > .auto:hover { background-color: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); color: var(--ui-ib-color-hi);
+  box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh-hi); transform: var(--ui-ib-lift); } }
+.askbox > .attach:active, .askbox > .auto:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+.askbox > .mic[aria-pressed="true"] { color: var(--md-primary); background-color: color-mix(in srgb, var(--md-primary) 12%, transparent); }
 .askbox > .attach:focus-visible, .askbox > .auto:focus-visible { outline: 2px solid var(--md-primary); outline-offset: 2px; }
-.askbox .send { transition: opacity .28s cubic-bezier(.22, 1, .36, 1), transform .28s cubic-bezier(.22, 1, .36, 1), background-color .2s; }
+@media (pointer: coarse) { .askbox > .attach, .askbox > .auto { position: relative; } .askbox > .attach::after, .askbox > .auto::after { content: ""; position: absolute; inset: -3px; border-radius: inherit; } }   /* 손가락 화면: 보이는 40 그대로, 누름 영역 44 */
+/* 보내기: 글을 쓰면 .6 → 1로 쫀득하게(0.42초 spring) 나타남, 누르면 .95 · .93(올림은 없음 — 대화 영역 시트 기준) */
+.askbox .send { transition: opacity var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring), background-color var(--ui-d2) var(--ui-ease-out); }
+.askbox.has .send:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
 @media (prefers-reduced-motion: reduce) { .askbox > .attach, .askbox > .auto, .askbox .send { transition-duration: .01s !important; } }
 /* 검색어 제안 목록: 레이아웃은 그대로 두고 clip-path · transform · opacity만 움직임(열림 .32초 위→아래, 항목 .03초 간격, 닫힘 .18초) */
 .sug { --sug-ez: cubic-bezier(.22, 1, .36, 1); opacity: 0; pointer-events: none; clip-path: inset(0 -48px 100% -48px);
@@ -399,6 +439,14 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
 @keyframes sugDown { from { opacity: 0; transform: translateY(-6px); } }
 @keyframes sugUp { from { opacity: 0; transform: translateY(6px); } }
 .sug li { transition: opacity .12s cubic-bezier(.4, 0, 1, 1), transform .12s cubic-bezier(.4, 0, 1, 1), background-color .15s; }
+/* 11-15 시트 6단계: 추천 목록 스크롤바 = 둥근 모서리 안에서만(위 6 · 아래 모서리 반지름만큼 띄움), 보이는 막대 6 */
+.sug::-webkit-scrollbar { width: 12px; }
+.sug::-webkit-scrollbar-track { background: transparent; margin-top: 6px; margin-bottom: calc(var(--bar) / 2); }
+.ask.kb .sug::-webkit-scrollbar-track { margin-top: calc(var(--bar) / 2); margin-bottom: 6px; }
+.sug::-webkit-scrollbar-thumb { background: var(--ui-scroll); border: 3px solid transparent; background-clip: padding-box; border-radius: 6px; }
+.sug::-webkit-scrollbar-thumb:hover { background: var(--ui-scroll-hi); background-clip: padding-box; }
+/* 낮은 화면(예 1024×768)에서 목록 아래 항목이 반쯤 잘려 보이던 것: 아래 끝을 바탕색으로 흐리게 해 "더 있음"으로 보이게. 끝까지 내리면 항목 글은 가리지 않음(항목 아래 여백 + 목록 아래 여백만 덮음) */
+.hero:not(.chat) .ask:not(.kb) .sug::after { content: ""; position: sticky; bottom: 0; display: block; height: 19px; margin-top: -9px; pointer-events: none; background: linear-gradient(color-mix(in srgb, var(--md-surface) 0%, transparent), var(--md-surface)); }
 .thread { animation: fadeIn .4s ease both; }
 .msg-q { animation: qIn .36s var(--ease-out) both; transform-origin: 100% 100%; }
 @keyframes qIn { from { opacity: 0; transform: translateY(12px) scale(.96); } }
@@ -411,6 +459,14 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
 .dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--md-on-surface-variant); opacity: .35; animation: dot 1.1s ease-in-out infinite; }
 .dots i:nth-child(2) { animation-delay: .15s; } .dots i:nth-child(3) { animation-delay: .3s; }
 @keyframes dot { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: .9; transform: translateY(-4px); } }
+/* 11-15 시트 3단계: 답 자리의 생각 중 = 점 3개(6 · 사이 4 · 1.2초) + 반짝이는 글. ask()의 마크업(span.dots)은 그대로 두고 CSS만(::after 글) */
+.ans .dots { justify-self: start; align-items: center; gap: 4px; padding: 2px 0; }
+.ans .dots i { width: 6px; height: 6px; background: var(--ui-label-3); opacity: 1; animation: uiDot 1.2s var(--ui-ease-out) infinite; }   /* 동작 줄이기면 opacity 1로 멈춤 */
+.ans .dots i:nth-child(2) { animation-delay: .15s; } .ans .dots i:nth-child(3) { animation-delay: .3s; }
+.ans .dots::after { content: "생각하는 중"; margin-left: 6px; font-size: 15px; line-height: 1.6; letter-spacing: -.008em; color: transparent;
+  background: linear-gradient(90deg, var(--ui-label-3) 0%, var(--md-on-surface) 50%, var(--ui-label-3) 100%) 0 0 / 200% 100%; -webkit-background-clip: text; background-clip: text; animation: uiShimmer 1.8s linear infinite; }
+@keyframes uiDot { 0%, 60%, 100% { opacity: .3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+@keyframes uiShimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
 .link, .cite, .nav a, .dbar .back { transition: color .2s, text-decoration-color .2s, background-color .2s; }
 .row .imgbox { transition: transform .5s var(--md-ease); }
 .row:hover .imgbox { transform: scale(1.015); }
@@ -453,16 +509,34 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
   .vchip .vname, .vchip .caret-i { display: none; }
   .vchip .vi { display: inline-block; }
 }
-.listen { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 8px; margin-left: -8px; border-radius: var(--md-full); color: var(--md-on-surface-variant); font-size: 15px; transition: background-color .2s, color .2s; }
-.listen:hover { background: color-mix(in srgb, var(--md-on-surface) 6%, transparent); color: var(--md-on-surface); }
-.listen .ms { font-size: 20px; }
-.listen.on { color: var(--md-primary); }
+/* 11-15 시트 7단계: 듣기 = 투명 알약(높이 32 · Caption 12 · 3단계 색), 켜지면(멈추기) 검정 채움. 올림은 마우스만, 누르면 쫀득. 아이콘 · 글 바꾸기는 사이트 setBtn() 그대로 */
+.listen { position: relative; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 9px; margin-left: -9px; border-radius: var(--md-full); color: var(--ui-label-3); font-size: 12px; font-weight: 500; line-height: 1.4; letter-spacing: 0; -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out), box-shadow var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
+@media (hover: hover) { .listen:hover { background: var(--ui-glass); color: var(--md-on-surface); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh-hi); transform: var(--ui-lift); } }
+.listen .ms { font-size: 15px; }
+.listen .lt { min-width: 3em; text-align: left; }   /* "듣기" ↔ "멈추기"로 바뀌어도 폭이 같아 옆 링크가 다음 줄로 튀지 않게 */
+.listen.on, .listen.on:hover { background: var(--ui-send-bg); color: var(--ui-send-fg); box-shadow: none; }
+.listen:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+@media (pointer: coarse) { .listen::after { content: ""; position: absolute; inset: -6px 0; } }   /* 손가락 화면: 보이는 32 그대로, 누름 영역 44 */
 .vctl { display: inline-flex; align-items: center; gap: 4px; }
+/* 11-15 시트 8단계: 답 복사 = 투명 아이콘 버튼 32(아이콘 17), 올리면(마우스만) 유리 1.06, 누르면 쫀득. 복사 뒤 체크가 톡 나오고 "복사했어요"는 버튼 위에 잠깐(줄이 밀리지 않게, 사이트 전역 알림 #toast와 따로) */
+.ans-copy { position: relative; width: 32px; height: 32px; border-radius: var(--md-full); display: grid; place-items: center; color: var(--ui-ib-color); -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out), box-shadow var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
+.vctl > .ans-copy:first-child { margin-left: -7px; }   /* 듣기가 없을 때 아이콘을 글 왼쪽 선에 */
+.ans-copy .ms { font-size: 17px; }
+@media (hover: hover) { .ans-copy:hover { background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); color: var(--ui-ib-color-hi); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh-hi); transform: var(--ui-ib-lift); } }
+.ans-copy:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+.ans-copy.done .ms { animation: uiPop var(--ui-d3) var(--ui-spring); }
+@keyframes uiPop { from { transform: scale(.4); opacity: 0; } }
+.ans-copied { position: absolute; left: 50%; bottom: calc(100% + 2px); white-space: nowrap; pointer-events: none; font-size: 12px; font-weight: 500; line-height: 1.4; letter-spacing: 0; color: var(--ui-label-3);
+  opacity: 0; transform: translate(-50%, 4px); transition: opacity var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
+.ans-copied.on { opacity: 1; transform: translate(-50%, 0); }
+@media (pointer: coarse) { .vctl { gap: 8px; } .ans-copy::after { content: ""; position: absolute; inset: -6px; border-radius: inherit; } }   /* 손가락 화면: 보이는 32 그대로, 누름 영역 44(옆 듣기와 안 겹치게 사이 8) */
 .ans.speaking .sn { cursor: pointer; }
-.ans.speaking .sn:hover:not(.reading) { background: var(--md-surface-container); }
+@media (hover: hover) { .ans.speaking .sn:hover:not(.reading) { background: var(--ui-hover); } }   /* 11-15: 손가락 화면에서 누른 문장에 회색이 남지 않게 마우스만 */
 .ans .next { align-items: center; }
-.sn { border-radius: 3px; -webkit-box-decoration-break: clone; box-decoration-break: clone; transition: background-color .25s; }
-.sn.reading { background: var(--md-surface-container-high); }
+.sn { border-radius: 6px; -webkit-box-decoration-break: clone; box-decoration-break: clone; transition: background-color var(--ui-d2) var(--ui-ease-out), box-shadow var(--ui-d2) var(--ui-ease-out); }
+.sn.reading { background: var(--ui-read); box-shadow: 0 0 0 3px var(--ui-read); }   /* 11-15 시트 7단계: 읽는 문장 = 옅은 바탕 + 바깥 3 번짐 */
 
 .fx { -webkit-box-decoration-break: clone; box-decoration-break: clone; border-radius: 3px; }
 
@@ -796,7 +870,7 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
 /* 11-15 사용자 "허기가 두 개 있는데 밑에 동글동글한 애는 없애도 될 것 같아": 아래 허기는 첫 방문 인트로(인사 → AI 버튼으로 들어감)에서만 보이고, 그 뒤 · 재방문 · 구석(hg-float)에서는 숨김. display:none이라 hugi.js가 화면 밖으로 보고 계산을 쉼. hg-dock = AI 버튼으로 날아가는 중 */
 html:not(.hg-intro) #hugi-root:not(.hg-dock) { display: none !important; }
 /* 11-14 인트로(첫 방문): 검색창과 허기만. 상단 홈 · 소리 · 메뉴 · AI 버튼(폭 0) · 아래 구역은 첫 그림부터 숨김. 첫 질문을 보내면 허기가 AI 버튼으로 들어가며 나타남 */
-.gbtn { transition: transform .2s cubic-bezier(0, 0, .2, 1), box-shadow .2s cubic-bezier(0, 0, .2, 1), background-color .2s cubic-bezier(0, 0, .2, 1), opacity .4s cubic-bezier(.28, .11, .32, 1), visibility 0s; }
+.gbtn { transition: transform var(--ui-d3) var(--ui-spring), box-shadow var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out), opacity .4s cubic-bezier(.28, .11, .32, 1), visibility 0s; }   /* 11-15: 등장 opacity .4초 · visibility는 그대로, 누름 · 올림 곡선만 시트 값 */
 /* 11-14 v9 세션(사용자 "상단 버튼 3개가 없어"): 인트로에서도 홈 · 소리 · 메뉴는 보임. AI 버튼만 폭 0(허기가 아직 밖에 있음) */
 html.hg-intro-wait #hugi-root { visibility: hidden; }
 html.hg-intro-a #ask-form { opacity: 0; }   /* 11-14 검색창은 허기 인사와 함께 점 → 알약으로 등장(introAsk) */
@@ -2782,8 +2856,9 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
         '<p class="note">[ ] 칸을 채우고 고친 뒤 보내 주세요. 보내기 전까지는 어디에도 전송되지 않아요.</p>' +
         '<div class="row"><button class="link" type="button" data-mail-open>메일 앱으로 열기 →</button><button class="link" type="button" data-mail-copy>복사하기</button></div></div>';
     }
-    h += '<div class="next">' + (VOICE.ok ? '<span class="vctl"><button class="listen" type="button" data-listen><span class="ms" aria-hidden="true">volume_up</span><span class="lt">듣기</span></button>' +
-      '</span>' : '') +
+    h += '<div class="next"><span class="vctl">' + (VOICE.ok ? '<button class="listen" type="button" data-listen><span class="ms" aria-hidden="true">volume_up</span><span class="lt">듣기</span></button>' : '') +
+      '<button class="ans-copy" type="button" data-ans-copy aria-label="답 복사" title="답 복사"><span class="ms" aria-hidden="true">content_copy</span><span class="ans-copied" aria-live="polite"></span></button>' +   // 11-15 시트 8단계: 답 복사
+      '</span>' +
       (r.file != null ? '<button class="link file" type="button" data-file="' + r.file + '"><span class="ms" aria-hidden="true">download</span>' + esc(FILEQ[r.file].name) + ' 받기</button>' : '') +
       (lab ? '<button class="link" type="button" data-act="' + r.act[0] + '" data-t="' + esc(r.act[1]) + '">' + esc(lab) + ' →</button>' : '') +
       (r.act && r.act[0] === 'contact' && !r.mail ? '<button class="link" type="button" data-mail-draft>메일 초안 쓰기 →</button>' : '') + '</div>';
@@ -2798,6 +2873,34 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
         r.ask.options.map(function (o) { return '<button class="pick" type="button" data-q="' + esc(o) + '">' + esc(o) + '</button>'; }).join('') + '</div></div>';
     }
     return h;
+  }
+  // 11-15 시트 8단계: 답 복사(대화 영역 시트 3-10). 답 본문 글만(근거 이름 · 생각 중 점은 빼고, 목록은 줄머리 · 표는 칸 사이 탭)
+  function ansText(B) {
+    var c = B.cloneNode(true); c.querySelectorAll('.cite, .dots').forEach(function (n) { n.remove(); });
+    c.querySelectorAll('br').forEach(function (n) { n.replaceWith('\n'); });
+    var line = function (n) { return n.textContent.replace(/[ \t ]+/g, ' ').replace(/ *\n */g, '\n').trim(); };
+    var out = [];
+    [].forEach.call(c.children, function (n) {
+      if (n.tagName === 'UL' || n.tagName === 'OL') [].forEach.call(n.children, function (li, i) { out.push((n.tagName === 'OL' ? (i + 1) + '. ' : '- ') + line(li)); });
+      else if (n.classList.contains('tbl')) n.querySelectorAll('tr').forEach(function (tr) { out.push([].map.call(tr.children, line).join('\t')); });
+      else out.push(line(n));
+    });
+    return out.filter(Boolean).join('\n');
+  }
+  function copyAns(b) {
+    var A = b.closest('.ans'), B = A && A.querySelector('.body'), note = b.querySelector('.ans-copied'), ic = b.querySelector('.ms'); if (!B) return;
+    var txt = ansText(B);
+    var show = function (ok) {
+      clearTimeout(b._t); b.classList.remove('done'); void b.offsetWidth; if (ok) b.classList.add('done');
+      ic.textContent = ok ? 'check' : 'content_copy'; note.textContent = ok ? '복사했어요' : '복사하지 못했어요'; note.classList.add('on');
+      if (ok) hgEvent('copyOk');   // 이미 있는 허기 반응(복사 성공)만 부름
+      b._t = setTimeout(function () { b.classList.remove('done'); ic.textContent = 'content_copy'; note.classList.remove('on'); }, 1600);
+    };
+    var legacy = function () {   // 클립보드 API가 막힌 곳(파일로 연 화면 등)
+      var ta = document.createElement('textarea'), ok = false; ta.value = txt; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none';
+      document.body.appendChild(ta); ta.select(); try { ok = document.execCommand('copy'); } catch (e) {} ta.remove(); try { b.focus({ preventScroll: true }); } catch (e) {} return ok;
+    };
+    try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { show(true); }, function () { show(legacy()); }); else show(legacy()); } catch (e) { show(legacy()); }
   }
 
   // LLM이 없을 때만 쓰는 미리 쓴 답
@@ -3661,6 +3764,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     if (sn && !e.target.closest('[data-cite]') && VOICE.btn && VOICE.btn.closest('.ans') === sn.closest('.ans')) { seekTo(sn.closest('.ans'), +sn.dataset.sn); return; }
     var lb = e.target.closest('[data-listen]');
     if (lb) { var A = lb.closest('.ans'); if (VOICE.btn === lb) stopVoice(); else speak(A, lb); return; }
+    var acb = e.target.closest('[data-ans-copy]'); if (acb) { copyAns(acb); return; }   // 11-15 답 복사
     if (e.target.closest('#auto-read') || e.target.closest('#g-voice')) { setAuto(!VOICE.auto); return; }
     if (e.target.closest('#g-menu')) { sideOpen(!$('#side').classList.contains('on')); return; }   // 열려 있으면 X로 닫기
     if (e.target.closest('#side-mail')) { var mb2 = e.target.closest('#side-mail'), ad = mb2.dataset.mail, sh = function (t) { mb2.textContent = t; setTimeout(function () { mb2.textContent = ad; }, 1600); }; try { navigator.clipboard.writeText(ad).then(function () { sh('복사했어요'); hgEvent('copyOk'); }, function () { sh(ad); }); } catch (err) { sh(ad); } return; }
