@@ -1,9 +1,9 @@
 <!-- 배포: GitHub(HanGnar/portfolio v9) push 시 GitHub Pages와 Vercel(hungry-hanjungmin.vercel.app)이 같은 파일로 함께 갱신 -->
 <meta charset="utf-8">
-<script>/* 11-14 인트로: 첫 방문이면 검색창과 허기만 보이게 첫 그림 전에 class를 붙인다. 재방문(hg-hello) · 저장된 대화 · 상세 주소면 인트로 없이 허기는 AI 버튼 안 */
+<script>/* 11-14 인트로: 첫 방문이면 검색창과 허기만 보이게 첫 그림 전에 class를 붙인다. 재방문(hg-hello) · 저장된 대화 · 상세 주소면 인트로 없이 원래 화면(허기는 질문창 옆과 AI 버튼 속 둘 다) */
 (function () { var R = document.documentElement, seen = false, saved = false;
   try { seen = sessionStorage.getItem('hg-hello') === '1'; saved = !!sessionStorage.getItem('hj-chat-v1'); } catch (e) {}
-  if (!seen && !saved && !location.hash) R.classList.add('hg-intro', 'hg-intro-t', 'm-hugi-gone', 'm-hugi-out'); else R.classList.add('hg-docked'); })();</script>
+  if (!seen && !saved && !location.hash) R.classList.add('hg-intro', 'hg-intro-t', 'm-hugi-gone', 'm-hugi-out'); })();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">   <!-- 2026-11-13: 없어서 휴대폰이 데스크톱 폭(980px)으로 줄여 보여 줬음 -->
 <title>헝그리한정민</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -720,7 +720,6 @@ html.hg-intro #vpick { display: none; }
 html.hg-intro main > section:not(#hero), html.hg-intro footer { visibility: hidden; }
 html.hg-intro #hugi-root { --hg-w: 125px; left: 50%; right: auto; margin-left: calc(var(--hg-w) * -.85); bottom: calc(100% + 106px); width: calc(var(--hg-w) * 1.7); height: calc(var(--hg-w) * 2.3); }
 html.hg-intro #hg-bubble { display: none !important; }   /* 인트로에서만 말풍선 끔(인사는 아래 타이핑 글로) */
-html.hg-docked #hugi-root { visibility: hidden; }   /* 허기는 AI 버튼 안 */
 .intro-typed { display: none; position: absolute; left: 50%; bottom: calc(100% + 24px); transform: translateX(-50%); width: min(560px, calc(100vw - 48px)); height: 60px; text-align: center; font-size: 13px; line-height: 20px; font-weight: 300; color: var(--md-on-surface-variant); letter-spacing: .01em; pointer-events: none; }
 .intro-typed div { min-height: 20px; word-break: keep-all; }
 html.hg-intro-t .intro-typed { display: block; }
@@ -3697,16 +3696,23 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') introSkip(); });
     document.addEventListener('click', function (e) { if (!e.target.closest('.ask, .hdr, #hugi-root, .sug')) introSkip(); });
   }
+  function introRestore() {   // 인트로가 끝나면 질문창 옆 허기를 원래 자리 · 원래 크기로 되돌리고 0.3초 동안 작게 → 원래 크기로 나타나게(인계.md: 허기는 질문창 옆과 AI 버튼 속 둘 다)
+    var root = $('#hugi-root'), ask = $('#ask'); if (!root || !ask) return;
+    try { root.getAnimations().forEach(function (a) { a.cancel(); }); } catch (e) {}
+    if (root.parentNode !== ask) ask.appendChild(root);
+    root.style.cssText = ''; window.dispatchEvent(new Event('resize'));   // hugi.js가 원래 크기(--hg-w)를 다시 읽는다
+    if (!RM && root.animate) root.animate([{ opacity: 0, transform: 'scale(.85)', transformOrigin: '50% 100%' }, { opacity: 1, transform: 'none', transformOrigin: '50% 100%' }], { duration: 300, easing: 'cubic-bezier(.2, 0, 0, 1)' });
+  }
   function introStopType() { introTy.forEach(clearTimeout); introTy = []; }
   function introSkip() {   // Esc · 빈 곳 클릭: 이동 없이 바로 일반 화면(허기는 AI 버튼 안)
     var R2 = document.documentElement; if (!R2.classList.contains('hg-intro')) return;
-    introStopType(); R2.classList.remove('hg-intro', 'hg-intro-t', 'm-hugi-out', 'm-hugi-gone'); R2.classList.add('hg-docked');
+    introStopType(); R2.classList.remove('hg-intro', 'hg-intro-t', 'm-hugi-out', 'm-hugi-gone'); introRestore();
   }
   function introEnd() {   // 날아가는 중이면 끝 상태로
     if (!introAn && !introT) return;
     var R2 = document.documentElement; clearTimeout(introT); introT = 0;
     if (introAn) { introAn.onfinish = null; introAn = null; }
-    R2.classList.add('hg-docked'); R2.classList.remove('m-hugi-out', 'm-hugi-morph'); btnRound(false);
+    R2.classList.remove('m-hugi-out', 'm-hugi-morph'); btnRound(false); introRestore();
   }
   function introDock() {
     var R2 = document.documentElement; if (!R2.classList.contains('hg-intro')) return;
@@ -3739,7 +3745,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       introT = 0; R2.classList.remove('m-hugi-out'); btnKick(1.2, -2.2);
       if (P1) btnWidth(P1.h, P1.W, 480, true, function () { R2.classList.remove('m-hugi-morph'); }); else R2.classList.remove('m-hugi-morph');
     }, hd ? hd.t * 1000 : sim.dur - 60);
-    introAn.onfinish = function () { introAn = null; R2.classList.add('hg-docked'); };   // 애니메이션은 마지막 모양으로 둔 채 숨김(취소하면 상자가 제자리로 튐)
+    introAn.onfinish = function () { introAn = null; introRestore(); };   // 알약에 들어간 뒤 질문창 옆 허기는 원래 자리에서 부드럽게 나타남
   }
   function sideOpen(on) {
     var sd = $('#side'), sc = $('#side-scrim'), mb = $('#g-menu'), isOn = sd.classList.contains('on');
