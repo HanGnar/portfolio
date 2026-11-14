@@ -103,6 +103,17 @@ p { margin: 0; }
   background: radial-gradient(ellipse at 50% 50%, rgba(70, 36, 12, .30), rgba(70, 36, 12, 0) 70%); transform-origin: 50% 50%; }
 .hbtn:focus { outline: none; }
 .hbtn:focus-visible { outline: 2px solid var(--md-primary, #0b57d0); outline-offset: 2px; border-radius: 999px; }
+/* 말하는 중 아이콘(11-15 사용자: 말할 때 몸이 지나치게 움직여 난잡 → 몸은 아주 살짝, 버튼 오른쪽 위에 소리 물결). 색 · 빠르기는 JS 값 표 SP의 col · 박자에서 */
+.hb-talk { position: absolute; right: -9px; top: -9px; width: 16px; height: 16px; pointer-events: none; color: var(--talk-col, #F29D0B);
+  opacity: 0; transform: scale(.6); transform-origin: 0% 100%; transition: opacity .18s ease, transform .22s cubic-bezier(.34, 1.56, .64, 1); }
+.hb-talk svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.hb-talk path { fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; opacity: .22; }
+.hbtn.hb-talking .hb-talk { opacity: 1; transform: scale(1); }
+.hbtn.hb-talking .hb-talk path { animation: hbTalk var(--talk-dur, .9s) ease-in-out infinite; }
+.hbtn.hb-talking .hb-talk path:nth-child(2) { animation-delay: calc(var(--talk-dur, .9s) * .16); }
+.hbtn.hb-talking .hb-talk path:nth-child(3) { animation-delay: calc(var(--talk-dur, .9s) * .32); }
+@keyframes hbTalk { 0%, 100% { opacity: .22; } 32% { opacity: 1; } 62% { opacity: .22; } }
+@media (prefers-reduced-motion: reduce) { .hbtn.hb-talking .hb-talk path { animation: none; opacity: .9; } .hb-talk { transition: opacity .18s ease; transform: none; } }
 /* HBTN-CSS-END */
 /* 메뉴 판(11-13 사용자 "메뉴 탭 인터렉션 따라 하기", 레퍼런스 adamperlis.com 값): 화면 위 가운데에서 내려오며 커지는 큰 판.
    열기: 판 투명 0→1 · 96%→100% · 8px 위→제자리 0.5초 / 항목은 10px 위에서 0.4초, 0.04초씩 차례로 / 허기가 AI 버튼에서 날아와 커짐.
@@ -126,6 +137,7 @@ html.m-open .hdr, html.m-calm .hdr { z-index: 50; }   /* 11-14: 닫는 동안에
 .side .mhead.mi { opacity: 1; transform: none; }   /* 허기 자리는 날아오는 허기가 채우므로 차례 등장에서 뺀다 */
 html.m-hugi-out #g-ai { opacity: 0; pointer-events: none; }   /* 허기가 버튼에서 빠져나간 동안 버튼은 안 보임 */
 #g-ai { transition: width .5s cubic-bezier(.22, 1, .36, 1), margin .5s cubic-bezier(.22, 1, .36, 1), opacity .06s linear; }
+html.m-hugi-morph #g-ai { transition: width .5s cubic-bezier(.22, 1, .36, 1), margin .5s cubic-bezier(.22, 1, .36, 1), opacity 0s; }   /* 11-15: 허기와 주고받는 순간은 버튼 그림이 바로 보이고 날아온 허기가 그 위에서 사라짐(둘 다 반투명해 흐려 보이던 것 없앰) */
 html.m-hugi-gone #g-ai { width: 0 !important; margin-left: -8px; }
 /* 11-14 사용자 "버튼이 판 위 가장자리에 걸쳐 어색" → 레퍼런스처럼 메뉴가 열리면 버튼 줄이 32px 내려와 판 안에 앉음(열 때 0.6초 길게 감속 · 닫을 때 0.35초) */
 .gnb { transition: transform .35s cubic-bezier(.4, 0, .2, 1); }
@@ -186,7 +198,17 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
   box-shadow: 0 1px 3px rgba(0, 0, 0, .05), 0 8px 24px rgba(31, 75, 150, .10); }
 .ask.open .askbox { border-radius: calc(var(--bar) / 2) calc(var(--bar) / 2) 0 0; }
 .askbox input { flex: 1; min-width: 0; height: 100%; border: 0; background: transparent; outline: none; font-size: 16px; }
-.askbox input::placeholder { color: var(--md-on-surface-variant); }
+.askbox input::placeholder { color: color-mix(in srgb, var(--md-on-surface-variant) 55%, transparent); }   /* 11-15 사용자: 검색창 안 글자는 전체적으로 연하게 */
+.askbox input { color: color-mix(in srgb, var(--md-on-surface) 72%, transparent); }
+#vpick { display: none !important; }   /* 11-15 사용자: 목소리는 라오메데이아 하나로 고정, 고르기 없음 */
+.mic[aria-pressed="true"] { color: var(--md-primary); background: color-mix(in srgb, var(--md-primary) 12%, transparent); animation: micPulse 1.2s ease-in-out infinite; }
+@keyframes micPulse { 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--md-primary) 14%, transparent); } }
+@media (prefers-reduced-motion: reduce) { .mic[aria-pressed="true"] { animation: none; } }
+@media (max-width: 480px) {   /* 폰: 첨부 · 마이크가 들어가며 안내 글이 잘려서, 비어 있을 때는 보내기 자리를 접고 간격을 줄임(글을 쓰면 보내기가 펼쳐짐) */
+  .askbox { gap: 2px; padding-left: 18px; }
+  .askbox .send { transition: opacity .18s var(--md-ease), transform .3s var(--ease-out), width .25s var(--md-ease), margin .25s var(--md-ease), background-color .2s; }
+  .askbox:not(.has) .send { width: 0; margin-left: -2px; }
+}
 .send { width: calc(var(--bar) - 16px); height: calc(var(--bar) - 16px); border-radius: var(--md-full); background: var(--md-primary); color: var(--md-on-primary); display: grid; place-items: center; transition: opacity .15s; }
 .send .ms { font-size: 20px; }
 .askbox:not(.has) .send { opacity: 0; pointer-events: none; }
@@ -783,6 +805,7 @@ html.hg-intro-t .intro-typed { display: block; }
           </div>
           <button class="attach" id="attach" type="button" aria-label="채용 공고 파일 붙이기(PDF · 이미지)" title="채용 공고 파일 붙이기(PDF · 이미지)"><span class="ms" aria-hidden="true">attach_file</span></button>
           <input id="attach-file" type="file" accept="application/pdf,image/png,image/jpeg,image/webp" hidden>
+          <button class="attach mic" id="mic" type="button" aria-pressed="false" aria-label="말로 물어보기" title="말로 물어보기"><span class="ms" aria-hidden="true">mic</span></button>
           <button class="auto" id="auto-read" type="button" hidden aria-pressed="false" aria-label="답 읽어 주기" title="답 읽어 주기 꺼짐"><span class="ms" aria-hidden="true">volume_off</span></button>
           <button class="send" type="submit" aria-label="질문 보내기"><span class="ms" aria-hidden="true">arrow_upward</span></button>
         </form>
@@ -2864,7 +2887,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   var VNAME = {}; VOICES.forEach(function (g) { g[1].forEach(function (v) { VNAME[v[0]] = v[1]; }); });
   var VSAY = '안녕하세요, 한정민이에요. 이 목소리로 답을 읽어 드릴게요.';
   VOICE.name = 'Laomedeia';
-  try { var sv = localStorage.getItem('hj-voice'); if (VNAME[sv]) VOICE.name = sv; } catch (e) {}
+  // 11-15 사용자: 목소리는 라오메데이아로 고정(예전에 고른 목소리 기억은 쓰지 않음)
   function vrank(v) { var n = v.name; return /Natural|Neural/i.test(n) ? 5 : /Premium|Enhanced|향상/i.test(n) ? 4 : /Google/i.test(n) ? 3 : /Yuna|유나/i.test(n) ? 2 : 1; }
   function dname(v) { return v.name.replace(/\s*[-–]\s*Korean.*$/i, '').replace(/^Microsoft\s+/i, '').replace(/\s*Online\s*\(Natural\)/i, '').replace(/\s*\(한국어.*\)$/, '').replace(/^Google 한국의$/, 'Google 한국어'); }
   function dnote(v) { return ['', '기본 목소리', '기본 목소리', '온라인 목소리', '고음질 목소리', '자연스러운 목소리'][vrank(v)]; }
@@ -3384,6 +3407,21 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     $('#ask-form').classList.add('has');
   }
   $('#attach').addEventListener('click', function () { $('#attach-file').click(); });
+  (function () {   // 11-15 사용자 "검색창에 음성으로 말할 수 있는 버튼": 말하면 글자로 바꿔 검색창에 채운다(보내기는 직접). 받아쓰기를 못 하는 브라우저면 버튼 숨김
+    var mic = $('#mic'), SRc = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!mic) return; if (!SRc) { mic.hidden = true; return; }
+    var rec = null, on = false, base = '';
+    function set(v) { on = v; mic.setAttribute('aria-pressed', String(v)); mic.title = v ? '듣는 중 · 누르면 멈춤' : '말로 물어보기'; mic.setAttribute('aria-label', mic.title); }
+    mic.addEventListener('click', function () {
+      if (on && rec) { try { rec.stop(); } catch (e) {} return; }
+      try { stopVoice(); } catch (e) {}   // 답을 읽는 소리가 마이크에 들어가지 않게
+      rec = new SRc(); rec.lang = 'ko-KR'; rec.interimResults = true; rec.continuous = false; base = IN.value ? IN.value.replace(/\s*$/, ' ') : '';
+      rec.onresult = function (e) { var t = ''; for (var i = 0; i < e.results.length; i++) t += e.results[i][0].transcript; IN.value = (base + t).slice(0, 8000); hasText(); try { if (window.HUGI && !BUSY) window.HUGI.typing(); } catch (x) {} };
+      rec.onerror = function (e) { set(false); if (e && (e.error === 'not-allowed' || e.error === 'service-not-allowed')) { mic.title = '마이크를 쓸 수 없어요(브라우저 권한 확인)'; } };
+      rec.onend = function () { set(false); try { IN.focus({ preventScroll: true }); } catch (x) {} };
+      try { rec.start(); set(true); } catch (e) { set(false); }
+    });
+  })();
   $('#attach-file').addEventListener('change', function () {
     var f = this.files && this.files[0]; this.value = '';
     if (!f) return;
@@ -3502,6 +3540,10 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   var sideBack = null;
   var sideT = 0, HM = null;
   var flyAn = null, goneT = 0, launchT = 0;
+  function atAnim(an, ms, fn) {   // 11-15: 이어받기를 setTimeout이 아니라 이동 애니메이션 시각에 맞춤(타이머가 한 프레임 일찍 울려 착지 전 11px 위에서 바꿔 넣던 것). 중간에 다른 이동으로 바뀌면 안 부름
+    var tick = function () { if (flyAn !== an) return; if ((an.currentTime || 0) >= ms - 4) fn(); else requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  }
   function hmMake() { var el = $('#hugi-menu'); if (!HM && el && window.HUGI_MAKE) { try { HM = window.HUGI_MAKE(el, { prefix: 'hm', hello: false, bubble: false }); } catch (e) { HM = null; } } }
   window.addEventListener('load', function () { setTimeout(hmMake, 1200); });   // 처음 열 때 멈칫하지 않게 미리 만든다
   function btnS() { try { return window.HUGI_ORB && window.HUGI_ORB._rig && window.HUGI_ORB._rig.S; } catch (e) { return null; } }
@@ -3583,12 +3625,14 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
         tgt = o.crouch || 1;
         if (t >= o.A) { phase = 'air'; vx = o.vx; vy = o.vy; vst += o.kick || 0; }
       } else if (phase === 'air') {
-        tf += dt; vy += g * dt; var rfx = 1; if (o.rampIn) { var ui = Math.min(1, tf / o.rampIn); rfx *= ui * ui * (3 - 2 * ui); } if (o.rampOut) { var uo = Math.max(0, Math.min(1, (o.T - tf) / o.rampOut)); rfx *= uo * uo * (3 - 2 * uo); } x += vx * dt * rfx; y += vy * dt;
-        tgt = 1 + Math.min(.2, Math.sqrt(vx * vx + vy * vy) / 7000);
-        rtgt = land ? 0 : Math.max(-10, Math.min(10, vx / 45));
+        tf += dt; vy += g * dt; var rfx = 1, rfo = 1; if (o.rampIn) { var ui = Math.min(1, tf / o.rampIn); rfx *= ui * ui * (3 - 2 * ui); } if (o.rampOut) { var uo = Math.max(0, Math.min(1, (o.T - tf) / o.rampOut)); rfo = uo * uo * (3 - 2 * uo); rfx *= rfo; } x += vx * dt * rfx; y += vy * dt;
+        // 11-15 메뉴 닫기 측정: 기울기 · 늘어남을 실제 가로 속도(완만 구간 반영)로 → 도착 때 똑바로 서 있어 이어받는 그림과 어긋나지 않음(전엔 10도 기운 채 도착해 몸 중심이 8~16px 어긋남)
+        tgt = 1 + Math.min(.2, Math.sqrt(vx * vx * rfx * rfx + vy * vy * rfo * rfo) / 7000);
+        rtgt = land ? 0 : Math.max(-10, Math.min(10, vx * rfx / 45));
         if (y >= o.y1 && vy > 0) {   // 닿음
           var vi = vy; y = o.y1; x = o.x1; vx = 0; land++;
-          if (o.hold) { phase = 'hold'; o.handAt = { t: t }; vst -= Math.min(5, vi * .005) * (o.holdSq == null ? 1 : o.holdSq); }
+          if (o.rampOut && land === 1) { st = 1; vst = 0; rot = 0; vrot = 0; tgt = 1; rtgt = 0; }   // 11-15: 그려진 자세는 착지 때 이미 똑바름(아래 rfo) → 내부 값도 맞춰 튀지 않게
+          if (o.hold) { phase = 'hold'; o.handAt = { t: t }; vst -= Math.min(5, vi * .005) * (o.holdSq == null ? 1 : o.holdSq); }   // 11-15: 그려진 자세는 착지 때 이미 똑바름(아래 rfo) → 내부 값도 맞춰 이어받기 때 튀지 않게
           else if (o.spread) { phase = 'spread'; sp0 = { sx: sNow / Math.sqrt(st), sy: sNow * st, vsx: Math.min(4, vi * .006), vsy: -Math.min(4, vi * .006), xv: o.vx * .35 }; }
           else { vst -= Math.min(9, vi * .0075); if (vi > 160 && land < 3) vy = -vi * .3; else { vy = 0; phase = 'ground'; } }
         }
@@ -3596,7 +3640,9 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
         var hT = t - o.handAt.t, opH = Math.max(0, 1 - hT / o.hold);
         var ast2 = -K * (st - 1) - Z * vst; vst += ast2 * dt; st = Math.max(.7, Math.min(1.28, st + vst * dt));
         var ar2 = -KR * rot - ZR * vrot; vrot += ar2 * dt; rot += vrot * dt;
+        var wq = Math.min(1, hT / o.hold), st2 = st, rot2 = rot; wq = wq * wq * (3 - 2 * wq); st = st + (1 - st) * wq; rot = rot * (1 - wq);   // 겹치는 동안 이어받는 그림 자세(똑바로 · 원래 크기)로 모음
         if (n % 4 === 0 || hT >= o.hold) rec(sNow / Math.sqrt(st), sNow * st, opH);
+        st = st2; rot = rot2;
         if (hT >= o.hold) break;
         t += dt; n++; continue;
       } else if (phase === 'spread') {   // 버튼 자리에 떨어져 퍼지며 알약 모양이 됨: 모양 · 가로 위치 모두 스프링(속도가 끊기지 않게)
@@ -3616,7 +3662,9 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       }
       var ast = -K * (st - tgt) - Z * vst; vst += ast * dt; st = Math.max(.7, Math.min(1.28, st + vst * dt));
       var ar = -KR * (rot - rtgt) - ZR * vrot; vrot += ar * dt; rot += vrot * dt;
+      var stR = st, rotR = rot; if (phase === 'air' && o.rampOut && rfo != null && !land) { st = 1 + (st - 1) * rfo; rot *= rfo; }   // 11-15 착지 직전 0.12초 동안 기울기 · 늘어남을 0으로 모음(스프링이 늦게 따라와 10도 기운 채 도착하던 것)
       if (n % 4 === 0) rec(sNow / Math.sqrt(st), sNow * st, phase === 'crouch' ? o.crouchOp : 1);
+      st = stR; rot = rotR;
       t += dt; n++;
     }
     var T = FR[FR.length - 1].t || 1;
@@ -3637,8 +3685,10 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
         scale: function (ph, tf) { return ph === 'crouch' ? o.s0 : (ph === 'air' && tf < T ? o.s0 + (o.s1 - o.s0) * Math.pow(tf / T, 1.6) : o.s1); } });
     }
     // 메뉴에서 웅크렸다가 뛰어올라, 버튼 위로 살짝 넘어간 뒤 떨어져 버튼 자리에 내려앉음 → 버튼에 0.06초 겹쳐 넘김
-    var g2 = 3000, Hh = Math.max(0, T0.y - T1.y) + 6, T2 = Math.sqrt(2 * Hh / g2) + Math.sqrt(2 * (Hh - (T0.y - T1.y)) / g2), ro = .12, vx2 = (T1.x - T0.x) / (T2 - ro / 2);
-    return flyPhys({ A: o.A, x0: T0.x, y0: T0.y, x1: T1.x, y1: T1.y, vx: vx2, vy: -Math.sqrt(2 * g2 * Hh), g: g2, T: T2, rampOut: ro, kick: 6, crouch: .8, crouchOp: 1, hold: o.fade, holdSq: .3,
+    var g2 = 3000, dY = T0.y - T1.y, Hh = Math.max(0, dY) + 6, Tf = function (H) { return Math.sqrt(2 * H / g2) + Math.sqrt(2 * (H - dY) / g2); }, T2 = Tf(Hh);
+    if (o.minT) while (T2 < o.minT && Hh < 400) { Hh += 2; T2 = Tf(Hh); }   // 11-15: 높이 차가 거의 없으면(인트로 가운데로) 0.13초 만에 158px를 가로질러 끊겨 보였음 → 최소 비행 시간만큼 더 높이 뜀
+    var ro = .12, ri2 = .04, vx2 = (T1.x - T0.x) / (T2 - ro / 2 - ri2 / 2);   // 출발 때 가로 속도도 0.04초 동안 붙음(한 프레임에 20px 튀던 것 완화)
+    return flyPhys({ A: o.A, x0: T0.x, y0: T0.y, x1: T1.x, y1: T1.y, vx: vx2, vy: -Math.sqrt(2 * g2 * Hh), g: g2, T: T2, rampIn: ri2, rampOut: ro, kick: 6, crouch: .8, crouchOp: 1, hold: o.fade, holdSq: 0,
       scale: function (ph, tf) { var u = Math.min(1, tf / T2); return ph === 'crouch' ? o.s0 : o.s0 + (o.s1 - o.s0) * (1 - Math.pow(1 - u, 2.2)); } });   // 일찍 작아져야 꼭대기에서 머리가 안 잘림
   }
   function sideFly(open) {
@@ -3684,15 +3734,15 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     } else {
       // 메뉴에서 웅크리며 반대로 당기고 → 열 때와 같은 길을 거꾸로 날아 → 버튼 둥근 몸과 같은 크기 · 자리에 도착 → 0.06초 겹쳐 넘기고 버튼이 눌렸다가 쭉 늘어나 알약
       var A2 = st0 ? .02 : .12;
-      var sim2 = dockFly({ dir: 'in', c0: st0 ? st0.c : mc, c1: pc, s0: st0 ? st0.s : 1, s1: spill, O: O, oc: oc, A: A2, T: .5, arc: arcH, yFirst: false, visible0: true, pull: st0 ? 0 : 10, crouch: .82, kick: 3, fade: .06 });
+      var sim2 = dockFly({ dir: 'in', c0: st0 ? st0.c : mc, c1: pc, s0: st0 ? st0.s : 1, s1: spill, O: O, oc: oc, A: A2, T: .5, arc: arcH, yFirst: false, visible0: true, pull: st0 ? 0 : 10, crouch: .82, kick: 3, fade: .08 });
       if (HM) try { HM.set('wow'); } catch (e) {}
       flyAn = el.animate(sim2.kf, { duration: sim2.dur, easing: 'linear', fill: 'forwards' });
       R2.classList.add('m-hugi-morph'); btnRound(true);   // 숨어 있는 동안 버튼 그림을 둥글게 준비
       var hd = sim2.hand, P1 = btnPill();
-      launchT = setTimeout(function () {   // 도착하는 순간: 같은 크기의 둥근 버튼 그림이 이어받고(0.06초 겹침) 눌렸다가 가운데부터 쭉 늘어나 알약
+      atAnim(flyAn, hd ? hd.t * 1000 : sim2.dur - 60, function () {   // 도착하는 순간: 같은 크기의 둥근 버튼 그림이 이어받고(0.08초 겹침) 눌렸다가 가운데부터 쭉 늘어나 알약
         R2.classList.remove('m-hugi-out'); btnKick(1.2, -2.2);
         if (P1) btnWidth(P1.h, P1.W, 480, true, function () { R2.classList.remove('m-hugi-morph'); }); else R2.classList.remove('m-hugi-morph');
-      }, hd ? hd.t * 1000 : sim2.dur - 60);
+      });
       flyAn.onfinish = function () { var f = flyAn; flyAn = null; R2.classList.remove('m-hugi-out'); dock(); try { f.cancel(); } catch (e) {} R2.classList.remove('m-calm'); };
     }
   }
@@ -3753,14 +3803,18 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       flyAn = el.animate(sim.kf, { duration: sim.dur, easing: 'linear', fill: 'forwards' });
       flyAn.onfinish = function () { var f = flyAn; flyAn = null; dock(); try { f.cancel(); } catch (e) {} if (HM) try { HM.set('wave'); } catch (e) {} };
     } else {
-      var sim2 = dockFly({ dir: 'in', c0: st0 ? st0.c : mc, c1: ic, s0: st0 ? st0.s : 1, s1: is, O: O, oc: oc, A: st0 ? .02 : .12, T: .5, visible0: true, pull: st0 ? 0 : 10, crouch: .82, kick: 3, fade: .06 });
+      var sim2 = dockFly({ dir: 'in', c0: st0 ? st0.c : mc, c1: ic, s0: st0 ? st0.s : 1, s1: is, O: O, oc: oc, A: st0 ? .02 : .12, T: .5, visible0: true, pull: st0 ? 0 : 10, crouch: .82, kick: 3, fade: .08, minT: st0 ? 0 : .34 });   // 11-15 minT: 닫히는 메뉴 판(0.14초 뒤 0.3초 동안 사라짐)이 다 사라진 뒤 착지해야 판 밑의 가운데 허기가 흐리게 이어받지 않음
       if (HM) try { HM.set('wow'); } catch (e) {}
       flyAn = el.animate(sim2.kf, { duration: sim2.dur, easing: 'linear', fill: 'forwards' });
       var hd = sim2.hand;
-      launchT = setTimeout(function () { R2.classList.remove('hg-intro-away'); }, hd ? hd.t * 1000 : sim2.dur - 60);   // 도착 순간 가운데 허기가 이어받음
+      atAnim(flyAn, hd ? hd.t * 1000 : sim2.dur - 60, function () { R2.classList.remove('hg-intro-away'); });   // 도착 순간 가운데 허기가 이어받음
       flyAn.onfinish = function () { var f = flyAn; flyAn = null; R2.classList.remove('hg-intro-away'); dock(); try { f.cancel(); } catch (e) {} };
     }
   }
+  (function () {   // 11-15 허기가 평소 움직이는(뛰기 · 걷기) 가로 범위 = 검색창 좌우 끝(허기 자리가 검색창 위일 때만. 질문창 옆 · 구석이면 원래 무대). 끄는 동안 · 던진 뒤는 화면 안 어디든(hugi.js)
+    var hgr = $('#hugi-root'); if (!hgr) return;
+    hgr.__hgBox = function () { var f = $('#ask-form'); if (!f || hgr.classList.contains('hg-float')) return null; var r = f.getBoundingClientRect(), s = hgr.getBoundingClientRect(), cx = s.left + s.width / 2; return (r.width && cx > r.left && cx < r.right) ? { left: r.left, right: r.right } : null; };
+  })();
   function introStopType() { introTy.forEach(clearTimeout); introTy = []; }
   function introSkip() {   // 이동 없이 바로 일반 화면(모션 줄이기 · 그림 없음일 때만 introDock이 부름)
     var R2 = document.documentElement; if (!R2.classList.contains('hg-intro')) return;
@@ -3865,24 +3919,26 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     eye:     { scale: 1.18, gap: 1.6 },                  // 눈 크기 배율 · 두 눈 간격 배율(원래 간격 81 단위). 눈 그림은 늘리지 않고 크기만 키움
     wobble:  { sx: .010, sk: 1.1, tx: .5 },              // 숨 쉬듯 알약이 좌우로 아주 작게 출렁(젤리)
     click:   { sx: 1.8, sy: .8 },                        // 클릭 순간 길게 늘었다 돌아오는 "꿀럭"(속도 값, 클수록 많이 늘어남)
+    talk:    { nod: .012, dur: [.65, 1.3] },          // 말하는 중: 박자마다 세로로 1.2%만 끄덕 · 아이콘 한 바퀴 시간(초) 범위
     blink:   [3000, 6000], glance: [7000, 13000],
     longMs: 600, tapWindow: 1300, emoMs: 2300, dizzyMs: 1700, angryMs: 1300
   };
-  /* 말하는 박자(허기 SPEAK 표에서 단추에 필요한 것만) beat=박자 프레임[빠름,느림] up=뜸 arm=팔 각도 eyes=번갈아 쓰는 눈 look=시선 dy=내려앉기(px) */
+  /* 말하는 박자(허기 SPEAK 표에서 단추에 필요한 것만) col=말하는 중 아이콘(소리 물결) 색 beat=박자 프레임[빠름,느림](아이콘 빠르기 · 끄덕 박자) eyes=번갈아 쓰는 눈 look=시선 dy=내려앉기(px) rot0=계속 기운 각도
+     11-15: 말하는 중 몸 움직임은 V.talk의 아주 작은 끄덕만 쓰고 up · arm · hop · shake는 쓰지 않음(사용자: 지나치게 움직여 난잡) */
   var SP = {
-    calm: { beat: [10, 14], up: 1.025, arm: [2, 8], eyes: ['vec'], look: null, dy: 0 },
-    bright: { beat: [6, 9], up: 1.06, arm: [14, 36], eyes: ['happy', 'vec'], look: null, dy: 0 },
-    sunk: { beat: [13, 17], up: 1.015, arm: [0, 4], eyes: ['vec'], look: [0, .75], dy: .7 },
-    firm: { beat: [5, 6], up: 1.03, arm: [3, 9], eyes: ['vec'], look: [0, .1], dy: .3 },
-    shy: { beat: [9, 12], up: 1.02, arm: [0, 6], eyes: ['shy', 'vec'], look: [-.6, .45], dy: .3 },
-    sob: { beat: [15, 19], up: 1.012, arm: [0, 3], eyes: ['sad'], look: [0, .8], dy: 1 },
-    mad: { beat: [5, 6], up: 1.035, arm: [0, 5], eyes: ['angry'], look: [0, 0], dy: .3, shake: 1 },
-    blush: { beat: [10, 13], up: 1.018, arm: [0, 4], eyes: ['shy'], look: [-.5, .5], dy: .4 },
-    drowsy: { beat: [18, 24], up: 1.01, arm: [0, 3], eyes: ['closed'], look: [0, .5], dy: .5 },
-    hype: { beat: [5, 7], up: 1.07, arm: [24, 44], eyes: ['sparkle', 'happy'], look: null, dy: 0, hop: 1 },
-    flustered: { beat: [4, 6], up: 1.03, arm: [10, 40], eyes: ['surprised', 'vec'], look: null, dy: 0, shake: 1 },
-    skeptic: { beat: [11, 15], up: 1.02, arm: [0, 4], eyes: ['doubt'], look: [-.4, -.6], dy: 0, rot0: -5 },
-    touched: { beat: [11, 14], up: 1.03, arm: [0, 5], eyes: ['sparkle', 'happy'], look: [0, -.3], dy: 0 }
+    calm: { col: '#E0A23A', beat: [10, 14], up: 1.025, arm: [2, 8], eyes: ['vec'], look: null, dy: 0 },
+    bright: { col: '#F29D0B', beat: [6, 9], up: 1.06, arm: [14, 36], eyes: ['happy', 'vec'], look: null, dy: 0 },
+    sunk: { col: '#B9A06A', beat: [13, 17], up: 1.015, arm: [0, 4], eyes: ['vec'], look: [0, .75], dy: .7 },
+    firm: { col: '#E8742A', beat: [5, 6], up: 1.03, arm: [3, 9], eyes: ['vec'], look: [0, .1], dy: .3 },
+    shy: { col: '#EE7FA0', beat: [9, 12], up: 1.02, arm: [0, 6], eyes: ['shy', 'vec'], look: [-.6, .45], dy: .3 },
+    sob: { col: '#5FA8DC', beat: [15, 19], up: 1.012, arm: [0, 3], eyes: ['sad'], look: [0, .8], dy: 1 },
+    mad: { col: '#F05A28', beat: [5, 6], up: 1.035, arm: [0, 5], eyes: ['angry'], look: [0, 0], dy: .3, shake: 1 },
+    blush: { col: '#EE7FA0', beat: [10, 13], up: 1.018, arm: [0, 4], eyes: ['shy'], look: [-.5, .5], dy: .4 },
+    drowsy: { col: '#8C95B8', beat: [18, 24], up: 1.01, arm: [0, 3], eyes: ['closed'], look: [0, .5], dy: .5 },
+    hype: { col: '#F29D0B', beat: [5, 7], up: 1.07, arm: [24, 44], eyes: ['sparkle', 'happy'], look: null, dy: 0, hop: 1 },
+    flustered: { col: '#3FB0E0', beat: [4, 6], up: 1.03, arm: [10, 40], eyes: ['surprised', 'vec'], look: null, dy: 0, shake: 1 },
+    skeptic: { col: '#E0A23A', beat: [11, 15], up: 1.02, arm: [0, 4], eyes: ['doubt'], look: [-.4, -.6], dy: 0, rot0: -5 },
+    touched: { col: '#F2B21B', beat: [11, 14], up: 1.03, arm: [0, 5], eyes: ['sparkle', 'happy'], look: [0, -.3], dy: 0 }
   };
   /* 감정/상태 → 눈 그림과 몸짓. 2.3초 뒤 기본으로. hold=true면 다른 상태가 올 때까지 */
   var EMO = {
@@ -3916,6 +3972,9 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var sh = document.createElement('span'); sh.className = 'hb-sh'; btn.appendChild(sh);
     var svg = el('svg', { 'class': 'hb-svg', 'aria-hidden': 'true', focusable: 'false' });
     btn.appendChild(svg);
+    var talk = document.createElement('span'); talk.className = 'hb-talk'; talk.setAttribute('aria-hidden', 'true');   // 말하는 중 아이콘: 버튼 오른쪽 위 소리 물결 세 줄
+    talk.innerHTML = '<svg viewBox="0 0 16 16"><path d="M2.87 9.08A5 5 0 0 1 6.92 13.13"/><path d="M3.56 5.14A9 9 0 0 1 10.86 12.43"/><path d="M4.26 1.2A13 13 0 0 1 14.8 11.74"/></svg>';
+    btn.appendChild(talk);
     var defs = el('defs', {}, svg);
     var EC = CX, EY = 357;                                           // 눈 중심(알약 가운데)
     var clipL = el('clipPath', { id: 'hbcL' }, defs), clipR = el('clipPath', { id: 'hbcR' }, defs), clipA = el('clipPath', { id: 'hbcA' }, defs);
@@ -4004,15 +4063,12 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       else if (m === 'speaking' && !RM) {
         var g = SP[persist.group] || SP.calm;
         if (now >= spk.next) {
-          var fr = rnd(g.beat[0], g.beat[1]) / 60 * 1000; spk.next = now + fr; spk.flip = spk.flip ? 0 : 1;
-          if (g.hop && spk.flip) { S.ty.v -= 70; }
-          if (g.shake) { S.tx.v += (spk.flip ? 1 : -1) * 28; }
+          var fr = rnd(g.beat[0], g.beat[1]) / 60 * 1000 * 2; spk.next = now + fr; spk.flip = spk.flip ? 0 : 1;   // 끄덕은 박자 두 배 간격(차분하게)
           if (++spk.eyeFlip % 4 === 0 && g.eyes.length > 1) spk.eyes = spk.eyes === g.eyes[0] ? g.eyes[1] : g.eyes[0];
         }
-        eye = (spk.eyes || g.eyes[0]);
-        T.sy = 1 + (spk.flip ? 1.7 : 0) * (g.up - 1) + V.breath.amp * breathe; T.sx = 1 - (spk.flip ? .8 : 0) * (g.up - 1);
-        T.ty += g.dy; T.rot += (g.rot0 || 0) * .4 + (spk.flip ? 1 : -1) * 1.6;
-        var a = (g.arm[0] + (spk.flip ? g.arm[1] : g.arm[0])) / 2.6; T.aL += spk.flip ? -a : 0; T.aR += spk.flip ? 0 : a; T.sk += (spk.flip ? 1 : -1) * 3; T.bu = spk.flip ? 1 : -1;   // 양끝이 번갈아 부풀며 통통
+        eye = (spk.eyes && g.eyes.indexOf(spk.eyes) >= 0) ? spk.eyes : g.eyes[0];   // 묶음이 바뀌면 앞 묶음의 눈이 남지 않게(11-15)
+        T.sy += spk.flip ? V.talk.nod : 0; T.sx -= spk.flip ? V.talk.nod * .5 : 0;   // 11-15: 몸은 아주 살짝 끄덕만. 말하는 느낌은 오른쪽 위 아이콘이 맡음
+        T.ty += g.dy * .6; T.rot += (g.rot0 || 0) * .4;
         look = g.look;
       } else if (m === 'speaking') { var g2 = SP[persist.group] || SP.calm; eye = g2.eyes[0]; look = g2.look; }
 
@@ -4114,6 +4170,10 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       if (C.tr !== tr) { C.tr = tr; svg.style.transform = tr; }
       ['aL', 'aR', 'lL', 'lR'].forEach(function (k) { put(G[k], k, 'transform', 'rotate(' + S[k].x.toFixed(1) + ' ' + CX + ' ' + CY + ')'); });
       var sht = 'scaleX(' + clamp(S.sx.x, .8, 1.3).toFixed(2) + ') scaleY(' + clamp(2 - S.sy.x, .7, 1.3).toFixed(2) + ')'; if (C.sh !== sht) { C.sh = sht; sh.style.transform = sht; var so = clamp(.9 - S.ty.x * .05, .4, 1).toFixed(2); sh.style.opacity = so; }
+      var talkOn = mode === 'speaking';                               // 말하는 중 아이콘
+      if (C.talk !== talkOn) { C.talk = talkOn; btn.classList.toggle('hb-talking', talkOn); }
+      if (talkOn && C.talkG !== persist.group) { C.talkG = persist.group; var tg = SP[persist.group] || SP.calm;
+        btn.style.setProperty('--talk-col', tg.col || '#F29D0B'); btn.style.setProperty('--talk-dur', clamp((tg.beat[0] + tg.beat[1]) / 2 / 60 * 6, V.talk.dur[0], V.talk.dur[1]).toFixed(2) + 's'); }
       var alive = moving || !RM || pressMode || special || emo || mode !== 'idle';
       if (alive && visible && !document.hidden) requestAnimationFrame(frame); else running = false;
     }
