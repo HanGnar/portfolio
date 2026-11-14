@@ -111,7 +111,8 @@ html.m-open .hdr, html.m-calm .hdr { z-index: 50; }   /* 11-14: 닫는 동안에
 .side .mhead.mi { opacity: 1; transform: none; }   /* 허기 자리는 날아오는 허기가 채우므로 차례 등장에서 뺀다 */
 html.m-hugi-out #g-ai { opacity: 0; pointer-events: none; }   /* 허기가 버튼에서 빠져나간 동안 버튼은 안 보임 */
 #g-ai { transition: width .5s cubic-bezier(.22, 1, .36, 1), margin .5s cubic-bezier(.22, 1, .36, 1), opacity .06s linear; }
-html.m-hugi-gone #g-ai { width: 0 !important; margin-left: -8px; }   /* 11-14 사용자: 버튼 자리가 줄어 남은 버튼 셋이 가운데로 모인다(간격 8px까지 없앰) */
+html.m-hugi-gone #g-ai { width: 0 !important; margin-left: -8px; }
+html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 그림이 둥글게 ↔ 알약으로 바뀌는 동안 자리 폭은 그대로 */   /* 11-14 사용자: 버튼 자리가 줄어 남은 버튼 셋이 가운데로 모인다(간격 8px까지 없앰) */
 .mline { color: var(--md-on-surface-variant); font-size: 15px; margin-bottom: 12px; }
 .mlist { list-style: none; margin: 0; padding: 0; }
 .mrow, .side summary { display: inline-flex; align-items: baseline; gap: 12px; padding: 8px 0; background: none; border: 0; cursor: pointer; text-align: left; font: inherit; font-size: 28px; line-height: 1.2; word-break: keep-all; color: var(--md-on-surface-variant);
@@ -3467,6 +3468,21 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   function hmMake() { var el = $('#hugi-menu'); if (!HM && el && window.HUGI_MAKE) { try { HM = window.HUGI_MAKE(el, { prefix: 'hm', hello: false, bubble: false }); } catch (e) { HM = null; } } }
   window.addEventListener('load', function () { setTimeout(hmMake, 1200); });   // 처음 열 때 멈칫하지 않게 미리 만든다
   function btnS() { try { return window.HUGI_ORB && window.HUGI_ORB._rig && window.HUGI_ORB._rig.S; } catch (e) { return null; } }
+  var morphRaf = 0;
+  function btnPill() { var O = window.HUGI_ORB, V = O && O._rig && O._rig.V; if (!V || !V.pill || !O.relayout) return null; var mq = window.matchMedia && matchMedia(V.pill.mq).matches, d = mq ? V.pill.mobile : V.pill.desktop; if (!d.W) d.W = d[0]; return { O: O, d: d, W: d.W, h: d[1] }; }
+  function btnWidth(from, to, dur, spring, done) {   // AI 버튼 그림을 가운데부터 늘이거나 줄인다(둥근 양 끝 · 눈은 그대로)
+    var P = btnPill(); cancelAnimationFrame(morphRaf); if (!P) { if (done) done(); return; }
+    var t0 = performance.now();
+    var step = function (now) {
+      var u = Math.min(1, (now - t0) / dur), k = (now - t0) / 1000, w;
+      if (spring) w = u >= 1 ? to : to + (from - to) * Math.exp(-7.5 * k) * Math.cos(15 * k);   // 쭉 늘어나 살짝 넘쳤다 돌아옴
+      else w = from + (to - from) * (u * u * (3 - 2 * u));
+      P.d[0] = w; try { P.O.relayout(); } catch (e) {}
+      if (u < 1) morphRaf = requestAnimationFrame(step); else if (done) done();
+    };
+    morphRaf = requestAnimationFrame(step);
+  }
+  function btnRound(on) { var P = btnPill(); if (!P) return; cancelAnimationFrame(morphRaf); P.d[0] = on ? P.h : P.W; try { P.O.relayout(); } catch (e) {} }
   function btnKick(sx, sy, set) {   // AI 버튼 허기의 스프링을 직접 건드린다(set이면 그 모양에서 출발, 아니면 속도만 준다)
     var S = btnS(); if (!S || !S.sx || !S.sy) return;
     if (set) { S.sx.x = sx; S.sy.x = sy; S.sx.v = 0; S.sy.v = 0; } else { S.sx.v += sx; S.sy.v += sy; }
@@ -3491,9 +3507,17 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
         rtgt = land ? 0 : Math.max(-10, Math.min(10, vx / 45));
         if (y >= o.y1 && vy > 0) {   // 닿음
           var vi = vy; y = o.y1; x = o.x1; vx = 0; land++;
-          if (o.spread) { phase = 'spread'; sp0 = { sx: sNow / Math.sqrt(st), sy: sNow * st, vsx: Math.min(4, vi * .006), vsy: -Math.min(4, vi * .006), xv: o.vx * .35 }; }
+          if (o.hold) { phase = 'hold'; o.handAt = { t: t }; vst -= Math.min(5, vi * .005); }
+          else if (o.spread) { phase = 'spread'; sp0 = { sx: sNow / Math.sqrt(st), sy: sNow * st, vsx: Math.min(4, vi * .006), vsy: -Math.min(4, vi * .006), xv: o.vx * .35 }; }
           else { vst -= Math.min(9, vi * .0075); if (vi > 160 && land < 3) vy = -vi * .3; else { vy = 0; phase = 'ground'; } }
         }
+      } else if (phase === 'hold') {   // 버튼 자리에 내려앉은 뒤 짧게 겹쳐 사라짐(이어받는 버튼 그림이 같은 둥근 모양)
+        var hT = t - o.handAt.t, opH = Math.max(0, 1 - hT / o.hold);
+        var ast2 = -K * (st - 1) - Z * vst; vst += ast2 * dt; st = Math.max(.7, Math.min(1.28, st + vst * dt));
+        var ar2 = -KR * rot - ZR * vrot; vrot += ar2 * dt; rot += vrot * dt;
+        if (n % 4 === 0 || hT >= o.hold) rec(sNow / Math.sqrt(st), sNow * st, opH);
+        if (hT >= o.hold) break;
+        t += dt; n++; continue;
       } else if (phase === 'spread') {   // 버튼 자리에 떨어져 퍼지며 알약 모양이 됨: 모양 · 가로 위치 모두 스프링(속도가 끊기지 않게)
         spreadT += dt;
         var P = sp0, KS = 650, ZS = 2 * .42 * Math.sqrt(650), KX = 500, ZX = 2 * .7 * Math.sqrt(500);
@@ -3520,11 +3544,12 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   function sideFly(open) {
     var el = $('#hugi-menu'), btn = $('#g-ai'), R2 = document.documentElement; if (!el) return;
     hmMake(); clearTimeout(goneT); clearTimeout(launchT);
+    if (R2.classList.contains('m-hugi-morph')) { btnRound(false); R2.classList.remove('m-hugi-morph'); }
     if (flyAn) { try { flyAn.onfinish = null; flyAn.cancel(); } catch (e) {} flyAn = null; var sl0 = $('#side .mhugi'); if (sl0 && el.parentNode !== sl0) { sl0.appendChild(el); el.style.cssText = ''; } }
     if (RM || !btn || !el.animate) { R2.classList.toggle('m-hugi-out', open); R2.classList.toggle('m-hugi-gone', open); if (open && HM) try { HM.set('wave'); } catch (e) {} return; }
     var aEnd = null;
     var vis = function () { var v = btn.querySelector('svg'); return (v || btn).getBoundingClientRect(); };   // 11-14: 버튼 상자가 아니라 버튼 속 허기 그림(팔 · 다리 포함)에 맞춘다 — 상자(64×42)와 그림(77×51) 크기가 달라 바꿔 넣을 때 툭 커졌음
-    if (open) sideFly.home = { r: vis(), w: innerWidth };
+    if (open) { sideFly.home = { r: vis(), w: innerWidth, bw: btn.getBoundingClientRect().width }; R2.style.setProperty('--gai-w', sideFly.home.bw + 'px'); }
     if (!open && R2.classList.contains('m-hugi-gone') && sideFly.home && sideFly.home.w === innerWidth) { aEnd = sideFly.home.r; R2.classList.remove('m-hugi-gone'); }
     else if (!open && R2.classList.contains('m-hugi-gone')) {   // 닫기: 버튼이 돌아갈 최종 자리를 먼저 재고, 자리를 다시 벌리기 시작
       btn.style.transition = 'none'; R2.classList.remove('m-hugi-gone'); void btn.offsetWidth; aEnd = vis();
@@ -3539,27 +3564,31 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     if (!b.width || !a.width) { dock(); R2.classList.toggle('m-hugi-out', open); R2.classList.toggle('m-hugi-gone', open); return; }
     el.style.transformOrigin = (b.left - c.left + b.width / 2) + 'px ' + (b.bottom - c.top) + 'px';   // 발밑 기준(눌릴 때 바닥에 붙어 있게)
     var dx = (a.left + a.width / 2) - (b.left + b.width / 2), dy = a.bottom - b.bottom;      // 버튼 발밑 - 메뉴 자리 발밑(위쪽이라 음수)
-    var px = a.width / b.width, py = a.height / b.height, k0 = Math.min(1, py * 1.12), kb = Math.min(1, py * 1.04);
+    var px = a.width / b.width, py = a.height / b.height, k0 = Math.min(1, py * 1.02), kb = Math.min(1, py * .86);   // 둥근 버튼 그림(약 55×50)과 같은 크기
     var easeIO = function (u) { return u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; };
     if (open) {
       // 버튼 속에서 먼저 꾹 눌리고(버튼 스프링), 0.11초 뒤 둥근 몸으로 튀어나와 작은 홉 → 중력으로 떨어져 통통 착지
-      var A = .11, T = .5, h = 9, Y = Math.max(40, -dy), g = Math.pow((Math.sqrt(2 * h) + Math.sqrt(2 * h + 2 * Y)) / T, 2);
+      var A = .11, T = .5, h = 4, Y = Math.max(40, -dy), g = Math.pow((Math.sqrt(2 * h) + Math.sqrt(2 * h + 2 * Y)) / T, 2);
       var sim = flySim({ A: A, x0: dx, y0: dy, x1: 0, y1: 0, vx: -dx / T, vy: -Math.sqrt(2 * g * h), g: g, kick: 5, crouch: 1, crouchOp: 0,
         scale: function (ph, tf) { return ph === 'crouch' ? k0 : (ph === 'air' && tf < T ? k0 + (1 - k0) * Math.pow(tf / T, 1.6) : 1); } });
-      btnKick(1.4, -2.6);
+      R2.classList.add('m-hugi-morph'); var P0 = btnPill(); if (P0) btnWidth(P0.W, P0.h, A * 1000, false); btnKick(.6, -1.2);
       launchT = setTimeout(function () { R2.classList.add('m-hugi-out'); if (HM) try { HM.set('wow'); } catch (e) {} }, A * 1000);
-      goneT = setTimeout(function () { R2.classList.add('m-hugi-gone'); }, A * 1000 + 70);   // 허기가 떠난 뒤 버튼 셋이 가운데로
+      goneT = setTimeout(function () { btnRound(false); R2.classList.remove('m-hugi-morph'); R2.classList.add('m-hugi-gone'); }, A * 1000 + 90);   // 버튼이 다 사라진 뒤에 알약 폭으로 되돌리고 자리를 줄임(보이는 동안 되돌리면 툭 커졌음)   // 허기가 떠난 뒤 버튼 셋이 가운데로
       flyAn = el.animate(sim.kf, { duration: sim.dur, easing: 'linear' });
       flyAn.onfinish = function () { flyAn = null; dock(); if (HM) try { HM.set('wave'); } catch (e) {} };
     } else {
       // 메뉴에서 웅크렸다가 뛰어올라, 버튼 위로 살짝 넘어간 뒤 떨어져 버튼 자리에 퍼지며 알약 모양 → 그 순간 버튼으로 넘기고 버튼 스프링이 출렁임
       var A2 = .12, g2 = 3000, H = -dy + 6, T2 = Math.sqrt(2 * H / g2) + Math.sqrt(2 * 6 / g2);   // 버튼 6px 위까지만 솟음(화면 위로 안 잘리게)
-      var sim2 = flySim({ A: A2, x0: 0, y0: 0, x1: dx, y1: dy, vx: dx / T2, vy: -Math.sqrt(2 * g2 * H), g: g2, kick: 6, crouch: .8, crouchOp: 1, spread: .3, fade: .06, pill: [px, py],
+      var sim2 = flySim({ A: A2, x0: 0, y0: 0, x1: dx, y1: dy, vx: dx / T2, vy: -Math.sqrt(2 * g2 * H), g: g2, kick: 6, crouch: .8, crouchOp: 1, hold: .06,
         scale: function (ph, tf) { var u = Math.min(1, tf / T2); return ph === 'crouch' ? 1 : 1 + (kb - 1) * (1 - Math.pow(1 - u, 2.2)); } });   // 일찍 작아져야 꼭대기에서 머리가 안 잘림
       if (HM) try { HM.set('wow'); } catch (e) {}
       flyAn = el.animate(sim2.kf, { duration: sim2.dur, easing: 'linear', fill: 'forwards' });
-      var hd = sim2.hand;   // 버튼으로 넘기는 순간: 버튼 스프링을 날아온 허기의 지금 모양에 맞추고, 0.09초 겹쳐 바꾼다(한 프레임 바꿔치기 없음)
-      launchT = setTimeout(function () { if (hd) btnKick(hd.rx, hd.ry, true); requestAnimationFrame(function () { R2.classList.remove('m-hugi-out'); }); }, hd ? hd.t * 1000 : sim2.dur - 90);
+      R2.classList.add('m-hugi-morph'); btnRound(true);   // 숨어 있는 동안 버튼 그림을 둥글게 준비
+      var hd = sim2.hand, P1 = btnPill();
+      launchT = setTimeout(function () {   // 내려앉는 순간: 둥근 버튼 그림이 이어받고(0.06초 겹침) 눌렸다가 가운데부터 쭉 늘어나 알약
+        R2.classList.remove('m-hugi-out'); btnKick(1.2, -2.2);
+        if (P1) btnWidth(P1.h, P1.W, 480, true, function () { R2.classList.remove('m-hugi-morph'); }); else R2.classList.remove('m-hugi-morph');
+      }, hd ? hd.t * 1000 : sim2.dur - 60);
       flyAn.onfinish = function () { var f = flyAn; flyAn = null; R2.classList.remove('m-hugi-out'); dock(); try { f.cancel(); } catch (e) {} R2.classList.remove('m-calm'); };
     }
   }
@@ -3891,6 +3920,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       speak: function (m) { var g = 'calm'; try { g = (window.HUGI && window.HUGI.speakGroup) ? window.HUGI.speakGroup(m) : (SP[m] ? m : 'calm'); } catch (e) {} if (!SP[g]) g = SP[m] ? m : 'calm'; persist.group = g; if (mode !== 'speaking') { mode = 'speaking'; persist.mode = mode; spk.eyes = null; } wake(); },
       react: function (k, m) { if (!startEmo(k) && mode !== 'speaking') return; if (m && mode === 'speaking') api.speak(m); },
       get state() { return special || (emo && emo.eye) || mode; },
+      relayout: function () { layout(); },   // 11-14 v9 세션: 메뉴 복귀 때 V.pill 가로를 바꿔 가며 다시 그려 '가운데부터 늘어나기'에 씀
       _rig: { S: S, V: V }
     };
 
