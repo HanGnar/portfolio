@@ -3498,7 +3498,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
      · 몸 중심은 시작 · 끝 속도와 가속도가 0인 곡선(E)으로 움직인다(전엔 가로가 일정한 속도로 갑자기 출발해 갑자기 멈췄음).
      · 크기는 버튼의 둥근 몸(지름 = 버튼 높이)에서 허기 몸까지 같은 곡선으로 변해, 바꿔 넣을 때 크기 · 위치가 어긋나지 않는다(전엔 버튼 그림 상자 높이에 맞춰 몸이 1/3 작게 이어받았음).
      · 가는 방향으로 속도만큼 길어지고, 닫기는 가기 전에 반대로 당기며 웅크리고 열기는 도착할 때 눌렸다 출렁인다. 1/480초씩 계산해 1/120초마다 프레임으로 남긴다. */
-  function dockFly(o) {
+  function flyCurve(o) {   // 곡선 이동 모델(시작 · 끝 속도 0). o.model === 'curve'로 고를 수 있다
     var out = o.dir === 'out', H = 1 / 480, A = o.A, T = o.T, tail = out ? o.settle : o.fade, total = A + T + tail;
     var cl = function (v, a, b) { return v < a ? a : v > b ? b : v; };
     var E = function (u) { u = cl(u, 0, 1); return u * u * u * (u * (6 * u - 15) + 10); };   // 시작 · 끝 속도와 가속도가 0
@@ -3536,6 +3536,76 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     }
     var Tt = fin.t || 1;
     return { dur: Tt * 1000, hand: out ? null : { t: A + T }, kf: FR.map(function (f, i) { return { offset: i === FR.length - 1 ? 1 : Math.min(1, f.t / Tt), transform: f.transform, opacity: f.op }; }) };
+  }
+
+  function flyPhys(o) {   // 개선 전 물리 호(웅크림 → 튀어나옴 → 중력 낙하 → 통통 착지). 버튼 쪽 끝만 속도가 서서히 붙고 줄어들게 가로 속도에 완만한 구간을 둠(o.rampIn / o.rampOut)
+    var FR = [], dt = 1 / 240, t = 0, n = 0;
+    var x = o.x0, y = o.y0, vx = 0, vy = 0, st = 1, vst = 0, rot = 0, vrot = 0, phase = 'crouch', land = 0, tf = 0, spreadT = 0, sp0 = null;
+    var g = o.g, K = 900, Z = 2 * .3 * 30, KR = 420, ZR = 2 * .26 * Math.sqrt(420);
+    var rec = function (sx, sy, op) { FR.push({ t: t, transform: 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + rot.toFixed(2) + 'deg) scale(' + sx.toFixed(3) + ',' + sy.toFixed(3) + ')', opacity: op }); };
+    while (t < 2.4) {
+      var sNow = o.scale(phase, tf), tgt = 1, rtgt = 0;
+      if (phase === 'crouch') {
+        tgt = o.crouch || 1;
+        if (t >= o.A) { phase = 'air'; vx = o.vx; vy = o.vy; vst += o.kick || 0; }
+      } else if (phase === 'air') {
+        tf += dt; vy += g * dt; var rfx = 1; if (o.rampIn) { var ui = Math.min(1, tf / o.rampIn); rfx *= ui * ui * (3 - 2 * ui); } if (o.rampOut) { var uo = Math.max(0, Math.min(1, (o.T - tf) / o.rampOut)); rfx *= uo * uo * (3 - 2 * uo); } x += vx * dt * rfx; y += vy * dt;
+        tgt = 1 + Math.min(.2, Math.sqrt(vx * vx + vy * vy) / 7000);
+        rtgt = land ? 0 : Math.max(-10, Math.min(10, vx / 45));
+        if (y >= o.y1 && vy > 0) {   // 닿음
+          var vi = vy; y = o.y1; x = o.x1; vx = 0; land++;
+          if (o.hold) { phase = 'hold'; o.handAt = { t: t }; vst -= Math.min(5, vi * .005) * (o.holdSq == null ? 1 : o.holdSq); }
+          else if (o.spread) { phase = 'spread'; sp0 = { sx: sNow / Math.sqrt(st), sy: sNow * st, vsx: Math.min(4, vi * .006), vsy: -Math.min(4, vi * .006), xv: o.vx * .35 }; }
+          else { vst -= Math.min(9, vi * .0075); if (vi > 160 && land < 3) vy = -vi * .3; else { vy = 0; phase = 'ground'; } }
+        }
+      } else if (phase === 'hold') {   // 버튼 자리에 내려앉은 뒤 짧게 겹쳐 사라짐(이어받는 버튼 그림이 같은 둥근 모양)
+        var hT = t - o.handAt.t, opH = Math.max(0, 1 - hT / o.hold);
+        var ast2 = -K * (st - 1) - Z * vst; vst += ast2 * dt; st = Math.max(.7, Math.min(1.28, st + vst * dt));
+        var ar2 = -KR * rot - ZR * vrot; vrot += ar2 * dt; rot += vrot * dt;
+        if (n % 4 === 0 || hT >= o.hold) rec(sNow / Math.sqrt(st), sNow * st, opH);
+        if (hT >= o.hold) break;
+        t += dt; n++; continue;
+      } else if (phase === 'spread') {   // 버튼 자리에 떨어져 퍼지며 알약 모양이 됨: 모양 · 가로 위치 모두 스프링(속도가 끊기지 않게)
+        spreadT += dt;
+        var P = sp0, KS = 650, ZS = 2 * .42 * Math.sqrt(650), KX = 500, ZX = 2 * .7 * Math.sqrt(500);
+        P.vsx += (-KS * (P.sx - o.pill[0]) - ZS * P.vsx) * dt; P.sx += P.vsx * dt;
+        P.vsy += (-KS * (P.sy - o.pill[1]) - ZS * P.vsy) * dt; P.sy += P.vsy * dt;
+        P.xv += (-KX * (x - o.x1) - ZX * P.xv) * dt; x += P.xv * dt;
+        var avr = -KR * rot - ZR * vrot; vrot += avr * dt; rot += vrot * dt;
+        var fadeFrom = o.spread - o.fade, op = spreadT < fadeFrom ? 1 : Math.max(0, 1 - (spreadT - fadeFrom) / o.fade);
+        if (!o.handAt && spreadT >= fadeFrom) o.handAt = { t: t, rx: P.sx / o.pill[0], ry: P.sy / o.pill[1] };   // 버튼을 보이기 시작할 때의 모양(버튼 스프링이 여기서 출발)
+        if (n % 4 === 0 || spreadT >= o.spread) rec(P.sx, P.sy, op);
+        if (spreadT >= o.spread) break;
+        t += dt; n++; continue;
+      } else {   // ground
+        if (t > o.A + .2 && Math.abs(st - 1) < .003 && Math.abs(vst) < .03 && Math.abs(rot) < .15) { st = 1; rot = 0; rec(sNow, sNow, 1); break; }
+      }
+      var ast = -K * (st - tgt) - Z * vst; vst += ast * dt; st = Math.max(.7, Math.min(1.28, st + vst * dt));
+      var ar = -KR * (rot - rtgt) - ZR * vrot; vrot += ar * dt; rot += vrot * dt;
+      if (n % 4 === 0) rec(sNow / Math.sqrt(st), sNow * st, phase === 'crouch' ? o.crouchOp : 1);
+      t += dt; n++;
+    }
+    var T = FR[FR.length - 1].t || 1;
+    return { dur: T * 1000, hand: o.handAt, kf: FR.map(function (f, k) { return { offset: k === FR.length - 1 ? 1 : Math.min(1, f.t / T), transform: f.transform, opacity: f.opacity }; }) };
+  }
+  /* 11-14 허기 ↔ AI 버튼 오가기 공통 호출 dockFly(o): 출발 · 도착 몸 중심(c0, c1)과 크기(s0, s1), 허기 발밑 O, 발밑 → 몸 중심 oc, 방향 dir('out' 열기 / 'in' 닫기)만 넘기면 된다.
+     이동 경로 모델은 바꿔 끼울 수 있다: 기본 'phys'(물리 호: 웅크림 → 튀어나옴 → 포물선 · 중력 낙하 → 통통 착지, 개선 전 느낌) / 'curve'(곡선).
+     버튼 쪽은 어느 모델이든 같다: 몸 지름 · 몸 중심을 맞춰 출발 · 도착하고(크기 · 위치가 버튼 그림과 같음), 열기는 가로 속도가 서서히 붙으며 떠나고 닫기는 가로 속도가 서서히 줄며 도착한 뒤 0.06초 겹쳐 버튼 그림에 넘긴다. */
+  function dockFly(o) {
+    if (o.model === 'curve') return flyCurve(o);
+    var out = o.dir === 'out';
+    var tr = function (c, s) { return { x: c.x - o.O.x - s * o.oc.x, y: c.y - o.O.y - s * o.oc.y }; };   // 몸 중심을 맞추는 발밑 이동량
+    var T0 = tr(o.c0, o.s0), T1 = tr(o.c1, o.s1);
+    if (out) {
+      // 버튼 속에서 먼저 꾹 눌리고(버튼 스프링), 둥근 몸으로 튀어나와 작은 홉 → 중력으로 떨어져 통통 착지
+      var A = o.A, T = .5, h = 4, Y = Math.max(40, T1.y - T0.y), g = Math.pow((Math.sqrt(2 * h) + Math.sqrt(2 * h + 2 * Y)) / T, 2), ri = o.A > .05 ? .07 : 0, vxs = (T1.x - T0.x) / (T - ri / 2);
+      return flyPhys({ A: A, x0: T0.x, y0: T0.y, x1: T1.x, y1: T1.y, vx: vxs, vy: -Math.sqrt(2 * g * h), g: g, T: T, rampIn: ri, kick: 5, crouch: 1, crouchOp: o.visible0 ? 1 : 0,
+        scale: function (ph, tf) { return ph === 'crouch' ? o.s0 : (ph === 'air' && tf < T ? o.s0 + (o.s1 - o.s0) * Math.pow(tf / T, 1.6) : o.s1); } });
+    }
+    // 메뉴에서 웅크렸다가 뛰어올라, 버튼 위로 살짝 넘어간 뒤 떨어져 버튼 자리에 내려앉음 → 버튼에 0.06초 겹쳐 넘김
+    var g2 = 3000, Hh = (T0.y - T1.y) + 6, T2 = Math.sqrt(2 * Hh / g2) + Math.sqrt(2 * 6 / g2), ro = .12, vx2 = (T1.x - T0.x) / (T2 - ro / 2);
+    return flyPhys({ A: o.A, x0: T0.x, y0: T0.y, x1: T1.x, y1: T1.y, vx: vx2, vy: -Math.sqrt(2 * g2 * Hh), g: g2, T: T2, rampOut: ro, kick: 6, crouch: .8, crouchOp: 1, hold: o.fade, holdSq: .3,
+      scale: function (ph, tf) { var u = Math.min(1, tf / T2); return ph === 'crouch' ? o.s0 : o.s0 + (o.s1 - o.s0) * (1 - Math.pow(1 - u, 2.2)); } });   // 일찍 작아져야 꼭대기에서 머리가 안 잘림
   }
   function sideFly(open) {
     var el = $('#hugi-menu'), btn = $('#g-ai'), R2 = document.documentElement; if (!el) return;
