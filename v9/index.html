@@ -3957,7 +3957,10 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     f.animate([{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 300, delay: 50, easing: E, fill: 'backwards' });
     f.animate([{ clipPath: dot }, { clipPath: 'inset(0px 0px round 999px)' }], { duration: 500, delay: 300, easing: E, fill: 'backwards' });
     f.animate([{ filter: 'blur(10px)' }, { filter: 'blur(0px)' }], { duration: 600, delay: 300, easing: E, fill: 'backwards' });
-    Array.prototype.forEach.call(f.children, function (k) { if (!k.hidden) k.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 600, easing: E, fill: 'backwards' }); });
+    Array.prototype.forEach.call(f.children, function (k) {   // 11-15: 원래 안 보이는 것(글 없을 때 보내기 버튼 등)은 건드리지 않음 — 0→1로 강제해서 보내기 버튼이 0.3초 나타났다 사라지던 오류
+      if (k.hidden) return; var o = +getComputedStyle(k).opacity; if (!(o > 0)) return;
+      k.animate([{ opacity: 0 }, { opacity: o }], { duration: 300, delay: 600, easing: E, fill: 'backwards' });
+    });
   }
   function introSideFly(open, el, cur0) {   // 11-14 인트로 중 메뉴: 가운데 허기가 위로 뛰어 메뉴 허기 자리로, 닫으면 다시 가운데로(인트로 유지 · AI 버튼은 계속 폭 0)
     var R2 = document.documentElement, ich = $('#hugi-root .hugi-char');
