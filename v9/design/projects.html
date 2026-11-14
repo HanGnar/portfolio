@@ -646,7 +646,9 @@ function filter(cat){
     if(RM)return;
     cards.forEach(function(c){var a=before.get(c);if(!a||c.classList.contains('out'))return;var b=c.getBoundingClientRect(),dx=a.left-b.left,dy=a.top-b.top;
       if(Math.abs(dx)<1&&Math.abs(dy)<1)return;
-      busy.push(c.animate([{transform:'translate('+dx+'px,'+dy+'px)'},{transform:'none'}],{duration:420,easing:'cubic-bezier(.34,1.56,.64,1)'}))});
+      if(Math.abs(dy)>=1){entering.push(c);return}   // 4판: 다른 줄로 옮겨 가는 박스는 미끄러지지 않고 새로 나타남(같은 줄 안에서 옆으로만 미끄러짐)
+      busy.push(c.animate([{transform:'translateX('+dx+'px)'},{transform:'none'}],{duration:420,easing:'cubic-bezier(.34,1.56,.64,1)'}))});
+    entering.sort(function(x,y){return cards.indexOf(x)-cards.indexOf(y)});
     entering.forEach(function(c,i){busy.push(c.animate([{opacity:0,transform:'scale(.92)'},{opacity:1,transform:'none'}],{duration:420,delay:i*40,easing:'cubic-bezier(.34,1.56,.64,1)',fill:'backwards'}))});
   };
   if(RM||!leaving.length){go();return}

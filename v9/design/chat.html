@@ -34,27 +34,128 @@
 .t-subhead{font:var(--t-subhead);letter-spacing:var(--ls-subhead)} .t-footnote{font:var(--t-footnote);letter-spacing:var(--ls-footnote)}
 .t-caption{font:var(--t-caption);letter-spacing:var(--ls-caption)} .t-caption2{font:var(--t-caption2);letter-spacing:var(--ls-caption2)}
 
+/* ═══ 헝그리한정민 디자인 시스템 — 공통 부품 토큰 (2026-11-15 처음 만듦) ═══
+   히어로 시트와 대화 영역 시트에 같이 있는 부품의 값을 여기 한 곳에 모은다. 여기 값을 고치면 두 시트에 같이 들어간다.
+   - 넣는 곳: 시트/hero/build_ds.py · 시트/chat/build.py 가 ds/type.css 바로 다음에 넣는다.
+   - 두 시트의 마크업 · 선택자는 다르다(대화 영역 form#ask .ib .send / 히어로 form.askbox #attach #mic .send).
+     그래서 CSS 덩어리를 같이 쓰지 않고, 이 토큰(CSS 변수)만 같이 쓴다. 각 시트가 자기 선택자에서 var(--ui-…)로 부른다.
+   - 값의 기준: 두 시트 값이 다르면 대화 영역 시트 값(사용자 "채팅 페이지 기준으로 설정해줘").
+   - 이름은 모두 --ui- 로 시작한다. 실제 사이트(v9_ai/index.html)의 변수 이름(--md- · --ease-out · --bar 등)과 겹치지 않게 해서
+     히어로 시트에서 사이트 규칙(인트로 · 허기 버튼 엔진 등)을 건드리지 않는다.
+   - 사용자 판단 대기(값을 바꾸지 않고 둠):
+     ① 보내기 올림: 히어로는 올리면 1.04배, 대화 영역은 올림 없음
+     ② 3단계 글자색(label-3): 히어로 #86868B / 대화 영역 #8E8E93 (질문창 안내 글 · 초점 고리 색이 이 값을 씀. 아이콘색 --ui-ib-color는 대화 영역 값)
+     ③ 대화 영역 시트 390 반응형: 교차 검수에서 데스크톱 값(질문창 680 · 60)이 나왔던 것은 검사가 viewport 줄 없이 열어서 생긴 오탐으로 확인.
+        시트에 viewport 줄이 없는 것 자체(게시할 때 붙음)는 그대로 둠
+     ④ 다음 질문 칩 아이콘: 대화 영역 칩은 앞에 화살표 아이콘(14) + 왼쪽 여백 12, 히어로(사이트) 칩에는 아이콘이 없어 좌우 여백 15.
+        아이콘을 넣는 건 새 부품이라 사용자 판단 */
+:root {
+  /* ── 유리 재질(상단 내비 · 다음 질문 칩 · 아이콘 버튼 올림) ── */
+  --ui-glass: rgba(255, 255, 255, .80);
+  --ui-glass-edge: rgba(255, 255, 255, .70);                 /* 안쪽 밝은 선 */
+  --ui-glass-line: rgba(0, 0, 0, .06);                       /* 바깥 머리카락 선 */
+  --ui-glass-blur: blur(24px) saturate(180%);
+  --ui-glass-sh: 0 8px 24px -12px rgba(0, 0, 0, .18);         /* 기본 그림자 */
+  --ui-glass-sh-hi: 0 12px 30px -12px rgba(0, 0, 0, .28);     /* 올림 그림자 */
+
+  /* ── 움직임(공통기준 7장) ── */
+  --ui-ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ui-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --ui-d1: 120ms; --ui-d2: 240ms; --ui-d3: 420ms; --ui-d4: 640ms;
+  --ui-press: scale(.95, .93);      /* 누름(세로가 더 눌림) */
+  --ui-lift: scale(1.04);           /* 유리 버튼 올림 */
+  --ui-ib-lift: scale(1.06);        /* 투명 아이콘 버튼 올림(유리가 떠오름) */
+
+  /* ── 상단 내비 ── */
+  --ui-nav-btn: 40px;               /* 원형 버튼 지름 */
+  --ui-nav-pill-w: 56px;            /* 메뉴 알약 폭(높이는 --ui-nav-btn) */
+  --ui-nav-icon: 18px;              /* 홈 · 소리 아이콘 */
+  --ui-nav-gap: 8px;
+
+  /* ── 대화 폭 ── */
+  --ui-ask-maxw: 680px;             /* 질문창 최대 폭 = 글 폭 */
+  --ui-col-maxw: 720px;             /* 대화 기둥 최대 폭 = 680 + 좌우 20 */
+
+  /* ── 질문창(흰 상자) ── */
+  --ui-ask-h: 60px;                 /* 높이(데스크톱) */
+  --ui-ask-h-m: 56px;               /* 높이(≤640) */
+  --ui-ask-r: calc(var(--ui-ask-h) / 2);      /* 모서리 = 높이의 절반(알약) */
+  --ui-ask-r-m: calc(var(--ui-ask-h-m) / 2);
+  --ui-ask-pl: 24px;                /* 왼쪽 안 여백 */
+  --ui-ask-pl-m: 18px;              /* 왼쪽 안 여백(≤640) */
+  --ui-ask-pr: 8px;                 /* 오른쪽 안 여백(히어로는 사이트의 "보내기 자리 비우기" 값 8 + 보내기 + 간격 그대로) */
+  --ui-ask-gap: 10px;               /* 칸 사이 */
+  --ui-ask-bg: #FFFFFF;
+  --ui-ask-sh: 0 1px 3px rgba(0, 0, 0, .05), 0 8px 24px rgba(31, 75, 150, .10);        /* 바깥 선 없음 */
+  --ui-ask-sh-focus: 0 1px 3px rgba(0, 0, 0, .05), 0 12px 32px rgba(31, 75, 150, .16); /* 입력 중: 그림자만 조금 진하게 */
+
+  /* ── 질문창 첨부 · 마이크(투명 아이콘 버튼) ── */
+  --ui-ask-ib: 40px;                /* 버튼 지름 */
+  --ui-ask-ib-icon: 20px;           /* 아이콘 */
+  --ui-ib-color: #8E8E93;           /* 아이콘색(대화 영역 --label-3 값) */
+  --ui-ib-color-hi: #1D1D1F;        /* 올렸을 때 아이콘색 */
+
+  /* ── 보내기 ── */
+  --ui-send: 44px;                  /* 지름 */
+  --ui-send-icon: 18px;             /* 화살표 */
+  --ui-send-bg: #1D1D1F;            /* ink */
+  --ui-send-fg: #FFFFFF;            /* on-ink */
+
+  /* ── 다음 질문 칩(유리 알약) ── */
+  --ui-chip-h: 36px;
+  --ui-chip-pl: 12px;               /* 왼쪽 여백(앞에 아이콘이 있을 때) */
+  --ui-chip-pr: 15px;               /* 오른쪽 여백 */
+  --ui-chip-icon: 14px;
+  --ui-chip-gap: 6px;               /* 아이콘 ↔ 글 */
+  --ui-chip-row-gap: 8px;           /* 칩 사이 */
+
+  /* ── 질문 말풍선 ── */
+  --ui-bubble-bg: #ECECF0;
+  --ui-bubble-r: 22px 22px 8px 22px;   /* 오른쪽 아래만 8 */
+  --ui-bubble-pad: 10px 18px;
+
+  /* ── 답 글 ── */
+  --ui-ans-gap: 12px;               /* 문단 사이 */
+  --ui-ans-h-top: 24px;             /* 소제목 위 */
+  --ui-ans-list-gap: 8px;           /* 목록 항목 사이 */
+}
+
+/* 어두운 화면: 기기가 어두운 화면이고 data-theme="light"가 아닐 때, 또는 data-theme="dark" (두 경우 값 같음) */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --ui-glass: rgba(44, 44, 48, .72); --ui-glass-edge: rgba(255, 255, 255, .10); --ui-glass-line: rgba(255, 255, 255, .08);
+  --ui-glass-sh: 0 8px 24px -12px rgba(0, 0, 0, .7); --ui-glass-sh-hi: 0 12px 30px -12px rgba(0, 0, 0, .8);
+  --ui-ask-bg: #1C1C1E;   /* 질문창 그림자는 대화 영역처럼 밝은 화면과 같은 값 */
+  --ui-ib-color: #76767B; --ui-ib-color-hi: #F5F5F7;
+  --ui-send-bg: #F5F5F7; --ui-send-fg: #1D1D1F;
+  --ui-bubble-bg: #2A2A2D; } }
+:root[data-theme="dark"] {
+  --ui-glass: rgba(44, 44, 48, .72); --ui-glass-edge: rgba(255, 255, 255, .10); --ui-glass-line: rgba(255, 255, 255, .08);
+  --ui-glass-sh: 0 8px 24px -12px rgba(0, 0, 0, .7); --ui-glass-sh-hi: 0 12px 30px -12px rgba(0, 0, 0, .8);
+  --ui-ask-bg: #1C1C1E;
+  --ui-ib-color: #76767B; --ui-ib-color-hi: #F5F5F7;
+  --ui-send-bg: #F5F5F7; --ui-send-fg: #1D1D1F;
+  --ui-bubble-bg: #2A2A2D; }
+
 /* 레이아웃: 가운데 대화 기둥(글 폭 680) — 한 번의 주고받기(질문 + 답)를 한 묶음으로, 묶음 사이 56 · 묶음 안 20 */
 :root{
   --bg:#FBFBFD; --bg-2:#F4F4F7; --bg-3:#ECECF0; --surface:#FFFFFF;
   --label:#1D1D1F; --label-2:#6E6E73; --label-3:#8E8E93; --sep:rgba(0,0,0,.07); --hover:rgba(0,0,0,.035); --read:rgba(0,0,0,.055);
   --ink:#1D1D1F; --on-ink:#FFFFFF; --glow:#CFE0FA;
-  --glass:rgba(255,255,255,.80); --glass-edge:rgba(255,255,255,.70); --glass-line:rgba(0,0,0,.06);
-  --shadow:0 8px 24px -12px rgba(0,0,0,.18); --shadow-hi:0 12px 30px -12px rgba(0,0,0,.28);
+  /* 유리 · 움직임은 공통 부품 토큰(ds/components.css, 히어로 시트와 같이 씀)을 부름. 어두운 화면 값도 그 파일에서 바뀜 */
+  --glass:var(--ui-glass); --glass-edge:var(--ui-glass-edge); --glass-line:var(--ui-glass-line);
+  --shadow:var(--ui-glass-sh); --shadow-hi:var(--ui-glass-sh-hi);
   --card-sh:0 0 0 1px rgba(0,0,0,.035),0 1px 3px rgba(0,0,0,.04),0 8px 24px rgba(31,75,150,.08);
   --card-sh-hi:0 0 0 1px rgba(0,0,0,.035),0 1px 3px rgba(0,0,0,.04),0 16px 36px rgba(31,75,150,.14);
-  --ease-out:cubic-bezier(.22,1,.36,1); --spring:cubic-bezier(.34,1.56,.64,1); --d1:120ms; --d2:240ms; --d3:420ms; --d4:640ms;
-  --bar:60px; --r-card:20px; --r-box:16px; --scrim:rgba(20,24,33,.22);
+  --ease-out:var(--ui-ease-out); --spring:var(--ui-spring); --d1:var(--ui-d1); --d2:var(--ui-d2); --d3:var(--ui-d3); --d4:var(--ui-d4);
+  --r-card:20px; --r-box:16px; --scrim:rgba(20,24,33,.22);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0B0B0D; --bg-2:#1C1C1E; --bg-3:#2A2A2D; --surface:#1C1C1E; --label:#F5F5F7; --label-2:#A1A1A6; --label-3:#76767B; --sep:rgba(255,255,255,.09); --hover:rgba(255,255,255,.05); --read:rgba(255,255,255,.10);
-  --ink:#F5F5F7; --on-ink:#1D1D1F; --glow:rgba(66,133,244,.22); --glass:rgba(44,44,48,.72); --glass-edge:rgba(255,255,255,.10); --glass-line:rgba(255,255,255,.08);
-  --shadow:0 8px 24px -12px rgba(0,0,0,.7); --shadow-hi:0 12px 30px -12px rgba(0,0,0,.8);
+  --ink:#F5F5F7; --on-ink:#1D1D1F; --glow:rgba(66,133,244,.22);
   --card-sh:0 0 0 1px rgba(255,255,255,.06),0 8px 24px rgba(0,0,0,.35); --card-sh-hi:0 0 0 1px rgba(255,255,255,.08),0 16px 36px rgba(0,0,0,.5); --scrim:rgba(0,0,0,.5); color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0B0B0D; --bg-2:#1C1C1E; --bg-3:#2A2A2D; --surface:#1C1C1E; --label:#F5F5F7; --label-2:#A1A1A6; --label-3:#76767B; --sep:rgba(255,255,255,.09); --hover:rgba(255,255,255,.05); --read:rgba(255,255,255,.10);
-  --ink:#F5F5F7; --on-ink:#1D1D1F; --glow:rgba(66,133,244,.22); --glass:rgba(44,44,48,.72); --glass-edge:rgba(255,255,255,.10); --glass-line:rgba(255,255,255,.08);
-  --shadow:0 8px 24px -12px rgba(0,0,0,.7); --shadow-hi:0 12px 30px -12px rgba(0,0,0,.8);
+  --ink:#F5F5F7; --on-ink:#1D1D1F; --glow:rgba(66,133,244,.22);
   --card-sh:0 0 0 1px rgba(255,255,255,.06),0 8px 24px rgba(0,0,0,.35); --card-sh-hi:0 0 0 1px rgba(255,255,255,.08),0 16px 36px rgba(0,0,0,.5); --scrim:rgba(0,0,0,.5); color-scheme:dark}
 
 *{box-sizing:border-box}
@@ -66,28 +167,29 @@ button{font:inherit;letter-spacing:inherit;color:inherit;-webkit-tap-highlight-c
 svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
 
 /* ── 재질 · 누름(히어로와 같음) ── */
-.glass{background:var(--glass);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px var(--glass-edge),0 0 0 1px var(--glass-line),var(--shadow)}
+.glass{background:var(--glass);-webkit-backdrop-filter:var(--ui-glass-blur);backdrop-filter:var(--ui-glass-blur);box-shadow:inset 0 0 0 1px var(--glass-edge),0 0 0 1px var(--glass-line),var(--shadow)}
 .press{cursor:pointer;border:0;transition:transform var(--d3) var(--spring),box-shadow var(--d2) var(--ease-out),background-color var(--d2) var(--ease-out),color var(--d2) var(--ease-out),opacity var(--d2) var(--ease-out)}
-.press:active{transform:scale(.95,.93);transition-duration:var(--d1);transition-timing-function:var(--ease-out)}
+.press:active{transform:var(--ui-press);transition-duration:var(--d1);transition-timing-function:var(--ease-out)}
 .press:focus-visible{outline:2px solid var(--label-3);outline-offset:2px}
-@media (hover:hover){.glass.press:hover{transform:scale(1.04);box-shadow:inset 0 0 0 1px var(--glass-edge),0 0 0 1px var(--glass-line),var(--shadow-hi)}}
-.ib{width:32px;height:32px;border-radius:999px;display:grid;place-items:center;background:transparent;color:var(--label-3)}
+@media (hover:hover){.glass.press:hover{transform:var(--ui-lift);box-shadow:inset 0 0 0 1px var(--glass-edge),0 0 0 1px var(--glass-line),var(--shadow-hi)}}
+.ib{width:32px;height:32px;border-radius:999px;display:grid;place-items:center;background:transparent;color:var(--ui-ib-color)}
 .ib svg.i{width:17px;height:17px}
-@media (hover:hover){.ib:hover{background:var(--glass);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);color:var(--label);transform:scale(1.06);box-shadow:inset 0 0 0 1px var(--glass-edge),0 0 0 1px var(--glass-line),var(--shadow-hi)}}
+@media (hover:hover){.ib:hover{background:var(--glass);-webkit-backdrop-filter:var(--ui-glass-blur);backdrop-filter:var(--ui-glass-blur);color:var(--ui-ib-color-hi);transform:var(--ui-ib-lift);box-shadow:inset 0 0 0 1px var(--glass-edge),0 0 0 1px var(--glass-line),var(--shadow-hi)}}
 
 /* ── 상단 내비 ── */
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;justify-content:center;padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.nav{display:flex;gap:8px}
-.nb{width:40px;height:40px;border-radius:999px;display:grid;place-items:center;color:var(--label)}
-.nb.pill{width:56px}.nb.pill i{display:block;width:18px;height:1.5px;border-radius:2px;background:currentColor;box-shadow:0 5.5px 0 currentColor;transform:translateY(-2.75px)}
+.nav{display:flex;gap:var(--ui-nav-gap)}
+.nb{width:var(--ui-nav-btn);height:var(--ui-nav-btn);border-radius:999px;display:grid;place-items:center;color:var(--label)}
+.nb svg.i{width:var(--ui-nav-icon);height:var(--ui-nav-icon)}
+.nb.pill{width:var(--ui-nav-pill-w)}.nb.pill i{display:block;width:18px;height:1.5px;border-radius:2px;background:currentColor;box-shadow:0 5.5px 0 currentColor;transform:translateY(-2.75px)}
 
 /* ── 대화 기둥 ── */
-.thread{max-width:720px;margin:0 auto;padding:var(--s-4) max(20px,env(safe-area-inset-right,0px)) 200px max(20px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:var(--s-9)}
+.thread{max-width:var(--ui-col-maxw);margin:0 auto;padding:var(--s-4) max(20px,env(safe-area-inset-right,0px)) 200px max(20px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:var(--s-9)}
 .turn{display:flex;flex-direction:column;gap:var(--s-5)}
 .note-top{align-self:center;margin:0;font:var(--t-footnote);letter-spacing:var(--ls-footnote);color:var(--label-3)}
 
 .q{align-self:flex-end;max-width:78%;display:flex;flex-direction:column;align-items:flex-end;gap:var(--s-2)}
-.q p{margin:0;padding:10px 18px;border-radius:22px 22px 8px 22px;background:var(--bg-3)}
+.q p{margin:0;padding:var(--ui-bubble-pad);border-radius:var(--ui-bubble-r);background:var(--ui-bubble-bg)}
 .q .att{display:flex;align-items:center;gap:10px;padding:8px 14px 8px 8px;border-radius:14px;background:var(--surface);box-shadow:var(--card-sh)}
 .q .att .ty{width:30px;height:36px;padding-bottom:5px}
 .q .att span{font:var(--t-callout);letter-spacing:var(--ls-callout)}
@@ -98,10 +200,10 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.75;str
 .who img{width:24px;height:24px;border-radius:50%;display:block}
 .body{min-width:0}
 .body>*{margin:0}
-.body>*+*{margin-top:var(--s-3)}
-.body h4{font:var(--t-headline);letter-spacing:var(--ls-headline);margin-top:var(--s-6)}
+.body>*+*{margin-top:var(--ui-ans-gap)}
+.body h4{font:var(--t-headline);letter-spacing:var(--ls-headline);margin-top:var(--ui-ans-h-top)}
 .body strong{font-weight:600}
-.body ul,.body ol{padding-left:0;list-style:none;display:flex;flex-direction:column;gap:var(--s-2)}
+.body ul,.body ol{padding-left:0;list-style:none;display:flex;flex-direction:column;gap:var(--ui-ans-list-gap)}
 .body li{position:relative;padding-left:22px}
 .body ul li::before{content:"";position:absolute;left:8px;top:calc(.85em - 2px);width:4px;height:4px;border-radius:50%;background:var(--label-3)}
 .body ol{counter-reset:n}.body ol li{counter-increment:n}
@@ -133,9 +235,9 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.75;str
 .toast{font:var(--t-caption);letter-spacing:var(--ls-caption);color:var(--label-3);margin-left:6px;opacity:0;transform:translateX(-4px);transition:opacity var(--d2),transform var(--d3) var(--spring)}
 .toast.on{opacity:1;transform:none}
 
-.next{display:flex;flex-wrap:wrap;gap:var(--s-2)}
-.chip{height:36px;padding:0 15px 0 12px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;font:var(--t-callout);letter-spacing:var(--ls-callout);color:var(--label)}
-.chip svg.i{width:14px;height:14px;color:var(--label-3)}
+.next{display:flex;flex-wrap:wrap;gap:var(--ui-chip-row-gap)}
+.chip{height:var(--ui-chip-h);padding:0 var(--ui-chip-pr) 0 var(--ui-chip-pl);border-radius:999px;display:inline-flex;align-items:center;gap:var(--ui-chip-gap);font:var(--t-callout);letter-spacing:var(--ls-callout);color:var(--label)}
+.chip svg.i{width:var(--ui-chip-icon);height:var(--ui-chip-icon);color:var(--label-3)}
 
 /* 프로젝트 카드 */
 .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s-3)}
@@ -246,15 +348,17 @@ td.muted{color:var(--label-3)}
 /* 아래 질문창(히어로와 같음) */
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:30;padding:28px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
   background:linear-gradient(color-mix(in srgb,var(--bg) 0%,transparent),var(--bg) 45%);display:flex;justify-content:center}
-.ask{width:100%;max-width:680px;display:flex;align-items:center;gap:10px;height:var(--bar);padding:0 8px 0 24px;border-radius:calc(var(--bar)/2);background:var(--surface);
-  box-shadow:0 1px 3px rgba(0,0,0,.05),0 8px 24px rgba(31,75,150,.10);transition:box-shadow var(--d2) var(--ease-out)}
-.ask:focus-within{box-shadow:0 1px 3px rgba(0,0,0,.05),0 12px 32px rgba(31,75,150,.16)}
+/* 질문창 · 첨부 · 마이크 · 보내기 값은 공통 부품 토큰(ds/components.css, 히어로 시트와 같이 씀) */
+.ask{width:100%;max-width:var(--ui-ask-maxw);display:flex;align-items:center;gap:var(--ui-ask-gap);height:var(--ui-ask-h);padding:0 var(--ui-ask-pr) 0 var(--ui-ask-pl);border-radius:var(--ui-ask-r);background:var(--ui-ask-bg);
+  box-shadow:var(--ui-ask-sh);transition:box-shadow var(--d2) var(--ease-out)}
+.ask:focus-within{box-shadow:var(--ui-ask-sh-focus)}
 .ask input{flex:1;min-width:0;border:0;background:none;outline:none;font:var(--t-body);letter-spacing:var(--ls-body);color:var(--label)}
 .ask input::placeholder{color:var(--label-3)}
-.ask .ib{width:40px;height:40px}.ask .ib svg.i{width:20px;height:20px}
-.send{flex:none;width:44px;height:44px;border-radius:999px;display:grid;place-items:center;background:var(--ink);color:var(--on-ink);border:0;cursor:pointer;overflow:hidden;
+.ask .ib{width:var(--ui-ask-ib);height:var(--ui-ask-ib)}.ask .ib svg.i{width:var(--ui-ask-ib-icon);height:var(--ui-ask-ib-icon)}
+.send{flex:none;width:var(--ui-send);height:var(--ui-send);border-radius:999px;display:grid;place-items:center;background:var(--ui-send-bg);color:var(--ui-send-fg);border:0;cursor:pointer;overflow:hidden;
   transition:width .36s var(--ease-out),margin .36s var(--ease-out),opacity var(--d2),transform var(--d3) var(--spring)}
-.ask:not(.has) .send{width:0;margin-left:-10px;opacity:0;transform:scale(.4)}
+.send svg.i{width:var(--ui-send-icon);height:var(--ui-send-icon)}
+.ask:not(.has) .send{width:0;margin-left:calc(-1 * var(--ui-ask-gap));opacity:0;transform:scale(.4)}
 .send .sq{display:none}.send.stop .ar{display:none}.send.stop .sq{display:block}
 
 /* 시안 도구 · 글자 기준 */
@@ -284,7 +388,7 @@ body.spec [data-spec]::after{content:attr(data-spec);position:absolute;right:0;t
   .pc{flex:0 0 74%;scroll-snap-align:start}
   .q{max-width:88%}
   .thread{padding-top:52px}
-  .ask{height:56px;padding-left:18px}
+  .ask{height:var(--ui-ask-h-m);padding-left:var(--ui-ask-pl-m);border-radius:var(--ui-ask-r-m)}
   .ctl{top:calc(64px + env(safe-area-inset-top,0px));bottom:auto;flex-direction:row}
   .ctl button{height:30px;padding:0 11px}
   .spec-row{grid-template-columns:1fr;gap:4px}
@@ -299,13 +403,13 @@ body.spec [data-spec]::after{content:attr(data-spec);position:absolute;right:0;t
 }
 /* 누름이 데스크톱에서도 보이게: 올림 규칙 뒤에 누름을 다시 적음(쫀득: 누름 120ms ease-out → 놓음 420ms spring) */
 @media (hover:hover){
-  .glass.press:hover:active,.ib.press:hover:active,.play.press:hover:active,.chip.press:hover:active{transform:scale(.95,.93);transition-duration:var(--d1);transition-timing-function:var(--ease-out)}
+  .glass.press:hover:active,.ib.press:hover:active,.play.press:hover:active,.chip.press:hover:active{transform:var(--ui-press);transition-duration:var(--d1);transition-timing-function:var(--ease-out)}
 }
 .pc.press:active,.file.press:active{transform:scale(.98);transition-duration:var(--d1);transition-timing-function:var(--ease-out)}
 @media (hover:hover){.pc.press:hover:active{transform:translateY(-3px) scale(.98)}.file.press:hover:active{transform:translateY(-2px) scale(.98)}}
 .file.ing,.file.got{cursor:default}
 .file.press.ing:active,.file.press.got:active{transform:none}
-.send:active{transform:scale(.95,.93);transition-duration:var(--d1),var(--d1),var(--d1),var(--d1);transition-timing-function:var(--ease-out)}
+.send:active{transform:var(--ui-press);transition-duration:var(--d1),var(--d1),var(--d1),var(--d1);transition-timing-function:var(--ease-out)}
 .send:focus-visible,.shot button:focus-visible,.seg:focus-visible{outline:2px solid var(--label-3);outline-offset:2px}
 .shot button{transition:transform var(--d3) var(--spring),box-shadow var(--d2) var(--ease-out)}
 .shot button:active{transform:scale(.98);transition-duration:var(--d1);transition-timing-function:var(--ease-out)}

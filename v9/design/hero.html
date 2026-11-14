@@ -5204,17 +5204,120 @@ const b=HUGI_MAKE(document.getElementById('hugi-orb'),{prefix:'ho',hello:false,b
 .t-subhead{font:var(--t-subhead);letter-spacing:var(--ls-subhead)} .t-footnote{font:var(--t-footnote);letter-spacing:var(--ls-footnote)}
 .t-caption{font:var(--t-caption);letter-spacing:var(--ls-caption)} .t-caption2{font:var(--t-caption2);letter-spacing:var(--ls-caption2)}
 
+/* ═══ 헝그리한정민 디자인 시스템 — 공통 부품 토큰 (2026-11-15 처음 만듦) ═══
+   히어로 시트와 대화 영역 시트에 같이 있는 부품의 값을 여기 한 곳에 모은다. 여기 값을 고치면 두 시트에 같이 들어간다.
+   - 넣는 곳: 시트/hero/build_ds.py · 시트/chat/build.py 가 ds/type.css 바로 다음에 넣는다.
+   - 두 시트의 마크업 · 선택자는 다르다(대화 영역 form#ask .ib .send / 히어로 form.askbox #attach #mic .send).
+     그래서 CSS 덩어리를 같이 쓰지 않고, 이 토큰(CSS 변수)만 같이 쓴다. 각 시트가 자기 선택자에서 var(--ui-…)로 부른다.
+   - 값의 기준: 두 시트 값이 다르면 대화 영역 시트 값(사용자 "채팅 페이지 기준으로 설정해줘").
+   - 이름은 모두 --ui- 로 시작한다. 실제 사이트(v9_ai/index.html)의 변수 이름(--md- · --ease-out · --bar 등)과 겹치지 않게 해서
+     히어로 시트에서 사이트 규칙(인트로 · 허기 버튼 엔진 등)을 건드리지 않는다.
+   - 사용자 판단 대기(값을 바꾸지 않고 둠):
+     ① 보내기 올림: 히어로는 올리면 1.04배, 대화 영역은 올림 없음
+     ② 3단계 글자색(label-3): 히어로 #86868B / 대화 영역 #8E8E93 (질문창 안내 글 · 초점 고리 색이 이 값을 씀. 아이콘색 --ui-ib-color는 대화 영역 값)
+     ③ 대화 영역 시트 390 반응형: 교차 검수에서 데스크톱 값(질문창 680 · 60)이 나왔던 것은 검사가 viewport 줄 없이 열어서 생긴 오탐으로 확인.
+        시트에 viewport 줄이 없는 것 자체(게시할 때 붙음)는 그대로 둠
+     ④ 다음 질문 칩 아이콘: 대화 영역 칩은 앞에 화살표 아이콘(14) + 왼쪽 여백 12, 히어로(사이트) 칩에는 아이콘이 없어 좌우 여백 15.
+        아이콘을 넣는 건 새 부품이라 사용자 판단 */
+:root {
+  /* ── 유리 재질(상단 내비 · 다음 질문 칩 · 아이콘 버튼 올림) ── */
+  --ui-glass: rgba(255, 255, 255, .80);
+  --ui-glass-edge: rgba(255, 255, 255, .70);                 /* 안쪽 밝은 선 */
+  --ui-glass-line: rgba(0, 0, 0, .06);                       /* 바깥 머리카락 선 */
+  --ui-glass-blur: blur(24px) saturate(180%);
+  --ui-glass-sh: 0 8px 24px -12px rgba(0, 0, 0, .18);         /* 기본 그림자 */
+  --ui-glass-sh-hi: 0 12px 30px -12px rgba(0, 0, 0, .28);     /* 올림 그림자 */
+
+  /* ── 움직임(공통기준 7장) ── */
+  --ui-ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ui-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --ui-d1: 120ms; --ui-d2: 240ms; --ui-d3: 420ms; --ui-d4: 640ms;
+  --ui-press: scale(.95, .93);      /* 누름(세로가 더 눌림) */
+  --ui-lift: scale(1.04);           /* 유리 버튼 올림 */
+  --ui-ib-lift: scale(1.06);        /* 투명 아이콘 버튼 올림(유리가 떠오름) */
+
+  /* ── 상단 내비 ── */
+  --ui-nav-btn: 40px;               /* 원형 버튼 지름 */
+  --ui-nav-pill-w: 56px;            /* 메뉴 알약 폭(높이는 --ui-nav-btn) */
+  --ui-nav-icon: 18px;              /* 홈 · 소리 아이콘 */
+  --ui-nav-gap: 8px;
+
+  /* ── 대화 폭 ── */
+  --ui-ask-maxw: 680px;             /* 질문창 최대 폭 = 글 폭 */
+  --ui-col-maxw: 720px;             /* 대화 기둥 최대 폭 = 680 + 좌우 20 */
+
+  /* ── 질문창(흰 상자) ── */
+  --ui-ask-h: 60px;                 /* 높이(데스크톱) */
+  --ui-ask-h-m: 56px;               /* 높이(≤640) */
+  --ui-ask-r: calc(var(--ui-ask-h) / 2);      /* 모서리 = 높이의 절반(알약) */
+  --ui-ask-r-m: calc(var(--ui-ask-h-m) / 2);
+  --ui-ask-pl: 24px;                /* 왼쪽 안 여백 */
+  --ui-ask-pl-m: 18px;              /* 왼쪽 안 여백(≤640) */
+  --ui-ask-pr: 8px;                 /* 오른쪽 안 여백(히어로는 사이트의 "보내기 자리 비우기" 값 8 + 보내기 + 간격 그대로) */
+  --ui-ask-gap: 10px;               /* 칸 사이 */
+  --ui-ask-bg: #FFFFFF;
+  --ui-ask-sh: 0 1px 3px rgba(0, 0, 0, .05), 0 8px 24px rgba(31, 75, 150, .10);        /* 바깥 선 없음 */
+  --ui-ask-sh-focus: 0 1px 3px rgba(0, 0, 0, .05), 0 12px 32px rgba(31, 75, 150, .16); /* 입력 중: 그림자만 조금 진하게 */
+
+  /* ── 질문창 첨부 · 마이크(투명 아이콘 버튼) ── */
+  --ui-ask-ib: 40px;                /* 버튼 지름 */
+  --ui-ask-ib-icon: 20px;           /* 아이콘 */
+  --ui-ib-color: #8E8E93;           /* 아이콘색(대화 영역 --label-3 값) */
+  --ui-ib-color-hi: #1D1D1F;        /* 올렸을 때 아이콘색 */
+
+  /* ── 보내기 ── */
+  --ui-send: 44px;                  /* 지름 */
+  --ui-send-icon: 18px;             /* 화살표 */
+  --ui-send-bg: #1D1D1F;            /* ink */
+  --ui-send-fg: #FFFFFF;            /* on-ink */
+
+  /* ── 다음 질문 칩(유리 알약) ── */
+  --ui-chip-h: 36px;
+  --ui-chip-pl: 12px;               /* 왼쪽 여백(앞에 아이콘이 있을 때) */
+  --ui-chip-pr: 15px;               /* 오른쪽 여백 */
+  --ui-chip-icon: 14px;
+  --ui-chip-gap: 6px;               /* 아이콘 ↔ 글 */
+  --ui-chip-row-gap: 8px;           /* 칩 사이 */
+
+  /* ── 질문 말풍선 ── */
+  --ui-bubble-bg: #ECECF0;
+  --ui-bubble-r: 22px 22px 8px 22px;   /* 오른쪽 아래만 8 */
+  --ui-bubble-pad: 10px 18px;
+
+  /* ── 답 글 ── */
+  --ui-ans-gap: 12px;               /* 문단 사이 */
+  --ui-ans-h-top: 24px;             /* 소제목 위 */
+  --ui-ans-list-gap: 8px;           /* 목록 항목 사이 */
+}
+
+/* 어두운 화면: 기기가 어두운 화면이고 data-theme="light"가 아닐 때, 또는 data-theme="dark" (두 경우 값 같음) */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --ui-glass: rgba(44, 44, 48, .72); --ui-glass-edge: rgba(255, 255, 255, .10); --ui-glass-line: rgba(255, 255, 255, .08);
+  --ui-glass-sh: 0 8px 24px -12px rgba(0, 0, 0, .7); --ui-glass-sh-hi: 0 12px 30px -12px rgba(0, 0, 0, .8);
+  --ui-ask-bg: #1C1C1E;   /* 질문창 그림자는 대화 영역처럼 밝은 화면과 같은 값 */
+  --ui-ib-color: #76767B; --ui-ib-color-hi: #F5F5F7;
+  --ui-send-bg: #F5F5F7; --ui-send-fg: #1D1D1F;
+  --ui-bubble-bg: #2A2A2D; } }
+:root[data-theme="dark"] {
+  --ui-glass: rgba(44, 44, 48, .72); --ui-glass-edge: rgba(255, 255, 255, .10); --ui-glass-line: rgba(255, 255, 255, .08);
+  --ui-glass-sh: 0 8px 24px -12px rgba(0, 0, 0, .7); --ui-glass-sh-hi: 0 12px 30px -12px rgba(0, 0, 0, .8);
+  --ui-ask-bg: #1C1C1E;
+  --ui-ib-color: #76767B; --ui-ib-color-hi: #F5F5F7;
+  --ui-send-bg: #F5F5F7; --ui-send-fg: #1D1D1F;
+  --ui-bubble-bg: #2A2A2D; }
+
 /* ═══ 디자인 시스템 덮개(시안 2판) — 구성 · 인터랙션은 실제 사이트 그대로, 겉모습만 바꾼다 ═══
    원칙: 위계는 크기 · 굵기 · 색(무채색 3단계)으로만 / 강조색 없음 / 배경 빛(그라데이션) 없음 / 버튼은 원 · 알약 + 유리 / 누름은 쫀득 */
 :root {
   --ds-bg: #FBFBFD; --ds-bg-2: #F2F2F5; --ds-bg-3: #EBEBEF;
   --ds-label: #1D1D1F; --ds-label-2: #6E6E73; --ds-label-3: #86868B; --ds-sep: rgba(0, 0, 0, .08);
   --ds-ink: #1D1D1F; --ds-on-ink: #FFFFFF;
-  --ds-glass: rgba(255, 255, 255, .80); --ds-glass-edge: rgba(255, 255, 255, .70); --ds-glass-line: rgba(0, 0, 0, .06);
-  --ds-shadow: 0 8px 24px -12px rgba(0, 0, 0, .18); --ds-shadow-hi: 0 12px 30px -12px rgba(0, 0, 0, .28); --ds-focus: rgba(0, 0, 0, .22); --ds-glow: #CFE0FA; --ds-scroll: rgba(0, 0, 0, .22); --ds-scroll-hi: rgba(0, 0, 0, .38);
+  /* 유리 · 움직임은 공통 부품 토큰(ds/components.css, 대화 영역 시트와 같이 씀)을 부름. 어두운 화면 값도 그 파일에서 바뀜 */
+  --ds-glass: var(--ui-glass); --ds-glass-edge: var(--ui-glass-edge); --ds-glass-line: var(--ui-glass-line);
+  --ds-shadow: var(--ui-glass-sh); --ds-shadow-hi: var(--ui-glass-sh-hi); --ds-focus: rgba(0, 0, 0, .22); --ds-glow: #CFE0FA; --ds-scroll: rgba(0, 0, 0, .22); --ds-scroll-hi: rgba(0, 0, 0, .38);
   --ds-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
-  --ds-ease-out: cubic-bezier(.22, 1, .36, 1); --ds-spring: cubic-bezier(.34, 1.56, .64, 1);
-  --ds-d1: 120ms; --ds-d2: 240ms; --ds-d3: 420ms;
+  --ds-ease-out: var(--ui-ease-out); --ds-spring: var(--ui-spring);
+  --ds-d1: var(--ui-d1); --ds-d2: var(--ui-d2); --ds-d3: var(--ui-d3);
   /* 사이트 토큰을 새 값으로 */
   --md-primary: var(--ds-ink); --md-on-primary: var(--ds-on-ink);
   --md-surface: var(--ds-bg); --md-on-surface: var(--ds-label); --md-on-surface-variant: var(--ds-label-2);
@@ -5223,14 +5326,14 @@ const b=HUGI_MAKE(document.getElementById('hugi-orb'),{prefix:'ho',hello:false,b
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --ds-bg: #0B0B0D; --ds-bg-2: #1C1C1E; --ds-bg-3: #2C2C2E; --ds-label: #F5F5F7; --ds-label-2: #A1A1A6; --ds-label-3: #6E6E73; --ds-sep: rgba(255, 255, 255, .10);
-  --ds-ink: #F5F5F7; --ds-on-ink: #1D1D1F; --ds-glass: rgba(44, 44, 48, .72); --ds-glass-edge: rgba(255, 255, 255, .10); --ds-glass-line: rgba(255, 255, 255, .08);
-  --ds-shadow: 0 8px 24px -12px rgba(0, 0, 0, .7); --ds-shadow-hi: 0 12px 30px -12px rgba(0, 0, 0, .8); --ds-focus: rgba(255, 255, 255, .30); --ds-glow: rgba(66, 133, 244, .22); --ds-scroll: rgba(255, 255, 255, .24); --ds-scroll-hi: rgba(255, 255, 255, .40); color-scheme: dark;
+  --ds-ink: #F5F5F7; --ds-on-ink: #1D1D1F;
+  --ds-focus: rgba(255, 255, 255, .30); --ds-glow: rgba(66, 133, 244, .22); --ds-scroll: rgba(255, 255, 255, .24); --ds-scroll-hi: rgba(255, 255, 255, .40); color-scheme: dark;
   --md-primary: var(--ds-ink); --md-on-primary: var(--ds-on-ink); --md-surface: var(--ds-bg); --md-on-surface: var(--ds-label); --md-on-surface-variant: var(--ds-label-2);
   --md-surface-container: var(--ds-bg-2); --md-surface-container-high: var(--ds-bg-3); --md-outline-variant: var(--ds-sep); --hero-bg: var(--ds-bg); --glow: transparent; } }
 :root[data-theme="dark"] {
   --ds-bg: #0B0B0D; --ds-bg-2: #1C1C1E; --ds-bg-3: #2C2C2E; --ds-label: #F5F5F7; --ds-label-2: #A1A1A6; --ds-label-3: #6E6E73; --ds-sep: rgba(255, 255, 255, .10);
-  --ds-ink: #F5F5F7; --ds-on-ink: #1D1D1F; --ds-glass: rgba(44, 44, 48, .72); --ds-glass-edge: rgba(255, 255, 255, .10); --ds-glass-line: rgba(255, 255, 255, .08);
-  --ds-shadow: 0 8px 24px -12px rgba(0, 0, 0, .7); --ds-shadow-hi: 0 12px 30px -12px rgba(0, 0, 0, .8); --ds-focus: rgba(255, 255, 255, .30); --ds-glow: rgba(66, 133, 244, .22); --ds-scroll: rgba(255, 255, 255, .24); --ds-scroll-hi: rgba(255, 255, 255, .40); color-scheme: dark;
+  --ds-ink: #F5F5F7; --ds-on-ink: #1D1D1F;
+  --ds-focus: rgba(255, 255, 255, .30); --ds-glow: rgba(66, 133, 244, .22); --ds-scroll: rgba(255, 255, 255, .24); --ds-scroll-hi: rgba(255, 255, 255, .40); color-scheme: dark;
   --md-primary: var(--ds-ink); --md-on-primary: var(--ds-on-ink); --md-surface: var(--ds-bg); --md-on-surface: var(--ds-label); --md-on-surface-variant: var(--ds-label-2);
   --md-surface-container: var(--ds-bg-2); --md-surface-container-high: var(--ds-bg-3); --md-outline-variant: var(--ds-sep); --hero-bg: var(--ds-bg); --glow: transparent; }
 
@@ -5251,15 +5354,15 @@ body { background: var(--ds-bg); color: var(--ds-label); font-family: var(--ds-f
 
 /* 유리: 내비게이션 버튼과 같은 재질 하나만 */
 .gbtn, .askbox, .sug, .vmenu, .nextq button, .ask-back .opts .pick {
-  background: var(--ds-glass) !important; -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+  background: var(--ds-glass) !important; -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur);
   border-color: transparent !important; box-shadow: inset 0 0 0 1px var(--ds-glass-edge), 0 0 0 1px var(--ds-glass-line), var(--ds-shadow) !important; }
 .ask.open .askbox { box-shadow: inset 0 0 0 1px var(--ds-glass-edge), 0 0 0 1px var(--ds-glass-line) !important; }   /* 목록과 붙을 때는 그림자를 목록에만 */
 .askbox:focus-within { box-shadow: inset 0 0 0 1px var(--ds-glass-edge), 0 0 0 1px var(--ds-glass-line), var(--ds-shadow-hi) !important; }   /* 입력 중 바깥 선 없음(사용자 11-15), 그림자만 조금 짙게 */
 .ask.open .askbox:focus-within { box-shadow: inset 0 0 0 1px var(--ds-glass-edge), 0 0 0 1px var(--ds-glass-line) !important; }
 .sug li.on, .sug li:hover { background: var(--ds-hover); }   /* 대화 영역 시트 --hover와 같은 값(11-15 heroix) */
 
-/* 보내기: 강조색 대신 검정 채움 */
-.send { background: var(--ds-ink); color: var(--ds-on-ink); }
+/* 보내기: 강조색 대신 검정 채움(공통 부품 토큰) */
+.send { background: var(--ui-send-bg); color: var(--ui-send-fg); }
 
 /* 쫀득한 누름: 누를 때 0.12초에 줄고, 놓으면 0.42초 동안 살짝 넘쳤다 제자리 */
 .gbtn, .send, .attach, .vchip, .listen, .nextq button, .ask-back .opts .pick {
@@ -5274,7 +5377,7 @@ body { background: var(--ds-bg); color: var(--ds-label); font-family: var(--ds-f
 
 /* 기준 보기(시안 검토용, 사이트에는 없음) */
 .ds-spec { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 90; height: 36px; padding: 0 16px; border: 0; border-radius: 999px; cursor: pointer;
-  font: 500 15px/1 var(--ds-font); color: var(--ds-label); background: var(--ds-glass); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+  font: 500 15px/1 var(--ds-font); color: var(--ds-label); background: var(--ds-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur);
   box-shadow: inset 0 0 0 1px var(--ds-glass-edge), 0 0 0 1px var(--ds-glass-line), var(--ds-shadow); transition: transform var(--ds-d3) var(--ds-spring); }
 @media (prefers-reduced-motion: no-preference) { .ds-spec:active { transform: var(--ds-press); } }
 .ds-spec:active { transition-duration: var(--ds-d1); transition-timing-function: var(--ds-ease-out); }
@@ -5298,10 +5401,11 @@ body { background: var(--ds-bg); color: var(--ds-label); font-family: var(--ds-f
 .sug { border-radius: 0 0 calc(var(--bar) / 2) calc(var(--bar) / 2); }
 
 /* ③ 첨부 · 마이크: 내비게이션 버튼과 같은 반응(올리면 유리 바탕 + 그림자 + 1.04배, 누르면 줄었다 쫀득하게 복귀) */
-.attach { background: transparent; box-shadow: none; }
-@media (hover: hover) { .attach:not(:disabled):hover, .vchip:not(:disabled):hover, .listen:not(:disabled):hover { background: var(--ds-glass) !important; -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
-  box-shadow: inset 0 0 0 1px var(--ds-glass-edge), 0 0 0 1px var(--ds-glass-line), var(--ds-shadow-hi) !important; color: var(--ds-label); } }
-@media (hover: hover) and (prefers-reduced-motion: no-preference) { .attach:not(:disabled):hover, .askbox > .attach:not(:disabled):hover, .vchip:not(:disabled):hover, .listen:not(:disabled):hover { transform: var(--ds-lift); } }   /* 첨부 · 마이크 · 목소리 칩 · 듣기: 같은 유리 올림(11-15 heroix로 칩 · 듣기 더함) */
+.attach { background: transparent; box-shadow: none; color: var(--ui-ib-color); }   /* 아이콘색: 대화 영역 첨부 · 마이크와 같은 값(공통 부품 토큰). 듣는 중 마이크 색은 사이트 규칙이 더 구체적이라 그대로 */
+@media (hover: hover) { .attach:not(:disabled):hover, .vchip:not(:disabled):hover, .listen:not(:disabled):hover { background: var(--ds-glass) !important; -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur);
+  box-shadow: inset 0 0 0 1px var(--ds-glass-edge), 0 0 0 1px var(--ds-glass-line), var(--ds-shadow-hi) !important; color: var(--ui-ib-color-hi); } }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) { .vchip:not(:disabled):hover, .listen:not(:disabled):hover { transform: var(--ds-lift); }
+  .attach:not(:disabled):hover, .askbox > .attach:not(:disabled):hover { transform: var(--ui-ib-lift); } }   /* 목소리 칩 · 듣기는 유리 올림 1.04, 첨부 · 마이크는 대화 영역 투명 아이콘 버튼과 같은 1.06(11-15 components) */
 
 /* ④ 아이콘 밀려나기는 사이트 방식(오른쪽에 보내기 자리를 비우고 아이콘을 translate)을 그대로 씀 */
 @media (prefers-reduced-motion: reduce) { .askbox, .ask.open .askbox, .send { transition-duration: 1ms !important; transition-delay: 0s !important; } }
@@ -5316,13 +5420,14 @@ html, .thread, .sug, .vmenu { scrollbar-width: auto !important; scrollbar-color:
 @supports (-moz-appearance: none) { html, .thread, .sug, .vmenu { scrollbar-width: thin !important; scrollbar-color: var(--ds-scroll) transparent !important; } }
 
 /* 질문창 · 대화 폭: 640 → 680(+40), 대화 목록은 좌우 여백 20씩 포함 680 → 720으로 같이 늘려 가장자리 정렬 유지 */
-.ask { max-width: 680px; }
-.hero.chat .thread { max-width: 720px; }
+.ask { max-width: var(--ui-ask-maxw); }
+.hero.chat .thread { max-width: var(--ui-col-maxw); }
 
-/* 질문창 · 추천 목록: 사용자 첨부 화면(실제 사이트 질문창)과 같게 — 흰 바탕(유리 아님) · 테두리 없음 · 아래로 옅게 퍼지는 푸른 그림자 */
-:root { --ds-ask-bg: #FFFFFF; --ds-ask-sh: 0 1px 3px rgba(0, 0, 0, .05), 0 8px 24px rgba(31, 75, 150, .10); --ds-ask-sh-f: 0 1px 3px rgba(0, 0, 0, .05), 0 12px 32px rgba(31, 75, 150, .16); --ds-sug-sh: 0 14px 26px rgba(31, 75, 150, .12); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ds-ask-bg: #1C1C1E; --ds-ask-sh: 0 1px 3px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35); --ds-ask-sh-f: 0 1px 3px rgba(0, 0, 0, .3), 0 12px 32px rgba(0, 0, 0, .45); --ds-sug-sh: 0 14px 26px rgba(0, 0, 0, .4); } }
-:root[data-theme="dark"] { --ds-ask-bg: #1C1C1E; --ds-ask-sh: 0 1px 3px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35); --ds-ask-sh-f: 0 1px 3px rgba(0, 0, 0, .3), 0 12px 32px rgba(0, 0, 0, .45); --ds-sug-sh: 0 14px 26px rgba(0, 0, 0, .4); }
+/* 질문창 · 추천 목록: 사용자 첨부 화면(실제 사이트 질문창)과 같게 — 흰 바탕(유리 아님) · 테두리 없음 · 아래로 옅게 퍼지는 푸른 그림자.
+   질문창 바탕 · 그림자는 공통 부품 토큰(대화 영역과 같은 값, 어두운 화면도 대화 영역 값). 추천 목록 그림자는 히어로에만 있음 */
+:root { --ds-ask-bg: var(--ui-ask-bg); --ds-ask-sh: var(--ui-ask-sh); --ds-ask-sh-f: var(--ui-ask-sh-focus); --ds-sug-sh: 0 14px 26px rgba(31, 75, 150, .12); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ds-sug-sh: 0 14px 26px rgba(0, 0, 0, .4); } }
+:root[data-theme="dark"] { --ds-sug-sh: 0 14px 26px rgba(0, 0, 0, .4); }
 .askbox, .sug { background: var(--ds-ask-bg) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 .askbox { box-shadow: var(--ds-ask-sh) !important; }
 .askbox:focus-within { box-shadow: var(--ds-ask-sh-f) !important; }
@@ -5335,28 +5440,38 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 .askbox input { font: var(--t-body); letter-spacing: var(--ls-body); }
 .intro-typed { font: var(--t-footnote); letter-spacing: var(--ls-footnote); line-height: 20px; }
 .sug li { font: var(--t-subhead); letter-spacing: var(--ls-subhead); }
-.msg-q { font: var(--t-body); letter-spacing: var(--ls-body); padding: 10px 18px; border-radius: 22px 22px 8px 22px; }
-.ans .body { font: var(--t-body); letter-spacing: var(--ls-body); }
+.msg-q { font: var(--t-body); letter-spacing: var(--ls-body); padding: var(--ui-bubble-pad); border-radius: var(--ui-bubble-r); background: var(--ui-bubble-bg); }   /* 질문 말풍선: 공통 부품 토큰 */
+.ans .body { font: var(--t-body); letter-spacing: var(--ls-body); gap: var(--ui-ans-gap); }   /* 문단 사이: 사이트 grid gap 10 → 대화 영역 12 */
 .ans .body strong { font-weight: 600; }
-.ans .body h3, .ans .body h4 { font: var(--t-headline); letter-spacing: var(--ls-headline); margin-top: var(--s-6); }
+.ans .body h3, .ans .body h4 { font: var(--t-headline); letter-spacing: var(--ls-headline); margin-top: calc(var(--ui-ans-h-top) - var(--ui-ans-gap)); }   /* 사이트는 grid라 gap에 margin이 더해짐 → 소제목 위 합계 24(대화 영역과 같음) */
+.ans .body ul, .ans .body ol { gap: var(--ui-ans-list-gap); }
 .ans .body table { font: var(--t-subhead); letter-spacing: var(--ls-subhead); }
 .ans .body th { font: var(--t-caption); letter-spacing: var(--ls-caption); color: var(--ds-label-3); }
 .nextq button, .ask-back .opts .pick { font: var(--t-callout); letter-spacing: var(--ls-callout); }
+/* 다음 질문 · 고르기 알약: 대화 영역 칩과 같은 높이 36 · 오른쪽 여백 15(공통 부품 토큰). 사이트 칩엔 앞 아이콘이 없어 왼쪽도 15(사용자 판단 대기),
+   글이 길어 두 줄이 되면 높이가 늘어나게 높이는 최소값으로 */
+.nextq { gap: var(--ui-chip-row-gap); }
+.nextq button, .ask-back .opts .pick { display: inline-flex; align-items: center; gap: var(--ui-chip-gap); min-height: var(--ui-chip-h); padding: 0 var(--ui-chip-pr); }
 .thread-end, .ans .src { font: var(--t-footnote); letter-spacing: var(--ls-footnote); }
 .vchip { font: var(--t-callout); letter-spacing: var(--ls-callout); }
 
-/* ── 질문창 크기 · 아이콘: 대화 영역 시안 기준으로 통일 ──
+/* ── 질문창 크기 · 아이콘: 대화 영역 시안 기준으로 통일(값은 공통 부품 토큰 ds/components.css) ──
    높이 60(모바일 56) · 왼쪽 여백 24(모바일 18) · 오른쪽 8 · 간격 10 · 첨부 · 마이크 40×40 안 아이콘 20 · 보내기 44×44 안 화살표 18 */
-.hero { --bar: 60px !important; }
-.askbox { height: 60px !important; padding-left: 24px !important; gap: 10px !important; }   /* 오른쪽 여백은 사이트 값(8 + 보내기 44 + 간격 10) 그대로 */
-.askbox > .attach, .askbox > .auto { width: 40px !important; height: 40px !important; }
-.askbox > .attach .ms, .askbox > .auto .ms { font-size: 20px !important; }
-.send { width: 44px !important; height: 44px !important; }
-.send .ms { font-size: 18px !important; }
+.hero { --bar: var(--ui-ask-h) !important; }
+.askbox { height: var(--ui-ask-h) !important; padding-left: var(--ui-ask-pl) !important; gap: var(--ui-ask-gap) !important; }   /* 오른쪽 여백은 사이트 값(8 + 보내기 44 + 간격 10) 그대로 */
+.askbox > .attach, .askbox > .auto { width: var(--ui-ask-ib) !important; height: var(--ui-ask-ib) !important; }
+.askbox > .attach .ms, .askbox > .auto .ms { font-size: var(--ui-ask-ib-icon) !important; }
+.send { width: var(--ui-send) !important; height: var(--ui-send) !important; }
+.send .ms { font-size: var(--ui-send-icon) !important; }
 @media (max-width: 640px) {
-  .hero { --bar: 56px !important; }
-  .askbox { height: 56px !important; padding-left: 18px !important; }
+  .hero { --bar: var(--ui-ask-h-m) !important; }
+  .askbox { height: var(--ui-ask-h-m) !important; padding-left: var(--ui-ask-pl-m) !important; }
 }
+/* 상단 내비 버튼 크기 · 아이콘 · 간격: 대화 영역과 같은 토큰(아이콘 19 → 18) */
+.gnb { gap: var(--ui-nav-gap); }
+.gbtn { width: var(--ui-nav-btn); height: var(--ui-nav-btn); }
+.gpill { width: var(--ui-nav-pill-w); }
+.gbtn .ms { font-size: var(--ui-nav-icon); }
 
 /* 추천 목록 스크롤바: 둥근 모서리 안쪽에서만 움직이게 — 위아래로 여백을 주고(아래는 모서리 반지름만큼), 막대를 가장자리에서 3px 띄움 */
 .sug::-webkit-scrollbar { width: 12px; }
@@ -5369,7 +5484,7 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 /* ── 11-15 인터랙션 상세(heroix): 누를 수 있는 것 모두 올림 · 누름 · 놓음 · 초점 · 비활성을 같은 토큰으로 ──
    사용자 "인터랙션들 상세하게 … 오류 안 나게, 끊기는 거 없게, 부드럽게 쫀득하게". 값은 공통기준 7장 + 대화 영역 시트(초점 고리 · 목록 올림)가 기준.
    사이트 규칙은 지우지 않고 같은 세기의 선택자를 뒤에 두어 값만 바꿈(허기 버튼 몸 움직임 · 인트로 · 질문창 동작은 그대로). */
-:root { --ds-hover: rgba(0, 0, 0, .035); --ds-ring: var(--ds-label-3); --ds-press: scale(.95, .93); --ds-lift: scale(1.04); --ds-disabled: .4; }
+:root { --ds-hover: rgba(0, 0, 0, .035); --ds-ring: var(--ds-label-3); --ds-press: var(--ui-press); --ds-lift: var(--ui-lift); --ds-disabled: .4; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ds-hover: rgba(255, 255, 255, .05); } }
 :root[data-theme="dark"] { --ds-hover: rgba(255, 255, 255, .05); }
 
