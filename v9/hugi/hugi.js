@@ -663,6 +663,7 @@ function nod(){if(state==='listening')wavePulse(-1,BLUE);gsap.fromTo(BR,{y:0},{y
 const KEEP=/^(listening|thinking|speaking|error|loading)$/;   // 이어지는 상태는 같은 이름이 다시 와도 처음부터 다시 하지 않음
 const API={
   set(k){if(!M[k])return;if(k===state&&(k==='idle'||KEEP.test(k)))return;go(k);},
+  home(){if(drag)return;clearTimeout(homeT);homeT=null;phys.on=false;phys.under=false;gsap.killTweensOf(H);rest(true);gsap.set(H,{x:0,y:0});go('idle',1);},   // 11-15 메뉴로 숨는 동안: 걷기 · 떨어짐을 멈추고 가운데 쉬는 자세로(돌아올 때 자리가 어긋나 끊기지 않게)
   typing(){touch();if(/^(thinking|speaking)$/.test(state))return;
     if(state!=='listening')go('listening');else nod();
     clearTimeout(typingT);typingT=setTimeout(()=>{if(state==='listening'&&!(IN&&IN.value.trim()))go('idle');},3000);},
