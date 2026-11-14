@@ -34,6 +34,118 @@
 .t-subhead{font:var(--t-subhead);letter-spacing:var(--ls-subhead)} .t-footnote{font:var(--t-footnote);letter-spacing:var(--ls-footnote)}
 .t-caption{font:var(--t-caption);letter-spacing:var(--ls-caption)} .t-caption2{font:var(--t-caption2);letter-spacing:var(--ls-caption2)}
 
+/* ═══ 헝그리한정민 디자인 시스템 — 공통 부품 토큰 (2026-11-15 처음 만듦) ═══
+   히어로 시트와 대화 영역 시트에 같이 있는 부품의 값을 여기 한 곳에 모은다. 여기 값을 고치면 두 시트에 같이 들어간다.
+   - 넣는 곳: 시트/hero/build_ds.py · 시트/chat/build.py 가 ds/type.css 바로 다음에 넣는다.
+   - 두 시트의 마크업 · 선택자는 다르다(대화 영역 form#ask .ib .send / 히어로 form.askbox #attach #mic .send).
+     그래서 CSS 덩어리를 같이 쓰지 않고, 이 토큰(CSS 변수)만 같이 쓴다. 각 시트가 자기 선택자에서 var(--ui-…)로 부른다.
+   - 값의 기준: 두 시트 값이 다르면 대화 영역 시트 값(사용자 "채팅 페이지 기준으로 설정해줘").
+   - 이름은 모두 --ui- 로 시작한다. 실제 사이트(v9_ai/index.html)의 변수 이름(--md- · --ease-out · --bar 등)과 겹치지 않게 해서
+     히어로 시트에서 사이트 규칙(인트로 · 허기 버튼 엔진 등)을 건드리지 않는다.
+   - 사용자 판단 대기(값을 바꾸지 않고 둠):
+     ① 보내기 올림: 히어로는 올리면 1.04배, 대화 영역은 올림 없음
+     ② 3단계 글자색(label-3): 히어로 #86868B / 대화 영역 #8E8E93 (질문창 안내 글 · 초점 고리 색이 이 값을 씀. 아이콘색 --ui-ib-color는 대화 영역 값)
+     ③ 대화 영역 시트 390 반응형: 교차 검수에서 데스크톱 값(질문창 680 · 60)이 나왔던 것은 검사가 viewport 줄 없이 열어서 생긴 오탐으로 확인.
+        시트에 viewport 줄이 없는 것 자체(게시할 때 붙음)는 그대로 둠
+     ④ 다음 질문 칩 아이콘: 대화 영역 칩은 앞에 화살표 아이콘(14) + 왼쪽 여백 12, 히어로(사이트) 칩에는 아이콘이 없어 좌우 여백 15.
+        아이콘을 넣는 건 새 부품이라 사용자 판단 */
+:root {
+  /* ── 유리 재질(상단 내비 · 다음 질문 칩 · 아이콘 버튼 올림) ── */
+  --ui-glass: rgba(255, 255, 255, .80);
+  --ui-glass-edge: rgba(255, 255, 255, .70);                 /* 안쪽 밝은 선 */
+  --ui-glass-line: rgba(0, 0, 0, .06);                       /* 바깥 머리카락 선 */
+  --ui-glass-blur: blur(24px) saturate(180%);
+  --ui-glass-sh: 0 8px 24px -12px rgba(0, 0, 0, .18);         /* 기본 그림자 */
+  --ui-glass-sh-hi: 0 12px 30px -12px rgba(0, 0, 0, .28);     /* 올림 그림자 */
+
+  /* ── 움직임(공통기준 7장) ── */
+  --ui-ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ui-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --ui-d1: 120ms; --ui-d2: 240ms; --ui-d3: 420ms; --ui-d4: 640ms;
+  --ui-press: scale(.95, .93);      /* 누름(세로가 더 눌림) */
+  --ui-lift: scale(1.04);           /* 유리 버튼 올림 */
+  --ui-ib-lift: scale(1.06);        /* 투명 아이콘 버튼 올림(유리가 떠오름) */
+
+  /* ── 상단 내비 ── */
+  --ui-nav-btn: 40px;               /* 원형 버튼 지름 */
+  --ui-nav-pill-w: 56px;            /* 메뉴 알약 폭(높이는 --ui-nav-btn) */
+  --ui-nav-icon: 18px;              /* 홈 · 소리 아이콘 */
+  --ui-nav-gap: 8px;
+
+  /* ── 대화 폭 ── */
+  --ui-ask-maxw: 680px;             /* 질문창 최대 폭 = 글 폭 */
+  --ui-col-maxw: 720px;             /* 대화 기둥 최대 폭 = 680 + 좌우 20 */
+
+  /* ── 질문창(흰 상자) ── */
+  --ui-ask-h: 60px;                 /* 높이(데스크톱) */
+  --ui-ask-h-m: 56px;               /* 높이(≤640) */
+  --ui-ask-r: calc(var(--ui-ask-h) / 2);      /* 모서리 = 높이의 절반(알약) */
+  --ui-ask-r-m: calc(var(--ui-ask-h-m) / 2);
+  --ui-ask-pl: 24px;                /* 왼쪽 안 여백 */
+  --ui-ask-pl-m: 18px;              /* 왼쪽 안 여백(≤640) */
+  --ui-ask-pr: 8px;                 /* 오른쪽 안 여백(히어로는 사이트의 "보내기 자리 비우기" 값 8 + 보내기 + 간격 그대로) */
+  --ui-ask-gap: 10px;               /* 칸 사이 */
+  --ui-ask-bg: #FFFFFF;
+  --ui-ask-sh: 0 1px 3px rgba(0, 0, 0, .05), 0 8px 24px rgba(31, 75, 150, .10);        /* 바깥 선 없음 */
+  --ui-ask-sh-focus: 0 1px 3px rgba(0, 0, 0, .05), 0 12px 32px rgba(31, 75, 150, .16); /* 입력 중: 그림자만 조금 진하게 */
+
+  /* ── 질문창 첨부 · 마이크(투명 아이콘 버튼) ── */
+  --ui-ask-ib: 40px;                /* 버튼 지름 */
+  --ui-ask-ib-icon: 20px;           /* 아이콘 */
+  --ui-ib-color: #8E8E93;           /* 아이콘색(대화 영역 --label-3 값) */
+  --ui-ib-color-hi: #1D1D1F;        /* 올렸을 때 아이콘색 */
+
+  /* ── 보내기 ── */
+  --ui-send: 44px;                  /* 지름 */
+  --ui-send-icon: 18px;             /* 화살표 */
+  --ui-send-bg: #1D1D1F;            /* ink */
+  --ui-send-fg: #FFFFFF;            /* on-ink */
+
+  /* ── 다음 질문 칩(유리 알약) ── */
+  --ui-chip-h: 36px;
+  --ui-chip-pl: 12px;               /* 왼쪽 여백(앞에 아이콘이 있을 때) */
+  --ui-chip-pr: 15px;               /* 오른쪽 여백 */
+  --ui-chip-icon: 14px;
+  --ui-chip-gap: 6px;               /* 아이콘 ↔ 글 */
+  --ui-chip-row-gap: 8px;           /* 칩 사이 */
+
+  /* ── 질문 말풍선 ── */
+  --ui-bubble-bg: #ECECF0;
+  --ui-bubble-r: 22px 22px 8px 22px;   /* 오른쪽 아래만 8 */
+  --ui-bubble-pad: 10px 18px;
+
+  /* ── 답 글 ── */
+  --ui-ans-gap: 12px;               /* 문단 사이 */
+  --ui-ans-h-top: 24px;             /* 소제목 위 */
+  --ui-ans-list-gap: 8px;           /* 목록 항목 사이 */
+
+  /* ── 반응형(2026-11-15 더함, 기준/반응형.md) — 기존 값은 그대로, 새 토큰만 ──
+     세 화면: 웹 1081px 이상 · 태블릿 641~1080px · 모바일 640px 이하. 손가락 판단은 폭이 아니라 (pointer: coarse) · (hover: none) */
+  --ui-tap: 44px;                   /* 손가락 화면 최소 누름 영역. 보이는 크기는 그대로 두고 바깥 투명 영역(::after)만 이만큼 늘림 */
+  --ui-gutter-t: 32px;              /* 태블릿 좌우 여백 최소(--s-7과 같은 값) */
+  --ui-gutter-m: 20px;              /* 모바일 좌우 여백(--s-5와 같은 값, 안전 영역이 더 크면 그 값) */
+  /* 히어로 첫 화면 아래 여백(태블릿). 1024×768 같은 낮은 태블릿에서 질문창이 화면 아래쪽이라 추천 목록이 7개 중 4개만 보이고 잘렸다.
+     사이트 값 clamp(40px, 10vh, 120px)는 그대로 두고, 화면이 낮을수록(1120 − 화면 높이) 아래 여백을 늘려 질문창을 올린다.
+     768 높이 → 352(목록 7줄 × 44 다 보임), 1180 높이 → 사이트 값 그대로. 히어로 시트만 씀 */
+  --ui-hero-pb-t: max(clamp(40px, 10vh, 120px), calc(1120px - 100vh));
+}
+
+/* 어두운 화면: 기기가 어두운 화면이고 data-theme="light"가 아닐 때, 또는 data-theme="dark" (두 경우 값 같음) */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --ui-glass: rgba(44, 44, 48, .72); --ui-glass-edge: rgba(255, 255, 255, .10); --ui-glass-line: rgba(255, 255, 255, .08);
+  --ui-glass-sh: 0 8px 24px -12px rgba(0, 0, 0, .7); --ui-glass-sh-hi: 0 12px 30px -12px rgba(0, 0, 0, .8);
+  --ui-ask-bg: #1C1C1E;   /* 질문창 그림자는 대화 영역처럼 밝은 화면과 같은 값 */
+  --ui-ib-color: #76767B; --ui-ib-color-hi: #F5F5F7;
+  --ui-send-bg: #F5F5F7; --ui-send-fg: #1D1D1F;
+  --ui-bubble-bg: #2A2A2D; } }
+:root[data-theme="dark"] {
+  --ui-glass: rgba(44, 44, 48, .72); --ui-glass-edge: rgba(255, 255, 255, .10); --ui-glass-line: rgba(255, 255, 255, .08);
+  --ui-glass-sh: 0 8px 24px -12px rgba(0, 0, 0, .7); --ui-glass-sh-hi: 0 12px 30px -12px rgba(0, 0, 0, .8);
+  --ui-ask-bg: #1C1C1E;
+  --ui-ib-color: #76767B; --ui-ib-color-hi: #F5F5F7;
+  --ui-send-bg: #F5F5F7; --ui-send-fg: #1D1D1F;
+  --ui-bubble-bg: #2A2A2D; }
+
 /* 프로젝트 영역: 섹션 제목(Title 1) → 분류 버튼(전체 · 대표 · 협업 · 기획) → 프로젝트 박스 3열. 버튼을 누르면 그 분류의 박스만 보임 */
 :root{
   --bg:#FBFBFD; --bg-2:#F4F4F7; --bg-3:#ECECF0; --surface:#FFFFFF;
@@ -133,9 +245,15 @@ body.spec [data-spec]::after{content:attr(data-spec);position:absolute;right:0;t
 .spec-row .m b{display:block;font:var(--t-label);letter-spacing:var(--ls-label);font-size:13px;color:var(--label);margin-bottom:2px}
 .spec-row .x{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
+/* ── 반응형(6판, 11-15): 웹 1081px 이상 · 태블릿 641~1080px · 모바일 640px 이하 — 기준/반응형.md ──
+   웹: 3열 · 좌우 24 / 태블릿: 좌우 32, 961~1080은 3열 · 960 이하 2열(960은 태블릿 안 중간 경계) / 모바일: 1열 · 좌우 20 · 분류 막대 제목 아래.
+   박스 모양(모서리 16 · 재질 · 그림자)은 세 화면 모두 같고 크기 · 여백 · 배치만 바뀐다. */
+@media (min-width:641px) and (max-width:1080px){
+  .pj{padding-left:max(var(--ui-gutter-t),env(safe-area-inset-left,0px));padding-right:max(var(--ui-gutter-t),env(safe-area-inset-right,0px))}
+}
 @media (max-width:960px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-5)}}
 @media (max-width:640px){
-  .pj{padding-top:var(--s-7);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));gap:var(--s-5)}
+  .pj{padding-top:var(--s-7);padding-left:max(var(--ui-gutter-m),env(safe-area-inset-left,0px));padding-right:max(var(--ui-gutter-m),env(safe-area-inset-right,0px));gap:var(--s-5)}
   .pj-h{flex-direction:column;align-items:flex-start;gap:var(--s-4)}
   .seg{max-width:100%}
   .seg button{padding:0 13px}
@@ -145,6 +263,12 @@ body.spec [data-spec]::after{content:attr(data-spec);position:absolute;right:0;t
   .spec-row{grid-template-columns:1fr;gap:4px}
   .spec-row .x{white-space:normal}
   .sheet .pane{padding:22px 18px 16px}
+}
+/* 손가락 화면(태블릿 · 모바일): 누름 영역 44×44. 보이는 크기(내비 원 40 · 메뉴 알약 56×40 · 분류 버튼 높이 36 · 닫기 32)는 그대로,
+   바깥 투명 영역(::after)을 가운데 맞춰 44로 늘림. 분류 버튼은 막대 안 여백 4 안에서만 늘어나 막대 밖으로 안 나감. 허기 버튼은 엔진 값 그대로(사용자 판단) */
+@media (pointer:coarse){
+  .nb,.ib{position:relative}
+  .nb::after,.ib::after,.seg button::after{content:"";position:absolute;left:50%;top:50%;width:max(100%,var(--ui-tap));height:max(100%,var(--ui-tap));translate:-50% -50%;border-radius:999px}
 }
 /* HBTN-CSS-BEGIN */
 /* 허기 알약 버튼: 허기 몸을 가로로 늘린 알약이 그대로 버튼(11-13). 크기 · 비율은 rig.js 값 표의 pill에서(여기 크기는 JS가 덮음) */
@@ -619,6 +743,8 @@ body.spec [data-spec]::after{content:attr(data-spec);position:absolute;right:0;t
 (function(){
 var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return [].slice.call((r||document).querySelectorAll(s))};
 var RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* 사파리(iOS · iPadOS)는 문서에 touchstart 듣기가 있어야 손가락 누름(:active)이 보임 — 빈 듣기(passive), 히어로 시트와 같은 한 줄 */
+document.addEventListener('touchstart',function(){},{passive:true});
 var seg=$('#seg'),thumb=$('.thumb',seg),grid=$('#grid'),cards=$$('.pc',grid),busy=[],gen=0;
 
 /* 2판: 진한 알약의 왼쪽 끝 · 오른쪽 끝을 따로 용수철로 움직인다. 가는 쪽 끝이 먼저(조금 더 탱탱), 뒤쪽 끝이 늦게 따라와 늘어났다 줄어든다(쫀득).
