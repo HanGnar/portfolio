@@ -2862,6 +2862,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     if (ac.state !== 'running') ac.resume();
     if (!VOICE.aunlocked) { VOICE.aunlocked = true; var s = ac.createBufferSource(); s.buffer = ac.createBuffer(1, 1, 22050); s.connect(ac.destination); s.start(0); }
   }
+  document.addEventListener('pointerdown', unlock, true);   // 11-14: 오디오 깨우기(첫 번만 무거움)를 누르는 순간으로 당겨, 클릭 때 시작하는 움직임(메뉴 · 허기)이 첫 프레임에 멈칫하지 않게
   document.addEventListener('click', unlock, true);
   document.addEventListener('keydown', function (e) { if (e.key === 'Enter') unlock(); }, true);
 
@@ -3462,50 +3463,73 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   })();
   var sideBack = null;
   var sideT = 0, HM = null;
-  var flyAn = null;
-  function sideFly(open) {   // 11-14 사용자: AI 버튼의 허기가 빠져나와 메뉴 자리로 이동(허기는 화면에 하나만). 닫으면 다시 버튼으로 들어감
+  var flyAn = null, goneT = 0;
+  function hmMake() { var el = $('#hugi-menu'); if (!HM && el && window.HUGI_MAKE) { try { HM = window.HUGI_MAKE(el, { prefix: 'hm', hello: false, bubble: false }); } catch (e) { HM = null; } } }
+  window.addEventListener('load', function () { setTimeout(hmMake, 1200); });   // 처음 열 때 멈칫하지 않게 미리 만든다
+  /* 11-14 사용자: 허기가 버튼에서 "통" 튀어나와 포물선으로 날아가 통통 착지 / 닫으면 뛰어 들어가며 몸이 늘어나 그대로 알약 버튼이 된다.
+     프레임을 공식으로 미리 계산해 한 번에 넘긴다(구간이 꺾이지 않게). 값: 열기 0.82초 · 닫기 0.66초 */
+  function sideFly(open) {
     var el = $('#hugi-menu'), btn = $('#g-ai'), R2 = document.documentElement; if (!el) return;
-    if (!HM && window.HUGI_MAKE) { try { HM = window.HUGI_MAKE(el, { prefix: 'hm', hello: false, bubble: false }); } catch (e) { HM = null; } }
+    hmMake(); clearTimeout(goneT);
     if (flyAn) { try { flyAn.onfinish = null; flyAn.cancel(); } catch (e) {} flyAn = null; var sl0 = $('#side .mhugi'); if (sl0 && el.parentNode !== sl0) { sl0.appendChild(el); el.style.cssText = ''; } }
-    var pop = function () { if (btn && btn.animate && !RM) btn.animate([{ transform: 'scale(.6)' }, { transform: 'scale(1.12)', offset: .6 }, { transform: 'none' }], { duration: 360, easing: 'cubic-bezier(.3, .7, .4, 1)' }); };
     if (RM || !btn || !el.animate) { R2.classList.toggle('m-hugi-out', open); R2.classList.toggle('m-hugi-gone', open); if (open && HM) try { HM.set('wave'); } catch (e) {} return; }
+    var aEnd = null;
     if (!open && R2.classList.contains('m-hugi-gone')) {   // 닫기: 버튼이 돌아갈 최종 자리를 먼저 재고, 자리를 다시 벌리기 시작
-      btn.style.transition = 'none'; R2.classList.remove('m-hugi-gone'); void btn.offsetWidth; var aEnd = btn.getBoundingClientRect();
+      btn.style.transition = 'none'; R2.classList.remove('m-hugi-gone'); void btn.offsetWidth; aEnd = btn.getBoundingClientRect();
       R2.classList.add('m-hugi-gone'); void btn.offsetWidth; btn.style.transition = ''; void btn.offsetWidth; R2.classList.remove('m-hugi-gone');
     }
-    var slot = el.parentNode.classList && el.parentNode.classList.contains('mhugi') ? el.parentNode : $('#side .mhugi'), sd = $('#side');
-    var sr; if (open) { sd.style.transition = 'none'; sd.style.transform = 'none'; sr = slot.getBoundingClientRect(); sd.style.transform = ''; void sd.offsetWidth; sd.style.transition = ''; } else sr = slot.getBoundingClientRect();
+    var slot = $('#side .mhugi'), sd = $('#side'), sr;
+    if (open) { sd.style.transition = 'none'; sd.style.transform = 'none'; sr = slot.getBoundingClientRect(); sd.style.transform = ''; void sd.offsetWidth; sd.style.transition = ''; } else sr = slot.getBoundingClientRect();
     if (el.parentNode !== document.body) document.body.appendChild(el);
     el.style.cssText = 'position:fixed;inset:auto;z-index:60;left:' + sr.left + 'px;top:' + sr.top + 'px;width:' + sr.width + 'px;height:' + sr.height + 'px;';
     var dock = function () { slot.appendChild(el); el.style.cssText = ''; };
-    var ch = el.querySelector('.hugi-char') || el, a = (!open && aEnd) ? aEnd : btn.getBoundingClientRect(), b = ch.getBoundingClientRect(), c = el.getBoundingClientRect();
-    if (!b.width) { dock(); R2.classList.toggle('m-hugi-out', open); R2.classList.toggle('m-hugi-gone', open); return; }
-    var k = Math.max(.25, Math.min(1, a.width / b.width * 1.05));
+    var ch = el.querySelector('.hugi-char') || el, a = aEnd || btn.getBoundingClientRect(), b = ch.getBoundingClientRect(), c = el.getBoundingClientRect();
+    if (!b.width || !a.width) { dock(); R2.classList.toggle('m-hugi-out', open); R2.classList.toggle('m-hugi-gone', open); return; }
     el.style.transformOrigin = (b.left - c.left + b.width / 2) + 'px ' + (b.top - c.top + b.height / 2) + 'px';
     var dx = (a.left + a.width / 2) - (b.left + b.width / 2), dy = (a.top + a.height / 2) - (b.top + b.height / 2);
-    var T = function (x, y, sx, sy, r) { return 'translate(' + x + 'px,' + y + 'px) rotate(' + (r || 0) + 'deg) scale(' + sx + ',' + (sy == null ? sx : sy) + ')'; };
-    var mid = function (t) { return k + (1 - k) * t; };
+    var px = a.width / b.width, py = a.height / b.height;          // 알약 버튼 모양(가로로 긴 몸)
+    var kr = Math.min(1, py * 1.3);                                 // 날 때의 둥근 몸 크기
+    var H = open ? 16 : 14, lean = dx > 0 ? -1 : 1;   // 버튼이 화면 맨 위라 크게 솟으면 화면 밖으로 나감 → 작은 홉
+    var lerp = function (p, q, t) { return p + (q - p) * t; }, eio = function (t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }, eo = function (t) { return 1 - Math.pow(1 - t, 3); };
+    var kf = [], put = function (o, x, y, sx, sy, r, base, bh) {   // base: 이 자리에서 쉬는 세로 크기. 눌릴 때 발이 바닥에 붙게 아래로 민다
+      y += (bh || b.height) * ((base == null ? sy : base) - sy) / 2;
+      kf.push({ offset: Math.min(1, Math.max(0, o)), transform: 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + (r || 0).toFixed(2) + 'deg) scale(' + sx.toFixed(3) + ',' + sy.toFixed(3) + ')' });
+    };
+    var keys = function (o0, o1, ks, x, y, base, rot) {   // 눌림 · 늘어남 열쇠값 사이를 부드럽게(코사인) 잇는다
+      for (var k = 0; k < ks.length - 1; k++) for (var n = 0; n < 4; n++) {
+        var t = n / 4, e = (1 - Math.cos(Math.PI * t)) / 2, A = ks[k], B = ks[k + 1], tt = (k + t) / (ks.length - 1);
+        put(lerp(o0, o1, tt), typeof x === 'function' ? x(tt) : x, typeof y === 'function' ? y(tt) : y, lerp(A[0], B[0], e), lerp(A[1], B[1], e), rot ? rot(tt) : 0, base);
+      }
+    };
+    var arc = function (o0, o1, x0, y0, x1, y1, s0, s1, dir, steps) {   // 포물선: 가로는 천천히-빠르게-천천히, 세로는 위로 솟았다 내려옴
+      for (var n = 0; n <= steps; n++) {
+        var u = n / steps, e = eio(u), sc = lerp(s0[0], s1[0], e), sy = lerp(s0[1], s1[1], e);
+        var str = 1 + .07 * Math.sin(Math.PI * u);   // 공중에서는 살짝 길쭉하게
+        put(lerp(o0, o1, u), lerp(x0, x1, e), lerp(y0, y1, e) - H * 4 * u * (1 - u), sc / Math.sqrt(str), sy * str, 11 * dir * Math.sin(Math.PI * u), null);
+      }
+    };
     if (open) {
-      R2.classList.add('m-hugi-out'); R2.classList.add('m-hugi-gone');
-      flyAn = el.animate([
-        { transform: T(dx, dy, k * 1.1, k * .82), opacity: 1, offset: 0 },              // 버튼 속에서 몸을 웅크림
-        { transform: T(dx, dy - 26, k * .92, k * 1.12, -6), offset: .16 },                // 튀어나옴
-        { transform: T(dx * .55, dy * .55 - 70, mid(.55), mid(.55), -10), offset: .5 },   // 위로 크게 호를 그리며
-        { transform: T(0, 8, 1.1, .86), offset: .84 },                                    // 내려앉으며 눌림
-        { transform: T(0, -4, .97, 1.05), offset: .93 },
-        { transform: 'none', opacity: 1, offset: 1 }
-      ], { duration: 760, easing: 'cubic-bezier(.33, .1, .25, 1)' });
-      if (HM) try { HM.set('jump'); } catch (e) {}
+      R2.classList.add('m-hugi-out');
+      goneT = setTimeout(function () { R2.classList.add('m-hugi-gone'); }, 170);   // 허기가 떠난 뒤 버튼 셋이 가운데로
+      keys(0, .12, [[px, py], [px * 1.1, py * .78]], dx, dy, py);                                  // 버튼 모양 그대로 꾹 눌림
+      keys(.12, .25, [[px * 1.1, py * .78], [kr * .82, kr * 1.28]], dx, function (t) { return dy - 10 * eo(t); }, kr);   // 반동으로 둥근 몸이 되며 튀어나옴
+      arc(.25, .78, dx, dy - 10, 0, 0, [kr * .82, kr * 1.28], [1, 1], lean, 22);                    // 포물선
+      keys(.78, 1, [[1, 1], [1.18, .8], [.93, 1.1], [1.05, .95], [.99, 1.02], [1, 1]], 0, 0, 1);  // 통통 착지
+      kf.push({ offset: 1, transform: 'none' });
+      if (HM) try { HM.set('wow'); } catch (e) {}
+      flyAn = el.animate(kf, { duration: 820, easing: 'linear' });
       flyAn.onfinish = function () { flyAn = null; dock(); if (HM) try { HM.set('wave'); } catch (e) {} };
     } else {
-      flyAn = el.animate([
-        { transform: 'none', opacity: 1, offset: 0 },
-        { transform: T(0, 6, 1.08, .88), offset: .12 },                                   // 웅크렸다가
-        { transform: T(dx * .45, dy * .45 - 60, mid(.5), mid(.5), 8), offset: .5 },       // 뛰어서 돌아감
-        { transform: T(dx, dy, k, k), opacity: 1, offset: .9 },
-        { transform: T(dx, dy, k * .6, k * .6), opacity: 0, offset: 1 }
-      ], { duration: 520, easing: 'cubic-bezier(.4, 0, .2, 1)', fill: 'forwards' });
-      flyAn.onfinish = function () { R2.classList.remove('m-hugi-out'); pop(); var f = flyAn; flyAn = null; dock(); try { f.cancel(); } catch (e) {} };
+      keys(0, .13, [[1, 1], [1.14, .84]], 0, 0, 1);                                                // 웅크림
+      keys(.13, .24, [[1.14, .84], [.9, 1.16]], 0, function (t) { return -20 * eo(t); }, 1);       // 뛰어오름
+      arc(.24, .76, 0, -20, dx, dy, [.9, 1.16], [kr, kr], -lean, 20);                               // 버튼 쪽으로 포물선
+      keys(.76, 1, [[kr, kr], [px * .8, py * 1.18], [px * 1.13, py * .84], [px * .97, py * 1.04], [px, py]], dx, dy, null);   // 들어가며 가로로 늘어나 알약 버튼이 됨
+      put(1, dx, dy, px, py, 0, null);
+      flyAn = el.animate(kf, { duration: 660, easing: 'linear', fill: 'forwards' });
+      flyAn.onfinish = function () {
+        var f = flyAn; flyAn = null; R2.classList.remove('m-hugi-out'); dock(); try { f.cancel(); } catch (e) {}   // 같은 프레임에 버튼으로 바뀜
+        if (btn.animate) btn.animate([{ transform: 'scale(1.04,.96)' }, { transform: 'scale(.98,1.03)' }, { transform: 'none' }], { duration: 240, easing: 'ease-out' });
+      };
     }
   }
   function sideOpen(on) {
@@ -3524,7 +3548,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       document.documentElement.classList.remove('m-open');
       sd.classList.remove('on'); sc.classList.remove('on'); sd.classList.add('out'); sc.classList.add('out');
       sideFly(false);
-      sideT = setTimeout(function () { sd.hidden = sc.hidden = true; sd.classList.remove('out'); sc.classList.remove('out'); document.documentElement.classList.remove('m-hugi-out', 'm-hugi-gone'); Array.prototype.forEach.call(document.querySelectorAll('#side details[open]'), function (d) { d.open = false; }); }, RM ? 0 : 540);
+      sideT = setTimeout(function () { sd.hidden = sc.hidden = true; sd.classList.remove('out'); sc.classList.remove('out'); document.documentElement.classList.remove('m-hugi-out', 'm-hugi-gone'); Array.prototype.forEach.call(document.querySelectorAll('#side details[open]'), function (d) { d.open = false; }); }, RM ? 0 : 720);
       if (sideBack && sideBack.focus && sideBack !== mb) sideBack.focus({ preventScroll: true });
     }
   }
