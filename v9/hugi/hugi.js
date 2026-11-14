@@ -482,6 +482,7 @@ function go(k,quiet){
   reactTo=null;rest(quiet);state=k;
   if(!quiet)showInfo(k);
   M[k].run();
+  if(k==='idle'&&!homeT&&!RM&&Math.abs(gsap.getProperty(H,'x'))>8)homeT=setTimeout(walkHome,600);
 }
 function showInfo(k){}
 
@@ -568,7 +569,7 @@ function poke(){clicks++;clearTimeout(clickT);clickT=setTimeout(()=>clicks=0,130
 /* ================= 만지기: 끌기 · 던지기 ================= */
 function bounds(){const w=ST.clientWidth,hw=H.offsetWidth*.5+6,minY=-(ST.clientHeight-FLOOR+H.offsetWidth*.05-H.offsetHeight*.85);if(homing)return{minX:-1e5,maxX:1e5,minY};const bx=ROOT.__hgBox&&ROOT.__hgBox();if(bx){const r=ST.getBoundingClientRect(),cx=r.left+r.width/2;return{minX:Math.min(0,bx.left+hw-cx),maxX:Math.max(0,bx.right-hw-cx),minY};}return{minX:-(w/2-hw),maxX:w/2-hw,minY};}
 function fbounds(){const r=ST.getBoundingClientRect(),cx=r.left+r.width/2,hw=H.offsetWidth*.5+4,fb=r.bottom+H.offsetWidth*.05;return{minX:hw-cx,maxX:innerWidth-hw-cx,minY:Math.min(0,H.offsetHeight+4-fb),maxY:Math.max(0,innerHeight-fb-4)};}
-function walkHome(){homeT=null;if(drag||phys.on||RM)return;if(!(state==='idle'||state==='land')){return;}const x=gsap.getProperty(H,'x');if(Math.abs(x)<=8){if(Math.abs(x)>.5)gsap.to(H,{x:0,duration:.35,ease:'sine.inOut'});return;}rest(true);const dir=x>0?-1:1;state=dir<0?'walkL':'walkR';homing=true;const tl=T({onComplete:()=>{homing=false;gsap.set(H,{x:0});toIdle();}});face('base','vec');look(dir*.9,.2);const k=moveK(),n=Math.max(1,Math.min(5,Math.ceil(Math.abs(x)/(48*k))));let b=0;for(let i=0;i<n;i++)b=hop(tl,b,26,-x/n/k,{step:(i%2)===(dir<0?1:0)?'L':'R',arms:.5})-18;}
+function walkHome(){homeT=null;if(drag||phys.on||RM)return;if(!(state==='idle'||state==='land')){if(Math.abs(gsap.getProperty(H,'x'))>8&&!/^(walk|fall|drag)/.test(state))homeT=setTimeout(walkHome,700);return;}const x=gsap.getProperty(H,'x');if(Math.abs(x)<=8){if(Math.abs(x)>.5)gsap.to(H,{x:0,duration:.35,ease:'sine.inOut'});return;}rest(true);const dir=x>0?-1:1;state=dir<0?'walkL':'walkR';homing=true;const tl=T({onComplete:()=>{homing=false;gsap.set(H,{x:0});toIdle();}});face('base','vec');look(dir*.9,.2);const k=moveK(),n=Math.max(1,Math.min(5,Math.ceil(Math.abs(x)/(48*k))));let b=0;for(let i=0;i<n;i++)b=hop(tl,b,26,-x/n/k,{step:(i%2)===(dir<0?1:0)?'L':'R',arms:.5})-18;}
 const pos={x:0,y:0,tx:0,ty:0};
 H.addEventListener('pointerdown',e=>{if(phys.on)return;e.preventDefault();clearTimeout(homeT);homeT=null;rest();homing=false;gsap.killTweensOf(Object.values(LI));gsap.killTweensOf(H);   // 공중(인사 · 점프 중)에서 잡아도 땅으로 내려가던 움직임과 손을 따라가는 움직임이 싸우지 않게
   state='drag';H.setPointerCapture(e.pointerId);H.classList.add('drag');
