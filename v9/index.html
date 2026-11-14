@@ -3525,7 +3525,8 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var box = $('#att');
     if (!PENDING) { box.hidden = true; box.innerHTML = ''; return; }
     box.hidden = false;
-    box.innerHTML = '<span class="ms" aria-hidden="true">description</span><span>' + esc(PENDING.name) + '</span><button type="button" data-att-x aria-label="붙인 파일 빼기"><span class="ms" aria-hidden="true">close</span></button>';
+    var st = PENDING.up && !PENDING.files ? (PENDING.pct == null ? ' · 준비 중' : ' · 올리는 중 ' + PENDING.pct + '%') + (PENDING.go != null ? ' · 다 올리면 보낼게요' : '') : '';   // 11-15 큰 파일 진행률
+    box.innerHTML = '<span class="ms" aria-hidden="true">description</span><span>' + esc(PENDING.name) + st + '</span><button type="button" data-att-x aria-label="붙인 파일 빼기"><span class="ms" aria-hidden="true">close</span></button>';
     $('#ask-form').classList.add('has');
   }
   $('#attach').addEventListener('click', function () { $('#attach-file').click(); });
@@ -3544,10 +3545,71 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       try { rec.start(); set(true); } catch (e) { set(false); }
     });
   })();
+  /* 11-15 사용자 "첨부 최대 100MB, 버튼 두 번 그대로": 4MB 넘는 파일은 서버(/upload)를 거쳐 Gemini Files API(무료 · 48시간 보관)에 8MB씩 이어 올리고 주소만 질문에 붙인다.
+     Gemini는 PDF를 50MB · 1000쪽까지 읽어서, 그보다 큰 PDF는 브라우저에서 쪽 단위로 나눠 올린다(pdf-lib, 이때만 불러옴). 4MB 이하는 원래처럼 바로 보낸다. */
+  var UP_MAX = 100 * 1024 * 1024, PDF_PART = 45 * 1024 * 1024;
+  function sendAttach(f, v) {
+    ask(v || '붙인 채용 공고를 요건별로 한정민의 근거와 비교해 표로 정리해 주세요', (v || '채용 공고 정리해 주세요') + ' · 파일: ' + f.name,
+      { file: f.files ? { name: f.name, mime: f.mime, files: f.files } : { name: f.name, mime: f.mime, data: f.data } });
+  }
+  function upOne(blob, name, mime, onProg) {
+    var base = AI_ENDPOINT.replace(/\/$/, '') + '/upload';
+    var post = function (url, opt, tries) { return fetch(url, opt).then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); }).catch(function (e) { return tries > 0 ? new Promise(function (ok) { setTimeout(ok, 800); }).then(function () { return post(url, opt, tries - 1); }) : Promise.reject(e); }); };
+    return post(base + '?op=start', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: name, mime: mime, size: blob.size }) }, 1).then(function (s) {
+      var g = s.gran || 8388608, off = 0;
+      return (function step() {
+        var end = Math.min(blob.size, off + g), fin = end >= blob.size;
+        return post(base + '?op=put&id=' + encodeURIComponent(s.id) + '&off=' + off + (fin ? '&fin=1' : ''), { method: 'POST', headers: { 'content-type': 'application/octet-stream' }, body: blob.slice(off, end) }, 2)
+          .then(function (o) { onProg(end - off); off = end; if (!fin) return step(); return o && o.uri ? { mime: o.mime || mime, uri: o.uri } : Promise.reject('fin'); });
+      })();
+    });
+  }
+  function pdfLib() {
+    if (window.PDFLib) return Promise.resolve(window.PDFLib);
+    return new Promise(function (ok, no) { var sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js'; sc.onload = function () { window.PDFLib ? ok(window.PDFLib) : no('lib'); }; sc.onerror = function () { no('lib'); }; document.head.appendChild(sc); });
+  }
+  function splitPdf(f) {   // 50MB · 1000쪽 아래로 쪽 단위로 나눔(한 조각이 49MB를 넘으면 다시 반으로)
+    return pdfLib().then(function (L) {
+      return f.arrayBuffer().then(function (buf) { return L.PDFDocument.load(buf, { ignoreEncryption: true }); }).then(function (src) {
+        var n = src.getPageCount(), per = Math.ceil(n / Math.max(Math.ceil(f.size / PDF_PART), Math.ceil(n / 1000))), out = [], chain = Promise.resolve();
+        var make = function (a, b) {
+          return L.PDFDocument.create().then(function (d) { var idx = []; for (var i = a; i < b; i++) idx.push(i);
+            return d.copyPages(src, idx).then(function (ps) { ps.forEach(function (pg) { d.addPage(pg); }); return d.save(); }).then(function (bytes) {
+              if (bytes.length > 49 * 1024 * 1024 && b - a > 1) { var m = (a + b) >> 1; return make(a, m).then(function (x) { return make(m, b).then(function (y) { return x.concat(y); }); }); }
+              return [new Blob([bytes], { type: 'application/pdf' })];
+            }); });
+        };
+        for (var i = 0; i < n; i += per) (function (a, b) { chain = chain.then(function () { return make(a, b).then(function (x) { out = out.concat(x); }); }); })(i, Math.min(n, i + per));
+        return chain.then(function () { return out; });
+      });
+    });
+  }
+  function bigAttach(f) {
+    var me = PENDING = { name: f.name, mime: f.type, up: true, pct: null }; showAtt(); hasText(); IN.focus();
+    var live = function () { return PENDING === me; };
+    var parts = f.type === 'application/pdf' && f.size > PDF_PART + 4 * 1024 * 1024 ? splitPdf(f) : Promise.resolve([f]);
+    parts.then(function (list) {
+      var total = list.reduce(function (t, b) { return t + b.size; }, 0), done = 0, files = [], chain = Promise.resolve();
+      if (live()) { me.pct = 0; showAtt(); }
+      list.forEach(function (b, i) { chain = chain.then(function () { if (!live()) return Promise.reject('gone');
+        return upOne(b, list.length > 1 ? f.name.replace(/\.pdf$/i, '') + '_' + (i + 1) + '.pdf' : f.name, b.type || f.type, function (k) { done += k; if (live()) { me.pct = Math.min(99, Math.floor(done / total * 100)); showAtt(); } })
+          .then(function (x) { files.push(x); }); }); });
+      return chain.then(function () { return files; });
+    }).then(function (files) {
+      if (!live()) return;
+      me.files = files; me.pct = 100;
+      if (me.go != null) { PENDING = null; showAtt(); hasText(); sendAttach(me, me.go); } else showAtt();
+    }).catch(function (e) {
+      if (!live()) return;
+      PENDING = { name: e === 'lib' ? 'PDF를 나누지 못했어요. 50MB 이하로 다시 붙여 주세요' : '파일을 올리지 못했어요. 다시 붙여 주세요', bad: true }; showAtt();
+      setTimeout(function () { PENDING = null; showAtt(); hasText(); }, 3200);
+    });
+  }
   $('#attach-file').addEventListener('change', function () {
     var f = this.files && this.files[0]; this.value = '';
     if (!f) return;
-    if (f.size > 4 * 1024 * 1024) { PENDING = { name: '4MB가 넘는 파일은 붙일 수 없어요', bad: true }; showAtt(); setTimeout(function () { PENDING = null; showAtt(); hasText(); }, 2600); return; }
+    if (f.size > UP_MAX) { PENDING = { name: '100MB가 넘는 파일은 붙일 수 없어요', bad: true }; showAtt(); setTimeout(function () { PENDING = null; showAtt(); hasText(); }, 2600); return; }
+    if (f.size > 4 * 1024 * 1024) { bigAttach(f); return; }   // 11-15 4MB 초과: 고르는 순간부터 서버로 나눠 올림(작은 파일은 아래 그대로)
     var rd = new FileReader();
     rd.onload = function () { PENDING = { name: f.name, mime: f.type, data: String(rd.result).split(',')[1] }; showAtt(); IN.focus(); };
     rd.readAsDataURL(f);
@@ -3556,8 +3618,8 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     e.preventDefault();
     var v = IN.value.trim();
     if (PENDING && !PENDING.bad) {
-      var f = PENDING; PENDING = null; showAtt();
-      ask(v || '붙인 채용 공고를 요건별로 한정민의 근거와 비교해 표로 정리해 주세요', (v || '채용 공고 정리해 주세요') + ' · 파일: ' + f.name, { file: { name: f.name, mime: f.mime, data: f.data } });
+      if (PENDING.up && !PENDING.files) { PENDING.go = v; IN.value = ''; showAtt(); return; }   // 아직 올리는 중: 다 올리면 바로 보냄
+      var f = PENDING; PENDING = null; showAtt(); sendAttach(f, v);
       return;
     }
     if (v.length > 600) { ask('이 채용 공고를 요건별로 한정민의 근거와 비교해 표로 정리해 주세요', '채용 공고를 붙여 넣었어요 (' + v.length + '자)', { doc: v }); return; }
