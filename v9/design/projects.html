@@ -634,21 +634,25 @@ function moveThumb(b,instant){var r=b.getBoundingClientRect(),s=seg.getBoundingC
   var kf=A.map(function(a,i){var L=Math.max(lo,Math.min(hi-20,a)),Rr=Math.min(hi,Math.max(L+20,B[i]));return {transform:'translateX('+L.toFixed(2)+'px)',width:(Rr-L).toFixed(2)+'px'}});
   set(L1,R1);thAn=thumb.animate(kf,{duration:kf.length*1000/60,easing:'linear'});thAn.onfinish=function(){thAn=null}}
 
-/* 분류 바꾸기: 빠지는 박스는 줄며 사라지고(0.24초) → 남는 박스는 새 자리로 미끄러지고(FLIP, spring 0.42초) → 새로 오는 박스는 차례로 커지며 나타남(0.04초 간격) */
+/* 분류 바꾸기(5판). 바뀐 뒤 자리를 먼저 재 보고 두 가지 중 하나로 움직인다.
+   ① 남는 박스가 모두 같은 줄 안에 있으면: 빠지는 박스는 줄며 사라지고(0.24초) → 남는 박스는 옆으로 미끄러지고(spring 0.42초) → 새 박스는 차례로 커지며 나타남(0.04초 간격)
+   ② 남는 박스 중 하나라도 위아래로 줄을 바꾸면: 지금 보이는 박스가 모두 줄며 사라지고 → 새 분류의 박스가 처음 화면처럼 차례로 커지며 나타남(위아래로 움직이는 박스 없음) */
 function filter(cat){
   var my=++gen;busy.forEach(function(a){try{a.cancel()}catch(e){}});busy=[];   // 움직이는 중에 또 누르면 하던 움직임을 지우고 지금 자리에서 새로 시작
   var want=function(c){return cat==='all'||(' '+c.dataset.cat+' ').indexOf(' '+cat+' ')>=0};
-  var before=new Map();cards.forEach(function(c){if(!c.classList.contains('out'))before.set(c,c.getBoundingClientRect())});
-  var leaving=cards.filter(function(c){return !c.classList.contains('out')&&!want(c)});
+  var shown=cards.filter(function(c){return !c.classList.contains('out')});
+  var before=new Map();shown.forEach(function(c){before.set(c,c.getBoundingClientRect())});
+  var was=cards.map(function(c){return c.classList.contains('out')});   // 바뀐 뒤 자리를 미리 재 봄(그리기 전에 되돌림)
+  cards.forEach(function(c){c.classList.toggle('out',!want(c))});
+  var fresh=cards.some(function(c){var a=before.get(c);return a&&want(c)&&Math.abs(c.getBoundingClientRect().top-a.top)>=1});
+  cards.forEach(function(c,i){c.classList.toggle('out',was[i])});
+  var leaving=fresh?shown:shown.filter(function(c){return !want(c)});
   var go=function(){
-    leaving.forEach(function(c){c.classList.add('out')});
-    var entering=[];cards.forEach(function(c){if(want(c)&&c.classList.contains('out')){c.classList.remove('out');entering.push(c)}});
+    var entering=[];
+    cards.forEach(function(c){var w=want(c),o=c.classList.contains('out');c.classList.toggle('out',!w);if(w&&(o||fresh))entering.push(c)});
     if(RM)return;
-    cards.forEach(function(c){var a=before.get(c);if(!a||c.classList.contains('out'))return;var b=c.getBoundingClientRect(),dx=a.left-b.left,dy=a.top-b.top;
-      if(Math.abs(dx)<1&&Math.abs(dy)<1)return;
-      if(Math.abs(dy)>=1){entering.push(c);return}   // 4판: 다른 줄로 옮겨 가는 박스는 미끄러지지 않고 새로 나타남(같은 줄 안에서 옆으로만 미끄러짐)
-      busy.push(c.animate([{transform:'translateX('+dx+'px)'},{transform:'none'}],{duration:420,easing:'cubic-bezier(.34,1.56,.64,1)'}))});
-    entering.sort(function(x,y){return cards.indexOf(x)-cards.indexOf(y)});
+    if(!fresh)cards.forEach(function(c){var a=before.get(c);if(!a||c.classList.contains('out')||entering.indexOf(c)>=0)return;var dx=a.left-c.getBoundingClientRect().left;
+      if(Math.abs(dx)>=1)busy.push(c.animate([{transform:'translateX('+dx+'px)'},{transform:'none'}],{duration:420,easing:'cubic-bezier(.34,1.56,.64,1)'}))});
     entering.forEach(function(c,i){busy.push(c.animate([{opacity:0,transform:'scale(.92)'},{opacity:1,transform:'none'}],{duration:420,delay:i*40,easing:'cubic-bezier(.34,1.56,.64,1)',fill:'backwards'}))});
   };
   if(RM||!leaving.length){go();return}
