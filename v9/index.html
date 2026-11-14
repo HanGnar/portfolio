@@ -3712,17 +3712,8 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       if (k > 480 || (RM && k > 30)) { R0.classList.remove('hg-intro-wait'); introAsk(); introType(); return; }   // 8초 넘게 인사가 안 오면(그림 실패 등) 그냥 보여 주고 글자
       requestAnimationFrame(function () { wait(k + 1); });
     })(0);
-    document.addEventListener('keydown', function (e) { var sd = $('#side'); if (e.key === 'Escape' && !sd.classList.contains('on') && !sd.classList.contains('out')) introSkip(); });   // Esc로 메뉴를 닫을 때는 인트로 유지
-    var introPD = null, IN_SEL = '.ask, .hdr, #hugi-root, #hugi-menu, .sug, #side, #side-scrim';
-    document.addEventListener('pointerdown', function (e) { introPD = e.target; }, true);
-    document.addEventListener('click', function (e) {   // 11-14 버그: 허기를 잡았다 놓으면(허기가 움직여) click이 공통 조상(본문)에 와서 건너뛰기로 판정 → AI 버튼이 생겼음
-      var pd = introPD; introPD = null;
-      if (e.target.closest(IN_SEL) || (pd && pd.closest && pd.closest(IN_SEL))) return;
-      var hr = $('#hugi-root .hugi-char'), r = hr && hr.getBoundingClientRect();
-      if (r && e.clientX >= r.left - 12 && e.clientX <= r.right + 12 && e.clientY >= r.top - 12 && e.clientY <= r.bottom + 12) return;
-      if ($('#side').classList.contains('on')) return;
-      introSkip();
-    });
+    document.addEventListener('keydown', function (e) { var sd = $('#side'); if (e.key === 'Escape' && !sd.classList.contains('on') && !sd.classList.contains('out')) introDock(); });   // Esc: 첫 질문 때와 같이 허기가 AI 버튼으로 날아 들어가며 끝(모션 줄이기면 바로). 메뉴를 Esc로 닫을 때는 인트로 유지
+    // 11-15 사용자 버그 "빈 곳 클릭하면 허기가 끊기면서 위로 감": 빈 곳 클릭 건너뛰기는 없앰(빈 곳 클릭 = 아무 일 없음, 인트로 유지)
   }
   function introRestore() {   // 인트로가 끝나면 질문창 옆 허기를 원래 자리 · 원래 크기로 되돌리고 0.3초 동안 작게 → 원래 크기로 나타나게(인계.md: 허기는 질문창 옆과 AI 버튼 속 둘 다)
     var root = $('#hugi-root'), ask = $('#ask'); if (!root || !ask) return;
@@ -3771,7 +3762,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     }
   }
   function introStopType() { introTy.forEach(clearTimeout); introTy = []; }
-  function introSkip() {   // Esc · 빈 곳 클릭: 이동 없이 바로 일반 화면(허기는 AI 버튼 안)
+  function introSkip() {   // 이동 없이 바로 일반 화면(모션 줄이기 · 그림 없음일 때만 introDock이 부름)
     var R2 = document.documentElement; if (!R2.classList.contains('hg-intro')) return;
     introStopType(); R2.classList.remove('hg-intro', 'hg-intro-t', 'hg-intro-wait', 'hg-intro-a', 'hg-intro-away', 'm-hugi-out', 'm-hugi-gone'); introRestore();
   }
