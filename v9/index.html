@@ -3477,7 +3477,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var P = btnPill(); cancelAnimationFrame(morphRaf); if (!P) { if (done) done(); return; }
     var t0 = performance.now();
     var step = function (now) {
-      var u = Math.min(1, (now - t0) / dur), k = (now - t0) / 1000, w;
+      var u = Math.max(0, Math.min(1, (now - t0) / dur)), k = Math.max(0, (now - t0) / 1000), w;   // 11-14: rAF 시각이 시작 시각보다 앞서면 진행도가 음수가 되어 알약 폭이 한 프레임 크게 튀고 콘솔에 viewBox 오류가 났음
       if (spring) w = u >= 1 ? to : to + (from - to) * Math.exp(-7.5 * k) * Math.cos(15 * k);   // 쭉 늘어나 살짝 넘쳤다 돌아옴
       else w = from + (to - from) * (u * u * (3 - 2 * u));
       P.d[0] = w; try { P.O.relayout(); } catch (e) {}
@@ -3491,67 +3491,61 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     if (set) { S.sx.x = sx; S.sy.x = sy; S.sx.v = 0; S.sy.v = 0; } else { S.sx.v += sx; S.sy.v += sy; }
     try { if (window.HUGI_ORB.state === 'idle') window.HUGI_ORB.set('idle'); } catch (e) {}   // 쉬고 있던 그리기 되살리기
   }
-  /* 11-14 사용자 "누가 일자로 잡아당기는 느낌" → 정해 둔 모양을 잇지 않고 물리로 계산한다.
-     가로는 일정한 속도, 세로는 중력(솟았다가 점점 빨리 떨어짐) · 몸은 속도만큼 길쭉해지고(부피 유지) 가는 쪽으로 기움
-     · 가장 빠를 때 바닥에 닿아 그 속도만큼 납작 → 스프링으로 출렁 · 튕김은 갈수록 낮고 짧게. 1/240초씩 계산해 1/60초마다 프레임으로 남김 */
-  function flySim(o) {
-    var FR = [], dt = 1 / 240, t = 0, n = 0;
-    var x = o.x0, y = o.y0, vx = 0, vy = 0, st = 1, vst = 0, rot = 0, vrot = 0, phase = 'crouch', land = 0, tf = 0, spreadT = 0, sp0 = null;
-    var g = o.g, K = 900, Z = 2 * .3 * 30, KR = 420, ZR = 2 * .26 * Math.sqrt(420);
-    var rec = function (sx, sy, op) { FR.push({ t: t, transform: 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + rot.toFixed(2) + 'deg) scale(' + sx.toFixed(3) + ',' + sy.toFixed(3) + ')', opacity: op }); };
-    while (t < 2.4) {
-      var sNow = o.scale(phase, tf), tgt = 1, rtgt = 0;
-      if (phase === 'crouch') {
-        tgt = o.crouch || 1;
-        if (t >= o.A) { phase = 'air'; vx = o.vx; vy = o.vy; vst += o.kick || 0; }
-      } else if (phase === 'air') {
-        tf += dt; vy += g * dt; x += vx * dt; y += vy * dt;
-        tgt = 1 + Math.min(.2, Math.sqrt(vx * vx + vy * vy) / 7000);
-        rtgt = land ? 0 : Math.max(-10, Math.min(10, vx / 45));
-        if (y >= o.y1 && vy > 0) {   // 닿음
-          var vi = vy; y = o.y1; x = o.x1; vx = 0; land++;
-          if (o.hold) { phase = 'hold'; o.handAt = { t: t }; vst -= Math.min(5, vi * .005); }
-          else if (o.spread) { phase = 'spread'; sp0 = { sx: sNow / Math.sqrt(st), sy: sNow * st, vsx: Math.min(4, vi * .006), vsy: -Math.min(4, vi * .006), xv: o.vx * .35 }; }
-          else { vst -= Math.min(9, vi * .0075); if (vi > 160 && land < 3) vy = -vi * .3; else { vy = 0; phase = 'ground'; } }
-        }
-      } else if (phase === 'hold') {   // 버튼 자리에 내려앉은 뒤 짧게 겹쳐 사라짐(이어받는 버튼 그림이 같은 둥근 모양)
-        var hT = t - o.handAt.t, opH = Math.max(0, 1 - hT / o.hold);
-        var ast2 = -K * (st - 1) - Z * vst; vst += ast2 * dt; st = Math.max(.7, Math.min(1.28, st + vst * dt));
-        var ar2 = -KR * rot - ZR * vrot; vrot += ar2 * dt; rot += vrot * dt;
-        if (n % 4 === 0 || hT >= o.hold) rec(sNow / Math.sqrt(st), sNow * st, opH);
-        if (hT >= o.hold) break;
-        t += dt; n++; continue;
-      } else if (phase === 'spread') {   // 버튼 자리에 떨어져 퍼지며 알약 모양이 됨: 모양 · 가로 위치 모두 스프링(속도가 끊기지 않게)
-        spreadT += dt;
-        var P = sp0, KS = 650, ZS = 2 * .42 * Math.sqrt(650), KX = 500, ZX = 2 * .7 * Math.sqrt(500);
-        P.vsx += (-KS * (P.sx - o.pill[0]) - ZS * P.vsx) * dt; P.sx += P.vsx * dt;
-        P.vsy += (-KS * (P.sy - o.pill[1]) - ZS * P.vsy) * dt; P.sy += P.vsy * dt;
-        P.xv += (-KX * (x - o.x1) - ZX * P.xv) * dt; x += P.xv * dt;
-        var avr = -KR * rot - ZR * vrot; vrot += avr * dt; rot += vrot * dt;
-        var fadeFrom = o.spread - o.fade, op = spreadT < fadeFrom ? 1 : Math.max(0, 1 - (spreadT - fadeFrom) / o.fade);
-        if (!o.handAt && spreadT >= fadeFrom) o.handAt = { t: t, rx: P.sx / o.pill[0], ry: P.sy / o.pill[1] };   // 버튼을 보이기 시작할 때의 모양(버튼 스프링이 여기서 출발)
-        if (n % 4 === 0 || spreadT >= o.spread) rec(P.sx, P.sy, op);
-        if (spreadT >= o.spread) break;
-        t += dt; n++; continue;
-      } else {   // ground
-        if (t > o.A + .2 && Math.abs(st - 1) < .003 && Math.abs(vst) < .03 && Math.abs(rot) < .15) { st = 1; rot = 0; rec(sNow, sNow, 1); break; }
-      }
-      var ast = -K * (st - tgt) - Z * vst; vst += ast * dt; st = Math.max(.7, Math.min(1.28, st + vst * dt));
-      var ar = -KR * (rot - rtgt) - ZR * vrot; vrot += ar * dt; rot += vrot * dt;
-      if (n % 4 === 0) rec(sNow / Math.sqrt(st), sNow * st, phase === 'crouch' ? o.crouchOp : 1);
-      t += dt; n++;
+  /* 11-14 허기 ↔ AI 버튼 오가기 공통 동작 dockFly(o). 열기(out: 버튼 → 메뉴)와 닫기(in: 메뉴 → 버튼)가 같은 길을 거꾸로 간다.
+     o = { dir:'out'|'in', c0:{x,y} 출발 몸 중심, c1:{x,y} 도착 몸 중심, s0, s1: 출발 · 도착 크기 배율, O:{x,y} 허기 발밑(크기 · 기울기 기준), oc:{x,y} 발밑 → 몸 중심(배율 1),
+           A: 출발 전 준비 시간(초), T: 이동 시간, arc: 솟는 높이(px), yFirst: 세로가 먼저면 true(열기), visible0: 처음부터 보이면 true(중단 뒤 이어 갈 때),
+           pull: 닫기 때 반대 방향으로 당기는 거리, crouch: 웅크림 세로 배율, kick: 출발 때 늘어남 속도, land: 도착 때 눌림 속도, settle: 도착 뒤 출렁임 시간, fade: 겹쳐 넘기는 시간 }
+     · 몸 중심은 시작 · 끝 속도와 가속도가 0인 곡선(E)으로 움직인다(전엔 가로가 일정한 속도로 갑자기 출발해 갑자기 멈췄음).
+     · 크기는 버튼의 둥근 몸(지름 = 버튼 높이)에서 허기 몸까지 같은 곡선으로 변해, 바꿔 넣을 때 크기 · 위치가 어긋나지 않는다(전엔 버튼 그림 상자 높이에 맞춰 몸이 1/3 작게 이어받았음).
+     · 가는 방향으로 속도만큼 길어지고, 닫기는 가기 전에 반대로 당기며 웅크리고 열기는 도착할 때 눌렸다 출렁인다. 1/480초씩 계산해 1/120초마다 프레임으로 남긴다. */
+  function dockFly(o) {
+    var out = o.dir === 'out', H = 1 / 480, A = o.A, T = o.T, tail = out ? o.settle : o.fade, total = A + T + tail;
+    var cl = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+    var E = function (u) { u = cl(u, 0, 1); return u * u * u * (u * (6 * u - 15) + 10); };   // 시작 · 끝 속도와 가속도가 0
+    var dx = o.c1.x - o.c0.x, dy = o.c1.y - o.c0.y, len = Math.hypot(dx, dy) || 1, ux = dx / len, uy = dy / len;
+    var pull = out ? 0 : (o.pull || 0), px0 = -ux * pull, py0 = -uy * pull, sx0 = o.c0.x + px0, sy0 = o.c0.y + py0;
+    var pos = function (t) {
+      if (t < A) { var q = out ? 0 : E(t / A); return { x: o.c0.x + px0 * q, y: o.c0.y + py0 * q, s: o.s0, u: 0 }; }
+      var u = cl((t - A) / T, 0, 1), fy = o.yFirst ? E(1.16 * u) : E(1.16 * u - .16);   // 세로가 먼저(열기) / 나중(닫기)이라 길이 휜다
+      return { x: sx0 + (o.c1.x - sx0) * E(u), y: sy0 + (o.c1.y - sy0) * fy - o.arc * Math.pow(Math.sin(Math.PI * u), 2), s: o.s0 + (o.s1 - o.s0) * E(u), u: u };
+    };
+    var K = 900, Z = 2 * .3 * 30, KR = 420, ZR = 2 * .26 * Math.sqrt(420);
+    var st = 1, vst = 0, rot = 0, vrot = 0, k = 0, th = 0, prev = pos(0), kicked = false, landed = false, FR = [], n = 0, t = 0;
+    for (; t <= total + 1e-9; n++, t = n * H) {
+      var P = pos(t), vx = (P.x - prev.x) / H, vy = (P.y - prev.y) / H, sp = Math.hypot(vx, vy); prev = P;
+      if (!kicked && t >= A) { kicked = true; vst += o.kick || 0; }
+      if (out && !landed && t >= A + T) { landed = true; vst -= o.land || 0; }
+      var moving = t >= A && t < A + T, tgt = (!out && t < A) ? (o.crouch || 1) : 1, rtgt = moving ? cl(vx / 70, -5, 5) : 0;
+      vst += (-K * (st - tgt) - Z * vst) * H; st = cl(st + vst * H, .7, 1.28);
+      vrot += (-KR * (rot - rtgt) - ZR * vrot) * H; rot += vrot * H;
+      k += (cl(sp / 6500, 0, .15) - k) * (1 - Math.exp(-H * 30));
+      if (sp > 40) { var tn = Math.atan2(vy, vx), dd = Math.atan2(Math.sin(tn - th), Math.cos(tn - th)); th += dd * (1 - Math.exp(-H * 40)); }
+      if (n % 4) continue;
+      var sc = P.s, Sx = sc / Math.sqrt(st), Sy = sc * st, a = 1 + k, b = 1 / a, thD = th * 180 / Math.PI;
+      var ox = Sx * o.oc.x, oy = Sy * o.oc.y;   // M = R(rot) R(th) diag(a,b) R(-th) diag(Sx,Sy) 를 몸 중심 벡터에 적용
+      var c1 = Math.cos(-th), s1 = Math.sin(-th), rx = ox * c1 - oy * s1, ry = ox * s1 + oy * c1; rx *= a; ry *= b;
+      var c2 = Math.cos(th), s2 = Math.sin(th), qx = rx * c2 - ry * s2, qy = rx * s2 + ry * c2;
+      var cr = Math.cos(rot * Math.PI / 180), sr2 = Math.sin(rot * Math.PI / 180), mx = qx * cr - qy * sr2, my = qx * sr2 + qy * cr;
+      var Tx = P.x - o.O.x - mx, Ty = P.y - o.O.y - my;
+      var op = out ? (t < A && !o.visible0 ? 0 : 1) : (t < A + T ? 1 : Math.max(0, 1 - (t - A - T) / (tail || 1)));
+      FR.push({ t: t, op: op, transform: 'translate(' + Tx.toFixed(2) + 'px,' + Ty.toFixed(2) + 'px) rotate(' + rot.toFixed(2) + 'deg) rotate(' + thD.toFixed(2) + 'deg) scale(' + a.toFixed(4) + ',' + b.toFixed(4) + ') rotate(' + (-thD).toFixed(2) + 'deg) scale(' + Sx.toFixed(4) + ',' + Sy.toFixed(4) + ')' });
     }
-    var T = FR[FR.length - 1].t || 1;
-    return { dur: T * 1000, hand: o.handAt, kf: FR.map(function (f, k) { return { offset: k === FR.length - 1 ? 1 : Math.min(1, f.t / T), transform: f.transform, opacity: f.opacity }; }) };
+    var fin = FR[FR.length - 1];
+    if (out) {   // 끝 프레임은 정확히 제자리(허기가 자기 자리로 돌아가 붙는 순간 어긋나지 않게)
+      fin.transform = 'translate(' + (o.c1.x - o.O.x - o.oc.x * o.s1).toFixed(2) + 'px,' + (o.c1.y - o.O.y - o.oc.y * o.s1).toFixed(2) + 'px) rotate(0deg) rotate(0deg) scale(1,1) rotate(0deg) scale(' + o.s1 + ',' + o.s1 + ')'; fin.op = 1;
+    }
+    var Tt = fin.t || 1;
+    return { dur: Tt * 1000, hand: out ? null : { t: A + T }, kf: FR.map(function (f, i) { return { offset: i === FR.length - 1 ? 1 : Math.min(1, f.t / Tt), transform: f.transform, opacity: f.op }; }) };
   }
   function sideFly(open) {
     var el = $('#hugi-menu'), btn = $('#g-ai'), R2 = document.documentElement; if (!el) return;
     hmMake(); clearTimeout(goneT); clearTimeout(launchT);
     if (R2.classList.contains('m-hugi-morph')) { btnRound(false); R2.classList.remove('m-hugi-morph'); }
-    if (flyAn) { try { flyAn.onfinish = null; flyAn.cancel(); } catch (e) {} flyAn = null; var sl0 = $('#side .mhugi'); if (sl0 && el.parentNode !== sl0) { sl0.appendChild(el); el.style.cssText = ''; } }
+    var chA = el.querySelector('.hugi-char') || el, cur0 = null;   // 날아가는 중에 반대로 누르면 지금 보이는 자리에서 이어 간다(제자리로 튕겨 가지 않게)
+    if (flyAn) { try { var cr0 = chA.getBoundingClientRect(); if (cr0.width) cur0 = cr0; } catch (e) {} try { flyAn.onfinish = null; flyAn.cancel(); } catch (e) {} flyAn = null; var sl0 = $('#side .mhugi'); if (sl0 && el.parentNode !== sl0) { sl0.appendChild(el); el.style.cssText = ''; } }
     if (RM || !btn || !el.animate) { R2.classList.toggle('m-hugi-out', open); R2.classList.toggle('m-hugi-gone', open); R2.classList.toggle('m-shift', open); if (open && HM) try { HM.set('wave'); } catch (e) {} return; }
     var aEnd = null;
-    var vis = function () { var v = btn.querySelector('svg'); return (v || btn).getBoundingClientRect(); };   // 11-14: 버튼 상자가 아니라 버튼 속 허기 그림(팔 · 다리 포함)에 맞춘다 — 상자(64×42)와 그림(77×51) 크기가 달라 바꿔 넣을 때 툭 커졌음
+    var vis = function () { var v = btn.querySelector('svg'); return (v || btn).getBoundingClientRect(); };   // 11-14: 버튼 상자가 아니라 버튼 속 허기 그림(팔 · 다리 포함)에 맞춘다
     if (open) { sideFly.home = { r: vis(), w: innerWidth, bw: btn.getBoundingClientRect().width }; R2.style.setProperty('--gai-w', sideFly.home.bw + 'px'); }
     if (!open && R2.classList.contains('m-hugi-gone') && sideFly.home && sideFly.home.w === innerWidth) { aEnd = sideFly.home.r; R2.classList.remove('m-hugi-gone'); }
     else if (!open && R2.classList.contains('m-hugi-gone')) {   // 닫기: 버튼이 돌아갈 최종 자리를 먼저 재고, 자리를 다시 벌리기 시작
@@ -3565,30 +3559,32 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var dock = function () { slot.appendChild(el); el.style.cssText = ''; };
     var ch = el.querySelector('.hugi-char') || el, a = aEnd || vis(), b = ch.getBoundingClientRect(), c = el.getBoundingClientRect();
     if (!b.width || !a.width) { dock(); R2.classList.toggle('m-hugi-out', open); R2.classList.toggle('m-hugi-gone', open); return; }
-    el.style.transformOrigin = (b.left - c.left + b.width / 2) + 'px ' + (b.bottom - c.top) + 'px';   // 발밑 기준(눌릴 때 바닥에 붙어 있게)
-    var dx = (a.left + a.width / 2) - (b.left + b.width / 2), dy = a.bottom - b.bottom;      // 버튼 발밑 - 메뉴 자리 발밑(위쪽이라 음수)
-    var px = a.width / b.width, py = a.height / b.height, k0 = Math.min(1, py * 1.02), kb = Math.min(1, py * .86);   // 둥근 버튼 그림(약 55×50)과 같은 크기
-    var easeIO = function (u) { return u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; };
+    /* 위치 · 크기는 그림 상자가 아니라 몸(둥근 부분)으로 맞춘다: 허기 몸 중심 = 상자 안 (.5013, .5864), 몸 지름 = 상자 폭 × .608 / 버튼 둥근 몸 지름 = 버튼 높이 */
+    var Pb = btnPill(), Rh = Pb ? Pb.h : 42, Dc = b.width * 462 / 760, spill = Rh / Dc;
+    var bodyC = function (r) { return { x: r.left + r.width * .5013, y: r.top + r.height * .5864 }; };
+    var pc = { x: a.left + a.width / 2, y: a.top + a.height * 245 / 520 };   // 버튼 몸 중심(버튼 그림 svg: 몸 중심이 위에서 245/520 지점)
+    var mc = bodyC(b), O = { x: b.left + b.width / 2, y: b.bottom }, oc = { x: mc.x - O.x, y: mc.y - O.y };
+    el.style.transformOrigin = (O.x - c.left) + 'px ' + (O.y - c.top) + 'px';   // 발밑 기준
+    var arcH = Math.max(0, Math.min(10, pc.y - Rh / 2 - 4));   // 버튼이 화면 맨 위라 위로 솟는 높이는 머리가 안 잘릴 만큼만
+    var st0 = cur0 ? { c: bodyC(cur0), s: cur0.width / b.width } : null;   // 중단 뒤 이어 가는 출발 상태
     if (open) {
-      // 버튼 속에서 먼저 꾹 눌리고(버튼 스프링), 0.11초 뒤 둥근 몸으로 튀어나와 작은 홉 → 중력으로 떨어져 통통 착지
-      var A = .11, T = .5, h = 4, Y = Math.max(40, -dy), g = Math.pow((Math.sqrt(2 * h) + Math.sqrt(2 * h + 2 * Y)) / T, 2);
-      var sim = flySim({ A: A, x0: dx, y0: dy, x1: 0, y1: 0, vx: -dx / T, vy: -Math.sqrt(2 * g * h), g: g, kick: 5, crouch: 1, crouchOp: 0,
-        scale: function (ph, tf) { return ph === 'crouch' ? k0 : (ph === 'air' && tf < T ? k0 + (1 - k0) * Math.pow(tf / T, 1.6) : 1); } });
+      // 버튼 속에서 먼저 꾹 눌리고(버튼 스프링), 0.11초 뒤 둥근 몸으로 튀어나와 메뉴 자리로 곡선 이동 → 도착해 눌렸다 출렁
+      var A = st0 ? .02 : .11;
+      var sim = dockFly({ dir: 'out', c0: st0 ? st0.c : pc, c1: mc, s0: st0 ? st0.s : spill, s1: 1, O: O, oc: oc, A: A, T: .5, arc: arcH, yFirst: true, visible0: !!st0, kick: 3, land: 4, settle: .4 });
       R2.classList.add('m-hugi-morph'); var P0 = btnPill(); if (P0) btnWidth(P0.W, P0.h, A * 1000, false); btnKick(.6, -1.2);
       launchT = setTimeout(function () { R2.classList.add('m-hugi-out'); if (HM) try { HM.set('wow'); } catch (e) {} }, A * 1000);
-      goneT = setTimeout(function () { btnRound(false); R2.classList.remove('m-hugi-morph'); R2.classList.add('m-hugi-gone', 'm-shift'); }, A * 1000 + 90);   // 허기가 떠난 뒤 버튼 셋이 가운데로 모이며 아래로 내려옴   // 버튼이 다 사라진 뒤에 알약 폭으로 되돌리고 자리를 줄임(보이는 동안 되돌리면 툭 커졌음)   // 허기가 떠난 뒤 버튼 셋이 가운데로
+      goneT = setTimeout(function () { btnRound(false); R2.classList.remove('m-hugi-morph'); R2.classList.add('m-hugi-gone', 'm-shift'); }, A * 1000 + 90);   // 허기가 떠난 뒤 버튼 셋이 가운데로 모이며 아래로 내려옴(버튼이 다 사라진 뒤에 알약 폭으로 되돌리고 자리를 줄임)
       flyAn = el.animate(sim.kf, { duration: sim.dur, easing: 'linear' });
       flyAn.onfinish = function () { flyAn = null; dock(); if (HM) try { HM.set('wave'); } catch (e) {} };
     } else {
-      // 메뉴에서 웅크렸다가 뛰어올라, 버튼 위로 살짝 넘어간 뒤 떨어져 버튼 자리에 퍼지며 알약 모양 → 그 순간 버튼으로 넘기고 버튼 스프링이 출렁임
-      var A2 = .12, g2 = 3000, H = -dy + 6, T2 = Math.sqrt(2 * H / g2) + Math.sqrt(2 * 6 / g2);   // 버튼 6px 위까지만 솟음(화면 위로 안 잘리게)
-      var sim2 = flySim({ A: A2, x0: 0, y0: 0, x1: dx, y1: dy, vx: dx / T2, vy: -Math.sqrt(2 * g2 * H), g: g2, kick: 6, crouch: .8, crouchOp: 1, hold: .06,
-        scale: function (ph, tf) { var u = Math.min(1, tf / T2); return ph === 'crouch' ? 1 : 1 + (kb - 1) * (1 - Math.pow(1 - u, 2.2)); } });   // 일찍 작아져야 꼭대기에서 머리가 안 잘림
+      // 메뉴에서 웅크리며 반대로 당기고 → 열 때와 같은 길을 거꾸로 날아 → 버튼 둥근 몸과 같은 크기 · 자리에 도착 → 0.06초 겹쳐 넘기고 버튼이 눌렸다가 쭉 늘어나 알약
+      var A2 = st0 ? .02 : .12;
+      var sim2 = dockFly({ dir: 'in', c0: st0 ? st0.c : mc, c1: pc, s0: st0 ? st0.s : 1, s1: spill, O: O, oc: oc, A: A2, T: .5, arc: arcH, yFirst: false, visible0: true, pull: st0 ? 0 : 10, crouch: .82, kick: 3, fade: .06 });
       if (HM) try { HM.set('wow'); } catch (e) {}
       flyAn = el.animate(sim2.kf, { duration: sim2.dur, easing: 'linear', fill: 'forwards' });
       R2.classList.add('m-hugi-morph'); btnRound(true);   // 숨어 있는 동안 버튼 그림을 둥글게 준비
       var hd = sim2.hand, P1 = btnPill();
-      launchT = setTimeout(function () {   // 내려앉는 순간: 둥근 버튼 그림이 이어받고(0.06초 겹침) 눌렸다가 가운데부터 쭉 늘어나 알약
+      launchT = setTimeout(function () {   // 도착하는 순간: 같은 크기의 둥근 버튼 그림이 이어받고(0.06초 겹침) 눌렸다가 가운데부터 쭉 늘어나 알약
         R2.classList.remove('m-hugi-out'); btnKick(1.2, -2.2);
         if (P1) btnWidth(P1.h, P1.W, 480, true, function () { R2.classList.remove('m-hugi-morph'); }); else R2.classList.remove('m-hugi-morph');
       }, hd ? hd.t * 1000 : sim2.dur - 60);
