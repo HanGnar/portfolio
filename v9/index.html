@@ -3463,14 +3463,57 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   })();
   var sideBack = null;
   var sideT = 0, HM = null;
-  var flyAn = null, goneT = 0;
+  var flyAn = null, goneT = 0, launchT = 0;
   function hmMake() { var el = $('#hugi-menu'); if (!HM && el && window.HUGI_MAKE) { try { HM = window.HUGI_MAKE(el, { prefix: 'hm', hello: false, bubble: false }); } catch (e) { HM = null; } } }
   window.addEventListener('load', function () { setTimeout(hmMake, 1200); });   // 처음 열 때 멈칫하지 않게 미리 만든다
-  /* 11-14 사용자: 허기가 버튼에서 "통" 튀어나와 포물선으로 날아가 통통 착지 / 닫으면 뛰어 들어가며 몸이 늘어나 그대로 알약 버튼이 된다.
-     프레임을 공식으로 미리 계산해 한 번에 넘긴다(구간이 꺾이지 않게). 값: 열기 0.82초 · 닫기 0.66초 */
+  function btnS() { try { return window.HUGI_ORB && window.HUGI_ORB._rig && window.HUGI_ORB._rig.S; } catch (e) { return null; } }
+  function btnKick(sx, sy, set) {   // AI 버튼 허기의 스프링을 직접 건드린다(set이면 그 모양에서 출발, 아니면 속도만 준다)
+    var S = btnS(); if (!S || !S.sx || !S.sy) return;
+    if (set) { S.sx.x = sx; S.sy.x = sy; S.sx.v = 0; S.sy.v = 0; } else { S.sx.v += sx; S.sy.v += sy; }
+    try { if (window.HUGI_ORB.state === 'idle') window.HUGI_ORB.set('idle'); } catch (e) {}   // 쉬고 있던 그리기 되살리기
+  }
+  /* 11-14 사용자 "누가 일자로 잡아당기는 느낌" → 정해 둔 모양을 잇지 않고 물리로 계산한다.
+     가로는 일정한 속도, 세로는 중력(솟았다가 점점 빨리 떨어짐) · 몸은 속도만큼 길쭉해지고(부피 유지) 가는 쪽으로 기움
+     · 가장 빠를 때 바닥에 닿아 그 속도만큼 납작 → 스프링으로 출렁 · 튕김은 갈수록 낮고 짧게. 1/240초씩 계산해 1/60초마다 프레임으로 남김 */
+  function flySim(o) {
+    var FR = [], dt = 1 / 240, t = 0, n = 0;
+    var x = o.x0, y = o.y0, vx = 0, vy = 0, st = 1, vst = 0, rot = 0, vrot = 0, phase = 'crouch', land = 0, tf = 0, spreadT = 0, sp0 = null;
+    var g = o.g, K = 900, Z = 2 * .3 * 30, KR = 420, ZR = 2 * .26 * Math.sqrt(420);
+    var rec = function (sx, sy, op) { FR.push({ t: t, transform: 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + rot.toFixed(2) + 'deg) scale(' + sx.toFixed(3) + ',' + sy.toFixed(3) + ')', opacity: op }); };
+    while (t < 2.4) {
+      var sNow = o.scale(phase, tf), tgt = 1, rtgt = 0;
+      if (phase === 'crouch') {
+        tgt = o.crouch || 1;
+        if (t >= o.A) { phase = 'air'; vx = o.vx; vy = o.vy; vst += o.kick || 0; }
+      } else if (phase === 'air') {
+        tf += dt; vy += g * dt; x += vx * dt; y += vy * dt;
+        tgt = 1 + Math.min(.2, Math.sqrt(vx * vx + vy * vy) / 7000);
+        rtgt = land ? 0 : Math.max(-10, Math.min(10, vx / 45));
+        if (y >= o.y1 && vy > 0) {   // 닿음
+          var vi = vy; y = o.y1; x = o.x1; vx = 0; land++;
+          if (o.spread) { phase = 'spread'; sp0 = [sNow / Math.sqrt(st), sNow * st]; }
+          else { vst -= Math.min(9, vi * .0075); if (vi > 160 && land < 3) vy = -vi * .3; else { vy = 0; phase = 'ground'; } }
+        }
+      } else if (phase === 'spread') {   // 버튼 자리에 떨어져 퍼지며 알약 모양이 됨
+        spreadT += dt; var u = Math.min(1, spreadT / o.spread), e = 1 - Math.pow(1 - u, 3);
+        rot += (0 - rot) * .2;
+        if (n % 4 === 0 || u >= 1) { var sx = sp0[0] + (o.pill[0] - sp0[0]) * e, sy = sp0[1] + (o.pill[1] - sp0[1]) * e; rec(sx, sy, 1); }
+        if (u >= 1) break;
+        t += dt; n++; continue;
+      } else {   // ground
+        if (t > o.A + .2 && Math.abs(st - 1) < .003 && Math.abs(vst) < .03 && Math.abs(rot) < .15) { st = 1; rot = 0; rec(sNow, sNow, 1); break; }
+      }
+      var ast = -K * (st - tgt) - Z * vst; vst += ast * dt; st = Math.max(.7, Math.min(1.28, st + vst * dt));
+      var ar = -KR * (rot - rtgt) - ZR * vrot; vrot += ar * dt; rot += vrot * dt;
+      if (n % 4 === 0) rec(sNow / Math.sqrt(st), sNow * st, phase === 'crouch' ? o.crouchOp : 1);
+      t += dt; n++;
+    }
+    var T = FR[FR.length - 1].t || 1;
+    return { dur: T * 1000, kf: FR.map(function (f, k) { return { offset: k === FR.length - 1 ? 1 : Math.min(1, f.t / T), transform: f.transform, opacity: f.opacity }; }) };
+  }
   function sideFly(open) {
     var el = $('#hugi-menu'), btn = $('#g-ai'), R2 = document.documentElement; if (!el) return;
-    hmMake(); clearTimeout(goneT);
+    hmMake(); clearTimeout(goneT); clearTimeout(launchT);
     if (flyAn) { try { flyAn.onfinish = null; flyAn.cancel(); } catch (e) {} flyAn = null; var sl0 = $('#side .mhugi'); if (sl0 && el.parentNode !== sl0) { sl0.appendChild(el); el.style.cssText = ''; } }
     if (RM || !btn || !el.animate) { R2.classList.toggle('m-hugi-out', open); R2.classList.toggle('m-hugi-gone', open); if (open && HM) try { HM.set('wave'); } catch (e) {} return; }
     var aEnd = null;
@@ -3485,50 +3528,29 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var dock = function () { slot.appendChild(el); el.style.cssText = ''; };
     var ch = el.querySelector('.hugi-char') || el, a = aEnd || btn.getBoundingClientRect(), b = ch.getBoundingClientRect(), c = el.getBoundingClientRect();
     if (!b.width || !a.width) { dock(); R2.classList.toggle('m-hugi-out', open); R2.classList.toggle('m-hugi-gone', open); return; }
-    el.style.transformOrigin = (b.left - c.left + b.width / 2) + 'px ' + (b.top - c.top + b.height / 2) + 'px';
-    var dx = (a.left + a.width / 2) - (b.left + b.width / 2), dy = (a.top + a.height / 2) - (b.top + b.height / 2);
-    var px = a.width / b.width, py = a.height / b.height;          // 알약 버튼 모양(가로로 긴 몸)
-    var kr = Math.min(1, py * 1.3);                                 // 날 때의 둥근 몸 크기
-    var H = open ? 16 : 14, lean = dx > 0 ? -1 : 1;   // 버튼이 화면 맨 위라 크게 솟으면 화면 밖으로 나감 → 작은 홉
-    var lerp = function (p, q, t) { return p + (q - p) * t; }, eio = function (t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }, eo = function (t) { return 1 - Math.pow(1 - t, 3); };
-    var kf = [], put = function (o, x, y, sx, sy, r, base, bh) {   // base: 이 자리에서 쉬는 세로 크기. 눌릴 때 발이 바닥에 붙게 아래로 민다
-      y += (bh || b.height) * ((base == null ? sy : base) - sy) / 2;
-      kf.push({ offset: Math.min(1, Math.max(0, o)), transform: 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + (r || 0).toFixed(2) + 'deg) scale(' + sx.toFixed(3) + ',' + sy.toFixed(3) + ')' });
-    };
-    var keys = function (o0, o1, ks, x, y, base, rot) {   // 눌림 · 늘어남 열쇠값 사이를 부드럽게(코사인) 잇는다
-      for (var k = 0; k < ks.length - 1; k++) for (var n = 0; n < 4; n++) {
-        var t = n / 4, e = (1 - Math.cos(Math.PI * t)) / 2, A = ks[k], B = ks[k + 1], tt = (k + t) / (ks.length - 1);
-        put(lerp(o0, o1, tt), typeof x === 'function' ? x(tt) : x, typeof y === 'function' ? y(tt) : y, lerp(A[0], B[0], e), lerp(A[1], B[1], e), rot ? rot(tt) : 0, base);
-      }
-    };
-    var arc = function (o0, o1, x0, y0, x1, y1, s0, s1, dir, steps) {   // 포물선: 가로는 천천히-빠르게-천천히, 세로는 위로 솟았다 내려옴
-      for (var n = 0; n <= steps; n++) {
-        var u = n / steps, e = eio(u), sc = lerp(s0[0], s1[0], e), sy = lerp(s0[1], s1[1], e);
-        var str = 1 + .07 * Math.sin(Math.PI * u);   // 공중에서는 살짝 길쭉하게
-        put(lerp(o0, o1, u), lerp(x0, x1, e), lerp(y0, y1, e) - H * 4 * u * (1 - u), sc / Math.sqrt(str), sy * str, 11 * dir * Math.sin(Math.PI * u), null);
-      }
-    };
+    el.style.transformOrigin = (b.left - c.left + b.width / 2) + 'px ' + (b.bottom - c.top) + 'px';   // 발밑 기준(눌릴 때 바닥에 붙어 있게)
+    var dx = (a.left + a.width / 2) - (b.left + b.width / 2), dy = (a.bottom - 1) - b.bottom;      // 버튼 발밑 - 메뉴 자리 발밑(위쪽이라 음수)
+    var px = a.width / b.width, py = a.height / b.height, k0 = Math.min(1, a.height * 1.25 / b.height), kb = Math.min(1, a.height * 1.12 / b.height);
+    var easeIO = function (u) { return u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; };
     if (open) {
-      R2.classList.add('m-hugi-out');
-      goneT = setTimeout(function () { R2.classList.add('m-hugi-gone'); }, 170);   // 허기가 떠난 뒤 버튼 셋이 가운데로
-      keys(0, .12, [[px, py], [px * 1.1, py * .78]], dx, dy, py);                                  // 버튼 모양 그대로 꾹 눌림
-      keys(.12, .25, [[px * 1.1, py * .78], [kr * .82, kr * 1.28]], dx, function (t) { return dy - 10 * eo(t); }, kr);   // 반동으로 둥근 몸이 되며 튀어나옴
-      arc(.25, .78, dx, dy - 10, 0, 0, [kr * .82, kr * 1.28], [1, 1], lean, 22);                    // 포물선
-      keys(.78, 1, [[1, 1], [1.18, .8], [.93, 1.1], [1.05, .95], [.99, 1.02], [1, 1]], 0, 0, 1);  // 통통 착지
-      kf.push({ offset: 1, transform: 'none' });
-      if (HM) try { HM.set('wow'); } catch (e) {}
-      flyAn = el.animate(kf, { duration: 820, easing: 'linear' });
+      // 버튼 속에서 먼저 꾹 눌리고(버튼 스프링), 0.11초 뒤 둥근 몸으로 튀어나와 작은 홉 → 중력으로 떨어져 통통 착지
+      var A = .11, T = .5, h = 9, Y = Math.max(40, -dy), g = Math.pow((Math.sqrt(2 * h) + Math.sqrt(2 * h + 2 * Y)) / T, 2);
+      var sim = flySim({ A: A, x0: dx, y0: dy, x1: 0, y1: 0, vx: -dx / T, vy: -Math.sqrt(2 * g * h), g: g, kick: 5, crouch: 1, crouchOp: 0,
+        scale: function (ph, tf) { return ph === 'crouch' ? k0 : (ph === 'air' && tf < T ? k0 + (1 - k0) * Math.pow(tf / T, 1.6) : 1); } });
+      btnKick(1.4, -2.6);
+      launchT = setTimeout(function () { R2.classList.add('m-hugi-out'); if (HM) try { HM.set('wow'); } catch (e) {} }, A * 1000);
+      goneT = setTimeout(function () { R2.classList.add('m-hugi-gone'); }, A * 1000 + 70);   // 허기가 떠난 뒤 버튼 셋이 가운데로
+      flyAn = el.animate(sim.kf, { duration: sim.dur, easing: 'linear' });
       flyAn.onfinish = function () { flyAn = null; dock(); if (HM) try { HM.set('wave'); } catch (e) {} };
     } else {
-      keys(0, .13, [[1, 1], [1.14, .84]], 0, 0, 1);                                                // 웅크림
-      keys(.13, .24, [[1.14, .84], [.9, 1.16]], 0, function (t) { return -20 * eo(t); }, 1);       // 뛰어오름
-      arc(.24, .76, 0, -20, dx, dy, [.9, 1.16], [kr, kr], -lean, 20);                               // 버튼 쪽으로 포물선
-      keys(.76, 1, [[kr, kr], [px * .8, py * 1.18], [px * 1.13, py * .84], [px * .97, py * 1.04], [px, py]], dx, dy, null);   // 들어가며 가로로 늘어나 알약 버튼이 됨
-      put(1, dx, dy, px, py, 0, null);
-      flyAn = el.animate(kf, { duration: 660, easing: 'linear', fill: 'forwards' });
+      // 메뉴에서 웅크렸다가 뛰어올라, 버튼 위로 살짝 넘어간 뒤 떨어져 버튼 자리에 퍼지며 알약 모양 → 그 순간 버튼으로 넘기고 버튼 스프링이 출렁임
+      var A2 = .12, g2 = 3000, H = -dy + 12, T2 = Math.sqrt(2 * H / g2) + Math.sqrt(2 * 12 / g2);
+      var sim2 = flySim({ A: A2, x0: 0, y0: 0, x1: dx, y1: dy, vx: dx / T2, vy: -Math.sqrt(2 * g2 * H), g: g2, kick: 6, crouch: .8, crouchOp: 1, spread: .09, pill: [px * 1.08, py * .9],
+        scale: function (ph, tf) { return ph === 'crouch' ? 1 : 1 + (kb - 1) * easeIO(Math.min(1, tf / T2)); } });
+      if (HM) try { HM.set('wow'); } catch (e) {}
+      flyAn = el.animate(sim2.kf, { duration: sim2.dur, easing: 'linear', fill: 'forwards' });
       flyAn.onfinish = function () {
-        var f = flyAn; flyAn = null; R2.classList.remove('m-hugi-out'); dock(); try { f.cancel(); } catch (e) {}   // 같은 프레임에 버튼으로 바뀜
-        if (btn.animate) btn.animate([{ transform: 'scale(1.04,.96)' }, { transform: 'scale(.98,1.03)' }, { transform: 'none' }], { duration: 240, easing: 'ease-out' });
+        var f = flyAn; flyAn = null; R2.classList.remove('m-hugi-out'); btnKick(1.08, .9, true); dock(); try { f.cancel(); } catch (e) {}   // 같은 프레임에 버튼으로 넘김
       };
     }
   }
@@ -3548,7 +3570,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       document.documentElement.classList.remove('m-open');
       sd.classList.remove('on'); sc.classList.remove('on'); sd.classList.add('out'); sc.classList.add('out');
       sideFly(false);
-      sideT = setTimeout(function () { sd.hidden = sc.hidden = true; sd.classList.remove('out'); sc.classList.remove('out'); document.documentElement.classList.remove('m-hugi-out', 'm-hugi-gone'); Array.prototype.forEach.call(document.querySelectorAll('#side details[open]'), function (d) { d.open = false; }); }, RM ? 0 : 720);
+      sideT = setTimeout(function () { sd.hidden = sc.hidden = true; sd.classList.remove('out'); sc.classList.remove('out'); document.documentElement.classList.remove('m-hugi-out', 'm-hugi-gone'); Array.prototype.forEach.call(document.querySelectorAll('#side details[open]'), function (d) { d.open = false; }); }, RM ? 0 : 900);
       if (sideBack && sideBack.focus && sideBack !== mb) sideBack.focus({ preventScroll: true });
     }
   }
