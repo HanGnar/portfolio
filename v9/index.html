@@ -102,15 +102,15 @@ p { margin: 0; }
 .side.out { transition-duration: .3s; transition-delay: .14s; transition-timing-function: cubic-bezier(.4, 0, 1, 1); }
 .side-scrim.out { transition-delay: .14s; }
 html.m-open { overflow: hidden; }
-html.m-open .hdr { z-index: 50; }
-html.m-open .gbtn, html.m-calm .gbtn { -webkit-backdrop-filter: none; backdrop-filter: none; }
+html { scrollbar-gutter: stable; }   /* 메뉴를 열고 닫을 때 스크롤바가 생겼다 없어지며 버튼이 옆으로 튀지 않게 */
+html.m-open .hdr, html.m-calm .hdr { z-index: 50; }   /* 11-14: 닫는 동안에도 버튼이 사라지는 판 위에 있게(전엔 닫자마자 판 밑으로 들어갔다 다시 나와 깜빡였음). 흐림 끄기도 없앰(껐다 켜며 깜빡임) */
 .mnav { width: fit-content; max-width: 100%; min-height: 100%; margin: 0 auto; padding: 120px 24px 32px; display: flex; flex-direction: column; justify-content: space-between; gap: 32px; }
 .mhead { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 12px; }
 .mhugi { position: relative; width: 150px; height: 150px; flex: none; margin-left: -18px; }
 #hugi-menu { --hg-w: 104px; position: absolute; inset: 0; pointer-events: none; }
 .side .mhead.mi { opacity: 1; transform: none; }   /* 허기 자리는 날아오는 허기가 채우므로 차례 등장에서 뺀다 */
 html.m-hugi-out #g-ai { opacity: 0; pointer-events: none; }   /* 허기가 버튼에서 빠져나간 동안 버튼은 안 보임 */
-#g-ai { transition: width .5s cubic-bezier(.22, 1, .36, 1), margin .5s cubic-bezier(.22, 1, .36, 1), opacity .09s linear; }
+#g-ai { transition: width .5s cubic-bezier(.22, 1, .36, 1), margin .5s cubic-bezier(.22, 1, .36, 1), opacity .06s linear; }
 html.m-hugi-gone #g-ai { width: 0 !important; margin-left: -8px; }   /* 11-14 사용자: 버튼 자리가 줄어 남은 버튼 셋이 가운데로 모인다(간격 8px까지 없앰) */
 .mline { color: var(--md-on-surface-variant); font-size: 15px; margin-bottom: 12px; }
 .mlist { list-style: none; margin: 0; padding: 0; }
@@ -3533,7 +3533,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var slot = $('#side .mhugi'), sd = $('#side'), sr;
     if (open) { sd.style.transition = 'none'; sd.style.transform = 'none'; sr = slot.getBoundingClientRect(); sd.style.transform = ''; void sd.offsetWidth; sd.style.transition = ''; } else sr = slot.getBoundingClientRect();
     if (el.parentNode !== document.body) document.body.appendChild(el);
-    el.style.cssText = 'position:fixed;inset:auto;z-index:60;left:' + sr.left + 'px;top:' + sr.top + 'px;width:' + sr.width + 'px;height:' + sr.height + 'px;';
+    el.style.cssText = 'position:fixed;inset:auto;z-index:60;will-change:transform;left:' + sr.left + 'px;top:' + sr.top + 'px;width:' + sr.width + 'px;height:' + sr.height + 'px;';
     var dock = function () { slot.appendChild(el); el.style.cssText = ''; };
     var ch = el.querySelector('.hugi-char') || el, a = aEnd || vis(), b = ch.getBoundingClientRect(), c = el.getBoundingClientRect();
     if (!b.width || !a.width) { dock(); R2.classList.toggle('m-hugi-out', open); R2.classList.toggle('m-hugi-gone', open); return; }
@@ -3554,7 +3554,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     } else {
       // 메뉴에서 웅크렸다가 뛰어올라, 버튼 위로 살짝 넘어간 뒤 떨어져 버튼 자리에 퍼지며 알약 모양 → 그 순간 버튼으로 넘기고 버튼 스프링이 출렁임
       var A2 = .12, g2 = 3000, H = -dy + 6, T2 = Math.sqrt(2 * H / g2) + Math.sqrt(2 * 6 / g2);   // 버튼 6px 위까지만 솟음(화면 위로 안 잘리게)
-      var sim2 = flySim({ A: A2, x0: 0, y0: 0, x1: dx, y1: dy, vx: dx / T2, vy: -Math.sqrt(2 * g2 * H), g: g2, kick: 6, crouch: .8, crouchOp: 1, spread: .28, fade: .09, pill: [px, py],
+      var sim2 = flySim({ A: A2, x0: 0, y0: 0, x1: dx, y1: dy, vx: dx / T2, vy: -Math.sqrt(2 * g2 * H), g: g2, kick: 6, crouch: .8, crouchOp: 1, spread: .3, fade: .06, pill: [px, py],
         scale: function (ph, tf) { var u = Math.min(1, tf / T2); return ph === 'crouch' ? 1 : 1 + (kb - 1) * (1 - Math.pow(1 - u, 2.2)); } });   // 일찍 작아져야 꼭대기에서 머리가 안 잘림
       if (HM) try { HM.set('wow'); } catch (e) {}
       flyAn = el.animate(sim2.kf, { duration: sim2.dur, easing: 'linear', fill: 'forwards' });
