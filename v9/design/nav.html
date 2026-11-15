@@ -375,7 +375,7 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
   background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh);
   font-size: 15px; font-weight: 500; line-height: 1.45; letter-spacing: -.008em; color: var(--md-on-surface); text-align: left; text-decoration: none;
   transition: transform var(--ui-d3) var(--ui-spring), box-shadow var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out); -webkit-tap-highlight-color: transparent; }
-.nextq button { padding-left: var(--ui-chip-pl); }
+.nextq button { padding-left: var(--ui-chip-pl); white-space: nowrap; max-width: 100%; }   /* 11-15 다음 질문 버튼: 글은 한 줄(Worker가 16자 이하로 거름 — 360 화면 칸 320에 한 줄) */
 .nextq button::before { content: ""; flex: none; width: var(--ui-chip-icon); height: var(--ui-chip-icon); background: var(--ui-label-3);
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14m-5-5 5 5-5 5'/%3E%3C/svg%3E") center / contain no-repeat;
           mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14m-5-5 5 5-5 5'/%3E%3C/svg%3E") center / contain no-repeat; }
