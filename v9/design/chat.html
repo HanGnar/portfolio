@@ -234,6 +234,7 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.75;str
 @media (hover:hover){.turn:not(:last-of-type) .acts{opacity:0}.turn:not(:last-of-type):hover .acts,.turn:not(:last-of-type) .acts:focus-within{opacity:1}}
 .play{height:32px;display:inline-flex;align-items:center;gap:6px;padding:0 12px 0 9px;border-radius:999px;background:transparent;color:var(--label-3);font:var(--t-caption);letter-spacing:var(--ls-caption)}
 .play svg.i{width:15px;height:15px}
+.play .pl{min-width:3em;text-align:left}   /* 11-15 웹과 같게: "듣기 ↔ 멈추기"로 바뀌어도 폭 같음(옆 버튼 안 밀림) */
 @media (hover:hover){.play:hover{background:var(--glass);color:var(--label);box-shadow:inset 0 0 0 1px var(--glass-edge),0 0 0 1px var(--glass-line),var(--shadow-hi);transform:scale(1.04)}}
 .play .bars{display:none;align-items:center;gap:2px;height:13px}
 .play .bars i{width:2.5px;height:4px;border-radius:2px;background:currentColor;animation:bar .9s var(--ease-out) infinite}
@@ -394,6 +395,7 @@ body.spec [data-spec]::after{content:attr(data-spec);position:absolute;right:0;t
   .q{max-width:88%}
   .thread{padding-top:52px}
   .ask{height:var(--ui-ask-h-m);padding-left:var(--ui-ask-pl-m);border-radius:var(--ui-ask-r-m)}
+  .dock{padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}   /* 11-15 웹과 같게: 질문창 줄 여백 20 = 답 글 선 */
   .ctl{top:calc(64px + env(safe-area-inset-top,0px));bottom:auto;flex-direction:row}
   .ctl button{height:30px;padding:0 11px}
   .spec-row{grid-template-columns:1fr;gap:4px}
