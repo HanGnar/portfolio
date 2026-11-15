@@ -8435,8 +8435,7 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 .nv4-set[aria-hidden="true"] { translate: 32px 0; }
 
 /* 메뉴 줄: 위아래 머리카락 선, 번호 칸 48 · 이름 Title 1 · 펼침 원은 오른쪽 끝 */
-.side .mlist { border-top: 1px solid var(--ui-sep); }
-.nv4-row { border-bottom: 1px solid var(--ui-sep); }
+/* 6판: 줄 사이 가로선 없앰(사용자 "가로선 빼줘") — 줄 높이와 여백만으로 나눔 */
 .nv4-line { display: flex; align-items: center; gap: 8px; min-height: 56px; }
 .nv4-line .mrow { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 0; padding: 12px 0; font: var(--t-title3); font-family: inherit; letter-spacing: var(--ls-title3); color: var(--ui-label); }
 .nv4-line .mrow .no { flex: none; width: 36px; font: var(--t-footnote); font-family: inherit; letter-spacing: var(--ls-footnote); color: var(--ui-label-3); font-variant-numeric: tabular-nums; translate: 0 -0.1em; }
@@ -8510,6 +8509,7 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 /* 태블릿 · 폰: 이름 Title 1 모바일 값(type.css 32), 줄 높이 72, 상세 한 줄 · 번호 칸 36 */
 @media (max-width: 1080px) { .nv4-sh { min-height: 76px; } }
 @media (max-width: 640px) {
+  .nv4-seg button { padding: 0 11px; }
   .side .mnav { padding: 72px 20px 12px; }
   .nv4-line { min-height: 48px; }
   .nv4-line .mrow { padding: 8px 0; }
@@ -8547,36 +8547,37 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 
   // 2) 메뉴 줄: 01 프로젝트(이름 → 프로젝트 영역 · 원 → 이름 목록) · 02 헝그리한정민(이동만) · 03 연락(아직 기능 없음)
   list.innerHTML =
-    '<li class="mi nv4-row" data-k="pj"><div class="nv4-line"><button class="mrow" type="button" data-scroll="projects"><span class="no">01</span><span class="nm4">프로젝트</span></button>' +
+    '<li class="mi nv4-row" data-k="pj"><div class="nv4-line"><button class="mrow" type="button" data-scroll="projects"><span class="no">01</span><span class="nm4" data-t="pj">프로젝트</span></button>' +
       '<button class="nv4-tg" type="button" aria-expanded="false" aria-controls="nv4-sub-pj" aria-label="프로젝트 목록 펼치기">' + ic('chev') + '</button></div>' +
       '<div class="nv4-sub" id="nv4-sub-pj"><div><ul>' + pj.map(function (p, j) { return '<li><button type="button" data-open="' + esc(p.id) + '" style="--j:' + j + '" tabindex="-1"><span>' + esc(p.name) + '</span>' + ic('go') + '</button></li>'; }).join('') + '</ul></div></div></li>' +
-    '<li class="mi nv4-row"><div class="nv4-line"><button class="mrow" type="button" data-scroll="about"><span class="no">02</span><span class="nm4">헝그리한정민</span></button></div></li>' +
-    '<li class="mi nv4-row"><div class="nv4-line"><button class="mrow" type="button" aria-disabled="true"><span class="no">03</span><span class="nm4">연락</span></button></div></li>';
+    '<li class="mi nv4-row"><div class="nv4-line"><button class="mrow" type="button" data-scroll="about"><span class="no">02</span><span class="nm4" data-t="about">헝그리한정민</span></button></div></li>' +
+    '<li class="mi nv4-row"><div class="nv4-line"><button class="mrow" type="button" aria-disabled="true"><span class="no">03</span><span class="nm4" data-t="contact">연락</span></button></div></li>';
 
   // 3) 두 화면으로 감쌈: 메뉴(목록 + 설정 알약) · 설정
   var views = document.createElement('div'); views.className = 'nv4-views';
   var menu = document.createElement('div'); menu.className = 'nv4-pane nv4-menu'; menu.setAttribute('aria-hidden', 'false');
   list.parentNode.insertBefore(views, list); menu.appendChild(list); views.appendChild(menu);
   var foot = document.createElement('div'); foot.className = 'nv4-foot mi';
-  foot.innerHTML = '<button class="nv4-gear" type="button" aria-haspopup="true" aria-controls="nv4-set">' + ic('gear') + '<span>설정</span></button>';
+  foot.innerHTML = '<button class="nv4-gear" type="button" aria-haspopup="true" aria-controls="nv4-set">' + ic('gear') + '<span data-t="set">설정</span></button>';
   menu.appendChild(foot);
   var OPTS = [
+    ['lang', '언어', '메뉴와 답 언어', [['ko', '한국어'], ['en', 'English'], ['ja', '日本語'], ['zh', '中文']]],
     ['theme', '화면', '자동은 기기 설정을 따라요', [['auto', '자동'], ['light', '밝게'], ['dark', '어둡게']]],
     ['voice', '소리', '답을 소리로 읽어 줘요', [['on', '켬'], ['off', '끔']]],
     ['motion', '움직임', '허기와 화면 움직임', [['full', '기본'], ['less', '줄이기']]],
     ['text', '글자 크기', '대화 글자', [['md', '기본'], ['lg', '크게']]]
   ];
   var set = document.createElement('section'); set.className = 'nv4-pane nv4-set'; set.id = 'nv4-set'; set.setAttribute('aria-hidden', 'true'); set.setAttribute('aria-labelledby', 'nv4-set-h');
-  set.innerHTML = '<div class="nv4-sh"><button class="nv4-back" type="button" aria-label="메뉴로 돌아가기">' + ic('back') + '</button><h2 id="nv4-set-h">설정</h2></div><ul class="nv4-opts">' +
-    OPTS.map(function (o) { return '<li class="nv4-opt"><div class="nv4-ol"><b id="nv4-l-' + o[0] + '">' + o[1] + '</b><span>' + o[2] + '</span></div><div class="nv4-seg" role="radiogroup" aria-labelledby="nv4-l-' + o[0] + '" data-k="' + o[0] + '"><span class="th" aria-hidden="true"></span>' +
-      o[3].map(function (c, i) { return '<button type="button" role="radio" data-v="' + c[0] + '" aria-checked="' + (i === 0) + '">' + c[1] + '</button>'; }).join('') + '</div></li>'; }).join('') + '</ul>';
+  set.innerHTML = '<div class="nv4-sh"><button class="nv4-back" type="button" aria-label="메뉴로 돌아가기">' + ic('back') + '</button><h2 id="nv4-set-h" data-t="set">설정</h2></div><ul class="nv4-opts">' +
+    OPTS.map(function (o) { return '<li class="nv4-opt"><div class="nv4-ol"><b id="nv4-l-' + o[0] + '" data-t="o_' + o[0] + '">' + o[1] + '</b><span data-t="d_' + o[0] + '">' + o[2] + '</span></div><div class="nv4-seg" role="radiogroup" aria-labelledby="nv4-l-' + o[0] + '" data-k="' + o[0] + '"><span class="th" aria-hidden="true"></span>' +
+      o[3].map(function (c, i) { return '<button type="button" role="radio" data-v="' + c[0] + '"' + (o[0] === 'lang' ? ' lang="' + c[0] + '"' : ' data-t="v_' + o[0] + '_' + c[0] + '"') + ' aria-checked="' + (i === 0) + '">' + c[1] + '</button>'; }).join('') + '</div></li>'; }).join('') + '</ul>';
   views.appendChild(set);
   // 차례 등장 순서(사이트 방식 --i · --n)를 새 항목에 맞춤
   var mis = [].slice.call(side.querySelectorAll('.mi')); mis.forEach(function (el, i) { el.style.setProperty('--i', i); el.style.setProperty('--n', mis.length); });
 
   // 4) 펼침: 한 번에 하나만 열림. 이름 버튼은 사이트가 이동 + 메뉴 닫기
   function openRow(row, on) { if (!row) return; var tg = row.querySelector('.nv4-tg'); if (!tg) return;
-    row.classList.toggle('open', on); tg.setAttribute('aria-expanded', on); tg.setAttribute('aria-label', '프로젝트 목록 ' + (on ? '접기' : '펼치기'));
+    row.classList.toggle('open', on); tg.setAttribute('aria-expanded', on); tg.setAttribute('aria-label', tr(on ? 'a_close' : 'a_open'));
     row.querySelectorAll('.nv4-sub button').forEach(function (b) { b.tabIndex = on ? 0 : -1; }); }
   list.addEventListener('click', function (e) { var tg = e.target.closest('.nv4-tg'); if (!tg) return; e.stopPropagation();
     var row = tg.closest('.nv4-row'), on = !row.classList.contains('open');
@@ -8606,9 +8607,33 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
   set.addEventListener('click', function (e) { var b = e.target.closest('.nv4-seg button'); if (!b) return; e.stopPropagation();
     var g = b.closest('.nv4-seg'), k = g.dataset.k, v = b.dataset.v; if (b.getAttribute('aria-checked') === 'true') return;
     pick(g, v); seg(g); ST[k] = v; try { localStorage.setItem('nv4-set', JSON.stringify(ST)); } catch (_) {}
-    if (k === 'voice' && vb && (vb.getAttribute('aria-pressed') === 'true') !== (v === 'on')) vb.click(); });
+    if (k === 'voice' && vb && (vb.getAttribute('aria-pressed') === 'true') !== (v === 'on')) vb.click();
+    if (k === 'lang') applyLang(v); });
   set.addEventListener('keydown', function (e) { var b = e.target.closest('.nv4-seg button'); if (!b || !/^Arrow(Left|Right)$/.test(e.key)) return; e.preventDefault();
     var bs = [].slice.call(b.parentNode.querySelectorAll('button')), n = bs[(bs.indexOf(b) + (e.key === 'ArrowRight' ? 1 : bs.length - 1)) % bs.length]; n.focus(); n.click(); });
+
+  // 7) 언어(6판, 사용자 "설정에는 영어 일본어 중국어로 설정가능하게 해줘"): 고르면 메뉴 · 설정 글이 그 언어로 바뀜. 프로젝트 이름은 그대로.
+  //    사이트에 반영할 때는 답 언어(Worker 지시)와 화면 글 전체를 같이 바꿔야 함 — 시트는 메뉴 · 설정만 보여 줌
+  var T = {
+    pj: ['프로젝트', 'Projects', 'プロジェクト', '项目'], about: ['헝그리한정민', 'About', 'プロフィール', '关于'], contact: ['연락', 'Contact', 'お問い合わせ', '联系'], set: ['설정', 'Settings', '設定', '设置'],
+    o_lang: ['언어', 'Language', '言語', '语言'], d_lang: ['메뉴와 답 언어', 'Menu and answers', 'メニューと回答', '菜单和回答'],
+    o_theme: ['화면', 'Appearance', '表示', '外观'], d_theme: ['자동은 기기 설정을 따라요', 'Auto follows your device', '自動は端末の設定に従います', '自动跟随设备设置'],
+    v_theme_auto: ['자동', 'Auto', '自動', '自动'], v_theme_light: ['밝게', 'Light', 'ライト', '浅色'], v_theme_dark: ['어둡게', 'Dark', 'ダーク', '深色'],
+    o_voice: ['소리', 'Sound', 'サウンド', '声音'], d_voice: ['답을 소리로 읽어 줘요', 'Reads answers aloud', '回答を読み上げます', '朗读回答'],
+    v_voice_on: ['켬', 'On', 'オン', '开'], v_voice_off: ['끔', 'Off', 'オフ', '关'],
+    o_motion: ['움직임', 'Motion', 'モーション', '动效'], d_motion: ['허기와 화면 움직임', 'Hugi and screen motion', 'ハギと画面の動き', 'Hugi 与界面动效'],
+    v_motion_full: ['기본', 'Default', '標準', '默认'], v_motion_less: ['줄이기', 'Reduce', '減らす', '减少'],
+    o_text: ['글자 크기', 'Text size', '文字サイズ', '字号'], d_text: ['대화 글자', 'Chat text', '会話の文字', '对话文字'],
+    v_text_md: ['기본', 'Default', '標準', '默认'], v_text_lg: ['크게', 'Large', '大きく', '大'],
+    a_open: ['프로젝트 목록 펼치기', 'Show projects', 'プロジェクトを開く', '展开项目'], a_close: ['프로젝트 목록 접기', 'Hide projects', 'プロジェクトを閉じる', '收起项目'], a_back: ['메뉴로 돌아가기', 'Back to menu', 'メニューに戻る', '返回菜单']
+  }, LI = { ko: 0, en: 1, ja: 2, zh: 3 }, CUR = 0;
+  function tr(k) { return (T[k] || [])[CUR] || (T[k] || [])[0] || ''; }
+  function applyLang(l) { CUR = LI[l] || 0; side.setAttribute('lang', l || 'ko');
+    side.querySelectorAll('[data-t]').forEach(function (n) { n.textContent = tr(n.getAttribute('data-t')); });
+    var tg = list.querySelector('.nv4-tg'); if (tg) tg.setAttribute('aria-label', tr(tg.getAttribute('aria-expanded') === 'true' ? 'a_close' : 'a_open'));
+    back.setAttribute('aria-label', tr('a_back'));
+    set.querySelectorAll('.nv4-seg').forEach(function (g) { seg(g, true); }); }
+  applyLang(ST.lang || 'ko');
   addEventListener('resize', function () { if (set.getAttribute('aria-hidden') === 'false') set.querySelectorAll('.nv4-seg').forEach(function (g) { seg(g, true); }); });
 })();
 
