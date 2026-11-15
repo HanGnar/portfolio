@@ -7926,9 +7926,13 @@ const b=HUGI_MAKE(document.getElementById('hugi-orb'),{prefix:'ho',hello:false,b
 .hgb.has .hgb-go { opacity: 1; }
 .hgb-go:active { transform: var(--ui-press); transition-duration: var(--ui-d1); }
 .hgb-go svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
-.hgb-go:focus-visible, .hgb-in:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 2px; }
+.hgb-go:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 2px; }
+.hgb-in:focus, .hgb-in:focus-visible { outline: none; box-shadow: none; border: 0; }   /* 입력 칸은 선 없이(말풍선 자체가 입력 자리) */
 @media (pointer: coarse) { .hgb-go { position: relative; } .hgb-go::after { content: ""; position: absolute; inset: -4px; border-radius: inherit; } }
 @media (prefers-reduced-motion: reduce) { .hgb, .hgb.on { transition-duration: 1ms; } .hgb-m.wait::after { animation: none; width: auto; } }
+/* 프로젝트 상세(화면을 덮는 판)를 보는 동안에도 허기 버튼으로 이어서 물을 수 있게 내비를 상세 위로. 모바일은 상세의 "← 프로젝트 목록"과 겹치지 않게 메뉴 · 허기만 오른쪽에 */
+html:has(#detail:not([hidden])) .hdr { z-index: 41; }
+@media (max-width: 640px) { html:has(#detail:not([hidden])) .hdr .wrap { justify-content: flex-end; padding-right: max(16px, env(safe-area-inset-right, 0px)); } html:has(#detail:not([hidden])) #g-home, html:has(#detail:not([hidden])) #g-voice { display: none; } }
 /* HG-BUBBLE-END */</style>
 <script>/* HG-BUBBLE-BEGIN · 허기 말풍선 대화 + 홈 새로고침. 묻기는 첫 화면 질문 함수(HG_MAIN.ask)를 그대로 써서 대화 · 저장 · 허기 버튼 상태 · 소리가 첫 화면과 같다 */
 (function () {
@@ -8690,6 +8694,24 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 }
 @media (prefers-reduced-motion: reduce) { .nv4-row { transition-duration: 1ms; } }
 
+/* ═══ 8판(2026-11-15 HPP): 설정 화면도 메뉴(7판)와 같은 규칙 — 사용자 "여기는 인터렉션이랑 반응형 왜 적용이 안 되었어 반영해"
+   7판에서 칸이 480으로 좁아졌는데 설정 줄은 [이름 | 알약] 가로 배치 그대로라 이름이 한 글자씩 끊겼음(Language → La/ng/ua/ge) →
+   ① 선 없앰 · 항목마다 둥근 바탕 상자(16, label 4%) ② 머리 = 뒤로 원 32 + 제목 Title 3(메뉴 이름과 같은 크기)
+   ③ 항목은 늘 [이름 · 설명] 위, 고르기 알약 아래(칸 폭 가득, 칸 같은 폭) ④ 설정 화면이 열리면 항목이 메뉴처럼 차례로(40ms 간격) 들어옴 ═══ */
+.nv4-sh { min-height: 48px; gap: 8px; margin: 0 0 8px; border-bottom: 0; }
+.nv4-sh h2 { font: var(--t-title3); font-family: inherit; letter-spacing: var(--ls-title3); }
+.nv4-back { width: 32px; height: 32px; }
+.nv4-opts { gap: 8px; margin: 0 -12px; }
+.nv4-opt { flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 10px; min-height: 0; padding: 12px; border-bottom: 0; border-radius: 16px; background: color-mix(in srgb, var(--ui-label) 4%, transparent);
+  opacity: 0; translate: 0 8px; transition: opacity var(--ui-d3) var(--ui-ease-out), translate var(--ui-d3) var(--ui-ease-out); }
+.nv4-set[aria-hidden="false"] .nv4-opt { opacity: 1; translate: none; transition-delay: calc(60ms + var(--k, 0) * 40ms); }
+.nv4-ol b { font: var(--t-headline); font-family: inherit; letter-spacing: var(--ls-headline); word-break: keep-all; overflow-wrap: normal; }
+.nv4-ol span { word-break: keep-all; overflow-wrap: normal; }
+.nv4-seg { display: flex; width: 100%; background: var(--ui-bg); box-shadow: 0 0 0 1px var(--ui-sep); }
+.nv4-seg button { flex: 1 1 0; min-width: 0; height: 34px; padding: 0 8px; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 640px) { .nv4-opt { flex-direction: column; } .nv4-seg button { padding: 0 6px; } }
+@media (prefers-reduced-motion: reduce) { .nv4-opt { transition-duration: 1ms !important; transition-delay: 0s !important; translate: none; } }
+
 </style>
 <script>
 /* ═══ 4판(2026-11-15 HPP): 햄버거 메뉴 펼침 — 이름 = 이동, 펼침 원 = 상세, 맨 아래 설정 → 판 안에서 옆으로 넘어가는 설정 화면 ═══
@@ -8733,7 +8755,7 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
   ];
   var set = document.createElement('section'); set.className = 'nv4-pane nv4-set'; set.id = 'nv4-set'; set.setAttribute('aria-hidden', 'true'); set.setAttribute('aria-labelledby', 'nv4-set-h');
   set.innerHTML = '<div class="nv4-sh"><button class="nv4-back" type="button" aria-label="메뉴로 돌아가기">' + ic('back') + '</button><h2 id="nv4-set-h" data-t="set">설정</h2></div><ul class="nv4-opts">' +
-    OPTS.map(function (o) { return '<li class="nv4-opt"><div class="nv4-ol"><b id="nv4-l-' + o[0] + '" data-t="o_' + o[0] + '">' + o[1] + '</b><span data-t="d_' + o[0] + '">' + o[2] + '</span></div><div class="nv4-seg" role="radiogroup" aria-labelledby="nv4-l-' + o[0] + '" data-k="' + o[0] + '"><span class="th" aria-hidden="true"></span>' +
+    OPTS.map(function (o, k) { return '<li class="nv4-opt" style="--k:' + k + '"><div class="nv4-ol"><b id="nv4-l-' + o[0] + '" data-t="o_' + o[0] + '">' + o[1] + '</b><span data-t="d_' + o[0] + '">' + o[2] + '</span></div><div class="nv4-seg" role="radiogroup" aria-labelledby="nv4-l-' + o[0] + '" data-k="' + o[0] + '"><span class="th" aria-hidden="true"></span>' +
       o[3].map(function (c, i) { return '<button type="button" role="radio" data-v="' + c[0] + '"' + (o[0] === 'lang' ? ' lang="' + c[0] + '"' : ' data-t="v_' + o[0] + '_' + c[0] + '"') + ' aria-checked="' + (i === 0) + '">' + c[1] + '</button>'; }).join('') + '</div></li>'; }).join('') + '</ul>';
   views.appendChild(set);
   // 차례 등장 순서(사이트 방식 --i · --n)를 새 항목에 맞춤
@@ -8750,7 +8772,7 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
   // 5) 설정 화면: 판 안에서 옆으로(메뉴 왼쪽으로 24 비키며 흐려짐 · 설정 오른쪽 24에서 들어옴, 0.42초 ease-out). 뒤로 · Esc = 메뉴로
   var gear = foot.querySelector('.nv4-gear'), back = set.querySelector('.nv4-back');
   function show(s) { side.classList.toggle('nv4-menu-on', !s); menu.setAttribute('aria-hidden', s ? 'true' : 'false'); set.setAttribute('aria-hidden', s ? 'false' : 'true'); menu.inert = !!s; set.inert = !s;
-    if (s) { segAll(); setTimeout(function () { back.focus({ preventScroll: true }); }, RM ? 0 : 60); side.scrollTop = 0; } else gear.focus({ preventScroll: true }); }
+    if (s) { segAll(); setTimeout(function () { back.focus({ preventScroll: true, focusVisible: false }); }, RM ? 0 : 60); side.scrollTop = 0; } else gear.focus({ preventScroll: true, focusVisible: false }); }
   set.inert = true; side.classList.add('nv4-menu-on');
   gear.addEventListener('click', function (e) { e.stopPropagation(); show(true); });
   back.addEventListener('click', function (e) { e.stopPropagation(); show(false); });
