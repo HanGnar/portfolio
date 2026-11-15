@@ -8719,6 +8719,7 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 .side.nv4-set-on { overflow-y: hidden; }
 .nv4-opts { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
 .nv4-opts::-webkit-scrollbar { display: none; }
+.nv4-opts > .nv4-opt { flex-shrink: 0; }   /* 목록 높이를 줄여도 상자가 눌리지 않고 안에서 스크롤 */
 @media (min-width: 641px) {
   .side .mnav { width: min(720px, 100%); }
   .nv4-opt { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 360px); align-items: center; column-gap: 24px; padding: 12px 12px 12px 16px; }
