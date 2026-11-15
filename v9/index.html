@@ -4252,6 +4252,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     TH.querySelectorAll('.ans:not(:last-child) .ask-back').forEach(function (n) { n.remove(); });
     setTimeout(function () { TH.scrollTop = TH.scrollHeight; }, 0);
   }
+  window.HG_MAIN = { ask: function (q) { return ask(q); }, busy: function () { return BUSY; } };   // 11-15 허기 말풍선: 위 대화와 같은 질문 함수로 묻는다(첫 화면 대화에도 쌓임)
   function ask(q, shown, opt) {
     q = (q || '').trim(); if (!q || BUSY) return;
     BUSY = true; nudgeStop(); closeSug(); closeVoices(); IN.value = ''; hasText(); stopVoice();
@@ -6551,7 +6552,8 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   var RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   window.HUGI_ORB = HUGIBTN_MAKE(btn, {
     src: function (n) { return 'hugi/' + n; },
-    onActivate: function () {   // 클릭: 질문창으로. 첫 화면이 아니면 질문창이 보이게 가져오고, 질문창 옆 허기가 손을 흔든다(답하는 중이면 방해하지 않음)
+    onActivate: function () { if (window.HG_BUBBLE && window.HG_BUBBLE.toggle()) return;   // 11-15 사용자: 첫 화면에서는 반응만, 다른 곳에서는 허기 말풍선 대화. 아래는 말풍선 묶음이 없을 때만
+      // 클릭: 질문창으로. 첫 화면이 아니면 질문창이 보이게 가져오고, 질문창 옆 허기가 손을 흔든다(답하는 중이면 방해하지 않음)
       var IN = document.getElementById('ask-input'); if (!IN) return;
       var r = IN.getBoundingClientRect();
       if (r.top < 0 || r.bottom > window.innerHeight) { try { IN.scrollIntoView({ block: 'center', behavior: RM ? 'auto' : 'smooth' }); } catch (e) {} }
@@ -7204,3 +7206,140 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   addEventListener('resize', function () { if (S.open) place(fit(S.box)); });
 })();
 /* HG-VIDEO-END */</script>
+<style>/* HG-BUBBLE-BEGIN · 11-15 사용자 "허기 버튼은 … 채팅창이 허기 말풍선처럼 나와서 대화를 할 수 있는 작은 LLM" · "히어로 페이지에서 … 기능 없는 버튼 … 다른 페이지로 이동하게 되면 … 기존의 LLM과 나눴던 내용을 이어서" */
+.hgb { position: fixed; z-index: 48; top: calc(env(safe-area-inset-top, 0px) + 64px); left: 16px; width: min(360px, calc(100vw - 32px)); display: flex; flex-direction: column;
+  background: var(--ui-surface, #fff); color: var(--ui-label, #1D1D1F); border-radius: 22px; box-shadow: 0 0 0 1px var(--ui-sep), 0 18px 48px -16px rgba(0, 0, 0, .28);
+  transform-origin: var(--hgb-tx, 50%) 0; opacity: 0; transform: translateY(-6px) scale(.92); pointer-events: none;
+  transition: opacity .18s var(--ui-ease-out), transform .18s var(--ui-ease-out); }
+.hgb.on { opacity: 1; transform: none; pointer-events: auto; transition: opacity .24s var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
+.hgb::before { content: ""; position: absolute; top: -6px; left: calc(var(--hgb-tx, 50%) - 7px); width: 14px; height: 14px; background: inherit; border-radius: 3px 0 0 0; transform: rotate(45deg); box-shadow: -1px -1px 0 0 var(--ui-sep); }   /* 허기 쪽 꼬리 */
+.hgb-log { position: relative; max-height: min(46vh, 380px); overflow-y: auto; overscroll-behavior: contain; padding: 16px 16px 4px; display: flex; flex-direction: column; gap: 10px; scrollbar-width: thin; border-radius: 22px 22px 0 0; }
+.hgb-m { margin: 0; max-width: 88%; font-size: 15px; line-height: 1.6; letter-spacing: -.008em; word-break: keep-all; overflow-wrap: anywhere; white-space: pre-line; }
+.hgb-m.a { align-self: flex-start; color: var(--ui-label); }
+.hgb-m.q { align-self: flex-end; padding: 8px 13px; border-radius: 18px; background: var(--ui-hover, rgba(0, 0, 0, .05)); color: var(--ui-label); }
+.hgb-m.hi, .hgb-m.wait, .hgb-m.err { color: var(--ui-label-2); }
+.hgb-m.wait::after { content: "…"; display: inline-block; animation: hgbDot 1.2s steps(4, end) infinite; width: 1.2em; overflow: hidden; vertical-align: bottom; }
+@keyframes hgbDot { 0% { width: 0; } 100% { width: 1.2em; } }
+.hgb-f { display: flex; align-items: center; gap: 8px; padding: 10px 10px 10px 16px; }
+.hgb-in { flex: 1; min-width: 0; height: 40px; border: 0; outline: 0; background: none; font: inherit; font-size: 16px; color: var(--ui-label); }
+.hgb-in::placeholder { color: var(--ui-label-3); }
+.hgb-go { width: 36px; height: 36px; flex: none; display: grid; place-items: center; border: 0; border-radius: 999px; background: var(--ui-label); color: var(--ui-surface, #fff); cursor: pointer; opacity: .25;
+  transition: opacity var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); -webkit-tap-highlight-color: transparent; }
+.hgb.has .hgb-go { opacity: 1; }
+.hgb-go:active { transform: var(--ui-press); transition-duration: var(--ui-d1); }
+.hgb-go svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.hgb-go:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 2px; }
+.hgb-in:focus, .hgb-in:focus-visible { outline: none; box-shadow: none; border: 0; }   /* 입력 칸은 선 없이(말풍선 자체가 입력 자리) */
+@media (pointer: coarse) { .hgb-go { position: relative; } .hgb-go::after { content: ""; position: absolute; inset: -4px; border-radius: inherit; } }
+@media (prefers-reduced-motion: reduce) { .hgb, .hgb.on { transition-duration: 1ms; } .hgb-m.wait::after { animation: none; width: auto; } }
+/* 프로젝트 상세(화면을 덮는 판)를 보는 동안에도 허기 버튼으로 이어서 물을 수 있게 내비를 상세 위로. 모바일은 상세의 "← 프로젝트 목록"과 겹치지 않게 메뉴 · 허기만 오른쪽에 */
+html:has(#detail:not([hidden])) .hdr { z-index: 41; }
+@media (max-width: 640px) { html:has(#detail:not([hidden])) .hdr .wrap { justify-content: flex-end; padding-right: max(16px, env(safe-area-inset-right, 0px)); } html:has(#detail:not([hidden])) #g-home, html:has(#detail:not([hidden])) #g-voice { display: none; } }
+/* HG-BUBBLE-END */</style>
+<script>/* HG-BUBBLE-BEGIN · 허기 말풍선 대화 + 홈 새로고침. 묻기는 첫 화면 질문 함수(HG_MAIN.ask)를 그대로 써서 대화 · 저장 · 허기 버튼 상태 · 소리가 첫 화면과 같다 */
+(function () {
+  var btn = document.getElementById('g-ai'); if (!btn) return;
+  var RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var el = document.createElement('div'); el.className = 'hgb'; el.id = 'hgb'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', '허기와 대화'); el.hidden = true;
+  el.innerHTML = '<div class="hgb-log" aria-live="polite"></div>' +
+    '<form class="hgb-f" autocomplete="off"><input class="hgb-in" type="text" maxlength="500" placeholder="이어서 물어보기" aria-label="허기에게 이어서 물어보기">' +
+    '<button class="hgb-go" type="submit" aria-label="보내기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button></form>';
+  document.body.appendChild(el);
+  var log = el.querySelector('.hgb-log'), form = el.querySelector('.hgb-f'), inp = el.querySelector('.hgb-in');
+  var open = false, busy = false, hideT = 0;
+  function orb(k) { try { if (window.HUGI_ORB) { if (k === 'typing') window.HUGI_ORB.typing(); else window.HUGI_ORB.set(k); } } catch (e) {} }
+  function thread() { return document.getElementById('thread'); }
+  function atHero() {   // 첫 화면 대화가 화면에 보이고 상세가 닫혀 있으면 "첫 화면"
+    var d = document.getElementById('detail'); if (d && !d.hidden) return false;
+    var h = document.getElementById('hero'); if (!h) return false;
+    var r = h.getBoundingClientRect(); return r.bottom > window.innerHeight * 0.5 && r.top < window.innerHeight * 0.5;
+  }
+  function textOf(node) {   // 답 글만(근거 번호 · 버튼 빼고)
+    if (!node) return ''; var c = node.cloneNode(true);
+    c.querySelectorAll('button, sup, .cite, svg, .next, .hs-, [aria-hidden="true"]').forEach(function (n) { n.remove(); });
+    return (c.innerText || c.textContent || '').replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+  }
+  function bodyOf(a) { return a && (a.querySelector('.body') || a); }
+  function add(cls, text) { var p = document.createElement('p'); p.className = 'hgb-m ' + cls; p.textContent = text; log.appendChild(p); return p; }
+  function fill() {   // 첫 화면 대화의 최근 세 번(질문 · 답)을 이어서 보여 줌
+    log.textContent = ''; var T = thread(), items = [];
+    if (T) Array.prototype.forEach.call(T.children, function (n) {
+      if (n.classList.contains('msg-q')) items.push(['q', (n.textContent || '').trim()]);
+      else if (n.classList.contains('ans')) { var t = textOf(bodyOf(n)); if (t) items.push(['a', t]); }
+    });
+    var qi = 0, start = 0; for (var i = items.length - 1; i >= 0; i--) if (items[i][0] === 'q' && ++qi === 3) { start = i; break; }
+    items.slice(start).forEach(function (x) { add(x[0], x[1]); });
+    if (!items.length) add('a hi', '무엇이 궁금하세요? 짧게 물어보면 바로 답할게요.');
+    log.scrollTop = log.scrollHeight;
+  }
+  function place() {   // 허기 버튼 바로 아래, 꼬리가 버튼 가운데를 가리킴
+    var r = btn.getBoundingClientRect(), W = el.offsetWidth || 360, vw = document.documentElement.clientWidth;
+    var cx = r.left + r.width / 2, left = Math.max(16, Math.min(vw - 16 - W, cx - W / 2));
+    el.style.left = left + 'px'; el.style.top = Math.round(r.bottom + 12) + 'px';
+    el.style.setProperty('--hgb-tx', Math.max(22, Math.min(W - 22, cx - left)) + 'px');
+  }
+  function show(on) {
+    if (on === open) return; open = on; clearTimeout(hideT);
+    btn.setAttribute('aria-expanded', String(on));
+    if (on) {
+      if (!busy) fill();
+      el.hidden = false; place(); void el.offsetWidth; el.classList.add('on');
+      setTimeout(function () { try { inp.focus({ preventScroll: true }); } catch (e) {} }, 60);
+    } else {
+      el.classList.remove('on'); hideT = setTimeout(function () { el.hidden = true; }, RM ? 0 : 200);
+      if (el.contains(document.activeElement)) try { btn.focus({ preventScroll: true }); } catch (e) {}
+    }
+  }
+  function openChatQuiet() {   // 대화를 아직 안 열었을 때: 첫 화면이 맨 위로 튀지 않게 대화 모양만 미리 켜고 보던 자리를 그대로 둠
+    var h = document.getElementById('hero'); if (!h || h.classList.contains('chat')) return;
+    var y0 = h.getBoundingClientRect().bottom; h.classList.add('chat');
+    var dy = h.getBoundingClientRect().bottom - y0; if (dy) window.scrollBy(0, dy);
+  }
+  form.addEventListener('submit', function (e) {
+    e.preventDefault(); var q = inp.value.trim(); if (!q || busy) return;
+    var M = window.HG_MAIN; if (!M) { add('a err', '지금은 대화를 열 수 없어요.'); return; }
+    if (M.busy()) { add('a err', '위 대화에서 답하는 중이에요. 끝나면 다시 물어봐 주세요.'); log.scrollTop = log.scrollHeight; return; }
+    busy = true; inp.value = ''; el.classList.remove('has');
+    log.querySelectorAll('.hi').forEach(function (n) { n.remove(); });
+    add('q', q); var a = add('a wait', '생각 중'); log.scrollTop = log.scrollHeight;
+    var T0 = thread(), n0 = T0 ? T0.querySelectorAll(':scope > .ans').length : 0, t0 = Date.now(), seen = false;
+    openChatQuiet();
+    try { M.ask(q); } catch (err) { busy = false; a.className = 'hgb-m a err'; a.textContent = '지금은 답하기 어려워요. 잠시 뒤 다시 물어봐 주세요.'; return; }
+    (function watch() {   // 첫 화면에 그려지는 답을 말풍선에 그대로 옮김. 끝(BUSY 풀림)이면 멈춤
+      var T = thread(), A = T && T.querySelectorAll(':scope > .ans')[n0], t = textOf(bodyOf(A));
+      if (t) { seen = true; a.className = 'hgb-m a'; if (a.textContent !== t) { a.textContent = t; log.scrollTop = log.scrollHeight; } }
+      var done = !M.busy() && Date.now() - t0 > 300;
+      if (done || Date.now() - t0 > 120000) {
+        busy = false; if (!seen) { a.className = 'hgb-m a err'; a.textContent = '지금은 답하기 어려워요. 잠시 뒤 다시 물어봐 주세요.'; }
+        log.scrollTop = log.scrollHeight; if (open) setTimeout(function () { try { inp.focus({ preventScroll: true }); } catch (e) {} }, 30);
+        return;
+      }
+      setTimeout(watch, 120);
+    })();
+  });
+  inp.addEventListener('input', function () { el.classList.toggle('has', !!inp.value.trim()); if (!busy && inp.value) orb('typing'); });
+  document.addEventListener('pointerdown', function (e) { if (open && !el.contains(e.target) && !btn.contains(e.target)) show(false); }, true);
+  document.addEventListener('keydown', function (e) { if (open && e.key === 'Escape') show(false); }, true);
+  window.addEventListener('resize', function () { if (open) place(); });
+  window.addEventListener('scroll', function () { if (open) { place(); if (atHero() && !busy) show(false); } }, { passive: true });
+  var menu = document.getElementById('g-menu'); if (menu) menu.addEventListener('click', function () { show(false); });
+  window.HG_BUBBLE = {
+    toggle: function () {   // 허기 버튼 클릭: 첫 화면이면 반응만(손 흔들기), 다른 곳이면 말풍선 열고 닫기
+      if (!open && atHero()) { orb('wave'); return true; }
+      show(!open); return true;
+    },
+    close: function () { show(false); }
+  };
+
+  // 홈: 대화가 있으면 새로고침처럼 처음(허기 인사)부터. 대화가 없으면 원래대로 맨 위로
+  var home = document.getElementById('g-home');
+  if (home) home.addEventListener('click', function () {
+    var talked = !!document.querySelector('#thread .ans, #thread .msg-q');
+    try { talked = talked || !!sessionStorage.getItem('hj-chat-v1'); } catch (e) {}
+    if (!talked) return;
+    var ic = home.querySelector('svg'); if (ic && ic.animate && !RM) ic.animate([{ transform: 'rotate(0)' }, { transform: 'rotate(-360deg)' }], { duration: 420, easing: 'cubic-bezier(.22,1,.36,1)' });
+    try { window.scrollTo(0, 0); } catch (e) {}
+    setTimeout(function () { location.reload(); }, RM ? 0 : 260);
+  }, true);
+})();
+/* HG-BUBBLE-END */</script>
