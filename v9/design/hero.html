@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link rel="preload" href="../files/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>   <!-- 11-15 시트 2차: 히어로 · 대화 영역 글꼴을 먼저 받아 첫 화면에서 글꼴이 바뀌어 보이는 것을 줄임 -->
+   <!-- 11-15 시트 2차: 히어로 · 대화 영역 글꼴을 먼저 받아 첫 화면에서 글꼴이 바뀌어 보이는 것을 줄임 -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block">
 <style>
 /* 헝그리한정민 v0.3 — Material 3 규칙(색 역할 · 타입 · 모양)만 쓰고 부품은 최소로.
@@ -86,8 +86,7 @@
   --ui-card-sh: 0 0 0 1px rgba(255, 255, 255, .06), 0 8px 24px rgba(0, 0, 0, .35); --ui-card-sh-hi: 0 0 0 1px rgba(255, 255, 255, .08), 0 16px 36px rgba(0, 0, 0, .5); --ui-scrim: rgba(0, 0, 0, .5);
 }
 /* 11-15 시트 11단계: Pretendard(OFL, files/PretendardVariable.woff2 — 파일이 없으면 같은 판 CDN). 히어로 · 대화 영역(.hero)과 그 위에 뜨는 판(.ui-layer)에서만 쓴다 */
-@font-face { font-family: "Pretendard Variable"; font-style: normal; font-weight: 45 920; font-display: swap;
-  src: url("../files/PretendardVariable.woff2") format("woff2"), url("https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/woff2/PretendardVariable.woff2") format("woff2"); }
+
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -698,6 +697,289 @@ html.ui-lock { overflow: hidden; }
 .ui-lb-go { position: relative; pointer-events: auto; font-size: 13px; font-weight: 500; line-height: 1.5; color: var(--ui-label); text-decoration: underline; text-decoration-color: var(--ui-sep); text-underline-offset: 3px; text-decoration-thickness: 1.5px; -webkit-tap-highlight-color: transparent; }
 @media (pointer: coarse) { .ui-tv-b, .ui-lb-x { width: 44px; height: 44px; } .ui-lb-go::after { content: ""; position: absolute; inset: -12px -8px; } }
 @media (prefers-reduced-motion: reduce) { .tbl-bt, .tbl-bt .tt, .cite, .ui-tip, .ans-file, .af-go, .ans .shot button, .ans .shot img, .ui-tv-b, .ui-lb-x, .ui-tv-msg { transition-duration: 1ms; } .ans-file.ing .af-go .ms { animation: none; } }
+/* HS3-CSS-BEGIN · 11-15 시트 → 웹 3차(HPP3): 대화 상황 부품(나오는 조건은 디자인시스템/시트/algo/상황규칙.md · qa/hg_situation.js).
+ * 모양은 대화 영역 시트 situations/add.css · chat_tpl.html 값. 이름은 모두 hs- 로 시작(사이트 이름과 안 겹침). 올림은 (hover: hover) 안, 손가락 화면 누름 영역 44 */
+.hs-pill { position: relative; display: inline-flex; align-items: center; gap: var(--ui-chip-gap); min-height: var(--ui-chip-h); padding: 4px var(--ui-chip-pr) 4px var(--ui-chip-pl); border-radius: var(--md-full); border: 0;
+  background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh);
+  font-size: 15px; font-weight: 500; line-height: 1.45; letter-spacing: -.008em; color: var(--ui-label); text-align: left; text-decoration: none; white-space: nowrap; -webkit-tap-highlight-color: transparent;
+  transition: transform var(--ui-d3) var(--ui-spring), box-shadow var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out); }
+.hs-pill .ms { font-size: var(--ui-chip-icon); color: var(--ui-label-3); width: auto; }
+.hs-pill.hs-done .ms { color: inherit; animation: uiPop var(--ui-d3) var(--ui-spring); }
+.hs-pill.hs-on { background: var(--ui-send-bg); color: var(--ui-send-fg); box-shadow: none; }
+.hs-pill.hs-on .ms { color: var(--ui-send-fg); }
+@media (hover: hover) { .hs-pill:hover { box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh-hi); transform: var(--ui-lift); } .hs-pill.hs-on:hover { box-shadow: none; } }
+.hs-pill:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+.hs-pill:focus-visible, .hs-more:focus-visible, .hs-src:focus-visible, .hs-gobtn:focus-visible, .hs-pc:focus-visible, .hs-jump:focus-visible, .hs-gal-it:focus-visible, .hs-gal-tr:focus-visible, .hs-gal-nav:focus-visible, .hs-gal-dots button:focus-visible, .hs-mv-send:focus-visible, .hs-sg button:focus-visible, .hs-cv-h:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 2px; }
+.hs-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* 표 복사 · 크게 보기 버튼은 표가 다 온 뒤에(흘러나오는 중에는 숨김, 자리는 그대로) */
+.ans.hs-wait .tbl-bt { visibility: hidden; pointer-events: none; }
+
+/* ── 질문 쪽: 붙인 글 · 파일 칸(말풍선 바로 위), 긴 질문 6줄 접기 ── */
+.hs-att { align-self: flex-end; max-width: 80%; margin-bottom: -20px; display: flex; flex-direction: column; gap: 8px; padding: 8px 14px 8px 8px; border-radius: 14px; background: var(--ui-surface); box-shadow: var(--ui-card-sh); animation: qIn .36s var(--ease-out) both; transform-origin: 100% 100%; }
+.hs-att-h { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.hs-ty { flex: none; position: relative; width: 30px; height: 36px; border-radius: 7px 10px 7px 7px; background: var(--ui-bg-2); box-shadow: inset 0 0 0 1px var(--ui-sep); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5px;
+  font-size: 10px; font-weight: 600; line-height: 1.3; letter-spacing: .01em; color: var(--ui-label-2); }
+.hs-ty::before { content: ""; position: absolute; right: 0; top: 0; width: 10px; height: 10px; border-radius: 0 0 0 4px; background: var(--ui-bg-3); box-shadow: inset 1px -1px 0 var(--ui-sep); }
+.hs-att-n { min-width: 0; font-size: 15px; font-weight: 500; line-height: 1.45; letter-spacing: -.008em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hs-doc { margin: 0 0 0 4px; font-size: 15px; line-height: 1.6; letter-spacing: -.008em; color: var(--ui-label-2); white-space: pre-line; word-break: keep-all; overflow-wrap: anywhere; }
+.msg-q .hs-qt { display: block; }
+.hs-long .hs-qt, .hs-att.hs-long .hs-doc { max-height: calc(1.7em * 6); overflow: hidden; -webkit-mask-image: linear-gradient(#000 calc(100% - 2.6em), transparent); mask-image: linear-gradient(#000 calc(100% - 2.6em), transparent); }
+.hs-att.hs-long .hs-doc { max-height: calc(1.6em * 6); }
+.hs-long.hs-open .hs-qt, .hs-att.hs-long.hs-open .hs-doc { max-height: none; -webkit-mask-image: none; mask-image: none; }
+.hs-more { position: relative; display: inline-flex; align-items: center; gap: 4px; height: 32px; margin: 2px 0 -4px -10px; padding: 0 10px; border-radius: var(--md-full); border: 0; background: transparent; cursor: pointer;
+  font-size: 12px; font-weight: 500; line-height: 1.4; letter-spacing: 0; color: var(--ui-label-2); -webkit-tap-highlight-color: transparent;
+  transition: transform var(--ui-d3) var(--ui-spring), color var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out); }
+.hs-att .hs-more { align-self: flex-start; margin: -2px 0 -2px 0; }
+.hs-more::before { content: attr(data-l); }
+.hs-more::after { content: ""; width: 13px; height: 13px; background: currentColor; transition: transform var(--ui-d3) var(--ui-spring);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat; }
+.hs-more[aria-expanded="true"]::after { transform: rotate(180deg); }
+.hs-more:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+@media (hover: hover) { .hs-more:hover { color: var(--ui-label); background: var(--ui-hover); } }
+
+/* ── 되묻기: 고르면 고른 알약만 진하게, 나머지 흐려지고 막힘(기존 .ask-back 모양 그대로 이어 받음) ── */
+.ans .hs-asked { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--md-outline-variant); }
+.ans .hs-asked p { font-weight: 600; line-height: 1.5; letter-spacing: -.012em; }
+.hs-asked .opts .pick, .hs-asked .opts .link { position: relative; display: inline-flex; align-items: center; min-height: var(--ui-chip-h); padding: 4px var(--ui-chip-pr); border-radius: var(--md-full); border: 0;
+  background: var(--ui-glass); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh); font-size: 15px; font-weight: 500; line-height: 1.45; letter-spacing: -.008em; color: var(--md-on-surface);
+  pointer-events: none; opacity: .4; transition: opacity var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out); }
+.hs-asked .opts .skip { opacity: .4; pointer-events: none; }
+.hs-asked .opts [aria-pressed="true"] { opacity: 1; background: var(--ui-send-bg); color: var(--ui-send-fg); box-shadow: none; }
+
+/* ── 큰 붙임 · 작은 붙임 공통 자리 ── */
+.ans .hs-cards, .ans .hs-gal, .ans .hs-pf, .ans .hs-contact, .ans .hs-goto { margin-top: 14px; }
+.ans .hs-contact + .hs-goto { margin-top: 10px; }
+
+/* ── 연락 카드: 메일 원 아이콘 + "한정민 메일" + 주소 복사 · 메일 쓰기(주소 글자는 보이지 않음) ── */
+.hs-contact { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; max-width: 560px; padding: 12px 12px 12px 16px; border-radius: var(--ui-r-box); background: var(--ui-surface); box-shadow: var(--ui-card-sh); }
+.hs-ci { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--ui-bg-2); color: var(--ui-label-2); }
+.hs-ci .ms { font-size: 18px; }
+.hs-ct { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.hs-ct b { font-size: 15px; font-weight: 600; line-height: 1.4; letter-spacing: -.008em; }
+.hs-ct span { font-size: 13px; line-height: 1.5; letter-spacing: -.004em; color: var(--ui-label-3); }
+.hs-cb { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ── 메일 초안: 기존 메일 상자(.mailbox) 위에 흰 상자 모양(머리 · 제목 · 본문 · 아래 알약). 입력 칸 · 버튼 · 클릭 동작은 그대로 ── */
+.mailbox.hs-mail { gap: 0; border-radius: var(--ui-r-box); background: var(--ui-surface); box-shadow: var(--ui-card-sh); overflow: hidden; }
+.hs-mh { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--ui-sep); }
+.hs-mh span { font-size: 12px; font-weight: 500; line-height: 1.4; color: var(--ui-label-3); }
+.hs-mh em { font-style: normal; font-size: 13px; line-height: 1.5; letter-spacing: -.004em; color: var(--ui-label-2); text-align: right; }
+.mailbox.hs-mail input, .mailbox.hs-mail textarea { border: 0; border-radius: 10px; background: transparent; color: var(--ui-label); transition: background-color var(--ui-d2) var(--ui-ease-out); }
+.mailbox.hs-mail input { margin: 6px 8px 0; width: calc(100% - 16px); padding: 8px 8px 4px; font-size: 17px; font-weight: 600; line-height: 1.45; letter-spacing: -.012em; }
+.mailbox.hs-mail textarea { margin: 0 8px 4px; width: calc(100% - 16px); min-height: 180px; padding: 4px 8px 12px; font-size: 15px; line-height: 1.6; letter-spacing: -.008em; resize: none; field-sizing: content; }
+.mailbox.hs-mail.hs-editing input, .mailbox.hs-mail.hs-editing textarea { background: var(--ui-bg-2); }
+.mailbox.hs-mail input:focus-visible, .mailbox.hs-mail textarea:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: -2px; }
+.mailbox.hs-mail .note { padding: 0 16px; font-size: 13px; line-height: 1.5; color: var(--ui-label-3); }
+.mailbox.hs-mail .row { gap: 8px; padding: 10px 12px 12px; }
+.mailbox.hs-mail .row .link { position: relative; display: inline-flex; align-items: center; min-height: var(--ui-chip-h); padding: 4px var(--ui-chip-pr); border-radius: var(--md-full); text-decoration: none;
+  background: var(--ui-glass); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh); font-size: 15px; font-weight: 500; line-height: 1.45; letter-spacing: -.008em; color: var(--ui-label);
+  transition: transform var(--ui-d3) var(--ui-spring), box-shadow var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out); }
+.mailbox.hs-mail .row .link.hs-on { background: var(--ui-send-bg); color: var(--ui-send-fg); box-shadow: none; }
+@media (hover: hover) { .mailbox.hs-mail .row .link:hover { box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh-hi); transform: var(--ui-lift); } .mailbox.hs-mail .row .link.hs-on:hover { box-shadow: none; } }
+.mailbox.hs-mail .row .link:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+
+/* ── 외부 출처: 답 끝 Footnote 회색 알약(근거 번호와 다른 모양) ── */
+.hs-src { position: relative; display: inline-flex; align-items: center; gap: 6px; max-width: 100%; height: 28px; margin-top: 12px; padding: 0 12px 0 9px; border-radius: var(--md-full); background: var(--ui-bg-2); color: var(--ui-label-2);
+  font-size: 13px; line-height: 1.5; letter-spacing: -.004em; text-decoration: none; white-space: nowrap; -webkit-tap-highlight-color: transparent;
+  transition: transform var(--ui-d3) var(--ui-spring), background-color var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out); }
+.hs-src .ms { font-size: 13px; width: auto; color: var(--ui-label-3); }
+.hs-src b { font-weight: 600; color: var(--ui-label); }
+.hs-src .hs-st { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.hs-src:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+@media (hover: hover) { .hs-src:hover { background: var(--ui-bg-3); color: var(--ui-label); } }
+.ans .hs-src-row { display: flex; }
+
+/* ── 화면 이동: 유리 알약 안에 1.2초 차오르는 막대 → 다 차면 이동. 누르면 바로, "그대로 있기"는 멈춤 ── */
+.hs-goto { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.hs-gobtn { position: relative; overflow: hidden; isolation: isolate; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px 0 14px; border-radius: var(--md-full); border: 0;
+  background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh);
+  font-size: 15px; font-weight: 500; line-height: 1.45; letter-spacing: -.008em; color: var(--ui-label); -webkit-tap-highlight-color: transparent;
+  transition: transform var(--ui-d3) var(--ui-spring), box-shadow var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out); }
+.hs-gobtn .ms { font-size: 16px; width: auto; color: var(--ui-label-2); }
+.hs-fill { position: absolute; inset: 0; z-index: -1; background: var(--ui-bg-3); transform-origin: 0 50%; transform: scaleX(0); }
+.hs-gobtn.hs-run .hs-fill { transition: transform 1.2s linear; transform: scaleX(1); }
+.hs-gobtn.hs-gone { background: var(--ui-send-bg); color: var(--ui-send-fg); box-shadow: none; }
+.hs-gobtn.hs-gone .ms { color: var(--ui-send-fg); }
+.hs-gobtn.hs-gone .hs-fill { opacity: 0; }
+@media (hover: hover) { .hs-gobtn:hover { box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh-hi); transform: var(--ui-lift); } .hs-gobtn.hs-gone:hover { box-shadow: none; } }
+.hs-gobtn:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+
+/* ── 프로젝트 카드 1~3개(썸네일 · 구분 · 이름 · 한 줄), 누르면 상세 ── */
+.hs-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.hs-pc { display: flex; flex-direction: column; min-width: 0; padding: 0; border: 0; border-radius: 20px; overflow: hidden; background: var(--ui-surface); box-shadow: var(--ui-card-sh); color: inherit; text-align: left; -webkit-tap-highlight-color: transparent;
+  transition: transform var(--ui-d3) var(--ui-spring), box-shadow var(--ui-d2) var(--ui-ease-out); }
+.hs-th { aspect-ratio: 16 / 10; overflow: hidden; background: linear-gradient(160deg, var(--ui-bg-2), var(--ui-bg-3)); display: grid; place-items: center; }
+.hs-th img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform var(--ui-d4) var(--ui-ease-out); }
+.hs-th > span { padding: 0 12px; font-size: 20px; font-weight: 600; line-height: 1.3; letter-spacing: -.018em; color: var(--ui-label-3); text-align: center; word-break: keep-all; }
+.hs-tx { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 14px 16px 16px; }
+.hs-k { font-size: 12px; font-weight: 500; line-height: 1.4; color: var(--ui-label-3); }
+.hs-n { font-size: 17px; font-weight: 600; line-height: 1.45; letter-spacing: -.012em; }
+.hs-l { margin-top: 2px; font-size: 13px; line-height: 1.5; letter-spacing: -.004em; color: var(--ui-label-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+@media (hover: hover) { .hs-pc:hover { transform: translateY(-3px); box-shadow: var(--ui-card-sh-hi); } .hs-pc:hover .hs-th img { transform: scale(1.05); } .hs-pc:hover:active { transform: translateY(-3px) scale(.98); } }
+.hs-pc:active { transform: scale(.98); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+
+/* ── 이미지 여러 장: 상자 안에서 옆으로 넘기기 · 점 · 좌우 버튼, 누르면 크게 보기(2차) ── */
+.hs-gal { margin: 0; display: flex; flex-direction: column; gap: 8px; max-width: 520px; }
+.hs-gal-box { position: relative; border-radius: var(--ui-r-box); overflow: hidden; box-shadow: var(--ui-card-sh); background: var(--ui-bg-2); }
+.hs-gal-tr { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.hs-gal-tr::-webkit-scrollbar { display: none; }
+.hs-gal-tr:focus-visible { outline-offset: -2px; }
+.hs-gal-it { flex: 0 0 100%; scroll-snap-align: center; scroll-snap-stop: always; display: block; padding: 0; border: 0; background: none; cursor: zoom-in; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+.hs-gal-it img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; -webkit-user-drag: none; user-select: none; transition: transform var(--ui-d4) var(--ui-ease-out); }
+@media (hover: hover) { .hs-gal-it:hover img { transform: scale(1.03); } }
+.hs-gal-it:focus-visible { outline-offset: -4px; }
+.hs-gal-dots { position: absolute; left: 50%; bottom: 10px; z-index: 2; transform: translateX(-50%); display: flex; align-items: center; height: 24px; padding: 0 5px; border-radius: var(--md-full);
+  background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line); }
+.hs-gal-dots button { height: 24px; padding: 0 3px; border: 0; background: none; cursor: pointer; display: grid; place-items: center; }
+.hs-gal-dots button::before { content: ""; display: block; width: 6px; height: 6px; border-radius: var(--md-full); background: var(--ui-label); opacity: .28; transition: width var(--ui-d3) var(--ui-spring), opacity var(--ui-d2) var(--ui-ease-out); }
+.hs-gal-dots button[aria-current="true"]::before { width: 16px; opacity: .9; }
+.hs-gal-nav { position: absolute; top: 50%; z-index: 2; width: 36px; height: 36px; margin-top: -18px; border-radius: var(--md-full); border: 0; display: grid; place-items: center; color: var(--ui-label); opacity: 0;
+  background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh);
+  transition: opacity var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
+.hs-gal-nav .ms { font-size: 18px; }
+.hs-gal-nav.hs-prev { left: 10px; } .hs-gal-nav.hs-nxt { right: 10px; }
+.hs-gal-box:hover .hs-gal-nav, .hs-gal-box:focus-within .hs-gal-nav { opacity: 1; }
+.hs-gal-box .hs-gal-nav:disabled { opacity: 0; pointer-events: none; }
+.hs-gal-nav:active { transform: var(--ui-press); transition-duration: var(--ui-d1); }
+.hs-gal figcaption { font-size: 13px; line-height: 1.5; letter-spacing: -.004em; color: var(--ui-label-3); }
+.hs-gal-k { font-variant-numeric: tabular-nums; }
+
+/* ── 한정민 소개 답(사진 파일이 있을 때만 나옴) ── */
+.hs-pf { border-radius: 20px; background: var(--ui-surface); box-shadow: var(--ui-card-sh); overflow: hidden; max-width: 640px; }
+.hs-pf-top { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 24px; padding: 16px; }
+.hs-pf-ph { display: block; width: 100%; aspect-ratio: 3 / 4; border-radius: var(--ui-r-box); overflow: hidden; background: var(--ui-bg-2); }
+.hs-pf-ph img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+.hs-pf-id { display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; min-width: 0; padding: 8px 8px 0 0; }
+.hs-pf-k { font-size: 12px; font-weight: 500; line-height: 1.4; color: var(--ui-label-3); }
+.hs-pf-n { margin: 0; font-size: 22px; font-weight: 600; line-height: 1.35; letter-spacing: -.018em; }
+.hs-pf-l { margin: 0; font-size: 17px; font-weight: 600; line-height: 1.45; letter-spacing: -.012em; color: var(--ui-label-2); text-wrap: balance; }
+.hs-pf-f { margin: 16px 0 0; display: flex; flex-direction: column; }
+.hs-pf-f > div { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--ui-sep); }
+.hs-pf-f dt { font-size: 12px; font-weight: 500; line-height: 1.4; color: var(--ui-label-3); padding-top: 2px; }
+.hs-pf-f dd { margin: 0; font-size: 15px; line-height: 1.6; letter-spacing: -.008em; min-width: 0; }
+.hs-pf-bd { display: flex; flex-direction: column; gap: 12px; padding: 0 16px 16px; }
+.hs-sg { display: inline-flex; align-self: flex-start; gap: 2px; padding: 3px; border-radius: var(--md-full); background: var(--ui-bg-2); }
+.hs-sg button { height: 32px; padding: 0 14px; border: 0; border-radius: var(--md-full); background: transparent; font-size: 14px; font-weight: 500; color: var(--ui-label-2); transition: background-color var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out); }
+.hs-sg button[aria-selected="true"] { background: var(--ui-surface); color: var(--ui-label); box-shadow: 0 1px 3px rgba(0, 0, 0, .08), 0 0 0 1px var(--ui-sep); }
+.hs-cv { position: relative; max-height: 360px; overflow: hidden; -webkit-mask-image: linear-gradient(#000 calc(100% - 64px), transparent); mask-image: linear-gradient(#000 calc(100% - 64px), transparent); }
+.hs-pf-pn.hs-open .hs-cv { max-height: none; -webkit-mask-image: none; mask-image: none; }
+.hs-cv h5 { margin: 12px 0 6px; font-size: 12px; font-weight: 500; line-height: 1.4; color: var(--ui-label-3); }
+.hs-cv ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.hs-cv li { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; font-size: 14px; line-height: 1.55; }
+.hs-cv li > span:first-child { color: var(--ui-label-3); font-variant-numeric: tabular-nums; }
+.hs-cv li b { font-weight: 600; }
+.hs-cv li i { display: block; font-style: normal; color: var(--ui-label-2); }
+.hs-cl { border-top: 1px solid var(--ui-sep); }
+.hs-cv-h { display: flex; align-items: flex-start; gap: 12px; width: 100%; padding: 12px 0; border: 0; background: none; text-align: left; color: inherit; }
+.hs-cv-h b { display: block; font-size: 15px; font-weight: 600; line-height: 1.45; }
+.hs-cv-h i { display: block; font-style: normal; font-size: 13px; line-height: 1.5; color: var(--ui-label-2); }
+.hs-cv-h .ms { margin-left: auto; font-size: 18px; color: var(--ui-label-3); transition: transform var(--ui-d3) var(--ui-spring); }
+.hs-cv-h[aria-expanded="true"] .ms { transform: rotate(180deg); }
+.hs-cl p { margin: 0 0 12px; font-size: 14px; line-height: 1.7; color: var(--ui-label-2); }
+.hs-pf-end { margin: 8px 0 0; font-size: 14px; font-weight: 600; line-height: 1.6; }
+
+/* ── 새 답 ↓: 위로 올려 읽는 중이면 질문창 위 가운데 유리 알약(맨 아래로), 그사이 새 답이 오면 "새 답" ── */
+.hs-jump { position: absolute; left: 50%; bottom: calc(100% + 14px); z-index: 6; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px 0 11px; border-radius: var(--md-full); border: 0;
+  background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh);
+  font-size: 15px; font-weight: 500; line-height: 1.45; letter-spacing: -.008em; color: var(--ui-label); white-space: nowrap; -webkit-tap-highlight-color: transparent;
+  opacity: 0; pointer-events: none; transform: translate(-50%, 12px) scale(.9); transition: opacity var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring), box-shadow var(--ui-d2) var(--ui-ease-out); }
+.hs-jump.hs-on { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
+@media (hover: hover) { .hs-jump.hs-on:hover { transform: translate(-50%, 0) var(--ui-lift); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh-hi); } }
+.hs-jump.hs-on:active { transform: translate(-50%, 0) var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+.hs-jump .ms { font-size: 15px; width: auto; }
+.hs-jump .hs-dot { display: none; width: 6px; height: 6px; border-radius: 50%; background: var(--ui-label); }
+.hs-jump.hs-new .hs-dot { display: block; }
+
+/* ── 큰 파일 올리는 중: 붙인 파일 칸(#att)을 흰 상자로(종류 · 이름 · 상태 · 아래 2px 진행 막대 · 빼기). 올리기 동작은 그대로 ── */
+.att.hs-upl { position: relative; overflow: hidden; width: 100%; gap: 10px; margin-top: 8px; padding: 8px; border-radius: 14px; background: var(--ui-surface); box-shadow: var(--ui-card-sh); font-size: 15px; }
+.att.hs-upl .hs-ty { width: 30px; height: 36px; }
+.att.hs-upl.hs-bad .hs-ty { background: var(--ui-bg-3); }
+.hs-ut { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.att.hs-upl .hs-ut b { font-size: 15px; font-weight: 600; line-height: 1.4; letter-spacing: -.008em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.att.hs-upl .hs-ut span { font-size: 13px; line-height: 1.5; letter-spacing: -.004em; color: var(--ui-label-3); font-variant-numeric: tabular-nums; }
+.att.hs-upl > button { flex: none; width: 36px; height: 36px; border-radius: var(--md-full); }
+.hs-bar { position: absolute; left: 0; bottom: 0; height: 2px; width: 100%; background: var(--ui-label); transform-origin: 0 50%; transform: scaleX(var(--p, 0)); transition: transform var(--ui-d2) var(--ui-ease-out), opacity var(--ui-d2); }
+.att.hs-ok .hs-bar, .att.hs-bad .hs-bar { opacity: 0; }
+
+/* ── 말로 묻기: 마이크 진한 원 + 퍼지는 고리, 입력 칸 앞 소리 막대 5개, 안내 "듣고 있어요…" ── */
+.askbox.hs-listening > .mic[aria-pressed="true"] { background-color: var(--ui-send-bg); color: var(--ui-send-fg); animation: hsMicRing 1.4s var(--ui-ease-out) infinite; }
+@keyframes hsMicRing { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ui-label-3) 60%, transparent); } 100% { box-shadow: 0 0 0 10px transparent; } }
+.hs-lvl { flex: none; display: inline-flex; align-items: center; gap: 3px; height: 20px; }
+.hs-lvl i { width: 3px; height: 6px; border-radius: 2px; background: var(--ui-label-2); animation: hsLv .8s var(--ui-ease-out) infinite; }
+.hs-lvl i:nth-child(2) { animation-delay: .1s; } .hs-lvl i:nth-child(3) { animation-delay: .2s; } .hs-lvl i:nth-child(4) { animation-delay: .3s; } .hs-lvl i:nth-child(5) { animation-delay: .15s; }
+@keyframes hsLv { 0%, 100% { height: 5px; } 45% { height: 18px; } }
+
+/* ── 메일 쓰기 판: 연락 카드 "메일 쓰기"에서 열림. 받는 사람 고정 · 제목 · 내용, 다 쓰면 보내기 → 메일 앱(보냈다고 하지 않음). 닫아도 쓴 글은 남음 ── */
+.hs-mv { position: fixed; inset: 0; z-index: 67; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.hs-mv.hs-closing { pointer-events: none; }
+.hs-mv-scrim { position: absolute; inset: 0; background: var(--ui-scrim); -webkit-backdrop-filter: blur(14px) saturate(160%); backdrop-filter: blur(14px) saturate(160%); opacity: 0; }
+.hs-mv-panel { position: relative; display: flex; flex-direction: column; width: min(640px, 100%); height: min(640px, calc(100vh - 48px)); height: min(640px, calc(100dvh - 48px)); border-radius: 28px; background: var(--ui-surface);
+  box-shadow: var(--ui-card-sh-hi), 0 32px 80px -24px rgba(0, 0, 0, .32); overflow: hidden; will-change: transform, opacity; }
+.hs-mv-grab { display: none; }
+.hs-mv-head { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 16px 12px 24px; }
+.hs-mv-head h2 { margin: 0; font-size: 22px; font-weight: 600; line-height: 1.4; letter-spacing: -.018em; }
+.hs-mv-f { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; margin: 0 8px 8px; border-radius: 20px; background: var(--ui-bg-2); overflow: hidden; }
+.hs-mv-row { flex: none; display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 16px; border-bottom: 1px solid var(--ui-sep); transition: background-color var(--ui-d2) var(--ui-ease-out); }
+.hs-mv-row:focus-within, .hs-mv-body:focus-within { background: var(--ui-hover); }
+.hs-mv-l { flex: none; width: 64px; font-size: 13px; line-height: 1.5; color: var(--ui-label-3); }
+.hs-mv-to { min-width: 0; font-size: 15px; font-weight: 600; line-height: 1.4; }
+.hs-mv-row input, .hs-mv-body textarea { flex: 1; min-width: 0; border: 0; background: transparent; outline: none; color: var(--ui-label); font: inherit; font-size: 17px; line-height: 1.6; letter-spacing: -.012em; }
+.hs-mv-row input { height: 52px; padding: 0; }
+.hs-mv-row input::placeholder, .hs-mv-body textarea::placeholder { color: var(--ui-label-3); }
+.hs-mv-body { flex: 1 1 auto; min-height: 0; display: flex; transition: background-color var(--ui-d2) var(--ui-ease-out); }
+.hs-mv-body textarea { min-height: 140px; resize: none; padding: 14px 16px; }
+.hs-mv-foot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px; border-top: 1px solid var(--ui-sep); }
+.hs-mv-hint { flex: 1 1 220px; min-width: 0; padding-left: 4px; font-size: 13px; line-height: 1.5; color: var(--ui-label-3); }
+.hs-mv-btns { display: flex; gap: 8px; margin-left: auto; }
+.hs-mv-send { position: relative; height: var(--ui-chip-h); padding: 0 var(--ui-chip-pl) 0 var(--ui-chip-pr); border-radius: var(--md-full); border: 0; display: inline-flex; align-items: center; gap: var(--ui-chip-gap);
+  background: var(--ui-send-bg); color: var(--ui-send-fg); font-size: 15px; font-weight: 500; line-height: 1.45; letter-spacing: -.008em; transition: transform var(--ui-d3) var(--ui-spring), opacity var(--ui-d2) var(--ui-ease-out); }
+.hs-mv-send .ms { font-size: var(--ui-chip-icon); width: auto; }
+.hs-mv-send:disabled { opacity: .35; cursor: default; }
+.hs-mv-send:not(:disabled):active { transform: var(--ui-press); transition-duration: var(--ui-d1); }
+@media (max-width: 640px) {
+  .hs-mv { align-items: flex-end; padding: 0; }
+  .hs-mv-panel { width: 100%; height: calc(100vh - 24px); height: calc(100dvh - max(24px, calc(env(safe-area-inset-top, 0px) + 12px))); border-radius: 28px 28px 0 0; }
+  .hs-mv-grab { display: block; flex: none; height: 20px; }
+  .hs-mv-grab::before { content: ""; display: block; width: 36px; height: 5px; margin: 8px auto 0; border-radius: var(--md-full); background: var(--ui-label-3); opacity: .4; }
+  .hs-mv-head { padding: 0 12px 10px 20px; }
+  .hs-mv-head h2 { font-size: 20px; }
+  .hs-mv-f { margin: 0 8px max(8px, env(safe-area-inset-bottom, 0px)); }
+  .hs-mv-btns { width: 100%; } .hs-mv-btns > * { flex: 1; justify-content: center; }
+}
+
+@media (max-width: 640px) {
+  .hs-att { max-width: 88%; }
+  .hs-cards { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -20px; padding: 4px 20px 14px; gap: 10px; scrollbar-width: none; }
+  .hs-cards::-webkit-scrollbar { display: none; }
+  .hs-pc { flex: 0 0 74%; scroll-snap-align: start; }
+  .hs-cards > .hs-pc:only-child { flex-basis: 100%; }
+  .hs-contact .hs-cb { width: 100%; } .hs-contact .hs-cb .hs-pill { flex: 1; justify-content: center; }
+  .hs-pf-top { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .hs-pf-ph { aspect-ratio: 4 / 3; }
+  .hs-pf-ph img { object-position: 50% 22%; }
+  .hs-pf-id { padding: 0 4px; }
+  .hs-cv li { grid-template-columns: 84px minmax(0, 1fr); }
+}
+@media (hover: none) { .hs-gal-nav { display: none; } }
+@media (pointer: coarse) {
+  /* 보이는 크기는 그대로, 누름 영역만 44(다음 질문 칩과 같은 방법). 화면 이동 알약은 막대를 둥글게 자르려고 overflow: hidden이라 보이는 높이를 44로 */
+  .hs-pill::after, .hs-jump::after { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, var(--ui-tap)); height: max(100%, var(--ui-tap)); translate: -50% -50%; border-radius: var(--md-full); }
+  .hs-gobtn { height: 44px; }
+  .hs-more { height: 44px; margin-top: -4px; margin-bottom: -10px; }
+  .hs-src::after { content: ""; position: absolute; inset: -8px -6px; }
+  .mailbox.hs-mail .row .link::after { inset: -4px 0; }
+  .hs-mv-send::after { content: ""; position: absolute; inset: -4px 0; }
+  .hs-gal-dots { pointer-events: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hs-pill, .hs-more, .hs-more::after, .hs-src, .hs-gobtn, .hs-pc, .hs-th img, .hs-gal-it img, .hs-gal-nav, .hs-jump, .hs-bar, .hs-cv-h .ms { transition-duration: 1ms; }
+  .hs-att { animation: none; }
+  .askbox.hs-listening > .mic[aria-pressed="true"], .hs-lvl i { animation: none; }
+  .hs-gobtn.hs-run .hs-fill { transition: none; }
+}
+/* HS3-CSS-END */
 .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 60; padding: 12px 18px; border-radius: 8px; background: var(--md-on-surface); color: var(--md-surface); font-size: 15px; }
 
 @media (max-width: 860px) {
@@ -4133,6 +4415,900 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     if (v.length > 600) { ask('이 채용 공고를 요건별로 한정민의 근거와 비교해 표로 정리해 주세요', '채용 공고를 붙여 넣었어요 (' + v.length + '자)', { doc: v }); return; }
     if (v) ask(v); else IN.focus();
   });
+  /* HG-SITUATION-BEGIN · 아래는 디자인시스템/qa/hg_situation.js 그대로(규칙은 여기서 고치지 않음 — 고칠 때는 qa 파일과 같이, situation_test.py 다시 통과) */
+/* hg_situation.js — 대화 화면 "상황 부품" 고르기 규칙(라우터). 2026-11-15 처음 만듦.
+ *
+ * 하는 일: "답 데이터 + 질문 + 화면 상태 → 그릴 부품 목록"만 계산한다. DOM · 네트워크 · 저장소를 쓰지 않는다.
+ * 기준 문서: 디자인시스템/시트/algo/상황규칙.md (규칙을 바꾸면 그 MD와 이 파일을 같이 고친다)
+ * 시험: 디자인시스템/qa/situation_test.py (문항 qa/situation_cases.json)
+ *
+ * 원칙(사용자 2026-11-15): 확실할 때만 보인다. 헷갈리면 안 보이고 글 답만. 부품에 넣을 실제 내용이 없으면 절대 안 보인다.
+ *
+ * 사이트(v9 index.html)에 넣을 때: 'use strict' 묶음 안, tail() 정의 뒤 · restoreChat() 호출 앞에 이 파일 내용을 그대로 붙인다.
+ * 바깥에 드러나는 이름은 hgSituation · HS 둘뿐이다(사이트에 같은 이름 0개, 3차 계획 3-7).
+ *   var x = hgSituation({ ans: HS.fromParsed(parse(raw), { mood, final: true }), q: {...}, ui: {...}, ctx: {...}, data: HS.siteData(...) });
+ *   x.parts = 그릴 부품 id 순서대로, x.why = 부품마다 고르거나 뺀 까닭(검수용)
+ */
+(function (root) {
+  'use strict';
+  var MB = 1024 * 1024;
+
+  /* ── 수치 기준(화면 판단 부품) ─────────────────────────── */
+  var NUM = {
+    JUMP_SHOW: 240,   // 새 답↓: 맨 아래에서 240px 넘게 올라가 있으면 보임
+    JUMP_HIDE: 40,    // 보이는 중이면 40px 안으로 내려올 때 숨김(사이트 stick 기준과 같음). 40~240 사이는 앞 상태 유지(깜빡임 막기)
+    LONG_LINES: 6,    // 긴 질문 접기: 말풍선 글이 6줄을 넘으면(7줄부터)
+    DOC_MIN: 600,     // 공고 붙임: 보낸 글이 600자를 넘으면(사이트 submit 기준과 같음)
+    BIG_FILE: 4 * MB, // 큰 파일 올리는 중: 4MB를 넘으면(같으면 아님)
+    MAX_FILE: 100 * MB, // 100MB를 넘으면 거절 문구
+    REJECT_MS: 2600,  // 거절 문구 보이는 시간
+    FAIL_MS: 3200,    // 올리기 실패 문구 보이는 시간
+    CARDS_MAX: 3,     // 프로젝트 카드 최대
+    CARDS_EXP_MAX: 2, // 역량 질문일 때 카드 최대
+    OUT_MAX: 1200,    // 결과 상자 글 최대(넘으면 파일)
+    SMALL_MAX: 2      // 작은 붙임 최대
+  };
+  var HOLD = ['stopped', 'split', 'out', 'linkFail'];   // 보류(사용자 위임 2026-11-15): 멈춘 답 · Worker 새 칸 셋
+
+  /* ── 부품 목록(id → 이름 · 자리) ───────────────────────── */
+  var PARTS = {
+    ask: ['되묻기 보기', 'ask'], contact: ['연락 카드', 'small'], mail: ['메일 초안', 'big'], src: ['외부 출처', 'src'],
+    goto: ['화면 이동', 'small'], profile: ['한정민 소개 답', 'big'], gallery: ['이미지 여러 장', 'big'], cards: ['프로젝트 카드', 'big'],
+    tableCopy: ['표 복사', 'table'], split: ['진위 나눔', 'big'], out: ['결과 상자', 'big'], linkFail: ['링크 못 읽음', 'small'],
+    postAtt: ['공고 붙임', 'question'], fileAtt: ['파일 붙인 질문', 'question'], long: ['긴 질문 접기', 'question'],
+    jump: ['새 답↓', 'screen'], upload: ['큰 파일 올리는 중', 'screen'], listen: ['말로 묻기', 'screen'], stopped: ['멈춘 답', 'answer']
+  };
+  var BIG_ORDER = ['mail', 'out', 'split', 'profile', 'gallery', 'cards'];
+  var SMALL_ORDER = ['linkFail', 'contact', 'goto'];
+  var RENDER_ORDER = ['postAtt', 'fileAtt', 'long', 'stopped', 'tableCopy', 'mail', 'out', 'split', 'profile', 'gallery', 'cards', 'linkFail', 'contact', 'goto', 'src', 'ask', 'upload', 'listen', 'jump'];
+
+  /* ── 질문 글 판단(의도) ──────────────────────────────── */
+  var RE = {
+    // 연락 · 채용 의사, 한정민만 답할 것(처우 · 입사 시기 · 개인 사정)
+    CONTACT: /(연락(처|\s?(하고|하려|할|해도|드리|드릴|주세요|줘|방법|수단|창구|가능|받을|하면|하는\s?법|하는\s?방법))|컨택|이메일|메일\s?주소|전화|연봉|처우|급여|입사\s?(가능|시기|날|일)|언제부터\s?(일|출근|근무|합류)|합류\s?(가능|시기)|면접\s?(제안|일정|보|잡|요청|진행|모시|가능|기회|을\s?보|을\s?잡)|채용\s?(제안|절차|하고\s?싶|의사|진행)|협업\s?(제안|하고\s?싶|요청|문의)|같이\s?일\s?(하고|해\s?보고|할\s?수)|만나\s?(고\s?싶|볼\s?수|뵙)|뵙고\s?싶|커피\s?챗|스카우트|오퍼|모시고\s?싶|개인\s?사정|contact|e-?mail|salary|interview|hire|hiring)/i,
+    // 메일 초안을 써 달라는 말(사이트가 이때만 mode: "mail"을 붙임)
+    MAIL_WORD: /(메일|이메일|e-?mail)/i,
+    MAIL_DO: /(써|쓰기|작성|초안|만들어)/,
+    MAIL_ADDR: /메일\s?주소/,
+    IMPERSONATE: /(이름으로|명의로|인\s?척|본인인\s?척|대신\s?(써|보내|작성|답)|한정민(이|으로서)\s?(쓴|보내|답))/,
+    // 화면 이동 명령(동사로만. "이동 동선" 같은 명사는 아님)
+    MOVE: /((로|으로)\s?(가\s?(줘|주세요|줄래|자|볼래)|가고\s?싶|이동)|이동\s?(해|시켜|하자|할래|부탁)|열어\s?(줘|주세요|줄래|봐|볼래)|띄워\s?(줘|주세요)|데려가|보러\s?가(자|기|\s?줘)|바로\s?가기)/,
+    REF: /(그거|그걸|그것|그\s?프로젝트|거기|방금|아까|그\s?페이지|해당)/,
+    // 한정민이 어떤 사람인지(소개)
+    SUBJ: /(한정민|정민|헝그리|이\s?분|이\s?사람|이\s?기획자|포트폴리오\s?주인|만든\s?사람)/,
+    WHO: /(소개|어떤\s?(사람|분|기획자)|누구|자기\s?소개|에\s?대해\s?(알려|말해|얘기|설명)|(한정민|이\s?분)\s?(님\s?)?(좀\s?)?알려)/,
+    WHO_EXCL: /(프로젝트|parallax|패럴랙스|파랄랙스|페럴렉스|롯데|코레일|플로레터|유지\s?(프로젝트|앱)|번역|영어|영문|english|요약|줄로|한\s?줄|표로|파일|pdf|이력서|자소서|자기소개서|학교|학력|전공|경력|수상|자격증|허기|너는|넌\s|너\s|당신|\bai\b|소개한|소개된|소개하는\s?법)/i,
+    // 그림을 보여 달라는 말
+    VIS: /(화면|사진|이미지|그림|캡처|스크린\s?샷|시안|목업)/,
+    SHOW: /(보여|볼\s?수|보고\s?싶|더\s?(있|없|보)|있어요?\s?\?|있나요|구경)/,
+    // 프로젝트 목록 · 개요
+    PROJ_WORD: /(프로젝트|작업물|작업|포트폴리오)/,
+    LIST: /(뭐|뭘|무슨|어떤\s?(게|거|것|프로젝트|작업)|목록|전부|모두|다\s?(보여|알려)|몇\s?개|대표|추천|보여\s?(줘|주세요|줄래)|알려\s?(줘|주세요)|소개(해|\s?좀))/,
+    OVERVIEW: /(뭐(야|예요|에요|였|하는)|뭔가요|무엇|알려|소개|설명|어떤\s?(프로젝트|거|건|서비스|앱)|보여)/,
+    EXP: /(해\s?보(셨|았|신)|경험\s?(있|이\s?있|해\s?보)|해\s?본\s?적|써\s?보(셨|신|았)|다뤄\s?보(셨|신)|할\s?줄\s?(아|알))/,
+    RISK: /(약점|단점|실패|힘들었|힘든|어려웠|갈등|아쉬|후회|부족|실수|비판)/,
+    // 사적인 질문(가족 · 건강 · 종교 · 정치 · 외모 · 재산 · 나이 · 연애 · 사는 곳)
+    PRIVATE: /(나이|몇\s?살|생년|생일|키가|몸무게|혈액형|외모|잘생|예쁘|연애|여자\s?친구|남자\s?친구|애인|결혼|가족|부모님|형제|건강|아프|질병|종교|정치|재산|월세|사는\s?곳|어디\s?(살|사세|사시)|집\s?주소|주소가)/,
+    // 한정민 · 포트폴리오 이야기(외부 출처를 붙이지 않음)
+    SELF: /(한정민|정민|헝그리|허기|포트폴리오|이력서|자소서|자기소개서|parallax|롯데시네마|코레일톡|플로레터)/i,
+    // 진위 확인(팀 결과와 한정민이 맡은 것을 가려 묻기)
+    SPLIT: /(직접\s?(하|만드|한|맡|기획)|혼자|맡은\s?(부분|일|것|역할)|본인이\s?(한|직접|맡)|기여(도|한)|어디까지\s?(하|맡))/,
+    // 가져갈 결과 글(번역 · 요약 · 다듬기)
+    OUTQ: /(번역|영어로|영문으로|english|요약|줄여|다듬|고쳐\s?(써|줘|주세요)|한\s?줄로|두\s?줄로|세\s?줄로|바꿔\s?(줘|주세요))/i,
+    // 넓은 질문(골라야 답할 수 있음): 되묻기를 되묻기로 보일 때
+    BROAD: /(얘기\s?해|이야기\s?해|얘기\s?좀|추천|뭐부터|뭘\s?먼저|무엇부터|어디부터|어떤\s?걸\s?먼저|아무거나|둘러|구경)/,
+    // 답 글이 그림이 없다고 말함(그림을 붙이면 글과 어긋남)
+    IMG_DENY: /(사진|이미지|그림|캡처|화면)[^.!?]{0,24}(없어요|없습니다|없네요|없답니다|준비되어\s?있지\s?않|준비돼\s?있지\s?않)/,
+    URL: /https?:\/\/[^\s]+/,
+    // 답 글이 "모름 · 자료 없음"인지(첫 두 문장)
+    MORUM: /(자료에\s?(없|적혀\s?있지\s?않|담겨\s?있지\s?않)|아직\s?(못|모르|배우지|잘\s?몰|들은\s?적|정리되지)|못\s?배웠|못\s?들었|알지\s?못|잘\s?(모르|몰라)|몰라요|모르겠|모릅니|몰라서|직접\s?(여쭤|물어)|확인되지\s?않|정리되지\s?않|알\s?수\s?없|확인할\s?수\s?없)/,
+    LINK_FAIL_TEXT: /(열\s?수\s?없|열지\s?못|읽지\s?못|열리지\s?않)/,
+    DOC_SHOWN: /^채용 공고를 붙여 넣었어요 \(([\d,]+)자\)$/,
+    FILE_SHOWN: /\s·\s파일:\s(.+\.(pdf|png|jpe?g|webp))$/i
+  };
+  var FILE_OK = /^(application\/pdf|image\/(png|jpeg|webp))$/;
+  // 프로젝트 이름을 질문에서 찾는 말. "유지"는 흔한 낱말이라 프로젝트 · 앱이 붙거나 문장 맨 앞일 때만
+  var ALIAS = {
+    parallax: /(parallax|패럴랙스|파랄랙스|페럴렉스|패럴렉스|페럴랙스)/i,
+    lotte: /(롯데\s?시네마|롯시)/,
+    korail: /(코레일)/,
+    flo: /(플로\s?레터|flo\s?letter)/i,
+    uuji: /(유지\s?(프로젝트|앱|서비스)|^\s*유지(는|가|를|요)?\s?(뭐|어떤|알려|소개|상세|열어|보여))/
+  };
+  var SEC_WORD = { contact: /(연락처|연락\s?(하는\s?곳|페이지|칸)|컨택|메일)/, projects: /(프로젝트|작업)/, about: /(소개|어바웃|about|한정민\s?(페이지|칸))/i };
+
+  /* ── 작은 도구 ─────────────────────────────────────── */
+  function s(x) { return String(x == null ? '' : x); }
+  function plain(t) { return s(t).replace(/\[\[[^\]]*\]\]/g, '').replace(/\*\*/g, '').replace(/\s+/g, ' ').trim(); }
+  function sentencesOf(t) { return plain(t).split(/(?<=[.!?…])\s+/).filter(Boolean); }
+  function has(list, x) { return (list || []).indexOf(x) > -1; }
+  function uniq(a) { var o = []; a.forEach(function (x) { if (x && o.indexOf(x) < 0) o.push(x); }); return o; }
+  function projById(data, id) { return (data.projects || []).filter(function (p) { return p.id === id; })[0] || null; }
+  function namedProjects(q, data) {
+    return (data.projects || []).filter(function (p) {
+      var re = ALIAS[p.id]; if (re) return re.test(q);
+      return p.name && p.name.length >= 3 && q.toLowerCase().indexOf(p.name.toLowerCase()) > -1;
+    }).map(function (p) { return p.id; });
+  }
+  function projOfCard(cid, data) { var head = s(cid).split('-')[0]; return projById(data, head) ? head : null; }
+  function projOfAt(at, data) { var head = s(at).split('/')[0]; return projById(data, head) ? head : null; }
+
+  /* ── 사이트 메일 모드: 질문 글로 mode: "mail"을 붙일지(사칭이면 안 붙여 원래 사양 흐름으로) ── */
+  function mailMode(q) {
+    q = s(q);
+    return RE.MAIL_WORD.test(q) && RE.MAIL_DO.test(q) && !RE.MAIL_ADDR.test(q) && !RE.IMPERSONATE.test(q);
+  }
+
+  /* ── 답 데이터 맞추기 ① Worker 답 JSON → 판단용 모양(사이트 validate()와 같은 거름) ── */
+  var ACT_OK = ['open', 'filter', 'scroll', 'cite', 'contact'];
+  var FILE_KIND = ['resume', 'cover', 'resume_set', 'md', 'docx', 'xlsx', 'pdf', 'txt'];
+  function fromWorker(o, data, ctx) {
+    data = data || {}; ctx = ctx || {};
+    if (!o || !Array.isArray(o.sentences)) return { final: true, preset: true };   // 답 없음 = 사이트는 미리 쓴 안내(presetText)
+    var sens = o.sentences.filter(function (x) { return x && typeof x.text === 'string'; });
+    var text = sens.map(function (x) { return plain(x.text); }).join(' ');
+    var rows = 0, run = 0;
+    sens.forEach(function (x) { if (x.form === 'row') { run++; rows = Math.max(rows, run); } else run = 0; });
+    var cardIds = (data.cards || []);
+    var cites = uniq([].concat.apply([], sens.map(function (x) { return (x.cards || []).filter(function (c) { return has(cardIds, c); }); })));
+    var a = (o.actions || []).filter(function (x) { return x && has(ACT_OK, x.type) && (x.label || x.type === 'contact'); })[0];
+    var ask = null, askTeam = false;
+    if (o.ask && (o.ask.team || o.ask_team)) askTeam = !ctx.team;
+    else if (o.ask && Array.isArray(o.ask.options)) {
+      var opts = o.ask.options.map(function (x) { return s(x).replace(/\s+/g, ' ').trim().slice(0, 40); }).filter(Boolean).slice(0, 4);
+      if (opts.length >= 2) ask = { question: s(o.ask.question).slice(0, 80), options: opts };
+    }
+    var src = (Array.isArray(o.sources) ? o.sources : []).filter(function (x) { return x && /^https:\/\//.test(s(x.url)); }).slice(0, 2);
+    var mail = o.mail && (o.mail.subject || o.mail.body) ? { subject: s(o.mail.subject), body: s(o.mail.body) } : null;
+    var imgs = (data.images || []).map(function (i) { return i.id; });
+    var file = o.file && has(FILE_KIND, o.file.kind) && (/^resume|^cover/.test(o.file.kind) || s(o.file.content).trim()) ? o.file.kind : null;
+    return {
+      final: true, preset: false, mood: o.mood || (sens[0] && sens[0].mood) || null,
+      text: text, first2: sentencesOf(text).slice(0, 2).join(' '), rows: rows, cites: cites,
+      act: a ? [a.type, s(a.target)] : null, ask: ask, askTeam: askTeam, mail: mail, src: src,
+      img: o.image && has(imgs, o.image) ? o.image : null, file: file,
+      hs: { split: o.split || null, out: o.out || null, posting_failed: o.posting_failed === true }
+    };
+  }
+  /* ── 답 데이터 맞추기 ② 사이트 parse() 결과 → 판단용 모양(3차에서 사이트가 부름) ── */
+  function fromParsed(r, x) {
+    x = x || {};
+    if (!r) return { final: true, preset: true };
+    var said = r.said || [], html = s(r.html);
+    var cites = uniq((html.match(/data-cite="([a-z0-9-]+)"/g) || []).map(function (m) { return m.replace(/^data-cite="|"$/g, ''); }));
+    var tables = html.split('<table').slice(1).map(function (t) { return (t.split('</table>')[0].match(/<tr/g) || []).length; });
+    return {
+      final: x.final !== false, preset: !!x.preset || !!r.retry, mood: x.mood || null,
+      text: said.join(' '), first2: said.slice(0, 2).join(' '), rows: tables.length ? Math.max.apply(null, tables) : 0, cites: cites,
+      act: r.act || null, ask: r.ask && r.ask.options && r.ask.options.length >= 2 ? r.ask : null, askTeam: !!r.askTeam,
+      mail: r.mail || null, src: r.src || [], img: r.img || null, file: r.file != null ? 'file' : null,
+      hs: r.hs || {}, stopped: x.stopped || null, partialLen: x.partialLen || 0
+    };
+  }
+
+  /* ── 부품마다 "넣을 내용(데이터)이 있는지"만 본다(의도 · 금지는 안 봄). 시험에서 "정상 안 나옴"을 가릴 때도 씀 ── */
+  function dataFor(id, inp) {
+    var a = inp.ans || null, d = inp.data || {}, q = inp.q || {}, ui = inp.ui || {};
+    var hs = (a && a.hs) || {};
+    switch (id) {
+      case 'ask': return !!(a && (a.ask || a.askTeam));
+      case 'contact': return !!(a && a.act && (a.act[0] === 'contact' || (a.act[0] === 'scroll' && a.act[1] === 'contact')) && d.contactMail);
+      case 'mail': return !!(a && a.mail && (s(a.mail.subject).trim() || s(a.mail.body).trim()));
+      case 'src': return !!(a && a.src && a.src.length);
+      case 'goto': return !!(a && a.act && gotoTarget(a.act, d));
+      case 'profile': return !!(d.profileReady && a && a.text);
+      case 'gallery': return !!(a && a.img && galleryOf(a.img, d).length >= 2);
+      case 'cards': return true;   // 후보 프로젝트는 질문 경로마다 달라서 판단 안에서 셈(후보 0개면 no-data)
+      case 'tableCopy': return !!(a && a.rows >= 2);
+      case 'split': return !!(hs.split && (hs.split.team || []).filter(Boolean).length && (hs.split.me || []).filter(Boolean).length);
+      case 'out': return !!(hs.out && s(hs.out.text).trim() && s(hs.out.text).length <= NUM.OUT_MAX);
+      case 'linkFail': return hs.posting_failed === true;
+      case 'stopped': return !!(a && a.stopped && a.partialLen > 0);
+      default: return true;   // 화면 판단 부품은 화면 상태가 곧 데이터
+    }
+  }
+  function gotoTarget(act, d) {
+    var t = act[0], v = act[1];
+    if (t === 'open') return projById(d, v) ? { type: 'open', target: v, label: projById(d, v).name + ' 상세로 이동' } : null;
+    if (t === 'scroll' && has(['projects', 'about', 'contact'], v)) return { type: 'scroll', target: v, label: { projects: '프로젝트로 이동', about: '소개로 이동', contact: '연락처로 이동' }[v] };
+    if (t === 'filter' && has(d.filters || ['all', 'featured', 'collab', 'plan'], v)) return { type: 'filter', target: v, label: '프로젝트 목록으로 이동' };
+    if (t === 'contact') return { type: 'contact', target: '', label: '연락처로 이동' };
+    return null;
+  }
+  function galleryOf(img, d) {
+    var me = (d.images || []).filter(function (i) { return i.id === img; })[0];
+    if (!me || !me.at) return [];
+    return (d.images || []).filter(function (i) { return i.at === me.at; }).map(function (i) { return i.id; });
+  }
+
+  /* ── 본 판단 ──────────────────────────────────────── */
+  function hgSituation(inp) {
+    inp = inp || {};
+    var a = inp.ans || null, Q = inp.q || {}, ui = inp.ui || {}, ctx = inp.ctx || {}, d = inp.data || {};
+    var hold = (inp.opts && Array.isArray(inp.opts.hold)) ? inp.opts.hold : HOLD;
+    var q = s(Q.text).trim(), why = {}, got = {};
+    var prev = ctx.prev || [];
+    var ok = function (id, extra) { got[id] = extra || true; why[id] = 'ok'; };
+    var no = function (id, r) { if (!(id in why)) why[id] = r; };
+    var held = function (id) { if (has(hold, id)) { no(id, 'hold'); return true; } return false; };
+
+    /* 1) 질문 말풍선 부품(화면 판단) */
+    var docShown = !!(Q.restored && Q.shown && Q.shown !== q && RE.DOC_SHOWN.test(Q.shown));
+    if ((Q.sendKind === 'doc' && (Q.docLen || 0) > NUM.DOC_MIN) || docShown) ok('postAtt'); else no('postAtt', 'not-doc');
+    var fileShown = !!(Q.restored && Q.shown && Q.shown !== q && RE.FILE_SHOWN.test(Q.shown));
+    if ((Q.sendKind === 'file' && Q.file && FILE_OK.test(s(Q.file.mime)) && Q.file.name) || fileShown) ok('fileAtt'); else no('fileAtt', Q.sendKind === 'file' ? 'file-type' : 'no-file');
+    if (got.postAtt) no('long', 'off-by:postAtt');
+    else if ((Q.lines || 0) > NUM.LONG_LINES) ok('long'); else no('long', 'lines<=6');
+
+    /* 2) 화면 부품(답과 따로) */
+    var hasAns = ui.answers == null ? true : ui.answers > 0;
+    if (!ui.inChat) no('jump', 'not-chat');
+    else if (ui.overlay) no('jump', 'overlay');
+    else if (!hasAns) no('jump', 'no-answer');
+    else {
+      var dist = ui.dist || 0;
+      if (dist > NUM.JUMP_SHOW || (ui.jumpShown && dist >= NUM.JUMP_HIDE)) ok('jump', { variant: ui.newWhileAway ? 'new' : 'bottom' });
+      else no('jump', 'near-bottom');
+    }
+    var at = ui.attach || null;
+    if (!at) no('upload', 'no-attach');
+    else if (at.state === 'rejected') { if ((at.elapsed || 0) < NUM.REJECT_MS && (at.size || 0) > NUM.MAX_FILE) ok('upload', { variant: 'reject' }); else no('upload', 'reject-timeout'); }
+    else if (at.state === 'failed') { if ((at.elapsed || 0) < NUM.FAIL_MS) ok('upload', { variant: 'fail' }); else no('upload', 'fail-timeout'); }
+    else if (has(['prep', 'up', 'ready'], at.state) && at.size > NUM.BIG_FILE && at.size <= NUM.MAX_FILE) ok('upload', { variant: at.state });
+    else no('upload', at.size <= NUM.BIG_FILE ? 'small-file' : 'state:' + at.state);
+    if (ui.mic === 'on') ok('listen'); else no('listen', 'mic:' + (ui.mic || 'off'));
+
+    /* 3) 답 부품 — 답이 없거나 · 미리 쓴 안내 · 흘러나오는 중이면 하나도 안 그림 */
+    var ANS = ['ask', 'contact', 'mail', 'src', 'goto', 'profile', 'gallery', 'cards', 'tableCopy', 'split', 'out', 'linkFail', 'stopped'];
+    var gate = !a ? 'no-answer' : a.preset ? 'preset' : null;
+    if (!gate && a.stopped) {   // 멈춘 답(보류): 멈춘 답에는 다른 답 부품을 붙이지 않는다
+      if (!held('stopped')) { if (a.partialLen > 0 && has(['button', 'newQuestion'], a.stopped)) ok('stopped'); else no('stopped', a.partialLen > 0 ? 'not-user-stop' : 'no-text'); }
+      gate = 'stopped';
+    }
+    if (!gate && a.final === false) gate = 'streaming';
+    if (!gate && /^(alert|angry)$/.test(s(a.mood))) gate = 'mood:' + a.mood;   // 규칙 무시 · 사칭 · 모욕을 거절하는 답: 글만
+    if (gate) { ANS.forEach(function (id) { no(id, gate); }); return finish(); }
+    no('stopped', 'not-stopped');
+
+    var morum = RE.MORUM.test(s(a.first2));
+    var priv = RE.PRIVATE.test(q);
+    var named = namedProjects(q, d);
+    var moveQ = RE.MOVE.test(q);
+
+    // 메일 초안
+    if (!dataFor('mail', inp)) no('mail', 'no-data');
+    else if (!(mailMode(q) || ui.mailDraftClick)) no('mail', 'no-intent');
+    else ok('mail');
+
+    // 결과 상자(보류)
+    if (!held('out')) {
+      if (!dataFor('out', inp)) no('out', 'no-data');
+      else if (!RE.OUTQ.test(q)) no('out', 'no-intent');
+      else if (a.file) no('out', 'off-by:file');
+      else ok('out');
+    }
+    // 진위 나눔(보류) — 그 프로젝트에서 한정민이 맡은 부분 자료가 있을 때만(PARALLAX는 없음)
+    if (!held('split')) {
+      if (!dataFor('split', inp)) no('split', 'no-data');
+      else if (!RE.SPLIT.test(q)) no('split', 'no-intent');
+      else if (priv) no('split', 'block:private');
+      else if (named.length !== 1) no('split', 'project-unclear');
+      else if (!(d.roleReady && d.roleReady[named[0]] === true)) no('split', 'no-role-data:' + named[0]);
+      else ok('split');
+    }
+    // 링크 못 읽음(보류)
+    if (!held('linkFail')) {
+      if (!dataFor('linkFail', inp)) no('linkFail', 'no-data');
+      else if (!RE.URL.test(q) || Q.sendKind === 'doc' || Q.sendKind === 'file') no('linkFail', 'no-link');
+      else ok('linkFail');
+    }
+
+    // 되묻기 보기 — Worker가 ask를 자주(시험 답의 36%) "다음 이야기 권하기"로 쓰므로, 진짜 되묻기만 되묻기로 보인다.
+    //   진짜 되묻기 = 팀 되묻기 · 넓은 질문(프로젝트 이름 · 소개 의도 없음) · 연락 의사(전달 흐름: 목적 묻기)
+    //   나머지 ask 보기는 기존 "다음 질문" 버튼으로 내린다(askAsNext, 상황 부품 아님 · 다른 부품을 끄지 않음)
+    var profileQ = RE.SUBJ.test(q) && RE.WHO.test(q);
+    var realAsk = !!(a.askTeam && !a.ask) || (RE.BROAD.test(q) && !named.length && !profileQ) || RE.CONTACT.test(q);
+    if (!dataFor('ask', inp)) no('ask', 'no-data');
+    else if (!realAsk) { no('ask', 'not-broad'); if (a.ask) got.askAsNext = a.ask.options.slice(0, 3); }
+    else if (has(prev, 'ask')) { no('ask', 'repeat'); if (a.ask) got.askAsNext = a.ask.options.slice(0, 3); }   // 연속 두 번 금지(Worker 규칙을 화면도 지킴)
+    else ok('ask', { team: !a.ask && a.askTeam });
+
+    // 연락 카드
+    if (!dataFor('contact', inp)) no('contact', a.act && (a.act[0] === 'contact' || a.act[1] === 'contact') ? 'no-mail-data' : 'no-data');
+    else if (!RE.CONTACT.test(q)) no('contact', 'no-intent');
+    else if (priv) no('contact', 'block:private');
+    else if (RE.IMPERSONATE.test(q)) no('contact', 'block:impersonate');
+    else if (has(prev, 'contact')) no('contact', 'repeat');
+    else ok('contact');
+
+    // 화면 이동
+    var gt = a.act ? gotoTarget(a.act, d) : null;
+    if (!gt) no('goto', 'no-data');
+    else if (!moveQ) no('goto', 'no-intent');
+    else if (priv) no('goto', 'block:private');
+    else {
+      var tOk = false;
+      if (gt.type === 'open') tOk = has(named, gt.target) || (!named.length && RE.REF.test(q));
+      else if (gt.type === 'contact') tOk = SEC_WORD.contact.test(q);
+      else if (gt.type === 'scroll') tOk = SEC_WORD[gt.target].test(q);
+      else if (gt.type === 'filter') tOk = /(프로젝트|목록|작업)/.test(q);
+      if (!tOk) no('goto', 'target-mismatch'); else ok('goto', { type: gt.type, target: gt.target, label: gt.label, live: ctx.live !== false });
+    }
+
+    // 한정민 소개 답(한 대화에 한 번)
+    if (!dataFor('profile', inp)) no('profile', 'no-data');
+    else if (!(RE.SUBJ.test(q) && RE.WHO.test(q))) no('profile', 'no-intent');
+    else if (RE.WHO_EXCL.test(q)) no('profile', 'excluded-words');
+    else if (priv) no('profile', 'block:private');
+    else if (ctx.profileShown) no('profile', 'repeat');
+    else if (morum) no('profile', 'answer-unknown');
+    else if (a.file) no('profile', 'off-by:file');
+    else ok('profile');
+
+    // 이미지 여러 장
+    // 그림: Worker image가 있으면 그 묶음. 없으면(시험 답에서 image 0번) 질문이 프로젝트 하나를 이름 대고 그림을 원할 때
+    //   그 프로젝트의 2장 이상 묶음이 딱 하나일 때만 사이트 그림 목록에서 고른다(둘 이상이면 어느 것인지 헷갈려 안 보임)
+    var visQ = RE.VIS.test(q) && RE.SHOW.test(q);
+    var gal = a.img ? galleryOf(a.img, d) : [], galFirst = a.img;
+    if (gal.length < 2 && !a.img && visQ && named.length === 1) {
+      var groups = {}; (d.images || []).forEach(function (i) { if (projOfAt(i.at, d) === named[0]) (groups[i.at] = groups[i.at] || []).push(i.id); });
+      var big = Object.keys(groups).filter(function (k) { return groups[k].length >= 2; });
+      if (big.length === 1) { gal = groups[big[0]]; galFirst = gal[0]; }
+    }
+    var galAt = gal.length ? ((d.images || []).filter(function (i) { return i.id === galFirst; })[0] || {}).at : null;
+    if (gal.length < 2) no('gallery', 'no-data');
+    else if (!visQ) no('gallery', 'no-intent');
+    else if (named.length && !has(named, projOfAt(galAt, d))) no('gallery', 'project-mismatch');
+    else if (priv) no('gallery', 'block:private');
+    else if (morum) no('gallery', 'answer-unknown');
+    else if (RE.IMG_DENY.test(s(a.text))) no('gallery', 'answer-denies');
+    else if (has(prev, 'gallery:' + galAt)) no('gallery', 'repeat');
+    else ok('gallery', { at: galAt, from: a.img ? 'worker' : 'site', ids: [galFirst].concat(gal.filter(function (x) { return x !== galFirst; })) });
+
+    // 프로젝트 카드 — 세 경로(질문이 정함). 카드에 넣을 프로젝트는 답 데이터(동작 · 근거 · 답 글에 나온 이름)에서만 고름
+    //   A 목록 질문(프로젝트 이름 없이 "뭐 있어요 · 보여줘") · B 프로젝트 하나를 이름 대고 개요를 물음 · C 역량 질문("해 보셨어요?")
+    var cand = [], route = null;
+    var citedP = uniq((a.cites || []).map(function (c) { return projOfCard(c, d); }));
+    var saidP = namedProjects(s(a.text), d);   // 답 글에 이름이 나온 프로젝트
+    var actP = a.act && a.act[0] === 'open' && projById(d, a.act[1]) ? [a.act[1]] : [];
+    var filP = a.act && a.act[0] === 'filter' ? (d.projects || []).filter(function (p) { return a.act[1] === 'all' || has(p.groups, a.act[1]); }).map(function (p) { return p.id; }) : [];
+    var wantA = !named.length && RE.PROJ_WORD.test(q) && RE.LIST.test(q);
+    var wantB = named.length === 1 && RE.OVERVIEW.test(q) && !(RE.VIS.test(q) && RE.SHOW.test(q));   // 그림을 보여 달라는 말은 개요가 아님(이미지 여러 장 쪽)
+    var wantC = !wantA && !wantB && RE.EXP.test(q);
+    if (wantA) { route = 'A'; cand = uniq(filP.concat(actP, citedP, saidP)).slice(0, NUM.CARDS_MAX); }
+    else if (wantB) { route = 'B'; cand = has(actP, named[0]) || has(citedP, named[0]) || has(saidP, named[0]) ? [named[0]] : []; }
+    else if (wantC) { route = 'C'; cand = uniq(citedP.concat(saidP)).slice(0, NUM.CARDS_EXP_MAX); }
+    if (!route) no('cards', 'no-intent');
+    else if (!cand.length) no('cards', 'no-data');
+    else if (RE.RISK.test(q)) no('cards', 'block:risk');
+    else if (priv) no('cards', 'block:private');
+    else if (morum) no('cards', 'answer-unknown');
+    else if (has(prev, 'cards:' + cand.join(','))) no('cards', 'repeat');
+    else ok('cards', { route: route, ids: cand });
+
+    // 표 복사(표가 다 온 뒤, 머리 줄 + 1줄 이상)
+    if (dataFor('tableCopy', inp)) ok('tableCopy'); else no('tableCopy', 'no-data');
+
+    // 외부 출처 — 한정민 이야기가 아니고, 답이 그 자료를 실제로 썼을 때만
+    if (!dataFor('src', inp)) no('src', 'no-data');
+    else if (RE.SELF.test(q)) no('src', 'block:self');
+    else if (morum) no('src', 'answer-unknown');
+    else {
+      // 문서 이름(괄호 뺌) 전체나 그 첫 낱말(2자 이상)이 답 글 · 질문에 있어야 함. 엉뚱한 문서(예: "피그마"에 "이즈모 (비디오 게임)")는 숨김
+      var core = s(a.src[0].title).replace(/^위키백과\s*·\s*/, '').replace(/\s*\([^)]*\)\s*/g, ' ').trim();
+      var first = core.split(/\s+/)[0] || '';
+      var hay = a.text + ' ' + q;
+      var used = !!core && (hay.indexOf(core) > -1 || (first.length >= 2 && hay.indexOf(first) > -1));
+      if (!used) no('src', 'not-used'); else ok('src', { title: s(a.src[0].title), url: a.src[0].url });
+    }
+
+    /* 4) 서로 끄기 */
+    var off = function (id, by) { if (got[id]) { delete got[id]; why[id] = 'off-by:' + by; } };
+    if (got.mail) delete got.askAsNext;
+    if (got.mail) ['contact', 'goto', 'cards', 'gallery', 'profile', 'ask', 'out', 'split'].forEach(function (x) { off(x, 'mail'); });
+    if (got.ask) ['profile', 'gallery', 'cards', 'goto'].forEach(function (x) { off(x, 'ask'); });
+    if (got.goto) { off('cards', 'goto'); if (got.goto.type === 'contact' || got.goto.target === 'contact') off('contact', 'goto'); }
+    if (got.out || got.split) ['cards', 'gallery', 'profile'].forEach(function (x) { off(x, got.out ? 'out' : 'split'); });
+
+    /* 5) 개수: 큰 붙임 1 · 작은 붙임 2 */
+    var bigWin = BIG_ORDER.filter(function (x) { return got[x]; })[0];
+    BIG_ORDER.forEach(function (x) { if (got[x] && x !== bigWin) off(x, 'limit:big=' + bigWin); });
+    var smalls = SMALL_ORDER.filter(function (x) { return got[x]; });
+    smalls.slice(NUM.SMALL_MAX).forEach(function (x) { off(x, 'limit:small'); });
+    return finish();
+
+    function finish() {
+      var parts = RENDER_ORDER.filter(function (x) { return got[x]; });
+      return { parts: parts, detail: got, why: why };
+    }
+  }
+
+  /* 다음 답의 ctx.prev로 넘길 열쇠(바로 앞 답 되풀이 막기). 사이트는 답마다 이 값을 보관하고, 새로 고침으로 다시 그릴 때도 차례로 넘긴다 */
+  function prevKeys(x) {
+    var d = (x && x.detail) || {}, out = [];
+    if (d.contact) out.push('contact');
+    if (d.ask) out.push('ask');
+    if (d.cards && d.cards.ids) out.push('cards:' + d.cards.ids.join(','));
+    if (d.gallery && d.gallery.at) out.push('gallery:' + d.gallery.at);
+    if (d.profile) out.push('profile');
+    return out;
+  }
+
+  var HS = { NUM: NUM, HOLD: HOLD, PARTS: PARTS, RE: RE, mailMode: mailMode, fromWorker: fromWorker, fromParsed: fromParsed, dataFor: dataFor, prevKeys: prevKeys };
+  root.hgSituation = hgSituation; root.HS = HS;
+})(typeof window !== 'undefined' ? window : this);
+/* HG-SITUATION-END */
+  /* HS3-JS-BEGIN ══ 11-15 시트 → 웹 3차(HPP3): 대화 상황 부품 ══════════════════════════════════════
+   * 무엇을 그릴지는 바로 위 hgSituation(원본 디자인시스템/qa/hg_situation.js, 기준 시트/algo/상황규칙.md)만 정한다. 여기서는 사이트 상태를 모아 넘기고, 고른 부품만 그린다.
+   * 기존 validate · toRaw · parse · tail · ask · restoreChat 본문은 그대로 두고 바깥에서 감싼다(감싼 곳은 답 데이터에 표시 한 줄 @hs만 더함 — 예전 parse는 모르는 @줄을 버림).
+   * 허기 상태는 이미 있는 hgEvent('copyOk')만 부른다. 이벤트를 막지 않는다. 미리 쓴 안내 · 거절 답은 손대지 않는다(원래 답 그대로). */
+  var HS3_PF_PHOTO = '';   // 한정민 사진 파일(예: '../files/profile.jpg'). 비어 있으면 소개 답은 나오지 않는다(규칙: 사진 · 소개 글이 사이트에 있어야). 사진을 만들어 넣지 않음
+  var HS3 = { cur: null, restoring: false, ri: 0, prev: [], pf: false, pend: {}, n: 0, data: null, th: document.getElementById('thread'), hero: document.getElementById('hero'), mic: document.getElementById('mic'), up: null, badAt: 0 };
+  function hs3El(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+  function hs3Data() {
+    if (!HS3.data) HS3.data = {
+      projects: P.map(function (p) { return { id: p.id, name: p.name, groups: p.groups || [] }; }),
+      images: (K.images || []).map(function (i) { return { id: i.id, at: i.at }; }),
+      cards: Object.keys(CARD), filters: FILTERS.map(function (f) { return f.id; }), roleReady: {} };
+    var em = document.getElementById('email');
+    HS3.data.contactMail = !!(em && /@/.test(em.getAttribute('data-copy') || ''));
+    HS3.data.profileReady = !!HS3_PF_PHOTO;
+    return HS3.data;
+  }
+  function hs3Has(x, id) { return !!x && x.parts.indexOf(id) > -1; }
+
+  /* ── 감싸기: 원래 함수는 그대로 부르고, 앞뒤에서 값만 더함 ── */
+  var HS3_V0 = validate, HS3_T0 = toRaw, HS3_P0 = parse, HS3_TL0 = tail, HS3_A0 = ask, HS3_R0 = restoreChat;
+  validate = function (r) {   // 답의 감정(거절 답이면 부품을 붙이지 않으려고)만 더 읽음
+    var o = HS3_V0(r);
+    if (o) { var s0 = r.sentences[0]; o.hsMood = typeof r.mood === 'string' ? r.mood : (s0 && typeof s0.mood === 'string' ? s0.mood : null); }
+    return o;
+  };
+  toRaw = function (r) {   // 서버에서 실제로 받은 답이라는 표시 + 감정 한 줄(새로 고침 뒤에도 같은 판단)
+    return HS3_T0(r) + '\n@hs ' + JSON.stringify({ m: r.hsMood && /^[a-z]+$/.test(r.hsMood) ? r.hsMood : null });
+  };
+  parse = function (raw) {
+    var r = HS3_P0(raw), m = /^@hs \{"m":(?:"([a-z]+)"|null)\}\s*$/m.exec(String(raw || ''));
+    r.hsReal = !!m; r.hsMood = m ? (m[1] || null) : null;
+    return r;
+  };
+  ask = function (q, shown, opt) {   // 질문 상태를 적어 두고(질문 말풍선 · 답 판단용), 메일 초안 부탁이면 mode: "mail"을 붙임(사칭이면 안 붙임)
+    var qq = String(q || '').trim();
+    if (!qq || BUSY) return HS3_A0(q, shown, opt);
+    var o = Object.assign({}, opt || {}), click = o.mode === 'mail';
+    if (!o.mode && HS.mailMode(qq)) o.mode = 'mail';
+    HS3.cur = { q: qq, shown: shown || '', kind: o.doc ? 'doc' : o.file ? 'file' : 'text', docLen: o.doc ? String(o.doc).length : 0, doc: o.doc ? String(o.doc) : '',
+      file: o.file ? { name: String(o.file.name || ''), mime: String(o.file.mime || '') } : null, mailClick: click, used: false };
+    return HS3_A0(q, shown, o);
+  };
+  restoreChat = function () { HS3.restoring = true; HS3.ri = 0; HS3.prev = []; HS3.pf = false; try { HS3_R0(); } finally { HS3.restoring = false; } };
+  tail = function (r) {
+    var h = HS3_TL0(r);
+    try {
+      var live = !HS3.restoring && BUSY, info;
+      if (HS3.restoring) {
+        var t = SAVED[HS3.ri++] || {};
+        info = { q: String(t.q || ''), shown: String(t.shown || ''), kind: 'text', restored: true };
+        var mq = HS3.th.lastElementChild; if (mq && mq.classList.contains('msg-q') && !mq._hsq) mq._hsq = info;   // 새로 고침: 이 답의 질문 말풍선(방금 붙음)
+      } else info = HS3.cur || { q: '', shown: '' };
+      var x = hs3Judge(r, info, live), k = ++HS3.n;
+      HS3.pend[k] = { x: x, r: r, live: live };
+      return h + '<template class="hs-plan" data-k="' + k + '"></template>';
+    } catch (e) { return h; }
+  };
+  function hs3Judge(r, info, live) {
+    var a = HS.fromParsed(Object.assign({}, r, { askTeam: !!r.askTeam && !CTX.team }), { final: true, preset: !r.hsReal, mood: r.hsMood });
+    var x = hgSituation({ ans: a, q: { text: info.q, shown: info.shown, sendKind: info.kind || 'text', docLen: info.docLen || 0, file: info.file || null, lines: 1, restored: !!info.restored },
+      ui: { mailDraftClick: !!info.mailClick }, ctx: { prev: HS3.prev, profileShown: HS3.pf, team: CTX.team, live: live }, data: hs3Data() });
+    HS3.prev = HS.prevKeys(x); if (x.detail.profile) HS3.pf = true;
+    return x;
+  }
+
+  /* ── 감시 하나: 새 질문 말풍선 · 새 답의 판단(template)이 붙으면 그 자리에서 그림 ── */
+  new MutationObserver(function (ms) {
+    var th = HS3.th;
+    ms.forEach(function (m) {
+      [].forEach.call(m.addedNodes, function (n) {
+        if (n.nodeType !== 1) return;
+        if (n.parentNode === th) {
+          if (n.classList.contains('msg-q')) hs3Q(n);
+          else if (n.classList.contains('ans')) { var t = n.querySelector('template.hs-plan'); if (t) hs3Plan(n, t); else if (BUSY && !HS3.restoring) n.classList.add('hs-wait'); }   // 흘러나오는 중(표 복사 버튼은 다 온 뒤에)
+        } else if (n.classList.contains('ans-err')) { var E = n.closest('.ans'); if (E) E.classList.remove('hs-wait'); }
+        else if (n.tagName === 'TEMPLATE' && n.classList.contains('hs-plan')) { var A = n.parentNode && n.parentNode.closest ? n.parentNode.closest('.ans') : null; if (A) hs3Plan(A, n); }
+      });
+    });
+    hs3JumpSoon();
+  }).observe(HS3.th, { childList: true, subtree: true });
+  function hs3Plan(A, t) {
+    var k = t.getAttribute('data-k'), p = HS3.pend[k]; t.remove(); A.classList.remove('hs-wait'); if (!p) return; delete HS3.pend[k];
+    A._hs = p.x;   // 검수용(고른 부품 · 까닭). 화면에는 쓰지 않음
+    hs3Draw(A, p);
+    if (p.live) { if (stick) toBottom(); if (HS3J.shown) HS3J.nw = true; }
+  }
+
+  /* ── 질문 말풍선: 붙인 글 · 파일 칸, 긴 질문 접기(말풍선 글 · textContent는 그대로) ── */
+  function hs3Q(n) {
+    var info = n._hsq;
+    if (!info && HS3.cur && !HS3.cur.used) { info = n._hsq = HS3.cur; HS3.cur.used = true; }
+    if (!info) info = { q: n.textContent, shown: '' };
+    var txt = n.textContent;
+    var x = hgSituation({ ans: null, q: { text: info.q, shown: info.restored ? info.shown : txt, sendKind: info.kind || 'text', docLen: info.docLen || 0, file: info.file || null, lines: 1, restored: !!info.restored }, ui: {}, ctx: {}, data: {} });
+    var qt = hs3El('span', 'hs-qt'), suf = null;
+    if (hs3Has(x, 'fileAtt')) {
+      var fm = HS.RE.FILE_SHOWN.exec(txt), fname = info.file && info.file.name ? info.file.name : (fm ? fm[1] : '');
+      var cut = fm ? fm.index : txt.length;
+      qt.textContent = txt.slice(0, cut); if (cut < txt.length) { suf = hs3El('span', 'hs-fsuf'); suf.hidden = true; suf.textContent = txt.slice(cut); }
+      var mime = info.file && info.file.mime ? info.file.mime : '', img = /^image\//.test(mime) || /\.(png|jpe?g|webp)$/i.test(fname);
+      var att = hs3El('div', 'hs-att hs-file', '<div class="hs-att-h"><span class="hs-ty" aria-hidden="true">' + (img ? '이미지' : 'PDF') + '</span><span class="hs-att-n"></span></div>');
+      att.querySelector('.hs-att-n').textContent = fname; att.setAttribute('aria-label', '붙인 파일 ' + fname);
+      n.parentNode.insertBefore(att, n);
+    } else qt.textContent = txt;
+    if (hs3Has(x, 'postAtt')) {
+      var dm = HS.RE.DOC_SHOWN.exec(info.restored ? info.shown : txt), len = info.docLen || (dm ? +String(dm[1]).replace(/,/g, '') : 0);
+      var dc = hs3El('div', 'hs-att hs-docbox', '<div class="hs-att-h"><span class="hs-ty" aria-hidden="true">글</span><span class="hs-att-n">채용 공고 · ' + String(len).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '자</span></div>');
+      if (info.doc && !info.restored) {   // 공고 원문은 이번 방문 메모리에만(대화 저장에는 넣지 않음)
+        var dp = hs3El('p', 'hs-doc'); dp.id = 'hs-doc-' + (++HS3.n); dp.textContent = info.doc; dc.appendChild(dp);
+        dc.appendChild(hs3MoreBtn(dp.id));
+      }
+      n.parentNode.insertBefore(dc, n);
+      n._hsDoc = true;
+      if (dc.querySelector('.hs-doc')) hs3Fit(dc);
+    }
+    n.textContent = ''; n.appendChild(qt); if (suf) n.appendChild(suf);
+    qt.id = 'hs-q-' + (++HS3.n);
+    if (!n._hsDoc) hs3Fit(n, info);
+  }
+  function hs3MoreBtn(id) { var b = hs3El('button', 'hs-more'); b.type = 'button'; b.hidden = true; b.setAttribute('data-hs-more', ''); b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-controls', id); b.setAttribute('aria-label', '글 전체 보기'); b.setAttribute('data-l', '더 보기'); return b; }
+  // 말풍선 글이 6줄을 넘으면 접기(화면 폭이 바뀌면 다시 잼)
+  function hs3Fit(n, info) {
+    var box = n.classList.contains('hs-att') ? n.querySelector('.hs-doc') : n.querySelector('.hs-qt'); if (!box) return;
+    var cs = getComputedStyle(box), lh = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.7, lines = Math.round(box.scrollHeight / lh);
+    var long;
+    if (n.classList.contains('hs-att')) long = lines > HS.NUM.LONG_LINES;
+    else { info = info || n._hsq || { q: '', shown: '' }; long = hs3Has(hgSituation({ ans: null, q: { text: info.q, shown: '', lines: lines }, ui: {}, ctx: {}, data: {} }), 'long'); }
+    var b = n.querySelector('.hs-more');
+    if (long && !b) { b = hs3MoreBtn(box.id); n.appendChild(b); }
+    n.classList.toggle('hs-long', long || (!!b && n.classList.contains('hs-open')));
+    if (b) b.hidden = !long && !n.classList.contains('hs-open');
+  }
+  var hs3FitT = 0;
+  window.addEventListener('resize', function () { clearTimeout(hs3FitT); hs3FitT = setTimeout(function () { HS3.th.querySelectorAll('.msg-q').forEach(function (n) { if (!n._hsDoc && n.querySelector('.hs-qt')) hs3Fit(n); }); HS3.th.querySelectorAll('.hs-att.hs-docbox').forEach(function (n) { if (n.querySelector('.hs-doc')) hs3Fit(n); }); }, 160); });
+  function hs3More(b) {
+    var n = b.parentNode, box = document.getElementById(b.getAttribute('aria-controls')); if (!n || !box) return;
+    var h0 = box.getBoundingClientRect().height; box.getAnimations().forEach(function (a) { a.cancel(); });
+    var on = !n.classList.contains('hs-open'); n.classList.toggle('hs-open', on);
+    b.setAttribute('aria-expanded', String(on)); b.setAttribute('data-l', on ? '접기' : '더 보기'); b.setAttribute('aria-label', on ? '글 접기' : '글 전체 보기');
+    if (uiRM() || !box.animate) return;
+    var h1 = on ? box.scrollHeight : parseFloat(getComputedStyle(box).maxHeight) || h0, y0 = b.getBoundingClientRect().top;
+    var an = box.animate([{ maxHeight: h0 + 'px' }, { maxHeight: h1 + 'px' }], { duration: Math.min(700, 360 + Math.abs(h1 - h0) * .2), easing: 'cubic-bezier(.4, 0, .2, 1)' }); an.finished.catch(function () {});
+    if (!on) (function keep() { var dy = b.getBoundingClientRect().top - y0; if (Math.abs(dy) > .5) HS3.th.scrollTop += dy; if (an.playState === 'running') requestAnimationFrame(keep); })();   // 접을 때 버튼이 손가락 아래 그대로
+  }
+
+  /* ── 답 부품 그리기 ── */
+  function hs3Draw(A, p) {
+    var x = p.x, D = x.detail, r = p.r, on = function (id) { return hs3Has(x, id); };
+    if (/^(no-answer|preset|stopped|streaming|mood:)/.test(x.why.cards || '')) return;   // 미리 쓴 안내 · 거절 답 · 끊긴 답: 손대지 않음
+    var body = A.querySelector('.body'), nx = A.querySelector('.next'), files = A.querySelector('.ans-files');
+    A.querySelectorAll('.body .tbl').forEach(function (tb) { if (!on('tableCopy') || tb.querySelectorAll('tr').length < 2) tb.querySelectorAll('.tbl-bt').forEach(function (b) { b.remove(); }); });   // 표 복사 · 크게 보기: 머리 줄 + 1줄 이상인 표만(2차 버튼 그대로, 머리 줄뿐인 표에서만 뺌)
+    var big = null;
+    if (on('profile')) big = hs3Profile();
+    else if (on('gallery')) big = hs3Gallery(D.gallery.ids);
+    else if (on('cards')) big = hs3Cards(D.cards.ids);
+    if (big) { A.insertBefore(big, body ? body.nextSibling : A.firstChild); if (on('gallery')) { var sh = A.querySelector('figure.shot'); if (sh) sh.remove(); hs3GalInit(big); } if (on('profile')) hs3PfInit(big); }
+    if (on('cards') && r.act && r.act[0] === 'open' && D.cards.ids.indexOf(r.act[1]) > -1) hs3Unlink(A, 'open', r.act[1]);   // 같은 프로젝트 "자세히 보기 →"는 카드가 대신
+    var mb = A.querySelector('.mailbox');
+    if (mb) { if (on('mail')) hs3Mail(mb); else mb.remove(); }
+    var ref = files || nx;
+    if (on('contact')) { A.insertBefore(hs3Contact(), ref); hs3Unlink(A, 'contact'); hs3Unlink(A, 'scroll', 'contact'); }
+    if (on('goto')) { var g = hs3Goto(D.goto, p.live); A.insertBefore(g, ref); hs3Unlink(A, D.goto.type, D.goto.type === 'contact' ? null : D.goto.target); hs3GoInit(g, p.live); }
+    if (files) { files.querySelectorAll('.ans-link').forEach(function (l) { l.remove(); }); if (!files.children.length) files.remove(); }   // 출처는 아래 알약 하나로(규칙: 답이 그 자료를 쓴 일반 사실 질문에만)
+    if (on('src')) { var s = hs3Src(D.src); if (nx && nx.parentNode === A) A.insertBefore(s, nx.nextSibling); else A.appendChild(s); }
+    var ab = A.querySelector('.ask-back');
+    if (!on('ask')) {   // 진짜 되묻기가 아니면 보기를 기존 "다음 질문" 버튼으로(최대 3개), 아니면 지움(새로 고침 뒤에도 같게)
+      if (ab) ab.remove();
+      if (D.askAsNext && D.askAsNext.length && !A.querySelector('.nextq:not(.ans-retry-row)')) {
+        var nq = hs3El('div', 'nextq'); nq.setAttribute('aria-label', '이어서 물어보기');
+        D.askAsNext.forEach(function (o) { var b = hs3El('button'); b.type = 'button'; b.setAttribute('data-q', o); b.textContent = o; nq.appendChild(b); });
+        A.appendChild(nq);
+      }
+    }
+  }
+  function hs3Unlink(A, type, target) {
+    A.querySelectorAll('.next [data-act="' + type + '"]').forEach(function (l) { if (target == null || l.getAttribute('data-t') === target) l.remove(); });
+  }
+  function hs3Copy(txt, done) {
+    var legacy = function () { var f = document.activeElement, ta = document.createElement('textarea'), ok = false; ta.value = txt; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none';
+      document.body.appendChild(ta); ta.select(); try { ok = document.execCommand('copy'); } catch (e) {} ta.remove(); if (f && f.focus) f.focus({ preventScroll: true }); return ok; };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { done(true); }, function () { done(legacy()); });
+    else done(legacy());
+  }
+  function hs3Flash(b, ok, okText, icon) {   // 알약 글을 잠깐 "복사했어요" · "복사하지 못했어요"로
+    var lab = b.querySelector('.hs-pl'), ic = b.querySelector('.ms'); if (!lab) return;
+    if (lab._o == null) { lab._o = lab.textContent; if (ic) ic._o = ic.textContent; }
+    clearTimeout(b._t); b.classList.remove('hs-done'); void b.offsetWidth;
+    if (ok) { b.classList.add('hs-done'); if (ic) ic.textContent = 'check'; hgEvent('copyOk'); }
+    lab.textContent = ok ? okText : '복사하지 못했어요';
+    b._t = setTimeout(function () { b.classList.remove('hs-done'); lab.textContent = lab._o; if (ic && ic._o) ic.textContent = ic._o; }, ok ? 1600 : 2400);
+  }
+  function hs3Addr() { var em = document.getElementById('email'); return em ? em.getAttribute('data-copy') || '' : ''; }
+
+  // 연락 카드(메일 주소 글자는 보이지 않음: 주소 복사 · 메일 쓰기 버튼만)
+  function hs3Contact() {
+    var c = hs3El('div', 'hs-contact', '<span class="hs-ci" aria-hidden="true"><span class="ms">mail</span></span><span class="hs-ct"><b>한정민 메일</b><span>주소를 복사하거나 바로 메일을 쓸 수 있어요</span></span>' +
+      '<span class="hs-cb"><button class="hs-pill" type="button" data-hs-mcopy><span class="ms" aria-hidden="true">content_copy</span><span class="hs-pl">주소 복사</span></button>' +
+      '<button class="hs-pill" type="button" data-hs-compose aria-haspopup="dialog"><span class="ms" aria-hidden="true">edit</span><span class="hs-pl">메일 쓰기</span></button></span>');
+    c.setAttribute('role', 'group'); c.setAttribute('aria-label', '한정민에게 연락하기');
+    return c;
+  }
+  // 메일 초안: 기존 상자에 머리 줄 · 고쳐 쓰기만 더함(입력 칸 · 메일 앱으로 열기 · 복사하기 동작은 그대로)
+  function hs3Mail(mb) {
+    mb.classList.add('hs-mail');
+    mb.insertBefore(hs3El('div', 'hs-mh', '<span>메일 초안</span><em>받는 사람 한정민</em>'), mb.firstChild);
+    mb.querySelectorAll('input, textarea').forEach(function (f) { f.readOnly = true; });
+    var row = mb.querySelector('.row');
+    if (row) { var e = hs3El('button', 'link', '고쳐 쓰기'); e.type = 'button'; e.setAttribute('data-hs-medit', ''); e.setAttribute('aria-pressed', 'false'); row.appendChild(e); }
+  }
+  function hs3MailEdit(b) {
+    var mb = b.closest('.mailbox'); if (!mb) return;
+    var on = !mb.classList.contains('hs-editing'); mb.classList.toggle('hs-editing', on); b.classList.toggle('hs-on', on);
+    b.setAttribute('aria-pressed', String(on)); b.textContent = on ? '다 고쳤어요' : '고쳐 쓰기';
+    mb.querySelectorAll('input, textarea').forEach(function (f) { f.readOnly = !on; });
+    if (on) { var ta = mb.querySelector('textarea'); if (ta) { ta.focus({ preventScroll: true }); try { ta.setSelectionRange(ta.value.length, ta.value.length); } catch (e) {} } }
+  }
+  // 외부 출처 알약(1개)
+  function hs3Src(s) {
+    var t = String(s.title || ''), host = ''; try { host = new URL(s.url).hostname.replace(/^www\./, ''); } catch (e) {}
+    var m = /^(위키백과)\s*·\s*(.+)$/.exec(t), who = m ? m[1] : host, what = m ? m[2] : t;
+    var a = hs3El('a', 'hs-src'); a.href = s.url; a.target = '_blank'; a.rel = 'noopener';
+    a.innerHTML = '<span class="ms" aria-hidden="true">link</span><span class="hs-st">출처 <b></b>' + (what ? ' · <span></span>' : '') + '</span>';
+    a.querySelector('b').textContent = who; if (what) a.querySelector('.hs-st > span').textContent = what;
+    a.setAttribute('aria-label', '출처 ' + who + (what ? ' ' + what : '') + ', 새 탭에서 열기');
+    var row = hs3El('div', 'hs-src-row'); row.appendChild(a); return row;
+  }
+  // 화면 이동: 지금 받은 답이고 화면에 60% 넘게 보이면 1.2초 차오른 뒤 이동. 새로 고침으로 다시 그린 답 · 동작 줄이기면 알약만
+  function hs3Goto(g, live) {
+    var w = hs3El('div', 'hs-goto', '<button class="hs-gobtn" type="button" data-hs-go><span class="hs-fill" aria-hidden="true"></span><span class="ms" aria-hidden="true">arrow_forward</span><span class="hs-gl"></span></button>' +
+      '<button class="hs-pill hs-gx" type="button" data-hs-stay hidden><span class="hs-pl">그대로 있기</span></button>');
+    w.querySelector('.hs-gl').textContent = g.label; w._go = { type: g.type, target: g.target };
+    return w;
+  }
+  function hs3GoInit(w, live) {
+    if (!live || uiRM() || !('IntersectionObserver' in window)) return;
+    var b = w.querySelector('.hs-gobtn'), x = w.querySelector('.hs-gx'), first = true;
+    var io = new IntersectionObserver(function (es) {
+      var e = es[es.length - 1]; io.disconnect();
+      if (!first || !e || e.intersectionRatio < .6) return; first = false;
+      x.hidden = false; void b.offsetWidth; b.classList.add('hs-run');
+      w._t = setTimeout(function () { w._t = 0; x.hidden = true; b.classList.remove('hs-run');
+        if (!document.contains(w) || BUSY || IN.value.trim()) return;   // 그사이 새 질문을 쓰거나 보냈으면 이동하지 않음
+        hs3Go(w); }, 1200);
+    }, { threshold: [0, .6] });
+    requestAnimationFrame(function () { io.observe(w); });
+  }
+  function hs3Go(w) {
+    var g = w._go, b = w.querySelector('.hs-gobtn'); if (!g || !ACTIONS[g.type]) return;
+    clearTimeout(w._t); w._t = 0; b.classList.remove('hs-run'); b.classList.add('hs-gone'); w.querySelector('.hs-gx').hidden = true;
+    ACTIONS[g.type](g.target);
+  }
+  function hs3Stay(w) { clearTimeout(w._t); w._t = 0; var b = w.querySelector('.hs-gobtn'); b.classList.remove('hs-run'); w.querySelector('.hs-gx').hidden = true; }
+  // 프로젝트 카드 1~3개(누르면 기존 [data-open] → 상세)
+  function hs3Cards(ids) {
+    var w = hs3El('div', 'hs-cards'); w.setAttribute('role', 'group'); w.setAttribute('aria-label', '관련 프로젝트');
+    ids.forEach(function (id) {
+      var p = BY[id]; if (!p) return;
+      var line = /^\[더미\]/.test(p.line || '') ? '' : (p.line || '');
+      var b = hs3El('button', 'hs-pc', '<span class="hs-th">' + (p.thumb ? '<img src="' + esc(p.thumb) + '" alt="" loading="lazy">' : '<span>' + esc(p.name) + '</span>') + '</span>' +
+        '<span class="hs-tx"><span class="hs-k">' + esc(p.kind || '') + '</span><span class="hs-n">' + esc(p.name) + '</span>' + (line ? '<span class="hs-l">' + esc(line) + '</span>' : '') + '</span>');
+      b.type = 'button'; b.setAttribute('data-open', id); b.setAttribute('aria-label', p.name + ' 자세히 보기');
+      w.appendChild(b);
+    });
+    return w;
+  }
+  // 이미지 여러 장(고른 그림 먼저). 누르면 기존 [data-img] → 2차 크게 보기
+  function hs3Gallery(ids) {
+    ids = ids.filter(function (id) { return IMG[id]; });
+    var pid = String(IMG[ids[0]].at || '').split('/')[0], pn = BY[pid] ? BY[pid].name : '';
+    var f = hs3El('figure', 'hs-gal'), its = ids.map(function (id, i) {
+      var im = IMG[id];
+      return '<button class="hs-gal-it" type="button" data-img="' + esc(id) + '" aria-label="' + esc(im.alt) + ' 크게 보기"' + (i ? ' tabindex="-1"' : '') + '><img src="' + esc(im.src) + '" alt="' + esc(im.alt) + '" width="1600" height="900" draggable="false"' + (i ? ' loading="lazy"' : '') + '></button>';
+    }).join('');
+    f.innerHTML = '<div class="hs-gal-box"><div class="hs-gal-tr" tabindex="0" role="region" aria-label="' + esc(pn) + ' 화면 ' + ids.length + '장, 옆으로 넘겨 보기">' + its + '</div>' +
+      '<button class="hs-gal-nav hs-prev" type="button" data-hs-gal="-1" aria-label="이전 이미지" disabled><span class="ms" aria-hidden="true">chevron_left</span></button>' +
+      '<button class="hs-gal-nav hs-nxt" type="button" data-hs-gal="1" aria-label="다음 이미지"><span class="ms" aria-hidden="true">chevron_right</span></button>' +
+      '<div class="hs-gal-dots">' + ids.map(function (id, i) { return '<button type="button" tabindex="-1" data-hs-dot="' + i + '" aria-label="' + (i + 1) + '번째 이미지"></button>'; }).join('') + '</div></div>' +
+      '<figcaption><span class="hs-gal-c"></span>' + (pn ? ' · ' + esc(pn) : '') + ' · <span class="hs-gal-k"></span></figcaption>';
+    return f;
+  }
+  function hs3GalInit(f) {
+    var tr = f.querySelector('.hs-gal-tr'), its = [].slice.call(tr.children), dots = [].slice.call(f.querySelectorAll('.hs-gal-dots button')), cap = f.querySelector('.hs-gal-c'), cnt = f.querySelector('.hs-gal-k');
+    var pv = f.querySelector('.hs-prev'), nv = f.querySelector('.hs-nxt'), cur = -1, raf = 0;
+    function idx() { return Math.max(0, Math.min(its.length - 1, Math.round(tr.scrollLeft / Math.max(1, tr.clientWidth)))); }
+    function sync() { var i = idx(); if (i === cur) return; cur = i;
+      dots.forEach(function (d, k) { d.setAttribute('aria-current', String(k === i)); }); pv.disabled = i === 0; nv.disabled = i === its.length - 1;
+      its.forEach(function (it, k) { it.tabIndex = k === i ? 0 : -1; }); cap.textContent = its[i].querySelector('img').alt; cnt.textContent = (i + 1) + ' / ' + its.length; }
+    f._go = function (i) { i = Math.max(0, Math.min(its.length - 1, i)); tr.scrollTo({ left: i * tr.clientWidth, behavior: uiRM() ? 'auto' : 'smooth' }); if (uiRM()) sync(); };
+    f._cur = function () { return cur; };
+    tr.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(function () { raf = 0; sync(); }); }, { passive: true });
+    window.addEventListener('resize', function () { if (cur > 0 && document.contains(tr)) tr.scrollLeft = cur * tr.clientWidth; });
+    sync();
+  }
+  // 한정민 소개 답(사진 파일이 있을 때만 규칙이 고름). 글은 사이트 근거 카드 · 이력서와 같은 내용, 생년월일 · 사는 곳 · 연락처 없음
+  function hs3Profile() {
+    var li = function (d, b, i) { return '<li><span>' + d + '</span><span><b>' + b + '</b>' + (i ? '<i>' + i + '</i>' : '') + '</span></li>'; };
+    var cl = function (n, b, i, p) { return '<div class="hs-cl"><button class="hs-cv-h" type="button" data-hs-cl aria-expanded="false" aria-controls="hs-cl-' + n + '"><span><b>' + b + '</b><i>' + i + '</i></span><span class="ms" aria-hidden="true">expand_more</span></button><div id="hs-cl-' + n + '" hidden><p>' + p + '</p></div></div>'; };
+    var w = hs3El('div', 'hs-pf',
+      '<div class="hs-pf-top"><span class="hs-pf-ph"><img src="' + esc(HS3_PF_PHOTO) + '" alt="한정민 사진" draggable="false"></span><div class="hs-pf-id"><span class="hs-pf-k">UI/UX 서비스 기획자</span><h3 class="hs-pf-n">한정민</h3>' +
+      '<p class="hs-pf-l">더 나은 결과를 찾는 배부르지 않은 기획자, 헝그리 한정민</p><dl class="hs-pf-f"><div><dt>학력</dt><dd>계원예술대학교 디지털미디어디자인과 기획 세부전공 · 2027.02 졸업 예정</dd></div>' +
+      '<div><dt>수상</dt><dd>커뮤니케이션 디자인 국제 어워드 회장상 · 기획 부문</dd></div><div><dt>활동</dt><dd>AI 동아리 AIM · AI 교육팀 팀장</dd></div></dl></div></div>' +
+      '<div class="hs-pf-bd"><div class="hs-sg" role="tablist" aria-label="소개 자료 고르기"><button type="button" role="tab" data-hs-tab="0" aria-selected="true">이력서</button><button type="button" role="tab" data-hs-tab="1" aria-selected="false" tabindex="-1">자기소개서</button></div>' +
+      '<div class="hs-pf-pn" role="tabpanel"><div class="hs-cv" id="hs-cv-' + (++HS3.n) + '">' +
+      '<h5>학력</h5><ul>' + li('2027.02', '계원예술대학교 디지털미디어디자인과', '기획 세부전공 졸업 예정') + li('2026.03', '계원예술대학교 디지털미디어디자인과', '기획 세부전공 선택') + li('2023.03', '계원예술대학교 디지털미디어디자인과', '입학') + li('2022.01', '야탑고등학교', '졸업') + '</ul>' +
+      '<h5>수상</h5><ul>' + li('2026.07', '회장상 · 기획 부문', '제32회 커뮤니케이션 디자인 국제 어워드 · 플로레터: 과천 공무원 대상 분재 선물 플랫폼 앱 서비스 기획') + li('2026.07', '입선 · 디자인 부문', '제32회 커뮤니케이션 디자인 국제 어워드 · 유지: AI 기반 목표 관리 앱 서비스 기획') + li('2026.06.26', '학과 연합 PT 우수작 선정 · 발표', '플로레터') + '</ul>' +
+      '<h5>교내 활동</h5><ul>' + li('2026.09–12', '툴 멘토링 · 멘토', '바이브 코딩 및 기획, Figma 활용 멘토링') + li('2026.09–12', 'AI 동아리 AIM · AI 교육팀 팀장', '바이브 코딩 기반 웹 앱 제작 교육') + li('2026.06–09', 'ESG 거버넌스 · 영상팀 팀장', '책임감 있는 AI 사용을 주제로 영상 제작') + li('2026.03–12', '기획동아리 초안 · 카드뉴스팀 팀장', '학과 생활 팁 카드뉴스 제작') + '</ul>' +
+      '<h5>경력</h5><ul>' + li('2026.02–현재', '바이칼 휘트니스 · 파트타이머', '사내 인수인계 시스템 제작, 사무 업무, 고객 응대') + li('2025.05–2026.01', '카페 선데이마켓 · 파트타이머', '브런치 및 커피 제조, 고객 응대') + li('2023.06–07', '희창냉장 · 파트타이머', '물류 상하차와 현장 업무') + li('2022.03–06', '하나로마트 · 파트타이머', '매장 보안 업무와 물류 관리') + '</ul>' +
+      '<h5>자격증</h5><ul>' + li('2025.03', '1종 보통 운전면허') + li('2025.04', '2종 소형 운전면허') + '</ul></div>' +
+      '<button class="hs-pill" type="button" data-hs-more-cv aria-expanded="false"><span class="ms" aria-hidden="true">expand_more</span><span class="hs-pl">이력서 전체 보기</span></button></div>' +
+      '<div class="hs-pf-pn" role="tabpanel" hidden>' +
+      cl(++HS3.n, '화면보다 먼저, 이유를 고민합니다', '해결안을 먼저 정하지 않고, 상황을 살핀 뒤 근거로 방향을 정해요.', '좋은 서비스는 화려한 화면보다 사용자가 원하는 목적을 쉽고 자연스럽게 달성할 수 있는 구조에서 시작한다고 생각합니다. 그래서 해결안을 먼저 정하기보다 사용자와 서비스의 상황을 살피고, 문제를 구체화한 뒤 근거를 바탕으로 방향을 정하려 합니다.') +
+      cl(++HS3.n, '사용자 맥락을 읽고, AI로 경험을 구체화합니다', '행동을 어렵게 만드는 조건을 찾고, 기획한 흐름을 직접 만들어 확인해요.', 'AI 코딩 도구로 기획한 인터랙션과 사용자 흐름을 웹 · 프로토타입으로 구현해, 문서와 화면 시안만으로는 알기 어려운 실제 동작을 확인했습니다. 저에게 AI는 결과물을 대신 만드는 도구가 아니라, 서비스 가설을 빠르게 구현하고 경험으로 확인하게 돕는 기획과 검증의 도구입니다.') +
+      cl(++HS3.n, '더 나은 근거를 찾는 기획자', '개인 취향보다 사용자 목표와 프로젝트 목적을 판단 기준으로 삼아요.', '저는 아직 완성된 기획자라고 생각하지 않습니다. 제게 배고픔은 무조건 더 많이 하는 욕심이 아니라, 지금의 답에 안주하지 않고 근거를 다시 살피며 더 나은 결과를 찾는 태도입니다.') +
+      '<p class="hs-pf-end">더 나은 결과를 향한 배고픔으로, 질문하고 검증하며 끝까지 만들어가겠습니다.</p></div></div>');
+    return w;
+  }
+  function hs3PfInit(w) { var cv = w.querySelector('.hs-cv'), b = w.querySelector('[data-hs-more-cv]'); if (cv && b) b.setAttribute('aria-controls', cv.id); }
+
+  /* ── 메일 쓰기 판(연락 카드 "메일 쓰기"): 받는 사람 고정 · 제목 · 내용 → 메일 앱. 닫아도 쓴 글은 남음 ── */
+  var HS3M = { el: null, open: false, from: null };
+  function hs3MvBuild() {
+    if (HS3M.el) return;
+    var d = hs3El('div', 'hs-mv ui-layer', '<div class="hs-mv-scrim" data-hs-mvx></div><div class="hs-mv-panel" role="dialog" aria-modal="true" aria-labelledby="hs-mv-h"><div class="hs-mv-grab" aria-hidden="true"></div>' +
+      '<div class="hs-mv-head"><h2 id="hs-mv-h">메일 쓰기</h2><button class="ui-tv-b" type="button" data-hs-mvx aria-label="메일 쓰기 닫기"><span class="ms" aria-hidden="true">close</span></button></div>' +
+      '<div class="hs-mv-f"><div class="hs-mv-row"><span class="hs-mv-l">받는 사람</span><span class="hs-mv-to">한정민</span></div>' +
+      '<label class="hs-mv-row"><span class="hs-mv-l">제목</span><input type="text" data-hs-mvs placeholder="제목을 써 주세요" autocomplete="off"></label>' +
+      '<label class="hs-mv-body"><span class="hs-sr">내용</span><textarea data-hs-mvb placeholder="한정민 님께 전할 내용을 써 주세요"></textarea></label>' +
+      '<div class="hs-mv-foot"><span class="hs-mv-hint" aria-live="polite">보내기를 누르면 쓰신 내용이 담긴 메일 앱이 열려요</span><span class="hs-mv-btns">' +
+      '<button class="hs-pill" type="button" data-hs-mvcp><span class="ms" aria-hidden="true">content_copy</span><span class="hs-pl">내용 복사</span></button>' +
+      '<button class="hs-mv-send" type="button" data-hs-mvsend disabled><span>메일 앱으로 보내기</span><span class="ms" aria-hidden="true">arrow_upward</span></button></span></div></div></div>');
+    d.hidden = true; document.body.appendChild(d);
+    HS3M.el = d; HS3M.p = d.querySelector('.hs-mv-panel'); HS3M.s = d.querySelector('.hs-mv-scrim'); HS3M.sub = d.querySelector('[data-hs-mvs]'); HS3M.bd = d.querySelector('[data-hs-mvb]');
+    HS3M.send = d.querySelector('[data-hs-mvsend]'); HS3M.hint = d.querySelector('.hs-mv-hint'); HS3M.h0 = HS3M.hint.textContent;
+    var sync = function () { HS3M.send.disabled = !(HS3M.sub.value.trim() && HS3M.bd.value.trim()); };
+    HS3M.sub.addEventListener('input', sync); HS3M.bd.addEventListener('input', sync);
+    HS3M.bd.addEventListener('keydown', function (e) { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey) && !HS3M.send.disabled) hs3MvSend(); });
+  }
+  function hs3MvOpen(from) {
+    hs3MvBuild(); if (HS3M.open) return;
+    HS3M.open = true; HS3M.from = from; HS3M.hint.textContent = HS3M.h0; HS3M.el.classList.remove('hs-closing'); HS3M.el.hidden = false; uiLock(true); tipHide();
+    var mob = UI.MOB.matches, RMx = uiRM();
+    HS3M.s.style.opacity = '0';
+    if (RMx) { HS3M.p.style.transform = 'none'; HS3M.p.style.opacity = '0'; uiTw(HS3M.p, 'opacity', '1', 200, UI.EO); }
+    else if (mob) { HS3M.p.style.opacity = '1'; HS3M.p.style.transform = 'translateY(' + Math.ceil(HS3M.p.getBoundingClientRect().height + 8) + 'px)'; uiTw(HS3M.p, 'transform', 'none', 500, UI.SHT); }
+    else { HS3M.p.style.opacity = '0'; HS3M.p.style.transform = 'translateY(16px) scale(.96)'; uiTw(HS3M.p, 'transform', 'none', 460, UI.SPR); uiTw(HS3M.p, 'opacity', '1', 160, UI.EO); }
+    uiTw(HS3M.s, 'opacity', '1', 260, UI.EO);
+    (mob ? HS3M.el.querySelector('.ui-tv-b') : (HS3M.sub.value.trim() ? HS3M.bd : HS3M.sub)).focus({ preventScroll: true });
+    hs3JumpSoon();
+  }
+  function hs3MvClose() {
+    if (!HS3M.open) return false;
+    HS3M.open = false; var mob = UI.MOB.matches, RMx = uiRM(), from = HS3M.from; HS3M.el.classList.add('hs-closing'); uiLock(false);
+    if (from && document.contains(from)) from.focus({ preventScroll: true });
+    var done = function () { if (HS3M.open) return; HS3M.el.hidden = true; HS3M.el.classList.remove('hs-closing'); HS3M.p.style.transform = ''; HS3M.p.style.opacity = ''; HS3M.s.style.opacity = ''; };
+    uiTw(HS3M.s, 'opacity', '0', RMx ? 200 : 320, UI.EO);
+    if (RMx) uiTw(HS3M.p, 'opacity', '0', 200, UI.EO).then(done);
+    else if (mob) uiTw(HS3M.p, 'transform', 'translateY(' + Math.ceil(HS3M.p.getBoundingClientRect().height + 8) + 'px)', 380, UI.SHT).then(done);
+    else { uiTw(HS3M.p, 'transform', 'translateY(12px) scale(.97)', 300, UI.EO); uiTw(HS3M.p, 'opacity', '0', 220, UI.EO).then(done); }
+    hs3JumpSoon();
+    return true;
+  }
+  function hs3MvSend() {   // 메일 앱을 엶(보냈다고 하지 않음). 열리지 않을 때를 위해 내용 복사 안내
+    if (HS3M.send.disabled) return;
+    location.href = 'mailto:' + hs3Addr() + '?subject=' + encodeURIComponent(HS3M.sub.value.trim()) + '&body=' + encodeURIComponent(HS3M.bd.value);
+    HS3M.hint.textContent = '메일 앱이 열리지 않으면 "내용 복사"로 복사해 메일에 붙여 넣어 주세요';
+  }
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && HS3M.open) hs3MvClose(); });
+
+  /* ── 새 답 ↓(질문창 위 가운데) ── */
+  var HS3J = { el: null, shown: false, nw: false, raf: 0 };
+  function hs3JumpSoon() { if (!HS3J.raf) HS3J.raf = requestAnimationFrame(function () { HS3J.raf = 0; hs3Jump(); }); }
+  function hs3Jump() {
+    var th = HS3.th, side = document.getElementById('side');
+    var ov = !!(side && side.classList.contains('on')) || !D.hidden || TV.open || LB.open || HS3M.open || ASK.classList.contains('open');
+    var x = hgSituation({ ans: null, q: {}, ui: { inChat: HS3.hero.classList.contains('chat'), answers: th.querySelectorAll('.ans').length, dist: th.scrollHeight - th.scrollTop - th.clientHeight, jumpShown: HS3J.shown, overlay: ov, newWhileAway: HS3J.nw }, ctx: {}, data: {} });
+    var on = hs3Has(x, 'jump');
+    if (!on) HS3J.nw = false;
+    if (!HS3J.el) {
+      if (!on) return;
+      HS3J.el = hs3El('button', 'hs-jump', '<span class="hs-dot" aria-hidden="true"></span><span class="ms" aria-hidden="true">arrow_downward</span><span class="hs-jl" aria-live="polite">맨 아래로</span>');
+      HS3J.el.type = 'button'; HS3J.el.setAttribute('data-hs-jump', ''); HS3J.el.tabIndex = -1; ASK.appendChild(HS3J.el); void HS3J.el.offsetWidth;
+    }
+    HS3J.shown = on; HS3J.el.classList.toggle('hs-on', on); HS3J.el.tabIndex = on ? 0 : -1; HS3J.el.setAttribute('aria-hidden', String(!on));
+    var nw = on && HS3J.nw; HS3J.el.classList.toggle('hs-new', nw);
+    var lab = nw ? '새 답' : '맨 아래로'; if (HS3J.el.querySelector('.hs-jl').textContent !== lab) HS3J.el.querySelector('.hs-jl').textContent = lab;
+  }
+  HS3.th.addEventListener('scroll', hs3JumpSoon, { passive: true });
+  window.addEventListener('resize', hs3JumpSoon);
+  new MutationObserver(hs3JumpSoon).observe(HS3.hero, { attributes: true, attributeFilter: ['class'] });
+  if (document.getElementById('side')) new MutationObserver(hs3JumpSoon).observe(document.getElementById('side'), { attributes: true, attributeFilter: ['class'] });
+  new MutationObserver(hs3JumpSoon).observe(D, { attributes: true, attributeFilter: ['hidden'] });
+  new MutationObserver(hs3JumpSoon).observe(ASK, { attributes: true, attributeFilter: ['class'] });
+
+  /* ── 큰 파일 올리는 중: 붙인 파일 칸(#att)에 상자 모양 · 진행 막대만 덧붙임(올리기 · 빼기 · 보내기 동작은 그대로) ── */
+  document.addEventListener('change', function (e) {   // 고른 파일 크기만 적어 둠(사이트 처리보다 먼저, 막지 않음)
+    var t = e.target; if (!t || t.type !== 'file' || !t.closest || !t.closest('.askbox') || !t.files || !t.files[0]) return;
+    HS3.up = { size: t.files[0].size, name: t.files[0].name, mime: t.files[0].type }; HS3.badAt = 0;
+  }, true);
+  var HS3_ATT = document.getElementById('att');
+  function hs3Upl() {
+    var box = HS3_ATT, pd = PENDING, u = HS3.up || {};
+    if (box.querySelector('.hs-ut')) return;   // 방금 이 함수가 바꾼 것
+    var st = !pd ? null : pd.bad ? (/^100MB/.test(pd.name) ? 'rejected' : 'failed') : pd.up ? (pd.files ? 'ready' : pd.pct == null ? 'prep' : 'up') : 'ready';
+    if (st === 'rejected' || st === 'failed') { if (!HS3.badAt) HS3.badAt = Date.now(); } else HS3.badAt = 0;
+    var size = pd && pd.up ? Math.max(u.size || 0, 4 * 1024 * 1024 + 1) : (u.size || 0);   // 서버로 나눠 올리는 파일은 4MB를 넘는 파일뿐(사이트 규칙)
+    var x = st ? hgSituation({ ans: null, q: {}, ui: { attach: { state: st, size: size, elapsed: HS3.badAt ? Date.now() - HS3.badAt : 0 } }, ctx: {}, data: {} }) : null;
+    var on = hs3Has(x, 'upload');
+    box.classList.toggle('hs-upl', on); box.classList.toggle('hs-ok', on && st === 'ready'); box.classList.toggle('hs-bad', on && (st === 'rejected' || st === 'failed'));
+    if (!on) return;
+    var nm = String(u.name || (pd && pd.name) || ''), mb = u.size ? (Math.round(u.size / 1048576 * 10) / 10) + 'MB' : '';
+    var title = st === 'rejected' || st === 'failed' ? pd.name : (pd.name || nm);
+    var stx = st === 'prep' ? '준비 중' : st === 'up' ? '올리는 중 ' + pd.pct + '%' : st === 'ready' ? (mb ? mb + ' · ' : '') + '다 올렸어요' : nm + (mb ? ' · ' + mb : '');
+    if ((st === 'prep' || st === 'up') && pd.go != null) stx += ' · 다 올리면 보낼게요';
+    var ic = box.querySelector('.ms'), tx = ic ? ic.nextElementSibling : null;
+    var ty = hs3El('span', 'hs-ty', /\.(png|jpe?g|webp)$/i.test(nm) ? '이미지' : 'PDF'); ty.setAttribute('aria-hidden', 'true');
+    var ut = hs3El('span', 'hs-ut', '<b></b><span></span>'); ut.querySelector('b').textContent = title; ut.querySelector('span').textContent = stx;
+    if (ic) ic.replaceWith(ty); else box.insertBefore(ty, box.firstChild);
+    if (tx && tx.tagName === 'SPAN') tx.replaceWith(ut); else box.insertBefore(ut, ty.nextSibling);
+    var bar = hs3El('span', 'hs-bar'); bar.setAttribute('aria-hidden', 'true'); bar.style.setProperty('--p', st === 'ready' ? 1 : st === 'up' ? Math.max(0, Math.min(1, pd.pct / 100)) : 0); box.appendChild(bar);
+    box.setAttribute('role', 'status');
+  }
+  new MutationObserver(hs3Upl).observe(HS3_ATT, { childList: true });
+
+  /* ── 말로 묻기: 마이크가 듣는 중이면 진한 원 + 고리, 입력 칸 앞 소리 막대(실제 음량 아님), 안내 "듣고 있어요…" ── */
+  function hs3Mic() {
+    var mic = HS3.mic, f = IN.form; if (!mic || !f) return;
+    var x = hgSituation({ ans: null, q: {}, ui: { mic: mic.getAttribute('aria-pressed') === 'true' && !mic.hidden ? 'on' : 'off' }, ctx: {}, data: {} }), on = hs3Has(x, 'listen');
+    f.classList.toggle('hs-listening', on);
+    if (on) {
+      if (!HS3.lvl) { HS3.lvl = hs3El('span', 'hs-lvl', '<i></i><i></i><i></i><i></i><i></i>'); HS3.lvl.setAttribute('aria-hidden', 'true'); }
+      if (!HS3.lvl.parentNode) f.insertBefore(HS3.lvl, IN);
+      if (HS3.ph == null) { HS3.ph = IN.getAttribute('placeholder') || ''; IN.setAttribute('placeholder', '듣고 있어요…'); }
+    } else {
+      if (HS3.lvl && HS3.lvl.parentNode) HS3.lvl.remove();
+      if (HS3.ph != null) { IN.setAttribute('placeholder', HS3.ph); HS3.ph = null; }
+    }
+  }
+  if (HS3.mic) new MutationObserver(hs3Mic).observe(HS3.mic, { attributes: true, attributeFilter: ['aria-pressed', 'hidden'] });
+  if (IN.form) IN.form.addEventListener('keydown', function (e) { if (e.key === 'Escape' && HS3.mic && HS3.mic.getAttribute('aria-pressed') === 'true') HS3.mic.click(); });   // Esc: 마이크가 켜져 있을 때만 멈춤
+
+  /* ── 되묻기: 보기를 누르면(답하는 중이 아닐 때) 고른 알약만 진하게 남음. 기존 클릭 처리보다 먼저 받기만 하고 막지 않음 ── */
+  document.addEventListener('click', function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('.ask-back .pick, .ask-back [data-team]') : null;
+    if (!b || BUSY || b.getAttribute('data-team') === 'skip') return;
+    var w = b.closest('.ask-back'); w.classList.remove('ask-back'); w.classList.add('hs-asked'); b.setAttribute('aria-pressed', 'true');
+  }, true);
+
+  /* ── 부품 안 버튼 ── */
+  document.addEventListener('click', function (e) {
+    var t = e.target, b; if (!t || !t.closest) return;
+    if ((b = t.closest('[data-hs-more]'))) { hs3More(b); return; }
+    if ((b = t.closest('[data-hs-mcopy]'))) { hs3Copy(hs3Addr(), function (ok) { hs3Flash(b, ok, '복사했어요'); }); return; }
+    if ((b = t.closest('[data-hs-compose]'))) { hs3MvOpen(b); return; }
+    if (t.closest('[data-hs-mvx]')) { hs3MvClose(); return; }
+    if ((b = t.closest('[data-hs-mvcp]'))) { hs3Copy('받는 사람: ' + hs3Addr() + '\n제목: ' + HS3M.sub.value.trim() + '\n\n' + HS3M.bd.value, function (ok) { hs3Flash(b, ok, '복사했어요'); }); return; }
+    if (t.closest('[data-hs-mvsend]')) { hs3MvSend(); return; }
+    if ((b = t.closest('[data-hs-medit]'))) { hs3MailEdit(b); return; }
+    if ((b = t.closest('[data-hs-go]'))) { hs3Go(b.closest('.hs-goto')); return; }
+    if ((b = t.closest('[data-hs-stay]'))) { hs3Stay(b.closest('.hs-goto')); return; }
+    if ((b = t.closest('[data-hs-gal]'))) { var f = b.closest('.hs-gal'); if (f && f._go) f._go(f._cur() + (+b.getAttribute('data-hs-gal'))); return; }
+    if ((b = t.closest('[data-hs-dot]'))) { var f2 = b.closest('.hs-gal'); if (f2 && f2._go) f2._go(+b.getAttribute('data-hs-dot')); return; }
+    if (t.closest('[data-hs-jump]')) { HS3.th.scrollTo({ top: HS3.th.scrollHeight, behavior: uiRM() ? 'auto' : 'smooth' }); return; }
+    if ((b = t.closest('[data-hs-tab]'))) { var pf = b.closest('.hs-pf'), i = +b.getAttribute('data-hs-tab');
+      pf.querySelectorAll('[data-hs-tab]').forEach(function (x, k) { x.setAttribute('aria-selected', String(k === i)); x.tabIndex = k === i ? 0 : -1; });
+      pf.querySelectorAll('.hs-pf-pn').forEach(function (p, k) { p.hidden = k !== i; }); return; }
+    if ((b = t.closest('[data-hs-more-cv]'))) { var pn = b.closest('.hs-pf-pn'), o2 = !pn.classList.contains('hs-open'); pn.classList.toggle('hs-open', o2); b.setAttribute('aria-expanded', String(o2)); b.querySelector('.hs-pl').textContent = o2 ? '접기' : '이력서 전체 보기'; return; }
+    if ((b = t.closest('[data-hs-cl]'))) { var o3 = b.getAttribute('aria-expanded') !== 'true', bd = document.getElementById(b.getAttribute('aria-controls')); b.setAttribute('aria-expanded', String(o3)); if (bd) bd.hidden = !o3; return; }
+    if (HS3J.el) hs3JumpSoon();
+  });
+  /* HS3-JS-END */
   restoreChat();   // 같은 탭에서 새로고침했으면 대화를 다시 그린다
 
   /* 화면 이벤트 → 허기 반응(LLM을 거치지 않고 바로). 답 만드는 중 · 읽어 주기 중 · 모션 줄이기면 하지 않는다. 오래 기다림(longIdle → 졸림)은 hugi.js가 25초 무입력에 이미 처리한다 */
