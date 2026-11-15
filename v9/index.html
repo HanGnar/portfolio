@@ -708,7 +708,8 @@ html.ui-lock { overflow: hidden; }
 .hs-pill.hs-on .ms { color: var(--ui-send-fg); }
 @media (hover: hover) { .hs-pill:hover { box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh-hi); transform: var(--ui-lift); } .hs-pill.hs-on:hover { box-shadow: none; } }
 .hs-pill:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
-.hs-pill:focus-visible, .hs-more:focus-visible, .hs-src:focus-visible, .hs-gobtn:focus-visible, .hs-pc:focus-visible, .hs-jump:focus-visible, .hs-gal-it:focus-visible, .hs-gal-tr:focus-visible, .hs-gal-nav:focus-visible, .hs-gal-dots button:focus-visible, .hs-mv-send:focus-visible, .hs-sg button:focus-visible, .hs-cv-h:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 2px; }
+.hs-pill:focus-visible, .hs-more:focus-visible, .hs-src:focus-visible, .hs-gobtn:focus-visible, .hs-pc:focus-visible, .hs-jump:focus-visible, .hs-gal-it:focus-visible, .hs-gal-tr:focus-visible, .hs-gal-nav:focus-visible, .hs-gal-dots button:focus-visible, .hs-mv-send:focus-visible, .hs-sg button:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 2px; }
+.hs-cv-h:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: -2px; }
 .hs-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* 표 복사 · 크게 보기 버튼은 표가 다 온 뒤에(흘러나오는 중에는 숨김, 자리는 그대로) */
@@ -846,38 +847,76 @@ html.ui-lock { overflow: hidden; }
 .hs-gal-k { font-variant-numeric: tabular-nums; }
 
 /* ── 한정민 소개 답(사진 파일이 있을 때만 나옴) ── */
-.hs-pf { border-radius: 20px; background: var(--ui-surface); box-shadow: var(--ui-card-sh); overflow: hidden; max-width: 640px; }
+.hs-pf { border-radius: 20px; background: var(--ui-surface); box-shadow: var(--ui-card-sh); overflow: hidden; }   /* 11-15 4차: 시트처럼 답 폭(680) 그대로 */
 .hs-pf-top { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 24px; padding: 16px; }
-.hs-pf-ph { display: block; width: 100%; aspect-ratio: 3 / 4; border-radius: var(--ui-r-box); overflow: hidden; background: var(--ui-bg-2); }
-.hs-pf-ph img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+.hs-pf-ph { position: relative; display: block; width: 100%; max-width: 100%; padding: 0; border: 0; aspect-ratio: 3 / 4; border-radius: var(--ui-r-box); overflow: hidden; background: var(--ui-bg-2); cursor: zoom-in; -webkit-tap-highlight-color: transparent; transition: transform var(--ui-d3) var(--ui-spring); }
+.hs-pf-ph img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; clip-path: inset(0 0 0 0 round 0px); transition: transform var(--ui-d4) var(--ui-ease-out), clip-path 720ms var(--ui-ease-out), opacity var(--ui-d3) var(--ui-ease-out); }
+/* 11-15 4차: 시트 .pf-ph와 같게 — 사진을 누르면 크게 보기, 올리면(마우스) 사진만 1.04배, 누르면 .98 */
+@media (hover: hover) { .hs-pf-ph:hover img { transform: scale(1.04); } }
+.hs-pf-ph:active { transform: scale(.98); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+.hs-pf-ph:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 2px; }
+.hs-pf-id > * { transition: opacity var(--ui-d3) var(--ui-ease-out), transform var(--ui-d4) var(--ui-ease-out); transition-delay: calc(var(--i, 0) * 60ms + 180ms); }
+.hs-pf.hs-pre .hs-pf-ph img { clip-path: inset(8% 8% 8% 8% round 24px); transform: scale(1.12); opacity: .001; transition: none; }
+.hs-pf.hs-pre .hs-pf-id > * { opacity: .001; transform: translateY(10px); transition: none; }
+/* 11-15 4차: 소개 답 글 · 고르기 · 이력서 · 자기소개서를 시트(chat_tpl.html .pf · .sg · .cv-g · .cl) 값 그대로. 이름 Title 2 28(폰 24) · 한 줄 Headline 17 · 요약 Subhead 15 */
 .hs-pf-id { display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; min-width: 0; padding: 8px 8px 0 0; }
 .hs-pf-k { font-size: 12px; font-weight: 500; line-height: 1.4; color: var(--ui-label-3); }
-.hs-pf-n { margin: 0; font-size: 22px; font-weight: 600; line-height: 1.35; letter-spacing: -.018em; }
-.hs-pf-l { margin: 0; font-size: 17px; font-weight: 600; line-height: 1.45; letter-spacing: -.012em; color: var(--ui-label-2); text-wrap: balance; }
+.hs-pf-n { margin: 0; font-size: 28px; font-weight: 600; line-height: 1.3; letter-spacing: -.022em; }
+.hs-pf-l { margin: 0; font-size: 17px; font-weight: 600; line-height: 1.5; letter-spacing: -.012em; color: var(--ui-label-2); text-wrap: balance; }
 .hs-pf-f { margin: 16px 0 0; display: flex; flex-direction: column; }
 .hs-pf-f > div { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--ui-sep); }
 .hs-pf-f dt { font-size: 12px; font-weight: 500; line-height: 1.4; color: var(--ui-label-3); padding-top: 2px; }
 .hs-pf-f dd { margin: 0; font-size: 15px; line-height: 1.6; letter-spacing: -.008em; min-width: 0; }
 .hs-pf-bd { display: flex; flex-direction: column; gap: 12px; padding: 0 16px 16px; }
-.hs-sg { display: inline-flex; align-self: flex-start; gap: 2px; padding: 3px; border-radius: var(--md-full); background: var(--ui-bg-2); }
-.hs-sg button { height: 32px; padding: 0 14px; border: 0; border-radius: var(--md-full); background: transparent; font-size: 14px; font-weight: 500; color: var(--ui-label-2); transition: background-color var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out); }
-.hs-sg button[aria-selected="true"] { background: var(--ui-surface); color: var(--ui-label); box-shadow: 0 1px 3px rgba(0, 0, 0, .08), 0 0 0 1px var(--ui-sep); }
-.hs-cv { position: relative; max-height: 360px; overflow: hidden; -webkit-mask-image: linear-gradient(#000 calc(100% - 64px), transparent); mask-image: linear-gradient(#000 calc(100% - 64px), transparent); }
-.hs-pf-pn.hs-open .hs-cv { max-height: none; -webkit-mask-image: none; mask-image: none; }
-.hs-cv h5 { margin: 12px 0 6px; font-size: 12px; font-weight: 500; line-height: 1.4; color: var(--ui-label-3); }
-.hs-cv ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
-.hs-cv li { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; font-size: 14px; line-height: 1.55; }
-.hs-cv li > span:first-child { color: var(--ui-label-3); font-variant-numeric: tabular-nums; }
-.hs-cv li b { font-weight: 600; }
-.hs-cv li i { display: block; font-style: normal; color: var(--ui-label-2); }
-.hs-cl { border-top: 1px solid var(--ui-sep); }
-.hs-cv-h { display: flex; align-items: flex-start; gap: 12px; width: 100%; padding: 12px 0; border: 0; background: none; text-align: left; color: inherit; }
-.hs-cv-h b { display: block; font-size: 15px; font-weight: 600; line-height: 1.45; }
-.hs-cv-h i { display: block; font-style: normal; font-size: 13px; line-height: 1.5; color: var(--ui-label-2); }
-.hs-cv-h .ms { margin-left: auto; font-size: 18px; color: var(--ui-label-3); transition: transform var(--ui-d3) var(--ui-spring); }
+.hs-pf-pv { position: relative; min-width: 0; }
+.hs-pf-pn { min-width: 0; }
+/* 고르기 알약: 고른 쪽 흰 바탕(.hs-sg-ink)이 옆으로 미끄러짐(0.42초 spring) */
+.hs-sg { position: relative; display: inline-flex; align-self: flex-start; padding: 3px; border-radius: var(--md-full); background: var(--ui-bg-2); box-shadow: inset 0 0 0 1px var(--ui-sep); isolation: isolate; }
+.hs-sg button { position: relative; z-index: 1; height: 30px; padding: 0 14px; border: 0; border-radius: var(--md-full); background: transparent; cursor: pointer; font-size: 12px; font-weight: 500; line-height: 1.4; color: var(--ui-label-2); -webkit-tap-highlight-color: transparent;
+  transition: color var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
+.hs-sg button[aria-selected="true"] { color: var(--ui-label); }
+.hs-sg button:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+@media (hover: hover) { .hs-sg button:hover { color: var(--ui-label); } }
+.hs-sg-ink { position: absolute; z-index: 0; top: 3px; bottom: 3px; left: 0; width: 0; border-radius: var(--md-full); background: var(--ui-surface); box-shadow: 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh); transition: transform var(--ui-d3) var(--ui-spring), width var(--ui-d3) var(--ui-spring); }
+/* 이력서: 묶음(학력 · 수상 …) 사이 12, 줄은 날짜 112 + 내용, 마우스를 올리면 줄 바탕. 처음엔 360까지 + 아래 흐림 96 */
+.hs-cv { position: relative; max-height: 360px; overflow: hidden; }
+.hs-cv::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 96px; background: linear-gradient(to bottom, transparent, var(--ui-surface)); pointer-events: none; transition: opacity var(--ui-d3) var(--ui-ease-out); }
+.hs-pf-pn.hs-open .hs-cv { max-height: none; }
+.hs-pf-pn.hs-open .hs-cv::after { opacity: 0; }
+.hs-cv-g + .hs-cv-g { margin-top: 12px; }
+.hs-cv-g h5 { margin: 0 0 4px; font-size: 12px; font-weight: 500; line-height: 1.4; color: var(--ui-label-3); }
+.hs-cv-g ul { list-style: none; margin: 0 -12px; padding: 0; }
+.hs-cv-g li { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 12px; padding: 10px 12px; border-radius: 12px; transition: background-color var(--ui-d2) var(--ui-ease-out); }
+@media (hover: hover) { .hs-cv-g li:hover { background: var(--ui-hover); } }
+.hs-cv-d { padding-top: 1px; font-size: 13px; line-height: 1.5; letter-spacing: -.004em; color: var(--ui-label-3); font-variant-numeric: tabular-nums; }
+.hs-cv-t { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.hs-cv-t b { font-size: 15px; font-weight: 600; line-height: 1.4; letter-spacing: -.008em; }
+.hs-cv-t span, .hs-cv-tl span { font-size: 13px; line-height: 1.5; letter-spacing: -.004em; color: var(--ui-label-2); }
+.hs-cv-g ul.hs-cv-tl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; }
+.hs-cv-tl li { display: flex; flex-direction: column; gap: 1px; padding: 8px 12px; }
+.hs-cv-tl b { font-size: 15px; font-weight: 600; line-height: 1.4; letter-spacing: -.008em; }
+/* 이력서 전체 보기: 가운데 유리 알약, 글 뒤 화살표가 펼치면 뒤집힘 */
+.hs-pill.hs-cv-more { display: flex; width: max-content; margin: 8px auto 0; padding: 0 12px 0 15px; min-height: var(--ui-chip-h); }
+.hs-cv-more .ms { transition: transform var(--ui-d3) var(--ui-spring); }
+.hs-cv-more[aria-expanded="true"] .ms { transform: rotate(180deg); }
+/* 자기소개서: 번호 · 제목 · 한 줄, 누르면 본문이 높이로 펼쳐짐(0.42초) */
+.hs-cl + .hs-cl { border-top: 1px solid var(--ui-sep); }
+.hs-cv-h { display: grid; grid-template-columns: 24px minmax(0, 1fr) 16px; gap: 12px; align-items: start; width: calc(100% + 24px); margin: 0 -12px; padding: 12px; border: 0; border-radius: 12px; background: transparent; color: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
+@media (hover: hover) { .hs-cv-h:hover { background: var(--ui-hover); } }
+.hs-cv-h:active { transform: scale(.985); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+.hs-cl-n { padding-top: 4px; font-size: 11px; font-weight: 600; line-height: 1.3; letter-spacing: .01em; color: var(--ui-label-3); font-variant-numeric: tabular-nums; }
+.hs-cl-tx { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.hs-cl-tx b { font-size: 15px; font-weight: 600; line-height: 1.4; letter-spacing: -.008em; }
+.hs-cl-tx span { font-size: 13px; line-height: 1.5; letter-spacing: -.004em; color: var(--ui-label-2); }
+.hs-cv-h .ms { font-size: 16px; padding-top: 3px; color: var(--ui-label-3); transition: transform var(--ui-d3) var(--ui-spring); }
 .hs-cv-h[aria-expanded="true"] .ms { transform: rotate(180deg); }
-.hs-cl p { margin: 0 0 12px; font-size: 14px; line-height: 1.7; color: var(--ui-label-2); }
-.hs-pf-end { margin: 8px 0 0; font-size: 14px; font-weight: 600; line-height: 1.6; }
+.hs-cl-b { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows var(--ui-d3) var(--ui-ease-out), visibility 0s linear var(--ui-d3); }
+.hs-cl-b > div { overflow: hidden; min-height: 0; }
+.hs-cl-b p { margin: 0; padding: 0 0 16px 36px; font-size: 15px; line-height: 1.6; letter-spacing: -.008em; color: var(--ui-label-2); opacity: 0; transform: translateY(-4px); transition: opacity var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-ease-out); }
+.hs-cl.hs-on .hs-cl-b { grid-template-rows: 1fr; visibility: visible; transition-delay: 0s; }
+.hs-cl.hs-on .hs-cl-b p { opacity: 1; transform: none; transition-delay: 60ms; }
+.hs-pf-end { margin: 8px 0 0; padding: 12px 16px; border-radius: 12px; background: var(--ui-bg-2); font-size: 13px; line-height: 1.5; letter-spacing: -.004em; color: var(--ui-label-2); }
 
 /* ── 새 답 ↓: 위로 올려 읽는 중이면 질문창 위 가운데 유리 알약(맨 아래로), 그사이 새 답이 오면 "새 답" ── */
 .hs-jump { position: absolute; left: 50%; bottom: calc(100% + 14px); z-index: 6; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px 0 11px; border-radius: var(--md-full); border: 0;
@@ -903,8 +942,11 @@ html.ui-lock { overflow: hidden; }
 .att.hs-ok .hs-bar, .att.hs-bad .hs-bar { opacity: 0; }
 
 /* ── 말로 묻기: 마이크 진한 원 + 퍼지는 고리, 입력 칸 앞 소리 막대 5개, 안내 "듣고 있어요…" ── */
-.askbox.hs-listening > .mic[aria-pressed="true"] { background-color: var(--ui-send-bg); color: var(--ui-send-fg); animation: hsMicRing 1.4s var(--ui-ease-out) infinite; }
-@keyframes hsMicRing { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ui-label-3) 60%, transparent); } 100% { box-shadow: 0 0 0 10px transparent; } }
+/* 11-15 4차: 시트(situations/add.css .mic-on)와 같게 — 고리는 버튼 바깥 4px의 2px 선이 .9 → 1.35배로 퍼지며 사라짐(1.4초). 예전 그림자 퍼짐 · 옛 파란 맥박(micPulse)은 듣는 중엔 끔 */
+.askbox.hs-listening > .mic[aria-pressed="true"] { position: relative; background-color: var(--ui-send-bg); color: var(--ui-send-fg); animation: none; }
+.askbox.hs-listening > .mic[aria-pressed="true"]::before { content: ""; position: absolute; inset: -4px; border-radius: 50%; box-shadow: 0 0 0 2px var(--ui-label-3); pointer-events: none; animation: hsMicRing 1.4s var(--ui-ease-out) infinite; }
+@keyframes hsMicRing { 0% { opacity: .8; transform: scale(.9); } 100% { opacity: 0; transform: scale(1.35); } }
+.askbox.hs-micerr input::placeholder { color: var(--ui-label-2); }
 .hs-lvl { flex: none; display: inline-flex; align-items: center; gap: 3px; height: 20px; }
 .hs-lvl i { width: 3px; height: 6px; border-radius: 2px; background: var(--ui-label-2); animation: hsLv .8s var(--ui-ease-out) infinite; }
 .hs-lvl i:nth-child(2) { animation-delay: .1s; } .hs-lvl i:nth-child(3) { animation-delay: .2s; } .hs-lvl i:nth-child(4) { animation-delay: .3s; } .hs-lvl i:nth-child(5) { animation-delay: .15s; }
@@ -959,7 +1001,8 @@ html.ui-lock { overflow: hidden; }
   .hs-pf-ph { aspect-ratio: 4 / 3; }
   .hs-pf-ph img { object-position: 50% 22%; }
   .hs-pf-id { padding: 0 4px; }
-  .hs-cv li { grid-template-columns: 84px minmax(0, 1fr); }
+  .hs-pf-n { font-size: 24px; line-height: 1.35; }
+  .hs-cv-g li { grid-template-columns: 100px minmax(0, 1fr); }
 }
 @media (hover: none) { .hs-gal-nav { display: none; } }
 @media (pointer: coarse) {
@@ -973,9 +1016,10 @@ html.ui-lock { overflow: hidden; }
   .hs-gal-dots { pointer-events: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hs-pill, .hs-more, .hs-more::after, .hs-src, .hs-gobtn, .hs-pc, .hs-th img, .hs-gal-it img, .hs-gal-nav, .hs-jump, .hs-bar, .hs-cv-h .ms { transition-duration: 1ms; }
+  .hs-pill, .hs-more, .hs-more::after, .hs-src, .hs-gobtn, .hs-pc, .hs-th img, .hs-gal-it img, .hs-gal-nav, .hs-jump, .hs-bar, .hs-cv-h .ms, .hs-pf-ph, .hs-pf-ph img, .hs-pf-id > *, .hs-sg button, .hs-sg-ink, .hs-cv::after, .hs-cv-g li, .hs-cv-more .ms, .hs-cv-h, .hs-cl-b, .hs-cl-b p { transition-duration: 1ms; transition-delay: 0s; }
   .hs-att { animation: none; }
-  .askbox.hs-listening > .mic[aria-pressed="true"], .hs-lvl i { animation: none; }
+  .askbox.hs-listening > .mic[aria-pressed="true"], .askbox.hs-listening > .mic[aria-pressed="true"]::before, .hs-lvl i { animation: none; }
+  .askbox.hs-listening > .mic[aria-pressed="true"]::before { opacity: .5; }
   .hs-gobtn.hs-run .hs-fill { transition: none; }
 }
 /* HS3-CSS-END */
@@ -3303,7 +3347,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var cards = '';
     if (r.file != null && FILEQ[r.file]) {
       var F = FILEQ[r.file], ext = (FILE_EXT[F.kind] || 'file').toUpperCase();
-      cards += '<button class="ans-file" type="button" data-file="' + r.file + '" aria-label="' + esc(F.name) + ' 받기"><span class="af-ty" aria-hidden="true">' + ext + '</span><span class="af-tx"><span class="af-name">' + esc(F.name) + '</span><span class="af-meta">' + (ORIGINAL[F.kind] ? ext + ' · 한정민이 만든 원본' : ext + ' · 허기가 방금 만든 파일') + '</span></span><span class="af-go" aria-hidden="true"><span class="ms">download</span></span></button>';
+      cards += '<button class="ans-file" type="button" data-hg4d="1" data-file="' + r.file + '" aria-label="' + esc(F.name) + ' 받기"><span class="af-ty" aria-hidden="true">' + ext + '</span><span class="af-tx"><span class="af-name">' + esc(F.name) + '</span><span class="af-meta">' + (ORIGINAL[F.kind] ? ext + ' · 한정민이 만든 원본' : ext + ' · 허기가 방금 만든 파일') + '</span></span><span class="af-go" aria-hidden="true"><span class="ms">download</span></span></button>';
     }
     (r.src || []).forEach(function (x) {
       if (!x || !/^https:\/\//.test(String(x.url))) return;
@@ -3610,8 +3654,10 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     return LOADED[k];
   }
   function download(blob, name) {
-    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
-    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+    // 11-15 4차: 종류를 octet-stream으로 바꿔 저장(사파리는 PDF · 텍스트 Blob도 새 탭에서 열 때가 있음). 이름은 a.download 그대로
+    var b = blob && blob.type && !/octet-stream/.test(blob.type) ? new Blob([blob], { type: 'application/octet-stream' }) : blob;
+    var a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = name; a.rel = 'noopener';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 40000);
   }
   // 마크다운 → 덩어리(제목 · 문단 · 목록 · 표)
   function mdBlocks(md) {
@@ -3694,8 +3740,16 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var card = btn.classList.contains('ans-file');
     var got = function () { if (!card) return; var m = btn.querySelector('.af-meta'), ic = btn.querySelector('.af-go .ms'), m0 = m.textContent; clearTimeout(btn._t); btn.classList.remove('ing'); btn.classList.add('got'); ic.textContent = 'check'; m.textContent = '받았어요';
       btn._t = setTimeout(function () { btn.classList.remove('got'); ic.textContent = 'download'; m.textContent = m0; }, 2400); };
-    if (ORIGINAL[f.kind]) { var a = document.createElement('a'); a.href = ORIGINAL[f.kind][0]; a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); got(); return; }
     var lab = btn.innerHTML; btn.disabled = true;
+    if (ORIGINAL[f.kind]) {   // 11-15 4차: 주소 링크(a.href = 파일)는 브라우저 · 서버에 따라 "파일 열기"가 됨 → 파일을 받아 Blob으로 저장(받는 중 표시 → 받았어요). 못 받으면 예전처럼 링크로
+      var url = ORIGINAL[f.kind][0];
+      if (card) { btn.classList.add('ing'); btn.querySelector('.af-go .ms').textContent = 'progress_activity'; btn.querySelector('.af-meta').textContent = '받는 중…'; }
+      fetch(url, { cache: 'force-cache' }).then(function (r) { return r.ok ? r.blob() : Promise.reject(r.status); })
+        .then(function (blob) { download(blob, f.name); }, function () { var a = document.createElement('a'); a.href = url; a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); })
+        .then(function () { btn.innerHTML = lab; btn.classList.remove('ing'); got(); })
+        .finally(function () { btn.disabled = false; });
+      return;
+    }
     if (card) { btn.classList.add('ing'); btn.querySelector('.af-go .ms').textContent = 'progress_activity'; btn.querySelector('.af-meta').textContent = '만드는 중…'; } else btn.lastChild.textContent = '만드는 중…';
     var B = mdBlocks(f.content), job;
     if (f.kind === 'md') job = Promise.resolve(new Blob([f.content], { type: 'text/markdown;charset=utf-8' }));
@@ -4329,9 +4383,10 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       try { stopVoice(); } catch (e) {}   // 답을 읽는 소리가 마이크에 들어가지 않게
       rec = new SRc(); rec.lang = 'ko-KR'; rec.interimResults = true; rec.continuous = false; base = IN.value ? IN.value.replace(/\s*$/, ' ') : '';
       rec.onresult = function (e) { var t = ''; for (var i = 0; i < e.results.length; i++) t += e.results[i][0].transcript; IN.value = (base + t).slice(0, 8000); hasText(); try { if (window.HUGI && !BUSY) window.HUGI.typing(); } catch (x) {} };
-      rec.onerror = function (e) { set(false); if (e && (e.error === 'not-allowed' || e.error === 'service-not-allowed')) { mic.title = '마이크를 쓸 수 없어요(브라우저 권한 확인)'; } };
+      rec.onerror = function (e) { mic.setAttribute('data-hs-err', (e && e.error) || 'x'); set(false); if (e && (e.error === 'not-allowed' || e.error === 'service-not-allowed')) { mic.title = '마이크를 쓸 수 없어요(브라우저 권한 확인)'; } };
       rec.onend = function () { set(false); try { IN.focus({ preventScroll: true }); } catch (x) {} };
-      try { rec.start(); set(true); } catch (e) { set(false); }
+      mic.removeAttribute('data-hs-err');
+      try { rec.start(); set(true); } catch (e) { mic.setAttribute('data-hs-err', 'start'); set(false); }
     });
   })();
   /* 11-15 사용자 "첨부 최대 100MB, 버튼 두 번 그대로": 4MB 넘는 파일은 서버(/upload)를 거쳐 Gemini Files API(무료 · 48시간 보관)에 8MB씩 이어 올리고 주소만 질문에 붙인다.
@@ -4841,7 +4896,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
    * 무엇을 그릴지는 바로 위 hgSituation(원본 디자인시스템/qa/hg_situation.js, 기준 시트/algo/상황규칙.md)만 정한다. 여기서는 사이트 상태를 모아 넘기고, 고른 부품만 그린다.
    * 기존 validate · toRaw · parse · tail · ask · restoreChat 본문은 그대로 두고 바깥에서 감싼다(감싼 곳은 답 데이터에 표시 한 줄 @hs만 더함 — 예전 parse는 모르는 @줄을 버림).
    * 허기 상태는 이미 있는 hgEvent('copyOk')만 부른다. 이벤트를 막지 않는다. 미리 쓴 안내 · 거절 답은 손대지 않는다(원래 답 그대로). */
-  var HS3_PF_PHOTO = '';   // 한정민 사진 파일(예: 'files/profile.jpg'). 비어 있으면 소개 답은 나오지 않는다(규칙: 사진 · 소개 글이 사이트에 있어야). 사진을 만들어 넣지 않음
+  var HS3_PF_PHOTO = 'files/profile.jpg';   // 한정민 사진 파일. 비어 있으면 소개 답은 나오지 않는다(규칙: 사진 · 소개 글이 사이트에 있어야). 11-15 4차: 시트(시트/chat/assets/profile.jpg 640×853)와 같은 사진을 넣음
   var HS3 = { cur: null, restoring: false, ri: 0, prev: [], pf: false, pend: {}, n: 0, data: null, th: document.getElementById('thread'), hero: document.getElementById('hero'), mic: document.getElementById('mic'), up: null, badAt: 0 };
   function hs3El(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
   function hs3Data() {
@@ -4993,7 +5048,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     if (on('profile')) big = hs3Profile();
     else if (on('gallery')) big = hs3Gallery(D.gallery.ids);
     else if (on('cards')) big = hs3Cards(D.cards.ids);
-    if (big) { A.insertBefore(big, body ? body.nextSibling : A.firstChild); if (on('gallery')) { var sh = A.querySelector('figure.shot'); if (sh) sh.remove(); hs3GalInit(big); } if (on('profile')) hs3PfInit(big); }
+    if (big) { A.insertBefore(big, body ? body.nextSibling : A.firstChild); if (on('gallery')) { var sh = A.querySelector('figure.shot'); if (sh) sh.remove(); hs3GalInit(big); } if (on('profile')) hs3PfInit(big, p.live); }
     if (on('cards') && r.act && r.act[0] === 'open' && D.cards.ids.indexOf(r.act[1]) > -1) hs3Unlink(A, 'open', r.act[1]);   // 같은 프로젝트 "자세히 보기 →"는 카드가 대신
     var mb = A.querySelector('.mailbox');
     if (mb) { if (on('mail')) hs3Mail(mb); else mb.remove(); }
@@ -5133,28 +5188,72 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   }
   // 한정민 소개 답(사진 파일이 있을 때만 규칙이 고름). 글은 사이트 근거 카드 · 이력서와 같은 내용, 생년월일 · 사는 곳 · 연락처 없음
   function hs3Profile() {
-    var li = function (d, b, i) { return '<li><span>' + d + '</span><span><b>' + b + '</b>' + (i ? '<i>' + i + '</i>' : '') + '</span></li>'; };
-    var cl = function (n, b, i, p) { return '<div class="hs-cl"><button class="hs-cv-h" type="button" data-hs-cl aria-expanded="false" aria-controls="hs-cl-' + n + '"><span><b>' + b + '</b><i>' + i + '</i></span><span class="ms" aria-hidden="true">expand_more</span></button><div id="hs-cl-' + n + '" hidden><p>' + p + '</p></div></div>'; };
+    // 11-15 4차: 이력서 칸은 시트(이력서 PDF 글 그대로, 묶음 학력 · 수상 · 교내 활동 · 경력 · 병역 · 자격증 · 툴)와 같게. 인적 사항(생년월일 · 사는 곳)은 넣지 않음(상황규칙.md 기본값)
+    var li = function (d, b, i) { return '<li><span class="hs-cv-d">' + d + '</span><span class="hs-cv-t"><b>' + b + '</b>' + (i ? '<span>' + i + '</span>' : '') + '</span></li>'; };
+    var g = function (h, items, cls) { return '<div class="hs-cv-g"><h5>' + h + '</h5><ul' + (cls ? ' class="' + cls + '"' : '') + '>' + items + '</ul></div>'; };
+    var tl = function (b, s) { return '<li><b>' + b + '</b><span>' + s + '</span></li>'; };
+    var cl = function (n, k, b, i, p) { return '<div class="hs-cl"><button class="hs-cv-h" type="button" data-hs-cl aria-expanded="false" aria-controls="hs-cl-' + n + '"><span class="hs-cl-n">0' + k + '</span><span class="hs-cl-tx"><b>' + b + '</b><span>' + i + '</span></span><span class="ms" aria-hidden="true">expand_more</span></button><div class="hs-cl-b" id="hs-cl-' + n + '"><div><p>' + p + '</p></div></div></div>'; };
     var w = hs3El('div', 'hs-pf',
-      '<div class="hs-pf-top"><span class="hs-pf-ph"><img src="' + esc(HS3_PF_PHOTO) + '" alt="한정민 사진" draggable="false"></span><div class="hs-pf-id"><span class="hs-pf-k">UI/UX 서비스 기획자</span><h3 class="hs-pf-n">한정민</h3>' +
-      '<p class="hs-pf-l">더 나은 결과를 찾는 배부르지 않은 기획자, 헝그리 한정민</p><dl class="hs-pf-f"><div><dt>학력</dt><dd>계원예술대학교 디지털미디어디자인과 기획 세부전공 · 2027.02 졸업 예정</dd></div>' +
+      '<div class="hs-pf-top"><button class="hs-pf-ph" type="button" data-img="hs-profile" aria-label="한정민 사진 크게 보기"><img src="' + esc(HS3_PF_PHOTO) + '" alt="한정민 사진" width="640" height="853" draggable="false"></button><div class="hs-pf-id"><span class="hs-pf-k" style="--i:0">UI/UX 서비스 기획자</span><h3 class="hs-pf-n" style="--i:1">한정민</h3>' +
+      '<p class="hs-pf-l" style="--i:2">더 나은 결과를 찾는 배부르지 않은 기획자, 헝그리 한정민</p><dl class="hs-pf-f" style="--i:3"><div><dt>학력</dt><dd>계원예술대학교 디지털미디어디자인과 기획 세부전공 · 2027.02 졸업 예정</dd></div>' +
       '<div><dt>수상</dt><dd>커뮤니케이션 디자인 국제 어워드 회장상 · 기획 부문</dd></div><div><dt>활동</dt><dd>AI 동아리 AIM · AI 교육팀 팀장</dd></div></dl></div></div>' +
-      '<div class="hs-pf-bd"><div class="hs-sg" role="tablist" aria-label="소개 자료 고르기"><button type="button" role="tab" data-hs-tab="0" aria-selected="true">이력서</button><button type="button" role="tab" data-hs-tab="1" aria-selected="false" tabindex="-1">자기소개서</button></div>' +
-      '<div class="hs-pf-pn" role="tabpanel"><div class="hs-cv" id="hs-cv-' + (++HS3.n) + '">' +
-      '<h5>학력</h5><ul>' + li('2027.02', '계원예술대학교 디지털미디어디자인과', '기획 세부전공 졸업 예정') + li('2026.03', '계원예술대학교 디지털미디어디자인과', '기획 세부전공 선택') + li('2023.03', '계원예술대학교 디지털미디어디자인과', '입학') + li('2022.01', '야탑고등학교', '졸업') + '</ul>' +
-      '<h5>수상</h5><ul>' + li('2026.07', '회장상 · 기획 부문', '제32회 커뮤니케이션 디자인 국제 어워드 · 플로레터: 과천 공무원 대상 분재 선물 플랫폼 앱 서비스 기획') + li('2026.07', '입선 · 디자인 부문', '제32회 커뮤니케이션 디자인 국제 어워드 · 유지: AI 기반 목표 관리 앱 서비스 기획') + li('2026.06.26', '학과 연합 PT 우수작 선정 · 발표', '플로레터') + '</ul>' +
-      '<h5>교내 활동</h5><ul>' + li('2026.09–12', '툴 멘토링 · 멘토', '바이브 코딩 및 기획, Figma 활용 멘토링') + li('2026.09–12', 'AI 동아리 AIM · AI 교육팀 팀장', '바이브 코딩 기반 웹 앱 제작 교육') + li('2026.06–09', 'ESG 거버넌스 · 영상팀 팀장', '책임감 있는 AI 사용을 주제로 영상 제작') + li('2026.03–12', '기획동아리 초안 · 카드뉴스팀 팀장', '학과 생활 팁 카드뉴스 제작') + '</ul>' +
-      '<h5>경력</h5><ul>' + li('2026.02–현재', '바이칼 휘트니스 · 파트타이머', '사내 인수인계 시스템 제작, 사무 업무, 고객 응대') + li('2025.05–2026.01', '카페 선데이마켓 · 파트타이머', '브런치 및 커피 제조, 고객 응대') + li('2023.06–07', '희창냉장 · 파트타이머', '물류 상하차와 현장 업무') + li('2022.03–06', '하나로마트 · 파트타이머', '매장 보안 업무와 물류 관리') + '</ul>' +
-      '<h5>자격증</h5><ul>' + li('2025.03', '1종 보통 운전면허') + li('2025.04', '2종 소형 운전면허') + '</ul></div>' +
-      '<button class="hs-pill" type="button" data-hs-more-cv aria-expanded="false"><span class="ms" aria-hidden="true">expand_more</span><span class="hs-pl">이력서 전체 보기</span></button></div>' +
+      '<div class="hs-pf-bd"><div class="hs-sg" role="tablist" aria-label="소개 자료 고르기"><i class="hs-sg-ink" aria-hidden="true"></i><button type="button" role="tab" data-hs-tab="0" aria-selected="true">이력서</button><button type="button" role="tab" data-hs-tab="1" aria-selected="false" tabindex="-1">자기소개서</button></div>' +
+      '<div class="hs-pf-pv"><div class="hs-pf-pn" role="tabpanel"><div class="hs-cv" id="hs-cv-' + (++HS3.n) + '">' +
+      g('학력', li('2027.02', '계원예술대학교 디지털미디어디자인과', '기획 세부전공 졸업 예정') + li('2026.03', '계원예술대학교 디지털미디어디자인과', '기획 세부전공 선택') + li('2023.03', '계원예술대학교 디지털미디어디자인과', '입학') + li('2022.01', '야탑고등학교', '졸업')) +
+      g('수상', li('2026.07', '회장상 · 기획 부문', '제32회 커뮤니케이션 디자인 국제 어워드 · 플로레터(Flo-Letter): 과천의 꽃으로 마음을 전하는 공무원 타겟 분재 선물 플랫폼 앱 서비스 기획') + li('2026.07', '입선 · 디자인 부문', '제32회 커뮤니케이션 디자인 국제 어워드 · 유지(Uuji): 목표 실천을 지속하기 어려운 자기계발 사용자를 위한 AI 기반 목표 관리 앱 서비스 기획')) +
+      g('교내 활동', li('2026.09–12', '툴 멘토링 · 멘토', '바이브 코딩 및 기획, Figma 활용 멘토링') + li('2026.09–12', 'AI 동아리 AIM · AI 교육팀 팀장', '바이브 코딩 기반 웹 앱 제작 교육') + li('2026.06–09', 'ESG 거버넌스 · 영상팀 팀장', '책임감 있는 AI 사용을 주제로 영상 제작') + li('2026.06.26', '학과 연합 PT 우수작 선정 · 발표', '플로레터(Flo-Letter): 과천 공무원 대상, 분재 선물 플랫폼 앱 기획') + li('2026.03–12', '기획동아리 초안 · 카드뉴스팀 팀장', '학과 생활 팁 카드뉴스 제작')) +
+      g('경력', li('2026.02–현재', '바이칼 휘트니스 · 파트타이머', '사내 인수인계 시스템 제작, 사무 업무, 고객 응대, 인포데스크 관리') + li('2025.05–2026.01<br>2023.04–2023.09', '카페 선데이마켓 · 파트타이머', '브런치 및 커피 제조, 고객 응대') + li('2023.06–2023.07', '희창냉장 · 파트타이머', '물류 상하차와 현장 업무') + li('2022.03–2022.06', '하나로마트 · 파트타이머', '매장 보안 업무와 물류 관리')) +
+      g('병역', li('2023.10.04–<br>2025.04.03', '육군 제22보병사단 제55보병여단 제2대대 · 소총수', '병장 만기 전역')) +
+      g('자격증', li('2025.03.25', '1종 보통 운전면허') + li('2025.04.23', '2종 소형 운전면허')) +
+      g('툴 활용 능력', tl('ChatGPT', '리서치 · 아이디어 정리') + tl('Claude', '바이브 코딩 · 논리 고도화') + tl('Gemini', '자료 조사') + tl('NotebookLM', '자료 종합 · 근거 기반 기획 인사이트') + tl('Midjourney', '이미지 시안') + tl('Figma', '와이어프레임 · 화면 설계') +
+        tl('Notion', '문서 · 일정 · 회의록') + tl('PowerPoint', '기획서 · 발표 자료') + tl('Excel', '데이터 정리') + tl('Word', '문서 · 회의록') + tl('한글', '문서 · 회의록') + tl('Visual Studio Code', '코드 작성 · 프로토타이핑'), 'hs-cv-tl') + '</div>' +
+      '<button class="hs-pill hs-cv-more" type="button" data-hs-more-cv aria-expanded="false"><span class="hs-pl">이력서 전체 보기</span><span class="ms" aria-hidden="true">expand_more</span></button></div>' +
       '<div class="hs-pf-pn" role="tabpanel" hidden>' +
-      cl(++HS3.n, '화면보다 먼저, 이유를 고민합니다', '해결안을 먼저 정하지 않고, 상황을 살핀 뒤 근거로 방향을 정해요.', '좋은 서비스는 화려한 화면보다 사용자가 원하는 목적을 쉽고 자연스럽게 달성할 수 있는 구조에서 시작한다고 생각합니다. 그래서 해결안을 먼저 정하기보다 사용자와 서비스의 상황을 살피고, 문제를 구체화한 뒤 근거를 바탕으로 방향을 정하려 합니다.') +
-      cl(++HS3.n, '사용자 맥락을 읽고, AI로 경험을 구체화합니다', '행동을 어렵게 만드는 조건을 찾고, 기획한 흐름을 직접 만들어 확인해요.', 'AI 코딩 도구로 기획한 인터랙션과 사용자 흐름을 웹 · 프로토타입으로 구현해, 문서와 화면 시안만으로는 알기 어려운 실제 동작을 확인했습니다. 저에게 AI는 결과물을 대신 만드는 도구가 아니라, 서비스 가설을 빠르게 구현하고 경험으로 확인하게 돕는 기획과 검증의 도구입니다.') +
-      cl(++HS3.n, '더 나은 근거를 찾는 기획자', '개인 취향보다 사용자 목표와 프로젝트 목적을 판단 기준으로 삼아요.', '저는 아직 완성된 기획자라고 생각하지 않습니다. 제게 배고픔은 무조건 더 많이 하는 욕심이 아니라, 지금의 답에 안주하지 않고 근거를 다시 살피며 더 나은 결과를 찾는 태도입니다.') +
-      '<p class="hs-pf-end">더 나은 결과를 향한 배고픔으로, 질문하고 검증하며 끝까지 만들어가겠습니다.</p></div></div>');
+      cl(++HS3.n, 1, '화면보다 먼저, 이유를 고민합니다', '해결안을 먼저 정하지 않고, 상황을 살핀 뒤 근거로 방향을 정해요.', '저는 좋은 서비스가 화려한 화면보다 사용자가 원하는 목적을 쉽고 자연스럽게 달성할 수 있는 구조에서 시작한다고 생각합니다. 그래서 해결안을 먼저 정하기보다 사용자와 서비스의 상황을 살피고, 문제를 구체화한 뒤 근거를 바탕으로 방향을 정하려 합니다. 또한 "형태는 기능을 따른다"는 말을 좋아해 UX 설계에도 적용합니다. 사용자의 목적을 먼저 이해하고, 그에 맞춰 정보의 순서와 화면의 흐름, 인터랙션을 설계합니다.') +
+      cl(++HS3.n, 2, '사용자 맥락을 읽고, AI로 경험을 구체화합니다', '행동을 어렵게 만드는 조건을 찾고, 기획한 흐름을 직접 만들어 확인해요.', '더 나아가 AI 코딩 도구로 기획한 인터랙션과 사용자 흐름을 웹·프로토타입으로 구현해 문서와 화면 시안만으로는 알기 어려운 실제 동작을 확인했습니다. 예상한 흐름과 다르거나 사용 과정이 복잡해지는 지점을 발견하면 다시 기획으로 돌아가 수정했고, AI가 생성한 결과도 사용자 목적과 기획 의도에 맞는지 검토했습니다. 저에게 AI는 결과물을 대신 만드는 도구가 아니라, 서비스 가설을 빠르게 구현하고 경험으로 확인하게 돕는 기획과 검증의 도구입니다.') +
+      cl(++HS3.n, 3, '더 나은 근거를 찾는 기획자', '개인 취향보다 사용자 목표와 프로젝트 목적을 판단 기준으로 삼아요.', '팀 프로젝트에서는 개인의 취향보다 사용자 목표와 프로젝트 목적을 판단 기준으로 삼으려 합니다. 팀원의 의견을 경청하고 사용자의 상황에 공감하며, 서로 다른 생각을 정리해 합의점을 찾는 커뮤니케이션 역량을 길러왔습니다. 저는 아직 완성된 기획자라고 생각하지 않습니다. 제게 \'배고픔\'은 무조건 더 많이 하는 욕심이 아니라, 지금의 답에 안주하지 않고 근거를 다시 살피며 더 나은 결과를 찾는 태도입니다.') +
+      '<p class="hs-pf-end">더 나은 결과를 향한 배고픔으로, 질문하고 검증하며 끝까지 만들어가겠습니다.</p></div></div></div>');
     return w;
   }
-  function hs3PfInit(w) { var cv = w.querySelector('.hs-cv'), b = w.querySelector('[data-hs-more-cv]'); if (cv && b) b.setAttribute('aria-controls', cv.id); }
+  // 고르기 알약 흰 바탕 자리(시트 sgInit place와 같음)
+  function hs3SgPlace(sg, instant) {
+    var ink = sg && sg.querySelector('.hs-sg-ink'), cur = sg && sg.querySelector('[aria-selected="true"]'); if (!ink || !cur || !cur.offsetWidth) return;
+    if (instant) ink.style.transition = 'none';
+    ink.style.width = cur.offsetWidth + 'px'; ink.style.transform = 'translateX(' + cur.offsetLeft + 'px)';
+    if (instant) { void ink.offsetWidth; ink.style.transition = ''; }
+  }
+  // 고르기: 높이가 0.42초로 바뀌며 새 내용이 차례로 올라옴(시트 그대로)
+  function hs3PfTab(b) {
+    var pf = b.closest('.hs-pf'), i = +b.getAttribute('data-hs-tab'), pv = pf.querySelector('.hs-pf-pv'); if (b.getAttribute('aria-selected') === 'true') return;
+    var h0 = pv.offsetHeight, pns = pf.querySelectorAll('.hs-pf-pn'), show = pns[i];
+    pf.querySelectorAll('[data-hs-tab]').forEach(function (x, k) { x.setAttribute('aria-selected', String(k === i)); x.tabIndex = k === i ? 0 : -1; });
+    hs3SgPlace(pf.querySelector('.hs-sg'));
+    if (pv.getAnimations) pv.getAnimations().forEach(function (a) { a.cancel(); });
+    pns.forEach(function (p, k) { if (p.getAnimations) p.getAnimations().forEach(function (a) { a.cancel(); }); p.hidden = k !== i; });
+    if (uiRM() || !pv.animate) return;
+    var h1 = pv.offsetHeight; pv.style.overflow = 'hidden';
+    pv.animate([{ height: h0 + 'px' }, { height: h1 + 'px' }], { duration: 420, easing: UI.EO }).finished.then(function () { pv.style.overflow = ''; }, function () {});
+    [].forEach.call(show.children, function (c, k) { c.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 420, easing: UI.EO, delay: 60 + k * 45, fill: 'backwards' }); });
+  }
+  // 이력서 전체 보기 · 접기: 높이가 부드럽게(최대 0.7초), 접을 때 버튼이 손가락 아래 그대로(대화 칸 스크롤을 맞춤)
+  function hs3PfMore(b) {
+    var pn = b.closest('.hs-pf-pn'), cl = pn.querySelector('.hs-cv'), open = !pn.classList.contains('hs-open'), h0 = cl.getBoundingClientRect().height;
+    if (cl.getAnimations) cl.getAnimations().forEach(function (a) { a.cancel(); });
+    pn.classList.toggle('hs-open', open); b.setAttribute('aria-expanded', String(open)); b.querySelector('.hs-pl').textContent = open ? '접기' : '이력서 전체 보기';
+    if (uiRM() || !cl.animate) return;
+    var h1 = open ? cl.scrollHeight : (parseFloat(getComputedStyle(cl).maxHeight) || 360), y0 = b.getBoundingClientRect().top;
+    var an = cl.animate([{ maxHeight: h0 + 'px' }, { maxHeight: h1 + 'px' }], { duration: Math.min(700, 360 + Math.abs(h1 - h0) * .2), easing: 'cubic-bezier(.4, 0, .2, 1)' }); an.finished.catch(function () {});
+    if (!open) (function keep() { var dy = b.getBoundingClientRect().top - y0; if (Math.abs(dy) > .5) HS3.th.scrollTop += dy; if (an.playState === 'running') requestAnimationFrame(keep); })();
+  }
+  function hs3PfInit(w, live) {
+    var cv = w.querySelector('.hs-cv'), b = w.querySelector('[data-hs-more-cv]'); if (cv && b) b.setAttribute('aria-controls', cv.id);
+    var sg = w.querySelector('.hs-sg'); requestAnimationFrame(function () { hs3SgPlace(sg, true); }); if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { hs3SgPlace(sg, true); });
+    IMG['hs-profile'] = { id: 'hs-profile', src: HS3_PF_PHOTO, alt: '한정민 사진', at: '' };   // 11-15 4차: 사진을 누르면 이미지와 같은 크게 보기(lbOpen이 IMG에서 찾음 · 프로젝트 이동 없음)
+    if (!live || uiRM() || !('IntersectionObserver' in window)) return;   // 시트와 같은 들어옴: 화면에 20% 보이면 사진이 안쪽에서 펼쳐지고 글이 차례로 올라옴(새로 받은 답만)
+    w.classList.add('hs-pre');
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { io.disconnect(); requestAnimationFrame(function () { requestAnimationFrame(function () { w.classList.remove('hs-pre'); }); }); } }); }, { threshold: .2 });
+    io.observe(w);
+  }
 
   /* ── 메일 쓰기 판(연락 카드 "메일 쓰기"): 받는 사람 고정 · 제목 · 내용 → 메일 앱. 닫아도 쓴 글은 남음 ── */
   var HS3M = { el: null, open: false, from: null };
@@ -5262,17 +5361,31 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   new MutationObserver(hs3Upl).observe(HS3_ATT, { childList: true });
 
   /* ── 말로 묻기: 마이크가 듣는 중이면 진한 원 + 고리, 입력 칸 앞 소리 막대(실제 음량 아님), 안내 "듣고 있어요…" ── */
+  // 11-15 4차: 듣기를 못 하면(권한 없음 · 이 브라우저에서 받아쓰기 서비스 없음 · 말소리 없음) 같은 자리에 2.6초 안내. 예전엔 바로 원래 모양으로 돌아가 "아무 반응 없음"으로 보였음
+  var HS3_MIC_ERR = { 'not-allowed': '마이크 권한을 허용해 주세요', 'service-not-allowed': '마이크 권한을 허용해 주세요', 'no-speech': '말소리가 들리지 않았어요. 다시 눌러 주세요',
+    'audio-capture': '마이크를 찾지 못했어요', network: '이 브라우저에서는 말로 묻기를 쓸 수 없어요', 'language-not-supported': '이 브라우저에서는 말로 묻기를 쓸 수 없어요', start: '이 브라우저에서는 말로 묻기를 쓸 수 없어요', x: '말로 묻기를 시작하지 못했어요' };
   function hs3Mic() {
     var mic = HS3.mic, f = IN.form; if (!mic || !f) return;
     var x = hgSituation({ ans: null, q: {}, ui: { mic: mic.getAttribute('aria-pressed') === 'true' && !mic.hidden ? 'on' : 'off' }, ctx: {}, data: {} }), on = hs3Has(x, 'listen');
+    var was = f.classList.contains('hs-listening');
     f.classList.toggle('hs-listening', on);
     if (on) {
+      clearTimeout(HS3.micT); f.classList.remove('hs-micerr');
       if (!HS3.lvl) { HS3.lvl = hs3El('span', 'hs-lvl', '<i></i><i></i><i></i><i></i><i></i>'); HS3.lvl.setAttribute('aria-hidden', 'true'); }
       if (!HS3.lvl.parentNode) f.insertBefore(HS3.lvl, IN);
-      if (HS3.ph == null) { HS3.ph = IN.getAttribute('placeholder') || ''; IN.setAttribute('placeholder', '듣고 있어요…'); }
+      if (HS3.ph == null) HS3.ph = IN.getAttribute('placeholder') || '';
+      IN.setAttribute('placeholder', '듣고 있어요…');
+      if (!was) try { if (window.HUGI_ORB && !BUSY) window.HUGI_ORB.typing(); } catch (e) {}   // 허기 버튼: 엔진 규칙대로 듣는 중(이미 있는 호출만)
     } else {
       if (HS3.lvl && HS3.lvl.parentNode) HS3.lvl.remove();
-      if (HS3.ph != null) { IN.setAttribute('placeholder', HS3.ph); HS3.ph = null; }
+      var er = mic.getAttribute('data-hs-err'), msg = er && er !== 'aborted' ? (HS3_MIC_ERR[er] || HS3_MIC_ERR.x) : '';
+      if (msg && was) {   // 듣던 중 실패: 입력 칸 안내 글로 2.6초(글이 있으면 글은 그대로 · 읽기 프로그램에는 상태로 알림)
+        if (HS3.ph == null) HS3.ph = IN.getAttribute('placeholder') || '';
+        IN.setAttribute('placeholder', msg); f.classList.add('hs-micerr');
+        if (!HS3.micLive) { HS3.micLive = hs3El('span', 'hs-sr'); HS3.micLive.setAttribute('role', 'status'); f.appendChild(HS3.micLive); }
+        HS3.micLive.textContent = msg;
+        clearTimeout(HS3.micT); HS3.micT = setTimeout(function () { f.classList.remove('hs-micerr'); if (HS3.ph != null) { IN.setAttribute('placeholder', HS3.ph); HS3.ph = null; } if (HS3.micLive) HS3.micLive.textContent = ''; }, 2600);
+      } else if (!f.classList.contains('hs-micerr') && HS3.ph != null) { IN.setAttribute('placeholder', HS3.ph); HS3.ph = null; }
     }
   }
   if (HS3.mic) new MutationObserver(hs3Mic).observe(HS3.mic, { attributes: true, attributeFilter: ['aria-pressed', 'hidden'] });
@@ -5285,6 +5398,14 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var w = b.closest('.ask-back'); w.classList.remove('ask-back'); w.classList.add('hs-asked'); b.setAttribute('aria-pressed', 'true');
   }, true);
 
+  /* 11-15 4차: 소개 고르기 알약 ← → · Home · End(시트 sgInit와 같음), 화면 폭이 바뀌면 흰 바탕 자리 다시 맞춤 */
+  document.addEventListener('keydown', function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('[data-hs-tab]') : null; if (!b) return;
+    var bs = [].slice.call(b.closest('.hs-sg').querySelectorAll('[data-hs-tab]')), k = bs.indexOf(b);
+    var n = e.key === 'ArrowRight' ? k + 1 : e.key === 'ArrowLeft' ? k - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? bs.length - 1 : null; if (n === null) return;
+    n = (n + bs.length) % bs.length; bs[n].focus(); hs3PfTab(bs[n]);
+  });
+  window.addEventListener('resize', function () { document.querySelectorAll('.hs-pf .hs-sg').forEach(function (s) { hs3SgPlace(s, true); }); });
   /* ── 부품 안 버튼 ── */
   document.addEventListener('click', function (e) {
     var t = e.target, b; if (!t || !t.closest) return;
@@ -5300,11 +5421,9 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     if ((b = t.closest('[data-hs-gal]'))) { var f = b.closest('.hs-gal'); if (f && f._go) f._go(f._cur() + (+b.getAttribute('data-hs-gal'))); return; }
     if ((b = t.closest('[data-hs-dot]'))) { var f2 = b.closest('.hs-gal'); if (f2 && f2._go) f2._go(+b.getAttribute('data-hs-dot')); return; }
     if (t.closest('[data-hs-jump]')) { HS3.th.scrollTo({ top: HS3.th.scrollHeight, behavior: uiRM() ? 'auto' : 'smooth' }); return; }
-    if ((b = t.closest('[data-hs-tab]'))) { var pf = b.closest('.hs-pf'), i = +b.getAttribute('data-hs-tab');
-      pf.querySelectorAll('[data-hs-tab]').forEach(function (x, k) { x.setAttribute('aria-selected', String(k === i)); x.tabIndex = k === i ? 0 : -1; });
-      pf.querySelectorAll('.hs-pf-pn').forEach(function (p, k) { p.hidden = k !== i; }); return; }
-    if ((b = t.closest('[data-hs-more-cv]'))) { var pn = b.closest('.hs-pf-pn'), o2 = !pn.classList.contains('hs-open'); pn.classList.toggle('hs-open', o2); b.setAttribute('aria-expanded', String(o2)); b.querySelector('.hs-pl').textContent = o2 ? '접기' : '이력서 전체 보기'; return; }
-    if ((b = t.closest('[data-hs-cl]'))) { var o3 = b.getAttribute('aria-expanded') !== 'true', bd = document.getElementById(b.getAttribute('aria-controls')); b.setAttribute('aria-expanded', String(o3)); if (bd) bd.hidden = !o3; return; }
+    if ((b = t.closest('[data-hs-tab]'))) { hs3PfTab(b); return; }
+    if ((b = t.closest('[data-hs-more-cv]'))) { hs3PfMore(b); return; }
+    if ((b = t.closest('[data-hs-cl]'))) { var o3 = b.getAttribute('aria-expanded') !== 'true'; b.setAttribute('aria-expanded', String(o3)); b.closest('.hs-cl').classList.toggle('hs-on', o3); return; }
     if (HS3J.el) hs3JumpSoon();
   });
   /* HS3-JS-END */
