@@ -242,7 +242,7 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
  * 사이트 전역 --md-* · 프로젝트 상세(.plx) · 메뉴 · 소개는 그대로. 질문창 높이 60(≤640 56) 고정 · 폭 680 · 대화 기둥 720 */
 .hero, .ui-layer { --md-surface: var(--ui-surface); --md-on-surface: var(--ui-label); --md-on-surface-variant: var(--ui-label-2); --md-surface-container: var(--ui-bg-2); --md-surface-container-high: var(--ui-bg-3); --md-outline-variant: var(--ui-sep); --hero-bg: var(--ui-bg);
   color: var(--ui-label); font-family: var(--ui-font); }
-@media (max-width: 640px) { .hero { --bar: var(--ui-ask-h-m); } .askbox { padding-left: var(--ui-ask-pl-m); } .hero .ask { width: calc(100% + 8px); margin-left: -4px; margin-right: -4px; } }
+@media (max-width: 640px) { .hero { --bar: var(--ui-ask-h-m); } .askbox { padding-left: var(--ui-ask-pl-m); } .hero .ask { width: 100%; margin-left: 0; margin-right: 0; } }   /* 11-15 사용자 "임의적으로 해": 모바일 질문창 왼쪽 끝을 답 글 선(20)에 맞춤(전 16) */
 .hero .wrap { width: 100%; display: flex; flex-direction: column; align-items: center; }
 .hero h1 { word-break: keep-all; font-weight: 300; font-size: clamp(26px, min(3.2vw, 5.2vh), 42px); line-height: 1.3; letter-spacing: -0.02em; text-align: center; }
 .hero.chat { height: 100vh; height: 100svh; min-height: 520px; justify-content: stretch; padding-bottom: clamp(16px, 3vh, 28px); }
@@ -270,6 +270,8 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
 @media (max-width: 480px) {   /* 폰: 첨부 · 마이크가 들어가며 안내 글이 잘려서, 비어 있을 때는 보내기 자리를 접고 간격을 줄임(글을 쓰면 보내기가 펼쳐짐) */
   .askbox { gap: 10px; padding-left: 18px; --sg: 2px; }   /* 11-15 모바일 4차 #4: 첨부 · 마이크 사이 2 → 10(누름 영역 44가 서로 안 겹침, 시트 5-1 "칸 사이 10") */
 }
+@media (max-width: 380px) { .askbox input::placeholder { font-size: 15px; } }
+.askbox input { text-overflow: ellipsis; }   /* 11-15 파일을 붙이고 글이 비어 보내기가 나타나 칸이 좁아질 때: 안내 글 끝을 잘라 먹지 않고 "…"로 줄임 */   /* 11-15 질문창 20 맞춤 뒤 360에서 안내 글이 2px 잘려서, 좁은 화면만 안내 글 15(입력 글자는 16 그대로 — 아이폰 확대 없음) */
 .send { width: var(--ui-send); height: var(--ui-send); border-radius: var(--md-full); background: var(--ui-send-bg); color: var(--ui-send-fg); display: grid; place-items: center; transition: opacity .15s; }   /* 11-15 시트 5단계: 보내기 44 · 검정 채움(어두운 화면은 밝은 채움) */
 .send .ms { font-size: var(--ui-send-icon); }
 .askbox:not(.has) .send { opacity: 0; pointer-events: none; }

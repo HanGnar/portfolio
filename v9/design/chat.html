@@ -408,6 +408,8 @@ body.spec [data-spec]::after{content:attr(data-spec);position:absolute;right:0;t
   .tv-head{padding:0 12px 10px 20px;touch-action:none}
   .tv-sc{margin:0 8px max(8px,env(safe-area-inset-bottom,0px))}
 }
+@media (max-width:380px){#q::placeholder{font-size:15px}}
+#q{text-overflow:ellipsis}   /* 11-15 웹과 같게: 파일만 붙여 보내기가 나타나 칸이 좁아지면 안내 글 끝을 "…"로 */   /* 11-15 웹과 같게: 좁은 화면만 안내 글 15(입력 글자 16 그대로) — 질문창 20 맞춤 뒤 360에서 안 잘리게 */
 /* 누름이 데스크톱에서도 보이게: 올림 규칙 뒤에 누름을 다시 적음(쫀득: 누름 120ms ease-out → 놓음 420ms spring) */
 @media (hover:hover){
   .glass.press:hover:active,.ib.press:hover:active,.play.press:hover:active,.chip.press:hover:active{transform:var(--ui-press);transition-duration:var(--d1);transition-timing-function:var(--ease-out)}
