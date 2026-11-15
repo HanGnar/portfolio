@@ -8410,3 +8410,199 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 })();
 
 </script>
+
+<style>
+/* ═══ 4판(2026-11-15 HPP): 햄버거 메뉴 펼침 다시 짜기 ═══
+   사용자 "텍스트를 누르면 해당 페이지로 이동하는 기능 드롭다운을 눌러야 상세가 뜨는 느낌으로 하고 싶고 설정버튼도 넣고싶은데 어디다가 넣고 어떻게 인터렉션이 나와야 자연스러울까"
+   + "햄버거 메뉴의 느낌을 살려서 디자인해줘 지금은 채팅창같아"
+   - 판 가운데 좁은 칸(채팅처럼 보임) → 판 폭을 쓰는 메뉴 칸(최대 960): 큰 글자 줄(Title 1)을 머리카락 선으로 나눔, 펼침 원은 줄 오른쪽 끝
+   - 한 줄 = [번호 · 이름(누르면 이동)] + [펼침 원(누르면 상세)]. 올리면 이름이 오른쪽으로 6 밀림(메뉴다운 반응)
+   - 설정 = 판 맨 아래 유리 알약. 누르면 판 안에서 옆으로 넘어가는 설정 화면(같은 줄 모양). 판을 닫았다 열면 늘 메뉴부터 */
+
+/* 판 안 칸: 가운데 좁은 칸 → 넓은 메뉴 칸(왼쪽 정렬) */
+.side .mnav { width: min(960px, 100%); padding: 104px clamp(24px, 6vw, 72px) 32px; justify-content: flex-start; gap: 0; }
+.side .mnav > div { width: 100%; }
+.side .mhead { margin-bottom: 8px; }
+
+/* 두 화면(메뉴 · 설정): 같은 칸에 겹쳐 두고 옆으로 넘김 */
+.nv4-views { position: relative; display: grid; width: 100%; }
+.nv4-pane { grid-area: 1 / 1; min-width: 0; width: 100%; transition: opacity var(--ui-d3) var(--ui-ease-out), translate var(--ui-d3) var(--ui-ease-out), visibility 0s; }
+.nv4-pane[aria-hidden="true"] { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity var(--ui-d2) var(--ui-ease-out), translate var(--ui-d3) var(--ui-ease-out), visibility 0s var(--ui-d3); }
+.nv4-menu[aria-hidden="true"] { translate: -32px 0; }
+.nv4-set[aria-hidden="true"] { translate: 32px 0; }
+
+/* 메뉴 줄: 위아래 머리카락 선, 번호 칸 48 · 이름 Title 1 · 펼침 원은 오른쪽 끝 */
+.side .mlist { border-top: 1px solid var(--ui-sep); }
+.nv4-row { border-bottom: 1px solid var(--ui-sep); }
+.nv4-line { display: flex; align-items: center; gap: 12px; min-height: 88px; }
+.nv4-line .mrow { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 0; padding: 16px 0; font: var(--t-title1); font-family: inherit; letter-spacing: var(--ls-title1); color: var(--ui-label); }
+.nv4-line .mrow .no { flex: none; width: 48px; font: var(--t-footnote); font-family: inherit; letter-spacing: var(--ls-footnote); color: var(--ui-label-3); font-variant-numeric: tabular-nums; translate: 0 -0.35em; }
+.nv4-line .mrow .nm4 { display: inline-block; transition: translate var(--ui-d3) var(--ui-spring), color var(--ui-d2) var(--ui-ease-out); }
+.nv4-line .mrow[aria-disabled="true"] { color: var(--ui-label-3); cursor: default; }
+@media (hover: hover) { .nv4-line .mrow:not([aria-disabled="true"]):hover .nm4 { translate: 6px 0; } }
+.nv4-line .mrow:active { scale: none; }
+.nv4-line .mrow:not([aria-disabled="true"]):active .nm4 { translate: 3px 0; transition-duration: var(--ui-d1); }
+.nv4-line .mrow:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 4px; border-radius: 8px; }
+
+/* 펼침 원: 평소엔 투명 · 올리면 유리가 떠오름(내비 아이콘 버튼과 같음) · 열리면 화살표 뒤집힘(spring) */
+.nv4-tg { position: relative; flex: none; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 999px; display: grid; place-items: center; background: transparent; color: var(--ui-label-2); cursor: pointer;
+  -webkit-tap-highlight-color: transparent; transition: background-color var(--ui-d2) var(--ui-ease-out), box-shadow var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
+.nv4-tg svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; transition: rotate var(--ui-d3) var(--ui-spring); }
+.nv4-tg[aria-expanded="true"] { color: var(--ui-label); background: var(--ui-bg-2); }
+.nv4-tg[aria-expanded="true"] svg.i { rotate: 180deg; }
+@media (hover: hover) { .nv4-tg:hover { color: var(--ui-label); background: var(--ui-glass); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh); transform: scale(1.06); } }
+.nv4-tg:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+.nv4-tg:focus-visible, .nv4-gear:focus-visible, .nv4-back:focus-visible, .nv4-seg button:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 2px; }
+
+/* 상세: 높이 0 → 내용만큼(grid 0fr → 1fr, 0.42초 ease-out), 이름들은 아래에서 차례로(30ms 간격). 웹은 두 줄 칸, 폰은 한 줄 */
+.nv4-sub { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--ui-d3) var(--ui-ease-out); }
+.nv4-row.open .nv4-sub { grid-template-rows: 1fr; }
+.nv4-sub > div { overflow: hidden; min-height: 0; }
+.nv4-sub ul { list-style: none; margin: 0; padding: 0 0 24px 48px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 24px; }
+.nv4-sub button { display: inline-flex; align-items: center; gap: 8px; background: none; border: 0; padding: 8px 0; font: var(--t-title3); font-family: inherit; letter-spacing: var(--ls-title3); color: var(--ui-label-2); text-align: left; word-break: keep-all; cursor: pointer;
+  opacity: 0; translate: 0 8px; -webkit-tap-highlight-color: transparent;
+  transition: opacity var(--ui-d2) var(--ui-ease-out), translate var(--ui-d3) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out); }
+.nv4-sub button svg.i { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; opacity: 0; translate: -4px 0; transition: opacity var(--ui-d2) var(--ui-ease-out), translate var(--ui-d3) var(--ui-spring); }
+.nv4-row.open .nv4-sub button { opacity: 1; translate: none; transition-delay: calc(60ms + var(--j, 0) * 30ms), calc(60ms + var(--j, 0) * 30ms), 0s; }
+@media (hover: hover) { .nv4-sub button:hover { color: var(--ui-label); } .nv4-sub button:hover svg.i { opacity: 1; translate: none; } }
+.nv4-sub button:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 2px; border-radius: 6px; }
+
+/* 맨 아래: 설정 알약(톱니 + "설정") */
+.nv4-foot { margin-top: 32px; display: flex; align-items: center; gap: 12px; }
+.nv4-gear, .nv4-back { position: relative; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px 0 14px; border: 0; border-radius: 999px; cursor: pointer; color: var(--ui-label);
+  font: var(--t-callout); font-family: inherit; letter-spacing: var(--ls-callout); -webkit-tap-highlight-color: transparent;
+  background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh);
+  transition: transform var(--ui-d3) var(--ui-spring), box-shadow var(--ui-d2) var(--ui-ease-out); }
+.nv4-gear svg.i, .nv4-back svg.i { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.nv4-gear svg.i { transition: rotate var(--ui-d4) var(--ui-ease-out); }
+@media (hover: hover) { .nv4-gear:hover, .nv4-back:hover { transform: var(--ui-lift); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh-hi); } .nv4-gear:hover svg.i { rotate: 60deg; } }
+.nv4-gear:active, .nv4-back:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+.nv4-back { width: 44px; padding: 0; justify-content: center; }
+
+/* 설정 화면: 메뉴와 같은 줄 모양(머리 = 뒤로 원 + Title 1 "설정", 항목 줄 = 이름 · 설명 + 고르기 알약 오른쪽 끝) */
+.nv4-sh { display: flex; align-items: center; gap: 16px; min-height: 88px; border-bottom: 1px solid var(--ui-sep); }
+.nv4-sh h2 { margin: 0; font: var(--t-title1); font-family: inherit; letter-spacing: var(--ls-title1); color: var(--ui-label); }
+.nv4-opts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.nv4-opt { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 80px; padding: 16px 0; border-bottom: 1px solid var(--ui-sep); min-width: 0; }
+.nv4-ol { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.nv4-ol b { font: var(--t-title3); font-family: inherit; letter-spacing: var(--ls-title3); color: var(--ui-label); }
+.nv4-ol span { font: var(--t-footnote); font-family: inherit; letter-spacing: var(--ls-footnote); color: var(--ui-label-3); }
+
+/* 고르기 알약: 진한 알약이 고른 칸으로 spring으로 미끄러짐(프로젝트 시트 분류 버튼과 같은 움직임) */
+.nv4-seg { position: relative; flex: none; display: inline-flex; padding: 4px; border-radius: 999px; background: var(--ui-bg-2); isolation: isolate; }
+.nv4-seg .th { position: absolute; z-index: -1; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 999px; background: var(--ui-label); box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
+  transition: translate var(--ui-d3) var(--ui-spring), width var(--ui-d3) var(--ui-spring); }
+.nv4-seg button { position: relative; height: 36px; padding: 0 16px; border: 0; border-radius: 999px; background: none; cursor: pointer; white-space: nowrap;
+  font: var(--t-callout); font-family: inherit; letter-spacing: var(--ls-callout); color: var(--ui-label-2); -webkit-tap-highlight-color: transparent; transition: color var(--ui-d2) var(--ui-ease-out), scale var(--ui-d3) var(--ui-spring); }
+.nv4-seg button[aria-checked="true"] { color: var(--ui-bg); }
+.nv4-seg button:active { scale: .95; transition-duration: var(--ui-d1); }
+@media (hover: hover) { .nv4-seg button:not([aria-checked="true"]):hover { color: var(--ui-label); } }
+
+/* 손가락 화면: 보이는 크기 그대로, 누름 영역 44 */
+@media (pointer: coarse) {
+  .nv4-seg button::after { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: 44px; translate: -50% -50%; border-radius: 999px; }
+  .nv4-sub button { min-height: 44px; }
+}
+/* 태블릿 · 폰: 이름 Title 1 모바일 값(type.css 32), 줄 높이 72, 상세 한 줄 · 번호 칸 36 */
+@media (max-width: 1080px) { .nv4-line { min-height: 76px; } .nv4-sh { min-height: 76px; } }
+@media (max-width: 640px) {
+  .side .mnav { padding: 88px 20px 24px; }
+  .nv4-line { min-height: 68px; gap: 8px; }
+  .nv4-line .mrow { padding: 12px 0; }
+  .nv4-line .mrow .no, .nv4-sub ul { width: 36px; }
+  .nv4-sub ul { width: auto; padding-left: 36px; grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .nv4-sh { min-height: 68px; }
+  .nv4-opt { flex-direction: column; align-items: flex-start; gap: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nv4-pane, .nv4-pane[aria-hidden="true"], .nv4-sub, .nv4-sub button, .nv4-sub button svg.i, .nv4-tg, .nv4-tg svg.i, .nv4-seg .th, .nv4-gear svg.i, .nv4-line .mrow .nm4 { transition-duration: 1ms !important; transition-delay: 0s !important; }
+  .nv4-menu[aria-hidden="true"], .nv4-set[aria-hidden="true"] { translate: none; }
+}
+
+</style>
+<script>
+/* ═══ 4판(2026-11-15 HPP): 햄버거 메뉴 펼침 — 이름 = 이동, 펼침 원 = 상세, 맨 아래 설정 → 판 안에서 옆으로 넘어가는 설정 화면 ═══
+   사이트가 만든 메뉴(#side-pj, 1판 반영본)를 읽어 다시 짠다. 이동(data-open · data-scroll)과 메뉴 닫기는 사이트 코드 그대로 씀 */
+(function () {
+  var side = document.getElementById('side'), list = document.getElementById('side-pj');
+  if (!side || !list || side.querySelector('.nv4-views')) return;
+  var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var P = {
+    chev: '<path d="m6 9.5 6 6 6-6"/>', go: '<path d="M5 12h14m-5-5 5 5-5 5"/>', back: '<path d="M14.5 6 8.5 12l6 6"/>',
+    gear: '<circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4 18 18M6 18l1.6-1.6M16.4 7.6 18 6"/>'
+  };
+  function ic(k) { return '<svg class="i" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + P[k] + '</svg>'; }
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  // 1) 프로젝트 이름 · id: 사이트 메뉴(1판 .nv-sub 또는 원래 details)에서 읽음
+  var pj = [].map.call(list.querySelectorAll('.nv-sub [data-open]'), function (b) { return { id: b.getAttribute('data-open'), name: b.textContent.trim() }; });
+  if (!pj.length) pj = [].map.call(list.querySelectorAll('details'), function (d) { var nm = d.querySelector('summary .nm'), a = d.querySelector('[data-open]'); return nm && a ? { id: a.getAttribute('data-open'), name: nm.textContent } : null; }).filter(Boolean);
+
+  // 2) 메뉴 줄: 01 프로젝트(이름 → 프로젝트 영역 · 원 → 이름 목록) · 02 헝그리한정민(이동만) · 03 연락(아직 기능 없음)
+  list.innerHTML =
+    '<li class="mi nv4-row" data-k="pj"><div class="nv4-line"><button class="mrow" type="button" data-scroll="projects"><span class="no">01</span><span class="nm4">프로젝트</span></button>' +
+      '<button class="nv4-tg" type="button" aria-expanded="false" aria-controls="nv4-sub-pj" aria-label="프로젝트 목록 펼치기">' + ic('chev') + '</button></div>' +
+      '<div class="nv4-sub" id="nv4-sub-pj"><div><ul>' + pj.map(function (p, j) { return '<li><button type="button" data-open="' + esc(p.id) + '" style="--j:' + j + '" tabindex="-1"><span>' + esc(p.name) + '</span>' + ic('go') + '</button></li>'; }).join('') + '</ul></div></div></li>' +
+    '<li class="mi nv4-row"><div class="nv4-line"><button class="mrow" type="button" data-scroll="about"><span class="no">02</span><span class="nm4">헝그리한정민</span></button></div></li>' +
+    '<li class="mi nv4-row"><div class="nv4-line"><button class="mrow" type="button" aria-disabled="true"><span class="no">03</span><span class="nm4">연락</span></button></div></li>';
+
+  // 3) 두 화면으로 감쌈: 메뉴(목록 + 설정 알약) · 설정
+  var views = document.createElement('div'); views.className = 'nv4-views';
+  var menu = document.createElement('div'); menu.className = 'nv4-pane nv4-menu'; menu.setAttribute('aria-hidden', 'false');
+  list.parentNode.insertBefore(views, list); menu.appendChild(list); views.appendChild(menu);
+  var foot = document.createElement('div'); foot.className = 'nv4-foot mi';
+  foot.innerHTML = '<button class="nv4-gear" type="button" aria-haspopup="true" aria-controls="nv4-set">' + ic('gear') + '<span>설정</span></button>';
+  menu.appendChild(foot);
+  var OPTS = [
+    ['theme', '화면', '자동은 기기 설정을 따라요', [['auto', '자동'], ['light', '밝게'], ['dark', '어둡게']]],
+    ['voice', '소리', '답을 소리로 읽어 줘요', [['on', '켬'], ['off', '끔']]],
+    ['motion', '움직임', '허기와 화면 움직임', [['full', '기본'], ['less', '줄이기']]],
+    ['text', '글자 크기', '대화 글자', [['md', '기본'], ['lg', '크게']]]
+  ];
+  var set = document.createElement('section'); set.className = 'nv4-pane nv4-set'; set.id = 'nv4-set'; set.setAttribute('aria-hidden', 'true'); set.setAttribute('aria-labelledby', 'nv4-set-h');
+  set.innerHTML = '<div class="nv4-sh"><button class="nv4-back" type="button" aria-label="메뉴로 돌아가기">' + ic('back') + '</button><h2 id="nv4-set-h">설정</h2></div><ul class="nv4-opts">' +
+    OPTS.map(function (o) { return '<li class="nv4-opt"><div class="nv4-ol"><b id="nv4-l-' + o[0] + '">' + o[1] + '</b><span>' + o[2] + '</span></div><div class="nv4-seg" role="radiogroup" aria-labelledby="nv4-l-' + o[0] + '" data-k="' + o[0] + '"><span class="th" aria-hidden="true"></span>' +
+      o[3].map(function (c, i) { return '<button type="button" role="radio" data-v="' + c[0] + '" aria-checked="' + (i === 0) + '">' + c[1] + '</button>'; }).join('') + '</div></li>'; }).join('') + '</ul>';
+  views.appendChild(set);
+  // 차례 등장 순서(사이트 방식 --i · --n)를 새 항목에 맞춤
+  var mis = [].slice.call(side.querySelectorAll('.mi')); mis.forEach(function (el, i) { el.style.setProperty('--i', i); el.style.setProperty('--n', mis.length); });
+
+  // 4) 펼침: 한 번에 하나만 열림. 이름 버튼은 사이트가 이동 + 메뉴 닫기
+  function openRow(row, on) { if (!row) return; var tg = row.querySelector('.nv4-tg'); if (!tg) return;
+    row.classList.toggle('open', on); tg.setAttribute('aria-expanded', on); tg.setAttribute('aria-label', '프로젝트 목록 ' + (on ? '접기' : '펼치기'));
+    row.querySelectorAll('.nv4-sub button').forEach(function (b) { b.tabIndex = on ? 0 : -1; }); }
+  list.addEventListener('click', function (e) { var tg = e.target.closest('.nv4-tg'); if (!tg) return; e.stopPropagation();
+    var row = tg.closest('.nv4-row'), on = !row.classList.contains('open');
+    list.querySelectorAll('.nv4-row.open').forEach(function (r) { if (r !== row) openRow(r, false); }); openRow(row, on); });
+
+  // 5) 설정 화면: 판 안에서 옆으로(메뉴 왼쪽으로 24 비키며 흐려짐 · 설정 오른쪽 24에서 들어옴, 0.42초 ease-out). 뒤로 · Esc = 메뉴로
+  var gear = foot.querySelector('.nv4-gear'), back = set.querySelector('.nv4-back');
+  function show(s) { menu.setAttribute('aria-hidden', s ? 'true' : 'false'); set.setAttribute('aria-hidden', s ? 'false' : 'true'); menu.inert = !!s; set.inert = !s;
+    if (s) { segAll(); setTimeout(function () { back.focus({ preventScroll: true }); }, RM ? 0 : 60); side.scrollTop = 0; } else gear.focus({ preventScroll: true }); }
+  set.inert = true;
+  gear.addEventListener('click', function (e) { e.stopPropagation(); show(true); });
+  back.addEventListener('click', function (e) { e.stopPropagation(); show(false); });
+  addEventListener('keydown', function (e) { if (e.key === 'Escape' && side.classList.contains('on') && set.getAttribute('aria-hidden') === 'false') { e.preventDefault(); e.stopImmediatePropagation(); show(false); } }, true);
+  // 판이 닫히면 다음에 열 때 늘 메뉴부터(펼친 줄도 접음)
+  new MutationObserver(function () { if (!side.classList.contains('on') || side.hidden) { if (set.getAttribute('aria-hidden') === 'false') { menu.setAttribute('aria-hidden', 'false'); set.setAttribute('aria-hidden', 'true'); menu.inert = false; set.inert = true; }
+    list.querySelectorAll('.nv4-row.open').forEach(function (r) { openRow(r, false); }); } }).observe(side, { attributes: true, attributeFilter: ['class', 'hidden'] });
+
+  // 6) 고르기 알약: 진한 알약이 고른 칸으로 spring으로 미끄러짐. 소리는 상단 소리 버튼과 같은 상태(누르면 그 버튼을 대신 누름)
+  var ST = {}; try { ST = JSON.parse(localStorage.getItem('nv4-set') || '{}') || {}; } catch (_) {}
+  var vb = document.getElementById('g-voice');
+  function seg(g, instant) { var b = g.querySelector('[aria-checked="true"]'), th = g.querySelector('.th'); if (!b || !b.offsetWidth) return;
+    if (instant) th.style.transition = 'none'; th.style.width = b.offsetWidth + 'px'; th.style.translate = b.offsetLeft + 'px 0'; if (instant) { void th.offsetWidth; th.style.transition = ''; } }
+  function pick(g, v) { g.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-checked', b.dataset.v === v); }); }
+  function segAll() { set.querySelectorAll('.nv4-seg').forEach(function (g) { var k = g.dataset.k;
+      if (k === 'voice' && vb) pick(g, vb.getAttribute('aria-pressed') === 'true' ? 'on' : 'off'); else if (ST[k]) pick(g, ST[k]);
+      seg(g, true); }); }
+  set.addEventListener('click', function (e) { var b = e.target.closest('.nv4-seg button'); if (!b) return; e.stopPropagation();
+    var g = b.closest('.nv4-seg'), k = g.dataset.k, v = b.dataset.v; if (b.getAttribute('aria-checked') === 'true') return;
+    pick(g, v); seg(g); ST[k] = v; try { localStorage.setItem('nv4-set', JSON.stringify(ST)); } catch (_) {}
+    if (k === 'voice' && vb && (vb.getAttribute('aria-pressed') === 'true') !== (v === 'on')) vb.click(); });
+  set.addEventListener('keydown', function (e) { var b = e.target.closest('.nv4-seg button'); if (!b || !/^Arrow(Left|Right)$/.test(e.key)) return; e.preventDefault();
+    var bs = [].slice.call(b.parentNode.querySelectorAll('button')), n = bs[(bs.indexOf(b) + (e.key === 'ArrowRight' ? 1 : bs.length - 1)) % bs.length]; n.focus(); n.click(); });
+  addEventListener('resize', function () { if (set.getAttribute('aria-hidden') === 'false') set.querySelectorAll('.nv4-seg').forEach(function (g) { seg(g, true); }); });
+})();
+
+</script>
