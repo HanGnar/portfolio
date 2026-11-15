@@ -8420,7 +8420,9 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
    - 설정 = 판 맨 아래 유리 알약. 누르면 판 안에서 옆으로 넘어가는 설정 화면(같은 줄 모양). 판을 닫았다 열면 늘 메뉴부터 */
 
 /* 판 안 칸: 가운데 좁은 칸 → 넓은 메뉴 칸(왼쪽 정렬) */
-.side .mnav { width: min(960px, 100%); padding: 104px clamp(24px, 6vw, 72px) 32px; justify-content: flex-start; gap: 0; }
+.side .mnav { width: min(720px, 100%); min-height: 0; padding: 88px clamp(24px, 6vw, 72px) 24px; justify-content: flex-start; gap: 0; }
+/* 5판: 메뉴 화면은 스크롤 없음(판 안에 다 들어오게 줄임). 설정 화면만 길면 스크롤 */
+.side.nv4-menu-on { overflow-y: hidden; }
 .side .mnav > div { width: 100%; }
 .side .mhead { margin-bottom: 8px; }
 
@@ -8428,26 +8430,27 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 .nv4-views { position: relative; display: grid; width: 100%; }
 .nv4-pane { grid-area: 1 / 1; min-width: 0; width: 100%; transition: opacity var(--ui-d3) var(--ui-ease-out), translate var(--ui-d3) var(--ui-ease-out), visibility 0s; }
 .nv4-pane[aria-hidden="true"] { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity var(--ui-d2) var(--ui-ease-out), translate var(--ui-d3) var(--ui-ease-out), visibility 0s var(--ui-d3); }
+.nv4-pane[aria-hidden="true"] { position: absolute; inset: 0; overflow: hidden; }   /* 5판: 숨은 화면은 높이 셈에서 뺌(폰에서 긴 설정 화면 때문에 메뉴가 스크롤되던 것) */
 .nv4-menu[aria-hidden="true"] { translate: -32px 0; }
 .nv4-set[aria-hidden="true"] { translate: 32px 0; }
 
 /* 메뉴 줄: 위아래 머리카락 선, 번호 칸 48 · 이름 Title 1 · 펼침 원은 오른쪽 끝 */
 .side .mlist { border-top: 1px solid var(--ui-sep); }
 .nv4-row { border-bottom: 1px solid var(--ui-sep); }
-.nv4-line { display: flex; align-items: center; gap: 12px; min-height: 88px; }
-.nv4-line .mrow { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 0; padding: 16px 0; font: var(--t-title1); font-family: inherit; letter-spacing: var(--ls-title1); color: var(--ui-label); }
-.nv4-line .mrow .no { flex: none; width: 48px; font: var(--t-footnote); font-family: inherit; letter-spacing: var(--ls-footnote); color: var(--ui-label-3); font-variant-numeric: tabular-nums; translate: 0 -0.35em; }
+.nv4-line { display: flex; align-items: center; gap: 8px; min-height: 56px; }
+.nv4-line .mrow { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 0; padding: 12px 0; font: var(--t-title3); font-family: inherit; letter-spacing: var(--ls-title3); color: var(--ui-label); }
+.nv4-line .mrow .no { flex: none; width: 36px; font: var(--t-footnote); font-family: inherit; letter-spacing: var(--ls-footnote); color: var(--ui-label-3); font-variant-numeric: tabular-nums; translate: 0 -0.1em; }
 .nv4-line .mrow .nm4 { display: inline-block; transition: translate var(--ui-d3) var(--ui-spring), color var(--ui-d2) var(--ui-ease-out); }
 .nv4-line .mrow[aria-disabled="true"] { color: var(--ui-label-3); cursor: default; }
-@media (hover: hover) { .nv4-line .mrow:not([aria-disabled="true"]):hover .nm4 { translate: 6px 0; } }
+@media (hover: hover) { .nv4-line .mrow:not([aria-disabled="true"]):hover .nm4 { translate: 4px 0; } }
 .nv4-line .mrow:active { scale: none; }
 .nv4-line .mrow:not([aria-disabled="true"]):active .nm4 { translate: 3px 0; transition-duration: var(--ui-d1); }
 .nv4-line .mrow:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 4px; border-radius: 8px; }
 
 /* 펼침 원: 평소엔 투명 · 올리면 유리가 떠오름(내비 아이콘 버튼과 같음) · 열리면 화살표 뒤집힘(spring) */
-.nv4-tg { position: relative; flex: none; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 999px; display: grid; place-items: center; background: transparent; color: var(--ui-label-2); cursor: pointer;
+.nv4-tg { position: relative; flex: none; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 999px; display: grid; place-items: center; background: transparent; color: var(--ui-label-2); cursor: pointer;
   -webkit-tap-highlight-color: transparent; transition: background-color var(--ui-d2) var(--ui-ease-out), box-shadow var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
-.nv4-tg svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; transition: rotate var(--ui-d3) var(--ui-spring); }
+.nv4-tg svg.i { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; transition: rotate var(--ui-d3) var(--ui-spring); }
 .nv4-tg[aria-expanded="true"] { color: var(--ui-label); background: var(--ui-bg-2); }
 .nv4-tg[aria-expanded="true"] svg.i { rotate: 180deg; }
 @media (hover: hover) { .nv4-tg:hover { color: var(--ui-label); background: var(--ui-glass); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh); transform: scale(1.06); } }
@@ -8458,26 +8461,27 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 .nv4-sub { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--ui-d3) var(--ui-ease-out); }
 .nv4-row.open .nv4-sub { grid-template-rows: 1fr; }
 .nv4-sub > div { overflow: hidden; min-height: 0; }
-.nv4-sub ul { list-style: none; margin: 0; padding: 0 0 24px 48px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 24px; }
-.nv4-sub button { display: inline-flex; align-items: center; gap: 8px; background: none; border: 0; padding: 8px 0; font: var(--t-title3); font-family: inherit; letter-spacing: var(--ls-title3); color: var(--ui-label-2); text-align: left; word-break: keep-all; cursor: pointer;
+.nv4-sub ul { list-style: none; margin: 0; padding: 0 0 14px 36px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; }
+.nv4-sub button { display: inline-flex; align-items: center; gap: 8px; background: none; border: 0; padding: 6px 0; font: var(--t-subhead); font-family: inherit; letter-spacing: var(--ls-subhead); color: var(--ui-label-2); text-align: left; word-break: keep-all; cursor: pointer;
   opacity: 0; translate: 0 8px; -webkit-tap-highlight-color: transparent;
   transition: opacity var(--ui-d2) var(--ui-ease-out), translate var(--ui-d3) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out); }
-.nv4-sub button svg.i { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; opacity: 0; translate: -4px 0; transition: opacity var(--ui-d2) var(--ui-ease-out), translate var(--ui-d3) var(--ui-spring); }
+.nv4-sub button svg.i { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; opacity: 0; translate: -4px 0; transition: opacity var(--ui-d2) var(--ui-ease-out), translate var(--ui-d3) var(--ui-spring); }
 .nv4-row.open .nv4-sub button { opacity: 1; translate: none; transition-delay: calc(60ms + var(--j, 0) * 30ms), calc(60ms + var(--j, 0) * 30ms), 0s; }
 @media (hover: hover) { .nv4-sub button:hover { color: var(--ui-label); } .nv4-sub button:hover svg.i { opacity: 1; translate: none; } }
 .nv4-sub button:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 2px; border-radius: 6px; }
 
 /* 맨 아래: 설정 알약(톱니 + "설정") */
-.nv4-foot { margin-top: 32px; display: flex; align-items: center; gap: 12px; }
-.nv4-gear, .nv4-back { position: relative; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px 0 14px; border: 0; border-radius: 999px; cursor: pointer; color: var(--ui-label);
+.nv4-foot { margin-top: 20px; display: flex; align-items: center; gap: 12px; }
+.nv4-gear, .nv4-back { position: relative; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px 0 12px; border: 0; border-radius: 999px; cursor: pointer; color: var(--ui-label);
   font: var(--t-callout); font-family: inherit; letter-spacing: var(--ls-callout); -webkit-tap-highlight-color: transparent;
   background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh);
   transition: transform var(--ui-d3) var(--ui-spring), box-shadow var(--ui-d2) var(--ui-ease-out); }
-.nv4-gear svg.i, .nv4-back svg.i { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.nv4-gear svg.i, .nv4-back svg.i { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
 .nv4-gear svg.i { transition: rotate var(--ui-d4) var(--ui-ease-out); }
 @media (hover: hover) { .nv4-gear:hover, .nv4-back:hover { transform: var(--ui-lift); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh-hi); } .nv4-gear:hover svg.i { rotate: 60deg; } }
 .nv4-gear:active, .nv4-back:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
-.nv4-back { width: 44px; padding: 0; justify-content: center; }
+.nv4-back { width: 36px; padding: 0; justify-content: center; }
+@media (pointer: coarse) { .nv4-tg::after, .nv4-gear::after, .nv4-back::after { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: 44px; translate: -50% -50%; border-radius: 999px; } }
 
 /* 설정 화면: 메뉴와 같은 줄 모양(머리 = 뒤로 원 + Title 1 "설정", 항목 줄 = 이름 · 설명 + 고르기 알약 오른쪽 끝) */
 .nv4-sh { display: flex; align-items: center; gap: 16px; min-height: 88px; border-bottom: 1px solid var(--ui-sep); }
@@ -8504,13 +8508,16 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
   .nv4-sub button { min-height: 44px; }
 }
 /* 태블릿 · 폰: 이름 Title 1 모바일 값(type.css 32), 줄 높이 72, 상세 한 줄 · 번호 칸 36 */
-@media (max-width: 1080px) { .nv4-line { min-height: 76px; } .nv4-sh { min-height: 76px; } }
+@media (max-width: 1080px) { .nv4-sh { min-height: 76px; } }
 @media (max-width: 640px) {
-  .side .mnav { padding: 88px 20px 24px; }
-  .nv4-line { min-height: 68px; gap: 8px; }
-  .nv4-line .mrow { padding: 12px 0; }
-  .nv4-line .mrow .no, .nv4-sub ul { width: 36px; }
-  .nv4-sub ul { width: auto; padding-left: 36px; grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .side .mnav { padding: 72px 20px 12px; }
+  .nv4-line { min-height: 48px; }
+  .nv4-line .mrow { padding: 8px 0; }
+  .nv4-sub button { padding: 4px 0; }
+  .nv4-sub ul { padding-bottom: 10px; }
+  .nv4-foot { margin-top: 12px; }
+  .nv4-line .mrow .no { width: 32px; }
+  .nv4-sub ul { padding-left: 32px; grid-template-columns: minmax(0, 1fr); }
   .nv4-sh { min-height: 68px; }
   .nv4-opt { flex-direction: column; align-items: flex-start; gap: 12px; }
 }
@@ -8577,14 +8584,14 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 
   // 5) 설정 화면: 판 안에서 옆으로(메뉴 왼쪽으로 24 비키며 흐려짐 · 설정 오른쪽 24에서 들어옴, 0.42초 ease-out). 뒤로 · Esc = 메뉴로
   var gear = foot.querySelector('.nv4-gear'), back = set.querySelector('.nv4-back');
-  function show(s) { menu.setAttribute('aria-hidden', s ? 'true' : 'false'); set.setAttribute('aria-hidden', s ? 'false' : 'true'); menu.inert = !!s; set.inert = !s;
+  function show(s) { side.classList.toggle('nv4-menu-on', !s); menu.setAttribute('aria-hidden', s ? 'true' : 'false'); set.setAttribute('aria-hidden', s ? 'false' : 'true'); menu.inert = !!s; set.inert = !s;
     if (s) { segAll(); setTimeout(function () { back.focus({ preventScroll: true }); }, RM ? 0 : 60); side.scrollTop = 0; } else gear.focus({ preventScroll: true }); }
-  set.inert = true;
+  set.inert = true; side.classList.add('nv4-menu-on');
   gear.addEventListener('click', function (e) { e.stopPropagation(); show(true); });
   back.addEventListener('click', function (e) { e.stopPropagation(); show(false); });
   addEventListener('keydown', function (e) { if (e.key === 'Escape' && side.classList.contains('on') && set.getAttribute('aria-hidden') === 'false') { e.preventDefault(); e.stopImmediatePropagation(); show(false); } }, true);
   // 판이 닫히면 다음에 열 때 늘 메뉴부터(펼친 줄도 접음)
-  new MutationObserver(function () { if (!side.classList.contains('on') || side.hidden) { if (set.getAttribute('aria-hidden') === 'false') { menu.setAttribute('aria-hidden', 'false'); set.setAttribute('aria-hidden', 'true'); menu.inert = false; set.inert = true; }
+  new MutationObserver(function () { if (!side.classList.contains('on') || side.hidden) { if (set.getAttribute('aria-hidden') === 'false') { side.classList.add('nv4-menu-on'); menu.setAttribute('aria-hidden', 'false'); set.setAttribute('aria-hidden', 'true'); menu.inert = false; set.inert = true; }
     list.querySelectorAll('.nv4-row.open').forEach(function (r) { openRow(r, false); }); } }).observe(side, { attributes: true, attributeFilter: ['class', 'hidden'] });
 
   // 6) 고르기 알약: 진한 알약이 고른 칸으로 spring으로 미끄러짐. 소리는 상단 소리 버튼과 같은 상태(누르면 그 버튼을 대신 누름)
