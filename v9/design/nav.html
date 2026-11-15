@@ -8344,7 +8344,9 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 .gpill[aria-expanded="true"] i::after { transform: translateY(-2.625px) rotate(-45deg); }
 
 /* 3. 메뉴 판: 바탕은 히어로 덮개 surface, 테두리 선은 어두운 화면 값이 있는 구분선 토큰으로 */
-.side { box-shadow: 0 30px 80px -24px rgba(0, 0, 0, .35), 0 0 0 1px var(--ds-sep); }
+/* 2판(11-15 사용자 "햄버거 메뉴 펼쳤을 때 나오는 배경 박스를 글래스 모피즘으로 바꾸자"): 내비 버튼과 같은 유리 토큰(바탕 · 흐림 · 안쪽 빛 테두리 · 바깥 선) + 판 그림자는 그대로 */
+.side { background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur);
+  box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), 0 30px 80px -24px rgba(0, 0, 0, .35); }
 
 /* 4. 메뉴 글자 단계(공통기준 12단계) */
 /* 글자 토큰(ds/type.css)을 부름 → 공통 값이 바뀌면 따라감. 글꼴 묶음은 히어로 덮개 그대로(inherit) */
@@ -8383,12 +8385,14 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
   function icon(k, cls) { return '<svg class="i' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + PATH[k] + '</svg>'; }
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
+  // 11-15 1판이 실제 웹에 반영됨(사이트 NAV-SHEET 묶음 · .gi 아이콘 · .nv-sub 메뉴). 사이트에 이미 있으면 다시 넣지 않음(아이콘이 두 개씩 보이던 것 고침)
+  var SITE_HAS = !!document.querySelector('#g-home svg.gi');
   // 1) 내비 아이콘: 사이트 .ms는 두고(숨김) 선 아이콘을 더함
-  var h = document.getElementById('g-home'); if (h) h.insertAdjacentHTML('beforeend', icon('home'));
-  var v = document.getElementById('g-voice'); if (v) v.insertAdjacentHTML('beforeend', icon('off', 'nv-off') + icon('on', 'nv-on'));
+  var h = document.getElementById('g-home'); if (h && !SITE_HAS) h.insertAdjacentHTML('beforeend', icon('home'));
+  var v = document.getElementById('g-voice'); if (v && !SITE_HAS) v.insertAdjacentHTML('beforeend', icon('off', 'nv-off') + icon('on', 'nv-on'));
 
   // 2) 메뉴 구성: 프로젝트(펼치면 이름만) · 헝그리한정민 · 연락(기능 없음). 프로젝트 이름 · id는 사이트가 만든 목록에서 읽음
-  var list = document.getElementById('side-pj'); if (!list) return;
+  var list = document.getElementById('side-pj'); if (!list || list.querySelector('.nv-sub')) return;
   var pj = Array.prototype.map.call(list.querySelectorAll('details'), function (d) {
     var nm = d.querySelector('summary .nm'), all = d.querySelector('[data-open]');
     return nm && all ? { id: all.getAttribute('data-open'), name: nm.textContent } : null;
