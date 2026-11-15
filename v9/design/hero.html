@@ -497,7 +497,7 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
 .askbox { transition: box-shadow .3s var(--md-ease), border-radius .2s var(--md-ease), transform .3s var(--md-ease); }
 .askbox:focus-within { box-shadow: 0 1px 3px rgba(0, 0, 0, .05), 0 12px 32px rgba(31, 75, 150, .16); }
 .send { transition: opacity .18s var(--md-ease), transform .3s var(--ease-out), background-color .2s; }
-.askbox:not(.has) .send { transform: scale(.6); }
+.askbox:not(.has) .send { transform: scale(.4); }   /* 11-15 4차: 시트처럼 .4에서 나타남 */
 .send:active { transform: var(--ui-press); }
 /* 11-15 사용자: 검색창 아래 모서리는 목록 펼침과 같은 곡선 · 같은 시간으로 줄고(.32초), 닫힐 때도 목록과 같은 .18초로 되돌아옴 */
 .askbox { border-radius: calc(var(--bar) / 2); transition: box-shadow .3s var(--md-ease), border-radius .28s cubic-bezier(.22, 1, .36, 1) .12s, transform .3s var(--md-ease); }   /* 11-15 시트 6단계: 닫을 때는 목록이 접힌 뒤(.12초 뒤) .28초에 둥글어짐 */   /* 999px가 아닌 실제 반경(높이의 절반)에서 줄여야 첫 프레임부터 모서리가 목록과 같이 줄어듦 */
@@ -518,7 +518,7 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
   box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh-hi); transform: var(--ui-ib-lift); } }
 .askbox > .attach:active, .askbox > .auto:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
 .askbox > .mic[aria-pressed="true"] { color: var(--md-primary); background-color: color-mix(in srgb, var(--md-primary) 12%, transparent); }
-.askbox > .attach:focus-visible, .askbox > .auto:focus-visible { outline: 2px solid var(--md-primary); outline-offset: 2px; }
+.askbox > .attach:focus-visible, .askbox > .auto:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 2px; }   /* 11-15 4차: 시트 초점 링 회색 */
 @media (pointer: coarse) { .askbox > .attach, .askbox > .auto { position: relative; } .askbox > .attach::after, .askbox > .auto::after { content: ""; position: absolute; inset: -3px; border-radius: inherit; } }   /* 손가락 화면: 보이는 40 그대로, 누름 영역 44 */
 /* 보내기: 글을 쓰면 .6 → 1로 쫀득하게(0.42초 spring) 나타남, 누르면 .95 · .93(올림은 없음 — 대화 영역 시트 기준) */
 .askbox .send { transition: opacity var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring), background-color var(--ui-d2) var(--ui-ease-out); }
@@ -1022,6 +1022,41 @@ html.ui-lock { overflow: hidden; }
   .askbox.hs-listening > .mic[aria-pressed="true"], .askbox.hs-listening > .mic[aria-pressed="true"]::before, .hs-lvl i { animation: none; }
   .askbox.hs-listening > .mic[aria-pressed="true"]::before { opacity: .5; }
   .hs-gobtn.hs-run .hs-fill { transition: none; }
+}
+/* ── 11-15 4차(HS4): 시트 대비 틈 ── */
+/* 히어로 질문창 마이크 듣는 중: 히어로 시트 6장(바탕 잉크 12% · 아이콘 잉크 · 1.2초 고리 0 → 6px). 대화 질문창은 위 대화 시트 고리 */
+.hero:not(.chat) .askbox.hs-listening > .mic[aria-pressed="true"] { background-color: color-mix(in srgb, var(--ui-label) 12%, transparent); color: var(--ui-label); animation: micPulse 1.2s ease-in-out infinite; }
+.hero:not(.chat) .askbox.hs-listening > .mic[aria-pressed="true"]::before { content: none; }
+/* 보내기 → 답 멈추기: 답하는 동안 보내기 원이 남고 안에 둥근 사각형(시트 .send.stop .sq) */
+.askbox.hs-busy > .attach, .askbox.hs-busy > .auto { translate: 0 0; }
+.askbox.hs-busy > input { margin-right: 0; }
+.askbox.hs-busy .send { opacity: 1; pointer-events: auto; transform: none; }
+.send .hs-sq { display: none; width: 10px; height: 10px; border-radius: 2px; background: currentColor; }
+.askbox.hs-busy .send .ms { display: none; }
+.askbox.hs-busy .send .hs-sq { display: block; }
+.askbox.hs-busy .send:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+/* 멈춘 답(시트 add.css .stopped · .note): 글은 흐리게 + 끝에 …, 알림 줄 + 이어서 답하기 */
+.ans.hs-stopped > .body { color: var(--ui-label-2); }
+.ans.hs-stopped:not(.hs-stopped0) > .body > :last-child::after { content: "…"; }
+.ans.hs-stopped0 > .body { display: none; }
+.hs-note { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 12px; font-size: 15px; line-height: 1.6; letter-spacing: -.008em; color: var(--ui-label-2); }
+.hs-note > .ms { font-size: 20px; color: var(--ui-label-3); }
+.ans > .hs-lf { margin-top: 14px; }
+/* 지난 답 동작 줄(듣기 · 복사 · 다시 답하기): 마우스 화면에서는 올릴 때만(시트 .acts). 이동 링크는 그대로, 손가락 화면은 늘 보임 */
+@media (hover: hover) {
+  #thread > .ans:not(:last-child) .vctl { opacity: 0; transition: opacity var(--ui-d2) var(--ui-ease-out); }
+  #thread > .ans:not(:last-child):hover .vctl, #thread > .ans .vctl:focus-within, #thread > .ans.speaking .vctl { opacity: 1; }
+}
+/* 갤러리 점: 올림 .28 → .6, 누름 .8(시트 12-1) */
+.hs-gal-dots button::before { transition: width var(--ui-d3) var(--ui-spring), opacity var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
+@media (hover: hover) { .hs-gal-dots button:not([aria-current="true"]):hover::before { opacity: .6; } }
+.hs-gal-dots button:active::before { transform: scale(.8); transition-duration: var(--ui-d1); }
+/* 메일 쓰기 판: 폰에서 손잡이 · 머리를 끌어 닫기 */
+@media (max-width: 640px) { .hs-mv-grab, .hs-mv-head { touch-action: none; } .hs-mv-grab { cursor: grab; } }
+@media (min-width: 641px) { .hs-mv-panel { transform-origin: 0 0; } }   /* 누른 카드 자리에서 커지는 FLIP 계산이 왼쪽 위 기준(표 크게 보기 판과 같음) */
+@media (prefers-reduced-motion: reduce) {
+  .hero:not(.chat) .askbox.hs-listening > .mic[aria-pressed="true"] { animation: none; }
+  #thread > .ans .vctl, .hs-gal-dots button::before { transition-duration: 1ms; }
 }
 /* HS3-CSS-END */
 .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 60; padding: 12px 18px; border-radius: 8px; background: var(--md-on-surface); color: var(--md-surface); font-size: 15px; }
@@ -3554,7 +3589,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       LB.img.addEventListener('pointermove', function (e) { if (!on) return; dx = e.clientX - x0; dy = e.clientY - y0; var k = Math.max(0, dy) / innerHeight;
         LB.img.style.transform = 'translate(' + (dx * .35) + 'px, ' + (dy > 0 ? dy : dy * .3) + 'px) scale(' + (1 - Math.min(.22, k * .6)) + ')'; LB.s.style.opacity = String(Math.max(.25, 1 - k * 1.6)); LB.ui.style.opacity = String(Math.max(0, 1 - k * 4)); });
       var up = function () { if (!on) return; on = false; LB.img.classList.remove('drag'); var dt = Math.max(1, performance.now() - t0);
-        if (dy > 120 || dy / dt > .6) lbClose(); else { uiTw(LB.img, 'transform', 'none', 440, UI.SPR); uiTw(LB.s, 'opacity', '1', 240, UI.EO); uiTw(LB.ui, 'opacity', '1', 240, UI.EO); } };
+        if (dy > 120 || (dy / dt > .6 && Math.abs(dy) > Math.abs(dx))) lbClose();   /* 11-15 4차: 빠른 옆 밀기(장 넘김)에서 닫히지 않게 세로로 더 움직였을 때만 */ else { uiTw(LB.img, 'transform', 'none', 440, UI.SPR); uiTw(LB.s, 'opacity', '1', 240, UI.EO); uiTw(LB.ui, 'opacity', '1', 240, UI.EO); } };
       LB.img.addEventListener('pointerup', up); LB.img.addEventListener('pointercancel', up);
     })();
   }
@@ -4916,15 +4951,17 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   var HS3_V0 = validate, HS3_T0 = toRaw, HS3_P0 = parse, HS3_TL0 = tail, HS3_A0 = ask, HS3_R0 = restoreChat;
   validate = function (r) {   // 답의 감정(거절 답이면 부품을 붙이지 않으려고)만 더 읽음
     var o = HS3_V0(r);
-    if (o) { var s0 = r.sentences[0]; o.hsMood = typeof r.mood === 'string' ? r.mood : (s0 && typeof s0.mood === 'string' ? s0.mood : null); }
+    if (o) { var s0 = r.sentences[0]; o.hsMood = typeof r.mood === 'string' ? r.mood : (s0 && typeof s0.mood === 'string' ? s0.mood : null); o.hsPf = r.posting_failed === true; }   // 11-15 4차: Worker 새 칸 posting_failed(링크 속 공고를 못 읽음)
     return o;
   };
   toRaw = function (r) {   // 서버에서 실제로 받은 답이라는 표시 + 감정 한 줄(새로 고침 뒤에도 같은 판단)
-    return HS3_T0(r) + '\n@hs ' + JSON.stringify({ m: r.hsMood && /^[a-z]+$/.test(r.hsMood) ? r.hsMood : null });
+    return HS3_T0(r) + '\n@hs ' + JSON.stringify({ m: r.hsMood && /^[a-z]+$/.test(r.hsMood) ? r.hsMood : null }) + (r.hsPf ? '\n@hs4 {"pf":1}' : '');
   };
   parse = function (raw) {
     var r = HS3_P0(raw), m = /^@hs \{"m":(?:"([a-z]+)"|null)\}\s*$/m.exec(String(raw || ''));
     r.hsReal = !!m; r.hsMood = m ? (m[1] || null) : null;
+    var st = /^@hsstop (\d+)\s*$/m.exec(String(raw || '')); r.hsStop = st ? +st[1] : 0;
+    if (/^@hs4 \{"pf":1\}\s*$/m.test(String(raw || ''))) r.hs = { posting_failed: true };   // 11-15 4차: 링크 못 읽음(규칙 fromParsed가 r.hs를 읽음)   // 11-15 4차: 멈춘 답 표시(예전 parse는 모르는 @줄을 버림)
     return r;
   };
   ask = function (q, shown, opt) {   // 질문 상태를 적어 두고(질문 말풍선 · 답 판단용), 메일 초안 부탁이면 mode: "mail"을 붙임(사칭이면 안 붙임)
@@ -4947,14 +4984,16 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
         var mq = HS3.th.lastElementChild; if (mq && mq.classList.contains('msg-q') && !mq._hsq) mq._hsq = info;   // 새로 고침: 이 답의 질문 말풍선(방금 붙음)
       } else info = HS3.cur || { q: '', shown: '' };
       var x = hs3Judge(r, info, live), k = ++HS3.n;
-      HS3.pend[k] = { x: x, r: r, live: live };
+      HS3.pend[k] = { x: x, r: r, live: live, info: info };
       return h + '<template class="hs-plan" data-k="' + k + '"></template>';
     } catch (e) { return h; }
   };
   function hs3Judge(r, info, live) {
     var a = HS.fromParsed(Object.assign({}, r, { askTeam: !!r.askTeam && !CTX.team }), { final: true, preset: !r.hsReal, mood: r.hsMood });
+    if (r.hsStop > 0) { a.stopped = 'button'; a.partialLen = r.hsStop; a.final = false; }   // 11-15 4차: 답 멈추기로 끝난 답(받은 글자 수)
     var x = hgSituation({ ans: a, q: { text: info.q, shown: info.shown, sendKind: info.kind || 'text', docLen: info.docLen || 0, file: info.file || null, lines: 1, restored: !!info.restored },
-      ui: { mailDraftClick: !!info.mailClick }, ctx: { prev: HS3.prev, profileShown: HS3.pf, team: CTX.team, live: live }, data: hs3Data() });
+      ui: { mailDraftClick: !!info.mailClick }, ctx: { prev: HS3.prev, profileShown: HS3.pf, team: CTX.team, live: live }, data: hs3Data(),
+      opts: { hold: HS.HOLD.filter(function (h) { return h !== 'stopped' && h !== 'linkFail'; }) } });   // 4차: 멈춘 답 · 링크 못 읽음은 사이트에서 켬(진위 나눔 · 결과 상자는 보류 그대로)
     HS3.prev = HS.prevKeys(x); if (x.detail.profile) HS3.pf = true;
     return x;
   }
@@ -5042,7 +5081,9 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   /* ── 답 부품 그리기 ── */
   function hs3Draw(A, p) {
     var x = p.x, D = x.detail, r = p.r, on = function (id) { return hs3Has(x, id); };
-    if (/^(no-answer|preset|stopped|streaming|mood:)/.test(x.why.cards || '')) return;   // 미리 쓴 안내 · 거절 답 · 끊긴 답: 손대지 않음
+    if (on('stopped')) { hs4Stopped(A, p); return; }   // 11-15 4차: 멈춘 답은 알림 줄만(다른 부품 · 동작 줄 없음)
+    if (/^(no-answer|preset|stopped|streaming|mood:)/.test(x.why.cards || '')) return;
+    hs4Redo(A, p);   // 11-15 4차: 동작 줄에 다시 답하기   // 미리 쓴 안내 · 거절 답 · 끊긴 답: 손대지 않음
     var body = A.querySelector('.body'), nx = A.querySelector('.next'), files = A.querySelector('.ans-files');
     A.querySelectorAll('.body .tbl').forEach(function (tb) { if (!on('tableCopy') || tb.querySelectorAll('tr').length < 2) tb.querySelectorAll('.tbl-bt').forEach(function (b) { b.remove(); }); });   // 표 복사 · 크게 보기: 머리 줄 + 1줄 이상인 표만(2차 버튼 그대로, 머리 줄뿐인 표에서만 뺌)
     var big = null;
@@ -5054,6 +5095,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var mb = A.querySelector('.mailbox');
     if (mb) { if (on('mail')) hs3Mail(mb); else mb.remove(); }
     var ref = files || nx;
+    if (on('linkFail')) { var lf = hs3El('div', 'hs-note hs-lf', '<span class="ms" aria-hidden="true">error</span><span>링크 속 공고를 열지 못했어요. 공고 글을 복사해 붙여 넣어 주세요.</span><button class="hs-pill" type="button" data-hs-paste><span class="ms" aria-hidden="true">content_paste</span><span class="hs-pl">공고 글 붙여 넣기</span></button>'); A.insertBefore(lf, ref); }   // 11-15 4차: 링크 못 읽음(시트 add.html 91)
     if (on('contact')) { A.insertBefore(hs3Contact(), ref); hs3Unlink(A, 'contact'); hs3Unlink(A, 'scroll', 'contact'); }
     if (on('goto')) { var g = hs3Goto(D.goto, p.live); A.insertBefore(g, ref); hs3Unlink(A, D.goto.type, D.goto.type === 'contact' ? null : D.goto.target); hs3GoInit(g, p.live); }
     if (files) { files.querySelectorAll('.ans-link').forEach(function (l) { l.remove(); }); if (!files.children.length) files.remove(); }   // 출처는 아래 알약 하나로(규칙: 답이 그 자료를 쓴 일반 사실 질문에만)
@@ -5101,12 +5143,17 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     mb.insertBefore(hs3El('div', 'hs-mh', '<span>메일 초안</span><em>받는 사람 한정민</em>'), mb.firstChild);
     mb.querySelectorAll('input, textarea').forEach(function (f) { f.readOnly = true; });
     var row = mb.querySelector('.row');
-    if (row) { var e = hs3El('button', 'link', '고쳐 쓰기'); e.type = 'button'; e.setAttribute('data-hs-medit', ''); e.setAttribute('aria-pressed', 'false'); row.appendChild(e); }
+    if (row) {
+      var cp = row.querySelector('[data-mail-copy]');
+      var c2 = hs3El('button', 'hs-pill', '<span class="ms" aria-hidden="true">content_copy</span><span class="hs-pl">복사</span>'); c2.type = 'button'; c2.setAttribute('data-hs-mdcopy', '');
+      if (cp) cp.replaceWith(c2); else row.appendChild(c2);
+      var e = hs3El('button', 'hs-pill', '<span class="ms" aria-hidden="true">edit</span><span class="hs-pl">고쳐 쓰기</span>'); e.type = 'button'; e.setAttribute('data-hs-medit', ''); e.setAttribute('aria-pressed', 'false'); row.appendChild(e);
+    }
   }
   function hs3MailEdit(b) {
     var mb = b.closest('.mailbox'); if (!mb) return;
     var on = !mb.classList.contains('hs-editing'); mb.classList.toggle('hs-editing', on); b.classList.toggle('hs-on', on);
-    b.setAttribute('aria-pressed', String(on)); b.textContent = on ? '다 고쳤어요' : '고쳐 쓰기';
+    b.setAttribute('aria-pressed', String(on)); var pl = b.querySelector('.hs-pl'); (pl || b).textContent = on ? '다 고쳤어요' : '고쳐 쓰기'; var ic = b.querySelector('.ms'); if (ic) ic.textContent = on ? 'check' : 'edit';
     mb.querySelectorAll('input, textarea').forEach(function (f) { f.readOnly = !on; });
     if (on) { var ta = mb.querySelector('textarea'); if (ta) { ta.focus({ preventScroll: true }); try { ta.setSelectionRange(ta.value.length, ta.value.length); } catch (e) {} } }
   }
@@ -5274,6 +5321,14 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var sync = function () { HS3M.send.disabled = !(HS3M.sub.value.trim() && HS3M.bd.value.trim()); };
     HS3M.sub.addEventListener('input', sync); HS3M.bd.addEventListener('input', sync);
     HS3M.bd.addEventListener('keydown', function (e) { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey) && !HS3M.send.disabled) hs3MvSend(); });
+    (function () {   // 11-15 4차: ≤640 손잡이 · 머리를 아래로 끌어 닫기(표 크게 보기 판과 같은 값: 110px 넘게 또는 빠르게 밀면 닫힘, 아니면 쫀득하게 제자리)
+      var y0 = 0, t0 = 0, dy = 0, on = false, H = 1;
+      var down = function (e) { if (!HS3M.open || !UI.MOB.matches || uiRM() || e.target.closest('button')) return; on = true; y0 = e.clientY; t0 = performance.now(); dy = 0; H = HS3M.p.getBoundingClientRect().height;
+        uiTw(HS3M.p, 'transform', getComputedStyle(HS3M.p).transform, 1, UI.EO); try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) {} };
+      var move = function (e) { if (!on) return; dy = e.clientY - y0; HS3M.p.style.transform = 'translateY(' + (dy > 0 ? dy : Math.max(-24, dy * .25)) + 'px)'; HS3M.s.style.opacity = String(Math.max(.35, 1 - Math.max(0, dy) / H)); };
+      var up = function () { if (!on) return; on = false; var v = dy / Math.max(1, performance.now() - t0); if (dy > 110 || v > .6) hs3MvClose(); else { uiTw(HS3M.p, 'transform', 'none', 420, UI.SPR); uiTw(HS3M.s, 'opacity', '1', 240, UI.EO); } };
+      [d.querySelector('.hs-mv-grab'), d.querySelector('.hs-mv-head')].forEach(function (h) { h.addEventListener('pointerdown', down); h.addEventListener('pointermove', move); h.addEventListener('pointerup', up); h.addEventListener('pointercancel', up); });
+    })();
   }
   function hs3MvOpen(from) {
     hs3MvBuild(); if (HS3M.open) return;
@@ -5282,7 +5337,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     HS3M.s.style.opacity = '0';
     if (RMx) { HS3M.p.style.transform = 'none'; HS3M.p.style.opacity = '0'; uiTw(HS3M.p, 'opacity', '1', 200, UI.EO); }
     else if (mob) { HS3M.p.style.opacity = '1'; HS3M.p.style.transform = 'translateY(' + Math.ceil(HS3M.p.getBoundingClientRect().height + 8) + 'px)'; uiTw(HS3M.p, 'transform', 'none', 500, UI.SHT); }
-    else { HS3M.p.style.opacity = '0'; HS3M.p.style.transform = 'translateY(16px) scale(.96)'; uiTw(HS3M.p, 'transform', 'none', 460, UI.SPR); uiTw(HS3M.p, 'opacity', '1', 160, UI.EO); }
+    else { HS3M.p.style.opacity = '0'; HS3M.p.style.transform = hs4MvFlip(from) || 'translateY(16px) scale(.96)'; uiTw(HS3M.p, 'transform', 'none', 460, UI.SPR); uiTw(HS3M.p, 'opacity', '1', 120, UI.EO); }
     uiTw(HS3M.s, 'opacity', '1', 260, UI.EO);
     (mob ? HS3M.el.querySelector('.ui-tv-b') : (HS3M.sub.value.trim() ? HS3M.bd : HS3M.sub)).focus({ preventScroll: true });
     hs3JumpSoon();
@@ -5295,7 +5350,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     uiTw(HS3M.s, 'opacity', '0', RMx ? 200 : 320, UI.EO);
     if (RMx) uiTw(HS3M.p, 'opacity', '0', 200, UI.EO).then(done);
     else if (mob) uiTw(HS3M.p, 'transform', 'translateY(' + Math.ceil(HS3M.p.getBoundingClientRect().height + 8) + 'px)', 380, UI.SHT).then(done);
-    else { uiTw(HS3M.p, 'transform', 'translateY(12px) scale(.97)', 300, UI.EO); uiTw(HS3M.p, 'opacity', '0', 220, UI.EO).then(done); }
+    else { uiTw(HS3M.p, 'transform', hs4MvFlip(from) || 'translateY(12px) scale(.97)', 300, UI.EO); uiTw(HS3M.p, 'opacity', '0', 220, UI.EO).then(done); }
     hs3JumpSoon();
     return true;
   }
@@ -5417,6 +5472,13 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     if ((b = t.closest('[data-hs-mvcp]'))) { hs3Copy('받는 사람: ' + hs3Addr() + '\n제목: ' + HS3M.sub.value.trim() + '\n\n' + HS3M.bd.value, function (ok) { hs3Flash(b, ok, '복사했어요'); }); return; }
     if (t.closest('[data-hs-mvsend]')) { hs3MvSend(); return; }
     if ((b = t.closest('[data-hs-medit]'))) { hs3MailEdit(b); return; }
+    if ((b = t.closest('[data-hs-mdcopy]'))) { var mbx = b.closest('.mailbox'); hs3Copy('받는 사람: ' + hs3Addr() + '\n제목: ' + mbx.querySelector('[data-mail-subj]').value + '\n\n' + mbx.querySelector('[data-mail-body]').value, function (ok) { hs3Flash(b, ok, '복사했어요'); }); return; }
+    if ((b = t.closest('[data-hs-paste]'))) {   // 붙여 넣기 칩: 질문창에 초점 + 안내 글(글을 쓰거나 초점이 빠지면 원래 안내 글)
+      if (HS3.ph == null) HS3.ph = IN.getAttribute('placeholder') || ''; IN.setAttribute('placeholder', '공고 글을 여기에 붙여 넣어 주세요'); IN.focus({ preventScroll: true });
+      var back = function () { IN.removeEventListener('input', back); IN.removeEventListener('blur', back); if (HS3.ph != null && !(IN.form && IN.form.classList.contains('hs-listening'))) { IN.setAttribute('placeholder', HS3.ph); HS3.ph = null; } };
+      IN.addEventListener('input', back); IN.addEventListener('blur', back); return; }
+    if ((b = t.closest('[data-hs-redo]'))) { var rq = b.closest('.ans') && b.closest('.ans')._hsQ; if (rq && !BUSY) ask(rq.q, rq.shown); return; }
+    if ((b = t.closest('[data-hs-cont]'))) { var cq = b.closest('.ans') && b.closest('.ans')._hsQ; if (cq && !BUSY) ask(cq.q, cq.shown); return; }
     if ((b = t.closest('[data-hs-go]'))) { hs3Go(b.closest('.hs-goto')); return; }
     if ((b = t.closest('[data-hs-stay]'))) { hs3Stay(b.closest('.hs-goto')); return; }
     if ((b = t.closest('[data-hs-gal]'))) { var f = b.closest('.hs-gal'); if (f && f._go) f._go(f._cur() + (+b.getAttribute('data-hs-gal'))); return; }
@@ -5426,6 +5488,109 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     if ((b = t.closest('[data-hs-more-cv]'))) { hs3PfMore(b); return; }
     if ((b = t.closest('[data-hs-cl]'))) { var o3 = b.getAttribute('aria-expanded') !== 'true'; b.setAttribute('aria-expanded', String(o3)); b.closest('.hs-cl').classList.toggle('hs-on', o3); return; }
     if (HS3J.el) hs3JumpSoon();
+  });
+  /* ══ 11-15 4차(HS4): 시트 대비 틈 ══════════════════════════════════════
+   * 답 멈추기 · 멈춘 답 · 다시 답하기 · 메일 쓰기 판 출발점 · 갤러리 키 · iOS 누름. 기존 ask · parse · tail · askOnce 본문은 그대로, llm · speak · fetch만 바깥에서 감쌈 */
+  // iOS · iPadOS 사파리는 문서에 touchstart가 있어야 버튼 :active(누름 .95 · .93)를 그림(시트 T:1206)
+  document.addEventListener('touchstart', function () {}, { passive: true });
+
+  // 메일 쓰기 판 FLIP: 누른 연락 카드(없으면 버튼) 자리 → 판 자리
+  function hs4MvFlip(from) {
+    var src = from && document.contains(from) ? (from.closest('.hs-contact') || from) : null; if (!src) return null;
+    var cur = HS3M.p.style.transform; HS3M.p.style.transform = 'none'; var F = HS3M.p.getBoundingClientRect(), S = src.getBoundingClientRect(); HS3M.p.style.transform = cur;
+    if (!F.width || !F.height || !S.width) return null;
+    return 'translate(' + (S.left - F.left) + 'px, ' + (S.top - F.top) + 'px) scale(' + (S.width / F.width) + ', ' + (S.height / F.height) + ')';
+  }
+
+  // 다시 답하기(시트 동작 줄 i-redo): 글로 물은 진짜 답에만. 누르면 같은 질문을 같은 말풍선 글로 다시 보냄
+  function hs4Redo(A, p) {
+    var info = p.info || {}, v = A.querySelector('.next .vctl');
+    if (!v || !info.q || (info.kind && info.kind !== 'text') || !p.r.hsReal) return;
+    A._hsQ = { q: info.q, shown: info.shown || '' };
+    var b = hs3El('button', 'ans-copy', '<span class="ms" aria-hidden="true">refresh</span>'); b.type = 'button'; b.setAttribute('data-hs-redo', ''); b.setAttribute('aria-label', '다시 답하기'); b.title = '다시 답하기';
+    v.appendChild(b);
+  }
+  // 멈춘 답: 글은 흐리게 + …, 아래 알림 줄 "여기서 멈췄어요." + 이어서 답하기(같은 질문을 처음부터 다시 — Worker에 이어 쓰기 칸이 없음)
+  function hs4Stopped(A, p) {
+    var info = p.info || {};
+    A.classList.add('hs-stopped');
+    A.querySelectorAll(':scope > .next, :scope > .nextq, :scope > .ans-files, :scope > .ask-back, :scope > .mailbox, :scope > figure.shot').forEach(function (n) { n.remove(); });
+    var n = hs3El('div', 'hs-note', '<span class="ms" aria-hidden="true">error</span><span>여기서 멈췄어요.</span>');
+    if (info.q && (!info.kind || info.kind === 'text')) {
+      A._hsQ = { q: info.q, shown: info.shown || '' };
+      n.insertAdjacentHTML('beforeend', '<button class="hs-pill" type="button" data-hs-cont><span class="ms" aria-hidden="true">refresh</span><span class="hs-pl">이어서 답하기</span></button>');
+    }
+    A.appendChild(n);
+  }
+
+  // 답 멈추기: 답하는 동안 보내기 원 = 멈추기(사각형). 누르면 받던 연결을 끊고, 받은 데까지를 멈춘 답으로 남김
+  var HS4S = null, HS4_SEND = IN.form ? IN.form.querySelector('.send') : null;
+  if (HS4_SEND && !HS4_SEND.querySelector('.hs-sq')) { var hs4sq = hs3El('span', 'hs-sq'); hs4sq.setAttribute('aria-hidden', 'true'); HS4_SEND.appendChild(hs4sq); }
+  function hs4Busy(on) {
+    var f = IN.form; if (!f || !HS4_SEND) return;
+    f.classList.toggle('hs-busy', on);
+    if (on) { if (HS4_SEND._lab == null) HS4_SEND._lab = HS4_SEND.getAttribute('aria-label') || ''; HS4_SEND.setAttribute('aria-label', '답 멈추기'); HS4_SEND.title = '답 멈추기'; }
+    else if (HS4_SEND._lab != null) { HS4_SEND.setAttribute('aria-label', HS4_SEND._lab); HS4_SEND.removeAttribute('title'); HS4_SEND._lab = null; }
+  }
+  var HS4_L0 = llm;
+  llm = function (q, onText, opt) {
+    if (!AI_ENDPOINT) return HS4_L0(q, onText, opt);   // 서버 없는 곳(미리 쓴 답 · claude.ai)은 그대로
+    var S = HS4S = { stopped: false, raw: '', ctl: null, ok: null, no: null, done: false };
+    var stopP = new Promise(function (ok, no) { S.ok = ok; S.no = no; });
+    hs4Busy(true);
+    var run = HS4_L0(q, function (t, p, r) { if (S.stopped) return; S.raw = t; onText(t, p, r); }, opt);
+    return Promise.race([run, stopP]).then(function (v) { S.done = true; hs4Busy(false); return v; }, function (e) { S.done = true; hs4Busy(false); throw e; });
+  };
+  // 사이트 askServer와 같은 일(첫 시도가 비면 1.2초 뒤 한 번 더) + 멈췄으면 다시 시도하지 않음
+  askServer = function (q, opt, onPart) {
+    opt = opt || {}; var S = HS4S || {};
+    return askOnce(q, true, opt, onPart).then(function (r) {
+      if (r || S.stopped) return r;
+      return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return S.stopped ? null : askOnce(q, false, opt, onPart); });
+    });
+  };
+  function hs4Stop() {
+    var S = HS4S; if (!S || S.done || S.stopped || !BUSY) return;
+    S.stopped = true;
+    try { if (S.ctl) S.ctl.abort(); } catch (e) {}
+    var said = 0; try { said = parse(S.raw).said.join(' ').length; } catch (e) {}
+    if (said > 0) { S.ok(S.raw.replace(/\n@[^\n]*$/, '') + '\n@hs {"m":null}\n@hsstop ' + said); return; }   // 받은 글 + 표시 줄(@hs 서버 답 · @hsstop 받은 글자 수)
+    // 글이 나오기 전 멈춤: 사이트의 "취소" 길(오류 문구 없음)로 끝내고, 생각 중 점 자리에 알림 줄만
+    var cur = HS3.cur; S.no({ code: 'cancelled' });
+    setTimeout(function () {
+      var A = HS3.th.querySelector('.ans:last-child'), bd = A && A.querySelector('.body'); if (!bd || !bd.querySelector('.dots')) return;
+      bd.innerHTML = ''; A.classList.add('hs-stopped', 'hs-stopped0');
+      var n = hs3El('div', 'hs-note', '<span class="ms" aria-hidden="true">error</span><span>답하기 전에 멈췄어요.</span>');
+      if (cur && cur.q && cur.kind === 'text') { A._hsQ = { q: cur.q, shown: cur.shown || '' }; n.insertAdjacentHTML('beforeend', '<button class="hs-pill" type="button" data-hs-cont><span class="ms" aria-hidden="true">refresh</span><span class="hs-pl">다시 답하기</span></button>'); }
+      A.appendChild(n);
+    }, 0);
+  }
+  // 받던 연결 끊기: 사이트 askOnce는 자기 AbortController만 가짐 → AI 질문 요청에만 끊을 수 있는 신호를 하나 더 겹침. 다른 요청(파일 올리기 · 목소리 등)은 그대로
+  var HS4_F0 = window.fetch;
+  window.fetch = function (u, o) {
+    var S = HS4S;
+    if (S && !S.done && !S.stopped && AI_ENDPOINT && String(u) === AI_ENDPOINT && o && o.method === 'POST') {
+      var c = new AbortController(), sg = o.signal;
+      if (sg) { if (sg.aborted) c.abort(); else sg.addEventListener('abort', function () { c.abort(); }); }
+      S.ctl = c; return HS4_F0.call(window, u, Object.assign({}, o, { signal: c.signal }));
+    }
+    return HS4_F0.apply(window, arguments);
+  };
+  // 멈춘 답은 자동 읽기를 하지 않음(멈춘 사람에게 소리가 나오지 않게)
+  var HS4_SP0 = speak;
+  speak = function (A, b) { if (HS4S && HS4S.stopped && BUSY) return; return HS4_SP0.apply(this, arguments); };
+  if (HS4_SEND) HS4_SEND.addEventListener('click', function (e) {   // 멈추기 자리 누름: 보내기(submit)로 가지 않게만 막음(질문창 동작 · 다른 듣기는 그대로)
+    if (!IN.form.classList.contains('hs-busy')) return;
+    e.preventDefault(); hs4Stop();
+  });
+
+  // 갤러리: 넘기는 칸에 초점이 있으면 ← → · Home · End로 장 이동(시트 12-1)
+  document.addEventListener('keydown', function (e) {
+    var tr = e.target && e.target.closest ? e.target.closest('.hs-gal-tr') : null; if (!tr) return;
+    var f = tr.closest('.hs-gal'); if (!f || !f._go) return;
+    var n = tr.children.length, i = f._cur();
+    var k = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? n - 1 : null; if (k === null) return;
+    e.preventDefault(); f._go(k);
   });
   /* HS3-JS-END */
   restoreChat();   // 같은 탭에서 새로고침했으면 대화를 다시 그린다
@@ -6973,6 +7138,483 @@ const b=HUGI_MAKE(document.getElementById('hugi-orb'),{prefix:'ho',hello:false,b
 })();
 
 });</script>
+<style>/* HG-4D-BEGIN · 11-15 4차 덧붙임(점검_4차_시트대비.md 1 · 2 · 4 · 5번). index.html 맨 끝(지금 파일에는 </body>가 없음 → 마지막 <script src="../hugi/hugi.js" defer> 줄 뒤)에 이 <style>과 아래 <script>를 그대로 붙임.
+ * 기존 함수 · 규칙은 고치지 않고 밖에서 붙임(클릭 위임 · MutationObserver). 이름은 모두 hg4d-. 값은 대화 영역 시트(chat_tpl.html · 인터랙션.md 3 · 10 · 10-1 · 12-1 · 12-2 · 13) */
+
+/* ── 1. 파일 카드: 상자 = 열어 보기, 오른쪽 원 = 받기(0.9초 차오름 원 → 체크) ── */
+.hg4d-file { position: relative; }
+.hg4d-fo { position: absolute; z-index: 1; left: 0; top: 0; bottom: 0; right: 56px; padding: 0; border: 0; background: none; border-radius: var(--ui-r-box) 0 0 var(--ui-r-box); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+@media (pointer: coarse) { .hg4d-fo { right: 64px; } }
+.hg4d-fo:focus-visible { outline: none; }
+.hg4d-file:has(> .hg4d-fo:focus-visible) > .ans-file { outline: 2px solid var(--ui-label-3); outline-offset: 2px; }
+@media (hover: hover) { .hg4d-file:hover > .ans-file { transform: translateY(-2px); box-shadow: var(--ui-card-sh-hi); } }
+.hg4d-file:has(> .hg4d-fo:active) > .ans-file { transform: scale(.98); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+@media (hover: hover) { .hg4d-file:has(> .hg4d-fo:active) > .ans-file { transform: translateY(-2px) scale(.98); } }
+.hg4d-file > .ans-file:active { transform: none; }
+@media (hover: hover) { .hg4d-file > .ans-file:hover:active { transform: translateY(-2px); } }
+.hg4d-file > .ans-file:not(.ing):not(.got):active .af-go { transform: scale(.9); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+.hg4d-file > .ans-file:focus-visible { outline: none; }
+.hg4d-file > .ans-file:focus-visible .af-go { outline: 2px solid var(--ui-label-3); outline-offset: 2px; }
+.hg4d-ring { position: absolute; z-index: 2; right: 10px; top: 50%; width: 36px; height: 36px; margin-top: -18px; transform: rotate(-90deg); opacity: 0; pointer-events: none; overflow: visible;
+  transition: transform var(--ui-d3) var(--ui-spring); }
+@media (pointer: coarse) { .hg4d-ring { width: 44px; height: 44px; margin-top: -22px; } }
+@media (hover: hover) { .hg4d-file:hover > .hg4d-ring { transform: translateY(-2px) rotate(-90deg); } }
+.hg4d-ring circle { fill: none; stroke: var(--ui-label); stroke-width: 2; stroke-dasharray: 100; stroke-dashoffset: 100; stroke-linecap: round; }
+.hg4d-file.hg4d-run > .hg4d-ring, .hg4d-file.hg4d-full > .hg4d-ring { opacity: 1; }
+.hg4d-file.hg4d-run > .hg4d-ring circle { animation: hg4dRing var(--hg4d-ring, .9s) var(--ui-ease-out) forwards; }
+.hg4d-file.hg4d-full > .hg4d-ring circle { stroke-dashoffset: 0; }
+@keyframes hg4dRing { to { stroke-dashoffset: 0; } }
+.hg4d-file > .ans-file.ing .af-go .ms { animation: none; }   /* 도는 표시 대신 차오름 원 */
+.hg4d-file.hg4d-run > .ans-file.got .af-go { background: var(--ui-bg-2); color: var(--ui-label); }   /* 받기가 원보다 먼저 끝나도 체크는 원이 다 찬 뒤 */
+.hg4d-file.hg4d-run > .ans-file.got .af-go .ms { animation: none; }
+
+/* 열어 보기 판: 표 크게 보기 판(.ui-tv)과 같은 모양 · 같은 움직임, 데스크톱 폭 760 · 높이 화면 - 48 */
+@media (min-width: 641px) { .hg4d-fv .ui-tv-panel { width: min(760px, 100%); height: calc(100vh - 48px); height: calc(100dvh - 48px); } }
+.hg4d-fv-id { display: flex; flex-direction: column; min-width: 0; }
+.hg4d-fv-m { font-size: 13px; line-height: 1.5; letter-spacing: -.004em; color: var(--ui-label-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hg4d-fv-bar { flex: none; padding: 0 24px 12px; }
+.hg4d-fv .ui-tv-sc { position: relative; }
+.hg4d-fv .ui-tv-sc.pdf { background: var(--ui-bg-2); }
+.hg4d-pdf { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 16px; }
+.hg4d-pdf canvas { display: block; width: 100%; max-width: 620px; height: auto; border-radius: 4px; background: #fff; box-shadow: var(--ui-card-sh); }
+.hg4d-fv-note { margin: 0; padding: 32px 24px; font-size: 15px; line-height: 1.6; color: var(--ui-label-2); text-align: center; }
+.hg4d-pg { position: absolute; left: 50%; bottom: max(20px, env(safe-area-inset-bottom, 0px)); z-index: 3; padding: 6px 12px; border-radius: var(--md-full); font-size: 12px; font-weight: 500; line-height: 1.4; color: var(--ui-label); font-variant-numeric: tabular-nums; pointer-events: none;
+  background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh);
+  opacity: 0; transform: translate(-50%, 6px); transition: opacity var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
+.hg4d-pg.on { opacity: 1; transform: translate(-50%, 0); }
+.hg4d-md, .hg4d-raw { max-width: 640px; margin: 0 auto; padding: 8px 24px 40px; }
+.hg4d-md > * { margin: 0; }
+.hg4d-md > * + * { margin-top: 12px; }
+.hg4d-md h1 { font-size: 22px; font-weight: 600; line-height: 1.4; letter-spacing: -.018em; }
+.hg4d-md h2 { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--ui-sep); font-size: 17px; font-weight: 600; line-height: 1.5; letter-spacing: -.012em; }
+.hg4d-md h3 { font-size: 15px; font-weight: 600; line-height: 1.5; }
+.hg4d-md p, .hg4d-md li { font-size: 17px; line-height: 1.7; letter-spacing: -.012em; }
+.hg4d-md strong { font-weight: 600; }
+.hg4d-md ul, .hg4d-md ol { padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.hg4d-md ul { list-style: none; }
+.hg4d-md ol { padding-left: 22px; }
+.hg4d-md ul li { position: relative; padding-left: 22px; }
+.hg4d-md ul li::before { content: ""; position: absolute; left: 8px; top: calc(.85em - 2px); width: 4px; height: 4px; border-radius: 50%; background: var(--ui-label-3); }
+.hg4d-tw { border-radius: var(--ui-r-box); background: var(--ui-surface); box-shadow: var(--ui-card-sh); overflow-x: auto; max-width: 100%; }
+.hg4d-tw table { border-collapse: collapse; width: max-content; min-width: 100%; font-size: 15px; line-height: 1.6; }
+.hg4d-tw th, .hg4d-tw td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--ui-sep); }
+.hg4d-tw th { font-size: 12px; font-weight: 500; color: var(--ui-label-3); white-space: nowrap; }
+.hg4d-tw tr:last-child > td { border-bottom: 0; }
+.hg4d-raw { margin: 0 auto; white-space: pre-wrap; word-break: break-word; font: inherit; font-size: 13px; line-height: 1.5; letter-spacing: -.004em; color: var(--ui-label-2); }
+.hg4d-sg { position: relative; display: inline-flex; padding: 3px; border-radius: var(--md-full); background: var(--ui-bg-2); box-shadow: inset 0 0 0 1px var(--ui-sep); isolation: isolate; }
+.hg4d-sg button { position: relative; z-index: 1; height: 30px; padding: 0 14px; border: 0; border-radius: var(--md-full); background: transparent; cursor: pointer; font-size: 12px; font-weight: 500; line-height: 1.4; color: var(--ui-label-2); -webkit-tap-highlight-color: transparent;
+  transition: color var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
+.hg4d-sg button[aria-selected="true"] { color: var(--ui-label); }
+.hg4d-sg button:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+.hg4d-sg button:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 2px; }
+@media (hover: hover) { .hg4d-sg button:hover { color: var(--ui-label); } }
+@media (pointer: coarse) { .hg4d-sg button::after { content: ""; position: absolute; inset: -7px 0; } }
+.hg4d-sg-ink { position: absolute; z-index: 0; top: 3px; bottom: 3px; left: 0; width: 0; border-radius: var(--md-full); background: var(--ui-surface); box-shadow: 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh); transition: transform var(--ui-d3) var(--ui-spring), width var(--ui-d3) var(--ui-spring); }
+.hg4d-rise { animation: hg4dRise 640ms var(--ui-ease-out) both; animation-delay: var(--hg4d-d, 0ms); }
+@keyframes hg4dRise { from { opacity: .001; transform: translateY(8px); } }
+.hg4d-fv-dl.done .ms { animation: uiPop var(--ui-d3) var(--ui-spring); }
+@media (max-width: 640px) { .hg4d-fv-bar { padding: 0 20px 10px; } .hg4d-md, .hg4d-raw { padding: 8px 20px 32px; } }
+
+/* ── 2. 이미지 크게 보기 여러 장: 좌우 버튼 · 점 · ← → 키 · 옆으로 끌기 / 갤러리 마우스 끌기 ── */
+.hg4d-lbnav { position: absolute; top: 50%; width: 44px; height: 44px; margin-top: -22px; border-radius: var(--md-full); display: grid; place-items: center; color: var(--ui-label); -webkit-tap-highlight-color: transparent;
+  background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh);
+  transition: transform var(--ui-d3) var(--ui-spring), box-shadow var(--ui-d2) var(--ui-ease-out), opacity var(--ui-d2) var(--ui-ease-out); }
+.hg4d-lbnav .ms { font-size: 20px; }
+.hg4d-lbnav.prev { left: max(16px, env(safe-area-inset-left, 0px)); }
+.hg4d-lbnav.next { right: max(16px, env(safe-area-inset-right, 0px)); }
+.hg4d-lbnav:disabled { opacity: 0; pointer-events: none; }
+@media (hover: hover) { .hg4d-lbnav:hover { box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh-hi); transform: var(--ui-lift); } }
+.hg4d-lbnav:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
+.hg4d-lbnav:focus-visible, .hg4d-dots button:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 2px; }
+@media (hover: none) { .hg4d-lbnav { display: none; } }
+.ui-lb-ui[data-hg4d-one] .hg4d-lbnav, .ui-lb-ui[data-hg4d-one] .hg4d-dots { display: none; }
+.hg4d-dots { pointer-events: auto; display: flex; align-items: center; height: 24px; padding: 0 5px; border-radius: var(--md-full);
+  background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line); }
+.hg4d-dots button { height: 24px; padding: 0 3px; border: 0; background: none; cursor: pointer; display: grid; place-items: center; border-radius: var(--md-full); }
+.hg4d-dots button::before { content: ""; display: block; width: 6px; height: 6px; border-radius: var(--md-full); background: var(--ui-label); opacity: .28; transition: width var(--ui-d3) var(--ui-spring), opacity var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
+.hg4d-dots button[aria-selected="true"]::before { width: 16px; opacity: .9; }
+@media (hover: hover) { .hg4d-dots button:hover::before { opacity: .6; } .hg4d-dots button[aria-selected="true"]:hover::before { opacity: .9; } }
+.hg4d-dots button:active::before { transform: scale(.8); transition-duration: var(--ui-d1); }
+@media (pointer: coarse) { .hg4d-dots { pointer-events: none; } }   /* 손가락 화면: 점은 보이기만, 넘기기는 옆으로 밀기 */
+.hs-gal-tr.hg4d-drag { scroll-snap-type: none; cursor: grabbing; -webkit-user-select: none; user-select: none; }
+.hs-gal-tr.hg4d-drag .hs-gal-it { cursor: grabbing; }
+
+/* ── 3. 듣기 켜짐: 소리 막대 3개(2.5 × 4 → 13, 0.9초, 0.15초 차이) ── */
+.listen .hg4d-bars { display: none; align-items: center; justify-content: center; gap: 2px; width: 15px; height: 15px; flex: none; }
+.listen .hg4d-bars i { width: 2.5px; height: 4px; border-radius: 2px; background: currentColor; animation: hg4dBar .9s var(--ui-ease-out) infinite; }
+.listen .hg4d-bars i:nth-child(2) { animation-delay: .15s; }
+.listen .hg4d-bars i:nth-child(3) { animation-delay: .3s; }
+@keyframes hg4dBar { 0%, 100% { height: 4px; } 40% { height: 13px; } }
+.listen.on .hg4d-bars { display: inline-flex; }
+.listen.on .hg4d-bars + .ms { display: none; }
+
+/* ── 4. 오류: 회색 아이콘 + 한 줄 + 다시 보내기(사이트 .ans-err 모양 그대로), 듣기 · 복사 줄 없음 ── */
+.ans.hg4d-err > .body, .ans.hg4d-err > .next { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hg4d-ring, .hg4d-lbnav, .hg4d-dots button::before, .hg4d-pg, .hg4d-sg button, .hg4d-sg-ink { transition-duration: 1ms; }
+  .hg4d-rise, .hg4d-fv-dl.done .ms { animation: none; }
+  .listen .hg4d-bars i { animation-duration: 1ms; animation-iteration-count: 1; }
+}
+/* HG-4D-END */</style>
+<script>/* HG-4D-BEGIN · 4차 덧붙임 동작. 사이트 함수(saveFile · lbOpen 등)는 부르지 않고, 사이트가 이미 하는 클릭 위임을 그대로 지나게 함:
+ * - 받기: 원래 받기 버튼(button.ans-file[data-file])을 그대로 두고 그 위 왼쪽에 "열어 보기" 버튼을 덮음 → 받기는 원래대로 사이트 saveFile(fetch → Blob → a.download)만 함. 이 덧붙임은 파일을 직접 받지 않음(두 번 받기 없음)
+ * - 크게 보기 장 넘김: 다음 장 이미지 버튼에 click을 보내 사이트 lbOpen이 그림을 바꾸게 하고, 움직임만 시트 값(∓56px)으로 바꿈 */
+(function () {
+  'use strict';
+  var R = document.documentElement; if (R.hasAttribute('data-hg4d')) return; R.setAttribute('data-hg4d', '1');
+  var EO = 'cubic-bezier(.22, 1, .36, 1)', SPR = 'cubic-bezier(.34, 1.56, .64, 1)', SHT = 'cubic-bezier(.32, .72, 0, 1)', CLIP = 'inset(0px 0px 0px 0px round 18px)';
+  var MOB = matchMedia('(max-width: 640px)'), RMQ = matchMedia('(prefers-reduced-motion: reduce)'), COARSE = matchMedia('(pointer: coarse)');
+  function rm() { return RMQ.matches; }
+  function $(s, r) { return (r || document).querySelector(s); }
+  function $$(s, r) { return [].slice.call((r || document).querySelectorAll(s)); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  // 한 속성을 지금 보이는 값에서 목표 값으로(사이트 uiTw와 같은 방식, 저장 칸만 따로)
+  function tw(el, prop, to, dur, ease, delay) {
+    el._h4 = el._h4 || {}; var from = getComputedStyle(el)[prop]; if (el._h4[prop]) el._h4[prop].cancel(); el.style[prop] = from;
+    if (!el.animate || dur <= 1) { el.style[prop] = to; return Promise.resolve(); }
+    var k1 = {}, k2 = {}; k1[prop] = from; k2[prop] = to;
+    var a = el.animate([k1, k2], { duration: dur, easing: ease, delay: delay || 0, fill: 'both' }); el._h4[prop] = a;
+    return a.finished.then(function () { if (el._h4[prop] === a) { el.style[prop] = to; a.cancel(); el._h4[prop] = null; } }, function () {});
+  }
+  function stopTw(el) { [el._h4, el._ua].forEach(function (m) { if (m) Object.keys(m).forEach(function (k) { if (m[k]) { m[k].cancel(); m[k] = null; } }); }); }
+  var LIVE = null;   // 화면 읽기 도구에 짧게 알림
+  function say(t) { if (!LIVE) { LIVE = document.createElement('div'); LIVE.className = 'ui-layer'; LIVE.setAttribute('aria-live', 'polite'); LIVE.style.cssText = 'position:fixed;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap'; document.body.appendChild(LIVE); } LIVE.textContent = ''; setTimeout(function () { LIVE.textContent = t; }, 30); }
+
+  /* 판이 열린 동안: 페이지 스크롤 잠금 + 뒤 화면 inert(사이트 판과 같은 방식, 세는 칸은 따로) */
+  var LK = { on: false, list: [], top: 0 };
+  function lock(on) {
+    if (on === LK.on) return; LK.on = on;
+    if (on) { R.style.overflow = 'hidden'; [].forEach.call(document.body.children, function (n) { if (!n.inert && !n.classList.contains('ui-layer') && !/^(SCRIPT|STYLE|TEMPLATE|LINK)$/.test(n.tagName)) { n.inert = true; LK.list.push(n); } }); }
+    else { R.style.overflow = ''; LK.list.forEach(function (n) { n.inert = false; }); LK.list = []; }
+  }
+
+  /* ════ 1. 파일 카드 ════ */
+  var ORIG = { resume: '../files/hanjungmin_resume.pdf', cover: '../files/hanjungmin_cover_letter.pdf', resume_set: '../files/hanjungmin_resume_cover.pdf' };   // 사이트 ORIGINAL과 같은 파일
+  var PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+  function fileOf(btn) {   // 사이트가 대화와 함께 저장하는 파일 목록(sessionStorage 'hj-chat-v1'.files)에서 같은 번호를 읽음
+    var f = null; try { var d = JSON.parse(sessionStorage.getItem('hj-chat-v1') || 'null'); f = d && d.files && d.files[+btn.getAttribute('data-file')]; } catch (e) {}
+    return f || null;
+  }
+  function fileCard(b) {
+    // 사이트가 붙인 data-hg4d="1"은 "받기는 사이트가 fetch → Blob으로 함" 표시로 봄(이 덧붙임은 원래 받지 않으므로 그대로 감쌈). 이미 감쌌으면 건너뜀
+    if (b.hasAttribute('data-hg4d-card') || (b.parentNode && b.parentNode.classList && b.parentNode.classList.contains('hg4d-file')) || b.classList.contains('ans-link') || !b.parentNode) return;
+    b.setAttribute('data-hg4d-card', '1');
+    var w = document.createElement('div'); w.className = 'hg4d-file'; b.parentNode.insertBefore(w, b);
+    var fo = document.createElement('button'); fo.type = 'button'; fo.className = 'hg4d-fo'; fo.setAttribute('data-hg4d-open', ''); fo.setAttribute('aria-haspopup', 'dialog'); fo.setAttribute('aria-label', nm(b) + ' 열어 보기');
+    w.appendChild(fo); w.appendChild(b);
+    w.insertAdjacentHTML('beforeend', '<svg class="hg4d-ring" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16" pathLength="100"/></svg>');
+    var m = $('.af-meta', b); if (m) m.setAttribute('data-hg4d-o', m.textContent);
+  }
+  // 받기 원을 누름: 사이트가 받기를 하기 전에 차오름 원을 시작(사이트 클릭 처리보다 먼저 = 문서 캡처 단계). 받기 자체는 사이트가 함
+  function ringStart(b) {
+    var w = b.parentNode; if (!w || !w.classList.contains('hg4d-file') || b.disabled || b.classList.contains('ing') || b.classList.contains('got') || w.classList.contains('hg4d-run')) return;
+    clearTimeout(w._t); w.classList.remove('hg4d-full'); void w.offsetWidth;
+    var dur = rm() ? 10 : 900; w.style.setProperty('--hg4d-ring', dur + 'ms'); w.classList.add('hg4d-run');
+    // 원이 차는 동안은 받기 아이콘 그대로(사이트가 바꾸는 도는 아이콘 · 이른 체크 대신). 원이 다 차면 사이트 상태대로
+    var keep = function () { var ic = $('.af-go .ms', b); if (ic && ic.textContent !== 'download') ic.textContent = 'download'; };
+    var io = new MutationObserver(function () { if (w.classList.contains('hg4d-run')) keep(); });
+    io.observe(b, { childList: true, subtree: true, characterData: true }); setTimeout(keep, 0);
+    w._t = setTimeout(function () {
+      io.disconnect(); var ic = $('.af-go .ms', b);
+      if (ic && b.classList.contains('got')) ic.textContent = 'check';
+      w.classList.remove('hg4d-run');
+      if (b.classList.contains('ing')) {   // 받기가 아직이면 원을 꽉 찬 채로 두고, 끝나면 사이트 "받았어요" 모양으로
+        w.classList.add('hg4d-full');
+        var mo = new MutationObserver(function () { if (!b.classList.contains('ing')) { mo.disconnect(); w.classList.remove('hg4d-full'); } });
+        mo.observe(b, { attributes: true, attributeFilter: ['class'] });
+      }
+      if (b.classList.contains('got')) say(nm(b) + ' 받았어요');
+    }, dur);
+  }
+  function nm(b) { return (($('.af-name', b) || {}).textContent || '파일'); }
+
+  // 열어 보기 판
+  var FV = { el: null, open: false, src: null, from: null, mob: false, seq: 0, mode: 'read', f: null, b: null, pdfSeq: 0 };
+  function fvBuild() {
+    if (FV.el) return;
+    var d = document.createElement('div'); d.className = 'ui-tv ui-layer hg4d-fv'; d.hidden = true;
+    d.innerHTML = '<div class="ui-tv-scrim" data-hg4d-x></div><div class="ui-tv-panel" role="dialog" aria-modal="true" aria-labelledby="hg4d-fv-h"><div class="ui-tv-grab" aria-hidden="true"></div><div class="ui-tv-in">' +
+      '<div class="ui-tv-head"><div class="hg4d-fv-id"><h2 id="hg4d-fv-h">파일</h2><span class="hg4d-fv-m"></span></div><div class="ui-tv-acts"><span class="ui-tv-msg" aria-live="polite"></span>' +
+      '<button class="ui-tv-b hg4d-fv-dl" type="button" aria-label="받기"><span class="ms" aria-hidden="true">download</span></button>' +
+      '<button class="ui-tv-b" type="button" data-hg4d-x aria-label="열어 보기 닫기"><span class="ms" aria-hidden="true">close</span></button></div></div>' +
+      '<div class="hg4d-fv-bar" hidden><div class="hg4d-sg" role="tablist" aria-label="MD 보기 방식"><i class="hg4d-sg-ink" aria-hidden="true"></i><button type="button" role="tab" aria-selected="true" data-hg4d-m="read">읽기</button><button type="button" role="tab" aria-selected="false" tabindex="-1" data-hg4d-m="raw">원문</button></div></div>' +
+      '<div class="ui-tv-sc" tabindex="0" role="region" aria-label="파일 내용"></div></div><span class="hg4d-pg" aria-hidden="true"></span></div>';
+    document.body.appendChild(d);
+    FV.el = d; FV.p = $('.ui-tv-panel', d); FV.s = $('.ui-tv-scrim', d); FV.inn = $('.ui-tv-in', d); FV.sc = $('.ui-tv-sc', d); FV.h = $('#hg4d-fv-h', d); FV.m = $('.hg4d-fv-m', d);
+    FV.bar = $('.hg4d-fv-bar', d); FV.sg = $('.hg4d-sg', d); FV.ink = $('.hg4d-sg-ink', d); FV.pg = $('.hg4d-pg', d); FV.dl = $('.hg4d-fv-dl', d); FV.msg = $('.ui-tv-msg', d); FV.x = $('.ui-tv-b[data-hg4d-x]', d);
+    var pgT = 0;
+    FV.sc.addEventListener('scroll', function () {
+      if (!FV.sc.classList.contains('pdf')) return; var ps = $$('canvas', FV.sc); if (!ps.length) return;
+      var mid = FV.sc.scrollTop + FV.sc.clientHeight / 2, n = 1; ps.forEach(function (p, k) { if (p.offsetTop <= mid) n = k + 1; });
+      FV.pg.textContent = n + ' / ' + ps.length; FV.pg.classList.add('on'); clearTimeout(pgT); pgT = setTimeout(function () { FV.pg.classList.remove('on'); }, 1200);
+    }, { passive: true });
+    FV.pgShow = function () { FV.sc.dispatchEvent(new Event('scroll')); };
+    (function () {   // ≤640: 손잡이 · 머리를 아래로 끌어 닫기(110px 넘게 또는 0.6px/ms보다 빠르면 닫힘)
+      var y0 = 0, t0 = 0, dy = 0, on = false, H = 1;
+      var down = function (e) { if (!FV.open || !FV.mob || rm() || e.target.closest('button')) return; on = true; y0 = e.clientY; t0 = performance.now(); dy = 0; H = FV.p.getBoundingClientRect().height;
+        tw(FV.p, 'transform', getComputedStyle(FV.p).transform, 1, EO); try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) {} };
+      var move = function (e) { if (!on) return; dy = e.clientY - y0; FV.p.style.transform = 'translateY(' + (dy > 0 ? dy : Math.max(-24, dy * .25)) + 'px)'; FV.s.style.opacity = String(Math.max(.35, 1 - Math.max(0, dy) / H)); };
+      var up = function () { if (!on) return; on = false; var v = dy / Math.max(1, performance.now() - t0); if (dy > 110 || v > .6) fvClose(); else { tw(FV.p, 'transform', 'none', 420, SPR); tw(FV.s, 'opacity', '1', 240, EO); } };
+      [$('.ui-tv-grab', d), $('.ui-tv-head', d)].forEach(function (h) { h.addEventListener('pointerdown', down); h.addEventListener('pointermove', move); h.addEventListener('pointerup', up); h.addEventListener('pointercancel', up); });
+    })();
+    d.addEventListener('click', function (e) {
+      if (e.target.closest('[data-hg4d-x]')) { fvClose(); return; }
+      var t = e.target.closest('[data-hg4d-m]'); if (t) { sgPick(t, true); return; }
+      if (e.target.closest('.hg4d-fv-dl')) fvGet();
+    });
+    FV.sg.addEventListener('keydown', function (e) { if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return; e.preventDefault(); var bs = $$('button', FV.sg), i = bs.indexOf(document.activeElement); var n = bs[(i + (e.key === 'ArrowRight' ? 1 : bs.length - 1)) % bs.length]; sgPick(n, true); n.focus(); });
+    window.addEventListener('resize', function () { if (FV.open) sgInk(true); });
+  }
+  function sgInk(instant) { var b = $('[aria-selected="true"]', FV.sg); if (!b || FV.bar.hidden) return; if (instant) FV.ink.style.transition = 'none'; FV.ink.style.width = b.offsetWidth + 'px'; FV.ink.style.transform = 'translateX(' + (b.offsetLeft) + 'px)'; if (instant) { void FV.ink.offsetWidth; FV.ink.style.transition = ''; } }
+  function sgPick(b, anim) {
+    if (b.getAttribute('aria-selected') === 'true') return;
+    $$('button', FV.sg).forEach(function (x) { var on = x === b; x.setAttribute('aria-selected', String(on)); x.tabIndex = on ? 0 : -1; }); sgInk(false);
+    var m = b.getAttribute('data-hg4d-m'), cur = FV.sc.firstChild;
+    if (!anim || rm() || !cur || !cur.animate) { fill(m, false); return; }
+    var seq = FV.mseq = (FV.mseq || 0) + 1;
+    cur.animate([{ opacity: getComputedStyle(cur).opacity }, { opacity: 0 }], { duration: 120, easing: EO, fill: 'forwards' }).finished.then(function () { if (seq === FV.mseq) fill(m, true); }, function () {});
+  }
+  // 마크다운 → 화면(제목 · 문단 · 목록 · 표 · 굵게)
+  function inl(s) { return esc(s).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/`([^`]+)`/g, '<code>$1</code>'); }
+  function mdHtml(src) {
+    var L = String(src || '').replace(/\r/g, '').split('\n'), o = [], i = 0, cells = function (l) { return l.trim().replace(/^\||\|$/g, '').split('|').map(function (c) { return c.trim(); }); };
+    while (i < L.length) {
+      var l = L[i], h = /^(#{1,3})\s+(.*)$/.exec(l);
+      if (!l.trim()) { i++; continue; }
+      if (h) { o.push('<h' + h[1].length + '>' + inl(h[2]) + '</h' + h[1].length + '>'); i++; continue; }
+      if (/^\s*[-*•]\s+/.test(l)) { var u = []; while (i < L.length && /^\s*[-*•]\s+/.test(L[i])) u.push('<li>' + inl(L[i++].replace(/^\s*[-*•]\s+/, '')) + '</li>'); o.push('<ul>' + u.join('') + '</ul>'); continue; }
+      if (/^\s*\d+[.)]\s+/.test(l)) { var ol = []; while (i < L.length && /^\s*\d+[.)]\s+/.test(L[i])) ol.push('<li>' + inl(L[i++].replace(/^\s*\d+[.)]\s+/, '')) + '</li>'); o.push('<ol>' + ol.join('') + '</ol>'); continue; }
+      if (/^\s*\|.*\|\s*$/.test(l)) { var rows = []; while (i < L.length && /^\s*\|.*\|\s*$/.test(L[i])) { if (!/^\s*\|?\s*:?-{2,}/.test(L[i])) rows.push(cells(L[i])); i++; }
+        o.push('<div class="hg4d-tw"><table><thead><tr>' + (rows[0] || []).map(function (c) { return '<th>' + inl(c) + '</th>'; }).join('') + '</tr></thead><tbody>' + rows.slice(1).map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + inl(c) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>'); continue; }
+      var p = []; while (i < L.length && L[i].trim() && !/^(#{1,3}\s|\s*[-*•]\s+|\s*\d+[.)]\s+|\s*\|.*\|\s*$)/.test(L[i])) p.push(inl(L[i++])); o.push('<p>' + p.join('<br>') + '</p>');
+    }
+    return o.join('');
+  }
+  function rise(els, base) { if (rm()) return; els.forEach(function (e, k) { e.classList.remove('hg4d-rise'); void e.offsetWidth; e.style.setProperty('--hg4d-d', (base + k * 60) + 'ms'); e.classList.add('hg4d-rise'); }); }
+  function fill(m, anim) {
+    FV.mode = m; FV.sc.innerHTML = ''; var src = (FV.f && FV.f.content) || '';
+    if (m === 'raw') { var pre = document.createElement('pre'); pre.className = 'hg4d-raw'; pre.textContent = src; FV.sc.appendChild(pre); }
+    else { var d = document.createElement('div'); d.className = 'hg4d-md'; d.innerHTML = mdHtml(src) || '<p>내용이 없어요.</p>'; FV.sc.appendChild(d); }
+    FV.sc.scrollTop = 0; if (anim) rise([FV.sc.firstChild], 0);
+  }
+  function note(t) { FV.sc.innerHTML = '<p class="hg4d-fv-note">' + esc(t) + '</p>'; }
+  function loadScript(u) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = u; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
+  var PDFLIB = null;
+  function pdfjs() { if (!PDFLIB) PDFLIB = (window.pdfjsLib ? Promise.resolve() : loadScript(PDFJS + 'pdf.min.js')).then(function () { window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS + 'pdf.worker.min.js'; return window.pdfjsLib; }); PDFLIB.catch(function () { PDFLIB = null; }); return PDFLIB; }
+  function pdfPages(url, title) {   // 원본 PDF를 쪽마다 그림으로(pdf.js, 열 때만 불러옴)
+    var seq = ++FV.pdfSeq, w = document.createElement('div'); w.className = 'hg4d-pdf'; FV.sc.appendChild(w);
+    pdfjs().then(function (L) { return L.getDocument({ url: url }).promise; }).then(function (doc) {
+      if (seq !== FV.pdfSeq) return;
+      var W = Math.min(620, Math.max(280, FV.sc.clientWidth - 32)), dpr = Math.min(2, window.devicePixelRatio || 1), job = Promise.resolve(), made = [];
+      for (var k = 1; k <= doc.numPages; k++) (function (k) {
+        job = job.then(function () { if (seq !== FV.pdfSeq) return; return doc.getPage(k).then(function (pg) {
+          var v0 = pg.getViewport({ scale: 1 }), v = pg.getViewport({ scale: W / v0.width * dpr }), c = document.createElement('canvas');
+          c.width = Math.round(v.width); c.height = Math.round(v.height); c.setAttribute('role', 'img'); c.setAttribute('aria-label', title + ' ' + k + '쪽');
+          w.appendChild(c); made.push(c); if (k === 1) rise([c], 180); else rise([c], 0);
+          return pg.render({ canvasContext: c.getContext('2d'), viewport: v }).promise;
+        }); });
+      })(k);
+      return job.then(function () { if (seq === FV.pdfSeq && FV.open) setTimeout(FV.pgShow, 520); });
+    }).catch(function () { if (seq === FV.pdfSeq) { w.remove(); note('미리 보기를 불러오지 못했어요. 오른쪽 위 받기로 파일을 받아 주세요.'); } });
+  }
+  function flip() { var cur = FV.p.style.transform; FV.p.style.transform = 'none'; var F = FV.p.getBoundingClientRect(), S = FV.src.getBoundingClientRect(); FV.p.style.transform = cur;
+    return 'translate(' + (S.left - F.left) + 'px, ' + (S.top - F.top) + 'px) scale(' + (S.width / F.width) + ', ' + (S.height / F.height) + ')'; }
+  function sheet() { var cur = FV.p.style.transform; FV.p.style.transform = 'none'; var h = FV.p.getBoundingClientRect().height; FV.p.style.transform = cur; return 'translateY(' + Math.ceil(h + 8) + 'px)'; }
+  function fvOpen(fo) {
+    fvBuild();
+    var w = fo.closest('.hg4d-file'), b = w && $('.ans-file[data-file]', w); if (!b) return;
+    if (FV.open && FV.b === b) return;
+    var fresh = FV.el.hidden, f = fileOf(b), RMx = rm(); FV.seq++;
+    lock(true); FV.open = true; FV.b = b; FV.src = b; FV.from = fo; FV.f = f; FV.el.classList.remove('closing');
+    if (fresh) {
+      var title = nm(b), meta = $('.af-meta', b), kind = f && f.kind, url = kind && ORIG[kind];
+      FV.h.textContent = title; FV.m.textContent = (meta && (meta.getAttribute('data-hg4d-o') || meta.textContent)) || '';
+      FV.dl.classList.remove('done'); $('.ms', FV.dl).textContent = 'download'; FV.msg.classList.remove('on'); FV.pg.classList.remove('on'); FV.pdfSeq++;
+      FV.sc.innerHTML = ''; FV.sc.scrollTop = 0; FV.sc.classList.toggle('pdf', !!url);
+      var isMd = !!(f && !url && (kind === 'md'));
+      FV.bar.hidden = !isMd;
+      if (url) { FV.sc.setAttribute('aria-label', title + ' 쪽 보기'); pdfPages(url, title); }
+      else if (f && f.content != null) { FV.sc.setAttribute('aria-label', title + ' 읽기'); $$('button', FV.sg).forEach(function (x, k) { x.setAttribute('aria-selected', String(!k)); x.tabIndex = k ? -1 : 0; }); fill('read', false); }
+      else { FV.sc.setAttribute('aria-label', title); note('미리 보기를 열 수 없어요. 오른쪽 위 받기로 파일을 받아 주세요.'); }
+      FV.mob = MOB.matches; FV.el.hidden = false; FV.s.style.opacity = '0';
+      if (RMx) { FV.p.style.transform = 'none'; FV.p.style.opacity = '0'; FV.inn.style.opacity = '1'; }
+      else if (FV.mob) { FV.p.style.transform = sheet(); FV.p.style.opacity = '1'; FV.inn.style.opacity = '1'; }
+      else { FV.p.style.transform = flip(); FV.p.style.opacity = '0'; FV.inn.style.opacity = '0'; }
+      if (isMd) sgInk(true);
+      if (!url) rise($$('.hg4d-md, .hg4d-raw', FV.sc), 180);
+    }
+    FV.x.focus({ preventScroll: true });
+    if (RMx) { tw(FV.p, 'opacity', '1', 200, EO); tw(FV.s, 'opacity', '1', 200, EO); return; }
+    tw(FV.s, 'opacity', '1', 260, EO);
+    if (FV.mob) { tw(FV.p, 'transform', 'none', 500, SHT); return; }
+    tw(FV.p, 'transform', 'none', 460, SPR); tw(FV.p, 'opacity', '1', 120, EO); tw(FV.inn, 'opacity', '1', 220, EO, 80); tw(FV.src, 'opacity', '0', 120, EO);
+  }
+  function fvClose(now) {
+    if (!FV.open) return false;
+    FV.open = false; var seq = ++FV.seq, src = FV.src, from = FV.from, RMx = rm(); FV.el.classList.add('closing'); FV.pdfSeq++;
+    lock(false); if (from && document.contains(from)) from.focus({ preventScroll: true });
+    var done = function () { if (seq !== FV.seq) return; FV.el.hidden = true; FV.el.classList.remove('closing'); [FV.p, FV.s, FV.inn].forEach(function (x) { x.style.transform = ''; x.style.opacity = ''; }); if (src) src.style.opacity = ''; FV.sc.innerHTML = ''; FV.pg.classList.remove('on'); FV.b = null; };
+    if (now) { [FV.p, FV.s, FV.inn, src].forEach(stopTw); done(); return true; }
+    if (RMx) { tw(FV.s, 'opacity', '0', 200, EO); tw(FV.p, 'opacity', '0', 200, EO).then(done); tw(src, 'opacity', '1', 1, EO); return true; }
+    tw(FV.s, 'opacity', '0', FV.mob ? 320 : 340, EO);
+    if (FV.mob || !document.contains(src)) { tw(FV.p, 'transform', sheet(), 380, SHT).then(done); return true; }
+    var pr = tw(FV.p, 'transform', flip(), 400, EO); tw(FV.inn, 'opacity', '0', 160, EO); tw(src, 'opacity', '1', 220, EO, 180); tw(FV.p, 'opacity', '0', 140, EO, 260); pr.then(done);
+    return true;
+  }
+  function fvGet() {   // 판 안 받기 = 뒤 파일 상자의 받기 원을 누른 것과 같음(사이트 받기 한 번)
+    var b = FV.b; if (!b) return;
+    if (!b.disabled && !b.classList.contains('ing') && !b.classList.contains('got')) b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    var ic = $('.ms', FV.dl); clearTimeout(FV.dl._t); FV.dl.classList.remove('done'); void FV.dl.offsetWidth; FV.dl.classList.add('done'); ic.textContent = 'check';
+    FV.msg.textContent = '받았어요'; FV.msg.classList.add('on');
+    FV.dl._t = setTimeout(function () { FV.dl.classList.remove('done'); ic.textContent = 'download'; FV.msg.classList.remove('on'); }, 1800);
+  }
+
+  /* ════ 2. 이미지 크게 보기: 여러 장 넘기기 ════ */
+  var G = { gal: null, items: [], i: 0, nseq: 0, built: false };
+  function lbEl() { return $('.ui-lb'); }
+  function lbIsOpen() { var l = lbEl(); return !!(l && !l.hidden && !l.classList.contains('closing')); }
+  function lbUi() {
+    var l = lbEl(); if (!l) return null;
+    if (!G.built) {
+      G.built = true; var ui = $('.ui-lb-ui', l), cap = $('.ui-lb-cap', l);
+      ui.insertAdjacentHTML('afterbegin', '<button class="hg4d-lbnav prev" type="button" aria-label="이전 이미지"><span class="ms" aria-hidden="true">chevron_left</span></button><button class="hg4d-lbnav next" type="button" aria-label="다음 이미지"><span class="ms" aria-hidden="true">chevron_right</span></button>');
+      var t = $('.ui-lb-t', cap); var dots = document.createElement('div'); dots.className = 'hg4d-dots'; dots.setAttribute('role', 'tablist'); dots.setAttribute('aria-label', '이미지 고르기'); t.parentNode.insertBefore(dots, t.nextSibling);
+      $('.hg4d-lbnav.prev', ui).addEventListener('click', function () { go(G.i - 1); });
+      $('.hg4d-lbnav.next', ui).addEventListener('click', function () { go(G.i + 1); });
+      dots.addEventListener('click', function (e) { var d = e.target.closest('button'); if (d) go(+d.getAttribute('data-k')); });
+      swipe($('.ui-lb-img', l));
+    }
+    return l;
+  }
+  function meta(swap) {
+    var l = lbUi(); if (!l) return; var ui = $('.ui-lb-ui', l), n = G.items.length, i = G.i, dots = $('.hg4d-dots', l), t = $('.ui-lb-t', l);
+    if (n > 1) ui.removeAttribute('data-hg4d-one'); else ui.setAttribute('data-hg4d-one', '');
+    if (dots.children.length !== n) dots.innerHTML = G.items.map(function (_, k) { return '<button type="button" role="tab" data-k="' + k + '" aria-label="' + (k + 1) + '번째 이미지"' + (COARSE.matches ? ' aria-hidden="true"' : '') + '></button>'; }).join('');
+    $$('button', dots).forEach(function (d, k) { d.setAttribute('aria-selected', String(k === i)); d.tabIndex = (k === i && !COARSE.matches) ? 0 : -1; });
+    $('.hg4d-lbnav.prev', l).disabled = i === 0; $('.hg4d-lbnav.next', l).disabled = i === n - 1;
+    if (n > 1) { var im = $('img', G.items[i]), txt = (im ? im.alt : '') + ' · ' + (i + 1) + ' / ' + n;
+      if (swap && !rm() && t.animate && t.textContent !== txt) { t.getAnimations().forEach(function (a) { a.cancel(); }); t.textContent = txt; t.animate([{ opacity: 0, transform: 'translateY(3px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: EO }); }
+      else t.textContent = txt; }
+  }
+  function galOf(b) { var g = b && b.closest('.hs-gal'); return g; }
+  function setFrom(b) {   // 누른 이미지 버튼 → 지금 장 목록
+    var g = galOf(b); G.gal = g; G.items = g ? $$('.hs-gal-it', g) : [b]; G.i = Math.max(0, G.items.indexOf(b));
+  }
+  function galTo(i) { var g = G.gal, tr = g && $('.hs-gal-tr', g); if (!tr) return; try { tr.scrollTo({ left: i * tr.clientWidth, behavior: 'instant' }); } catch (e) { tr.scrollLeft = i * tr.clientWidth; } }
+  function bump(d) { var img = $('.ui-lb-img'); if (rm() || !img || !img.animate) return; img.animate([{ transform: 'none' }, { transform: 'translateX(' + (-d * 18) + 'px)' }, { transform: 'none' }], { duration: 380, easing: EO }); }
+  function go(n) {
+    if (!lbIsOpen() || G.items.length < 2 || n === G.i) return;
+    if (n < 0 || n >= G.items.length) { bump(n < G.i ? -1 : 1); return; }
+    var d = n > G.i ? 1 : -1, seq = ++G.nseq, img = $('.ui-lb-img'), b = G.items[n], foc = document.activeElement, RMx = rm();
+    G.i = n; galTo(n);
+    stopTw(img);
+    var cur = getComputedStyle(img).transform; if (!cur || cur === 'none') cur = 'translateX(0px)';
+    var out = RMx || !img.animate ? null : img.animate([{ transform: cur, opacity: 1 }, { transform: 'translateX(' + (-d * 56) + 'px)', opacity: 0 }], { duration: 150, easing: EO, fill: 'forwards' });
+    (out ? out.finished : Promise.resolve()).then(function () {
+      if (seq !== G.nseq || !lbIsOpen()) { if (out) out.cancel(); return; }
+      G.self = true; b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })); G.self = false;   // 사이트 크게 보기가 그 장으로 그림을 바꿈
+      stopTw(img); if (out) out.cancel();
+      img.style.transform = 'none'; img.style.clipPath = CLIP; img.style.opacity = '1';
+      if (!RMx && img.animate) img.animate([{ transform: 'translateX(' + (d * 56) + 'px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 440, easing: SPR });
+      meta(true); var im = $('img', b); if (im) say(im.alt);
+      if (foc && foc.closest && foc.closest('.ui-lb') && document.contains(foc)) { var dt = foc.closest('.hg4d-dots') ? $('.hg4d-dots button[data-k="' + n + '"]') : foc; (dt && !dt.disabled ? dt : $('.ui-lb-x')).focus({ preventScroll: true }); }
+    });
+  }
+  function swipe(img) {   // 크게 보기 그림을 옆으로 끌기(사이트의 아래로 끌어 닫기는 그대로, 가로로 더 움직이면 장 넘김)
+    var on = false, x0 = 0, y0 = 0, t0 = 0, ax = null, dx = 0, dy = 0;
+    img.addEventListener('pointerdown', function (e) { if (!lbIsOpen() || rm() || e.button > 0 || G.items.length < 2) return; on = true; ax = null; dx = dy = 0; x0 = e.clientX; y0 = e.clientY; t0 = performance.now(); });
+    img.addEventListener('pointermove', function (e) {
+      if (!on) return; dx = e.clientX - x0; dy = e.clientY - y0;
+      if (!ax && Math.hypot(dx, dy) > 6) ax = Math.abs(dy) > Math.abs(dx) ? 'y' : 'x';
+      if (ax === 'x') { var edge = (G.i === 0 && dx > 0) || (G.i === G.items.length - 1 && dx < 0); img.style.transform = 'translateX(' + (edge ? dx * .3 : dx) + 'px)'; var l = lbEl(); $('.ui-lb-scrim', l).style.opacity = '1'; $('.ui-lb-ui', l).style.opacity = '1'; }
+    });
+    var up = function () { if (!on) return; on = false; if (ax !== 'x') return; var v = dx / Math.max(1, performance.now() - t0);
+      if (dx < -70 || v < -.5) go(G.i + 1); else if (dx > 70 || v > .5) go(G.i - 1); };   // 못 넘기면 사이트가 이미 440ms spring으로 제자리
+    img.addEventListener('pointerup', up); img.addEventListener('pointercancel', up);
+  }
+  // 갤러리 상자 마우스 끌기: 5px 넘으면 끌기, 놓을 때 60px · 0.45px/ms 넘으면 다음 장, 끈 뒤 클릭은 무시(크게 보기 안 열림)
+  var GD = { on: false, tr: null, x0: 0, s0: 0, t0: 0, moved: false, sup: false, tm: 0 };
+  document.addEventListener('pointerdown', function (e) {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return; var tr = e.target.closest && e.target.closest('.hs-gal-tr'); if (!tr || e.target.closest('.hs-gal-nav, .hs-gal-dots')) return;
+    GD.on = true; GD.tr = tr; GD.moved = false; GD.x0 = e.clientX; GD.s0 = tr.scrollLeft; GD.t0 = performance.now();
+  });
+  window.addEventListener('pointermove', function (e) {
+    if (!GD.on) return; var tr = GD.tr, dx = e.clientX - GD.x0;
+    if (!GD.moved && Math.abs(dx) > 5) { GD.moved = true; clearTimeout(GD.tm); tr.classList.add('hg4d-drag'); }
+    if (GD.moved) { var mx = tr.scrollWidth - tr.clientWidth, L = GD.s0 - dx; if (L < 0) L = L * .3; if (L > mx) L = mx + (L - mx) * .3; tr.scrollLeft = L; }
+  });
+  window.addEventListener('pointerup', function (e) {
+    if (!GD.on) return; GD.on = false; if (!GD.moved) return; var tr = GD.tr, f = tr.closest('.hs-gal'), dx = e.clientX - GD.x0, v = dx / Math.max(1, performance.now() - GD.t0), i = Math.round(GD.s0 / Math.max(1, tr.clientWidth));
+    if (dx < -60 || v < -.45) i++; else if (dx > 60 || v > .45) i--;
+    var n = tr.children.length; i = Math.max(0, Math.min(n - 1, i));
+    if (f && f._go) f._go(i); else tr.scrollTo({ left: i * tr.clientWidth, behavior: rm() ? 'auto' : 'smooth' });
+    GD.sup = true; setTimeout(function () { GD.sup = false; }, 0); GD.tm = setTimeout(function () { tr.classList.remove('hg4d-drag'); }, 520);
+  });
+  // 갤러리 설명 글: 장이 바뀌면 100ms 사라졌다가 260ms 올라옴(사이트가 글을 바꾼 뒤 움직임만)
+  function capWatch(f) {
+    var c = $('.hs-gal-c', f); if (!c || c._h4w) return; c._h4w = 1;
+    var mo = new MutationObserver(function (ms) {
+      var old = ms[0].removedNodes[0], was = old && old.textContent, t = c.textContent; if (!was || was === t || rm() || !c.animate) return;
+      var s = c._h4s = (c._h4s || 0) + 1;
+      c.getAnimations().forEach(function (a) { a.cancel(); }); c.textContent = was; mo.takeRecords();   // 옛 글로 잠깐 되돌려 사라지게 한 뒤 새 글
+      c.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 100, easing: EO, fill: 'forwards' }).finished.then(function () {
+        if (s !== c._h4s) return; c.textContent = t; mo.takeRecords(); c.getAnimations().forEach(function (a) { a.cancel(); });
+        c.animate([{ opacity: 0, transform: 'translateY(3px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: EO });
+      }, function () {});
+    });
+    mo.observe(c, { childList: true });
+  }
+
+  /* ════ 문서 캡처 단계(사이트 클릭 처리보다 먼저) ════ */
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    if (GD.sup && t.closest && t.closest('.hs-gal-tr')) { e.stopPropagation(); e.preventDefault(); return; }   // 갤러리를 끈 뒤 클릭: 크게 보기를 열지 않음
+    var b = t.closest && t.closest('.hg4d-file > .ans-file[data-file]');
+    if (b) { ringStart(b); return; }   // 받기 원: 원만 시작하고 받기는 사이트가 그대로
+    var ib = t.closest && t.closest('[data-img]');
+    if (ib && !G.self) setFrom(ib);
+  }, true);
+  // 버블 단계(사이트 클릭 처리 뒤): 열어 보기 판 · 크게 보기가 열렸으면 장 표시
+  document.addEventListener('click', function (e) {
+    var t = e.target, fo = t.closest && t.closest('[data-hg4d-open]');
+    if (fo) { fvOpen(fo); return; }
+    var ib = t.closest && t.closest('[data-img]');
+    if (ib && !G.self && lbIsOpen()) meta(false);
+  });
+  window.addEventListener('keydown', function (e) {
+    if (FV.open && e.key === 'Escape') { e.stopPropagation(); fvClose(); return; }   // Esc는 맨 위 판 하나만(이 판이 열렸으면 이 판)
+    if (!lbIsOpen() || (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') || G.items.length < 2) return;
+    if (e.altKey || e.metaKey || e.ctrlKey) return;
+    e.preventDefault(); go(G.i + (e.key === 'ArrowRight' ? 1 : -1));
+  }, true);
+
+  /* ════ 3 · 4 · 1 감시: 새 답에 붙는 듣기 버튼 · 오류 답 · 파일 카드 · 갤러리 ════ */
+  function bars(b) { if (b.querySelector('.hg4d-bars')) return; var ic = b.querySelector('.ms'); var s = document.createElement('span'); s.className = 'hg4d-bars'; s.setAttribute('aria-hidden', 'true'); s.innerHTML = '<i></i><i></i><i></i>'; b.insertBefore(s, ic || b.firstChild); }
+  function errAns(row) {
+    var A = row.closest('.ans'); if (!A || A.classList.contains('hg4d-err') || A.querySelector('.ans-err')) return;
+    var body = $('.body', A), btn = $('[data-retry]', row), txt = body ? body.textContent.replace(/\s+/g, ' ').trim() : '';
+    if (!btn || !txt) return;
+    var box = document.createElement('div'); box.className = 'ans-err';
+    box.innerHTML = '<p><span class="ms" aria-hidden="true">error</span><span></span></p><div class="nextq"></div>';
+    box.querySelector('p span:last-child').textContent = txt; box.querySelector('.nextq').appendChild(btn);   // 버튼은 옮기기만(사이트가 붙인 값 · 처리 그대로)
+    A.classList.add('hg4d-err'); (body ? body.parentNode.insertBefore(box, body.nextSibling) : A.appendChild(box)); row.remove();
+    var lb = $('.next [data-listen]', A);   // 오류 글은 소리로 읽지 않음(자동 읽기가 켜졌으면 멈춤)
+    if (lb) { var stop = function () { if (lb.classList.contains('on')) lb.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })); }; stop(); var mo = new MutationObserver(stop); mo.observe(lb, { attributes: true, attributeFilter: ['class'] }); setTimeout(function () { mo.disconnect(); }, 15000); }
+  }
+  function scan(n) {
+    if (n.nodeType !== 1) return;
+    var one = function (sel, fn) { if (n.matches(sel)) fn(n); $$(sel, n).forEach(fn); };
+    one('[data-listen]', bars);
+    one('button.ans-file[data-file]', fileCard);
+    one('.ans-retry-row', errAns);
+    one('.hs-gal', capWatch);
+  }
+  var TH = document.getElementById('thread') || document.body;
+  scan(TH);
+  new MutationObserver(function (ms) { ms.forEach(function (m) { [].forEach.call(m.addedNodes, scan); }); }).observe(TH, { childList: true, subtree: true });
+})();
+/* HG-4D-END */</script>
 
 <style>
 /* ═══ 헝그리한정민 디자인 시스템 — 글자 기준(시안 공통) ═══
