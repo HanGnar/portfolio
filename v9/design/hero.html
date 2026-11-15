@@ -611,8 +611,8 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
   .vchip .vname, .vchip .caret-i { display: none; }
   .vchip .vi { display: inline-block; }
 }
-/* 11-15 시트 7단계: 듣기 = 투명 알약(높이 32 · Caption 12 · 3단계 색), 켜지면(멈추기) 검정 채움. 올림은 마우스만, 누르면 쫀득. 아이콘 · 글 바꾸기는 사이트 setBtn() 그대로 */
-.listen { position: relative; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 9px; margin-left: -9px; border-radius: var(--md-full); color: var(--ui-label-3); font-size: 12px; font-weight: 500; line-height: 1.4; letter-spacing: 0; -webkit-tap-highlight-color: transparent;
+/* 11-15 선 맞춤: 듣기 · 복사 알약은 왼쪽 끝이 답 글 왼쪽 선에 맞음(음수 여백 없음, 멈추기 검정 알약이 글 밖으로 안 나감). 11-15 시트 7단계: 듣기 = 투명 알약(높이 32 · Caption 12 · 3단계 색), 켜지면(멈추기) 검정 채움. 올림은 마우스만, 누르면 쫀득. 아이콘 · 글 바꾸기는 사이트 setBtn() 그대로 */
+.listen { position: relative; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 9px; border-radius: var(--md-full); color: var(--ui-label-3); font-size: 12px; font-weight: 500; line-height: 1.4; letter-spacing: 0; -webkit-tap-highlight-color: transparent;
   transition: background-color var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out), box-shadow var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
 @media (hover: hover) { .listen:hover { background: var(--ui-glass); color: var(--md-on-surface); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh-hi); transform: var(--ui-lift); } }
 .listen .ms { font-size: 15px; }
@@ -624,7 +624,6 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
 /* 11-15 시트 8단계: 답 복사 = 투명 아이콘 버튼 32(아이콘 17), 올리면(마우스만) 유리 1.06, 누르면 쫀득. 복사 뒤 체크가 톡 나오고 "복사했어요"는 버튼 위에 잠깐(줄이 밀리지 않게, 사이트 전역 알림 #toast와 따로) */
 .ans-copy { position: relative; width: 32px; height: 32px; border-radius: var(--md-full); display: grid; place-items: center; color: var(--ui-ib-color); -webkit-tap-highlight-color: transparent;
   transition: background-color var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out), box-shadow var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
-.vctl > .ans-copy:first-child { margin-left: -7px; }   /* 듣기가 없을 때 아이콘을 글 왼쪽 선에 */
 .ans-copy .ms { font-size: 17px; }
 @media (hover: hover) { .ans-copy:hover { background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); color: var(--ui-ib-color-hi); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh-hi); transform: var(--ui-ib-lift); } }
 .ans-copy:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
@@ -993,7 +992,7 @@ html.ui-lock { overflow: hidden; }
 
 @media (max-width: 640px) {
   .hs-att { max-width: 88%; }
-  .hs-cards { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -20px; padding: 4px 20px 14px; gap: 10px; scrollbar-width: none; }
+  .hs-cards { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 20px; margin: 0 -20px; padding: 4px 20px 14px; gap: 10px; scrollbar-width: none; }   /* 11-15 선 맞춤: 붙는 자리를 안쪽 20에(첫 카드 왼쪽 = 답 글 왼쪽 선) */
   .hs-cards::-webkit-scrollbar { display: none; }
   .hs-pc { flex: 0 0 74%; scroll-snap-align: start; }
   .hs-cards > .hs-pc:only-child { flex-basis: 100%; }
