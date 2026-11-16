@@ -8655,12 +8655,15 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 
 /* 2. 햄버거 두 줄도 1.75 굵기(두 줄 ↔ X 움직임은 사이트 값 그대로, 겹치는 거리만 굵기에 맞춤) */
 /* 10판: 두 줄 굵기가 달라 보이던 것 — 칸 7 · 줄 1.75면 두 줄 위치 차가 5.25px라 한 줄은 화소 경계에 걸려 번져 보였음 → 칸 7.75로 차를 6px(정수)로 맞춰 두 줄이 같은 화소 위치에 그려지게 */
-/* 10판-2: 줄 굵기를 홈 · 소리 아이콘의 실제 선 굵기에 맞춤 — 아이콘은 24칸 그림을 18px로 줄여 그려 선 1.75 → 실제 1.3125px인데 햄버거만 1.75px라 혼자 진해(색이 달라) 보였음.
-   굵기 = 아이콘 크기 × 1.75 / 24(토큰 따라감), 두 줄 위치 차는 6px 정수 그대로(두 줄 같은 진하기) */
-.gpill i { height: calc(6px + var(--ui-nav-icon, 18px) * 1.75 / 24); }
-.gpill i::before, .gpill i::after { height: calc(var(--ui-nav-icon, 18px) * 1.75 / 24); }
-.gpill[aria-expanded="true"] i::before { transform: translateY(3px) rotate(45deg); }
-.gpill[aria-expanded="true"] i::after { transform: translateY(-3px) rotate(-45deg); }
+/* 10판-2: 햄버거를 홈 · 소리와 같은 그리는 방식으로 — 사용자 "햄버거 버튼 라인 너무 두꺼워서 혼자 색이 달라보여"
+   원인: 아이콘은 24칸 SVG 선 1.75를 18px로 줄여 그려 실제 1.31px(가장자리 부드럽게)인데, 햄버거는 막대(div) 두 줄이라 브라우저가 화소 단위로 반올림해 2px로 꽉 차게 그려 혼자 진해 보였음
+   → 막대(<i>)는 숨기고 같은 SVG 선(stroke 1.75 · 둥근 끝 · 18px)으로 두 줄(y 8 · 16, 길이 3 ~ 21). 열면 두 줄이 가운데로 모이며 X(같은 0.3초 곡선) */
+.gpill i { display: none; }
+.gpill svg.gi-burger { width: var(--ui-nav-icon, 18px); height: var(--ui-nav-icon, 18px); fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; flex: none; display: block; overflow: visible; }
+.gpill svg.gi-burger path { transform-box: view-box; transform-origin: 12px 12px; transition: transform .3s cubic-bezier(.4, 0, .2, 1); }
+.gpill[aria-expanded="true"] svg.gi-burger .l1 { transform: translateY(4px) rotate(45deg); }
+.gpill[aria-expanded="true"] svg.gi-burger .l2 { transform: translateY(-4px) rotate(-45deg); }
+@media (prefers-reduced-motion: reduce) { .gpill svg.gi-burger path { transition: none; } }
 
 /* 3. 메뉴 판: 바탕은 히어로 덮개 surface, 테두리 선은 어두운 화면 값이 있는 구분선 토큰으로 */
 /* 2판(11-15 사용자 "햄버거 메뉴 펼쳤을 때 나오는 배경 박스를 글래스 모피즘으로 바꾸자"): 내비 버튼과 같은 유리 토큰(바탕 · 흐림 · 안쪽 빛 테두리 · 바깥 선) + 판 그림자는 그대로 */
@@ -8726,6 +8729,11 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
   var foot = document.querySelector('#side .mfoot'); if (foot) foot.classList.remove('mi');
   var mis = Array.prototype.slice.call(document.querySelectorAll('#side .mi'));
   mis.forEach(function (el, i) { el.style.setProperty('--i', i); el.style.setProperty('--n', mis.length); });
+})();
+// 10판-2: 햄버거 두 줄을 아이콘과 같은 SVG 선으로(막대 <i>는 사이트 코드가 쓸 수 있어 지우지 않고 CSS로 숨김)
+(function () {
+  var m = document.getElementById('g-menu'); if (!m || m.querySelector('svg.gi-burger')) return;
+  m.insertAdjacentHTML('beforeend', '<svg class="gi gi-burger" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path class="l1" d="M3 8h18"/><path class="l2" d="M3 16h18"/></svg>');
 })();
 
 </script>
@@ -8937,6 +8945,15 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 .nv4-now > .nv4-pane { transition: none; }
 @media (prefers-reduced-motion: reduce) { .nv4-pane[aria-hidden="false"], .nv4-seg button { transition-duration: 1ms; } }
 
+/* 10판-3: 톱니는 햄버거 메뉴를 열었을 때만 — 사용자 "설정 버튼은 햄버거 메뉴 열었을 때 나오게 해줘"
+   닫힘: 폭 0 · 간격 상쇄(-8) · 투명 · .6배(누를 수 없음, 초점 없음 inert). 열림: 소리와 X 사이가 벌어지며 톱니가 spring으로 커져 나옴(햄버거가 X로 바뀌는 것보다 0.06초 늦게)
+   닫을 때는 d2 ease-out으로 빠르게 접힘(나가는 것은 ease-out 규칙) */
+#g-set { overflow: hidden; transition: transform var(--ui-d3) var(--ui-spring) 60ms, width var(--ui-d3) var(--ui-spring) 60ms, margin var(--ui-d3) var(--ui-spring) 60ms, opacity var(--ui-d2) var(--ui-ease-out) 60ms, box-shadow var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out); }
+.gnb:has(#g-menu[aria-expanded="false"]) #g-set { width: 0; min-width: 0; padding: 0; border-width: 0; margin-right: -8px; opacity: 0; transform: scale(.6); pointer-events: none;
+  transition: transform var(--ui-d2) var(--ui-ease-out), width var(--ui-d2) var(--ui-ease-out), margin var(--ui-d2) var(--ui-ease-out), opacity var(--ui-d1) var(--ui-ease-out); }
+#g-set:active { transition-delay: 0s; }
+@media (prefers-reduced-motion: reduce) { #g-set, .gnb:has(#g-menu[aria-expanded="false"]) #g-set { transition-duration: 1ms; transition-delay: 0s; } }
+
 </style>
 <script>
 /* ═══ 4판(2026-11-15 HPP): 햄버거 메뉴 펼침 — 이름 = 이동, 펼침 원 = 상세, 맨 아래 설정 → 판 안에서 옆으로 넘어가는 설정 화면 ═══
@@ -9010,7 +9027,8 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
   back.addEventListener('click', function (e) { e.stopPropagation(); show(false); });
   addEventListener('keydown', function (e) { if (e.key === 'Escape' && side.classList.contains('on') && set.getAttribute('aria-hidden') === 'false') { e.preventDefault(); e.stopImmediatePropagation(); show(false); } }, true);
   // 판이 닫히면 다음에 열 때 늘 메뉴부터(펼친 줄도 접음)
-  new MutationObserver(function () { if (pend) return; if (!side.classList.contains('on') || side.hidden) { if (set.getAttribute('aria-hidden') === 'false') { side.classList.add('nv4-menu-on'); side.classList.remove('nv4-set-on'); menu.setAttribute('aria-hidden', 'false'); set.setAttribute('aria-hidden', 'true'); menu.inert = false; set.inert = true; gear.setAttribute('aria-expanded', 'false'); }
+  gear.inert = true;   // 10판-3: 톱니는 판이 열렸을 때만(닫히면 누름 · 초점 없음)
+  new MutationObserver(function () { gear.inert = !(side.classList.contains('on') && !side.hidden); if (pend) return; if (!side.classList.contains('on') || side.hidden) { if (set.getAttribute('aria-hidden') === 'false') { side.classList.add('nv4-menu-on'); side.classList.remove('nv4-set-on'); menu.setAttribute('aria-hidden', 'false'); set.setAttribute('aria-hidden', 'true'); menu.inert = false; set.inert = true; gear.setAttribute('aria-expanded', 'false'); }
     list.querySelectorAll('.nv4-row.open').forEach(function (r) { openRow(r, false); }); } }).observe(side, { attributes: true, attributeFilter: ['class', 'hidden'] });
 
   // 6) 고르기 알약: 진한 알약이 고른 칸으로 spring으로 미끄러짐. 소리는 상단 소리 버튼과 같은 상태(누르면 그 버튼을 대신 누름)
