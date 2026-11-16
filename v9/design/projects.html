@@ -219,7 +219,7 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.75;str
 .pc .th img{width:100%;height:100%;object-fit:cover;display:block;transition:transform var(--d4) var(--ease-out)}
 .pc .th span{font:var(--t-title3);letter-spacing:var(--ls-title3);color:var(--label-3)}
 .pc .tx{padding:var(--s-4) var(--s-5) var(--s-5);display:flex;flex-direction:column;gap:2px;min-width:0}
-.pc .k{font:var(--t-caption);letter-spacing:var(--ls-caption);color:var(--label-3)}
+.pc .k{font:var(--t-caption);letter-spacing:var(--ls-caption);color:var(--label-2)}   /* 11-16 웹과 같게: 대비 4.5 넘게 */
 .pc .n{font:var(--t-headline);letter-spacing:var(--ls-headline)}
 .pc .l{font:var(--t-footnote);letter-spacing:var(--ls-footnote);color:var(--label-2);margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .pc.out{display:none}
@@ -753,11 +753,11 @@ var thAn=null,thL=0,thR=0;
 function spring(x0,x1,k,c){var x=x0,v=0,o=[];for(var i=0;i<72;i++){v+=(-k*(x-x1)-c*v)/60;x+=v/60;o.push(x)}o.push(x1);return o}
 function moveThumb(b,instant){var r=b.getBoundingClientRect(),s=seg.getBoundingClientRect(),lo=4,hi=s.width-4,L1=r.left-s.left,R1=r.right-s.left;
   if(thAn){var t=thumb.getBoundingClientRect();thL=t.left-s.left;thR=t.right-s.left;thAn.cancel();thAn=null}
-  var set=function(L,Rr){thumb.style.transform='translateX('+L+'px)';thumb.style.width=(Rr-L)+'px';thL=L;thR=Rr};
+  var set=function(L,Rr){thumb.style.left=L+'px';thumb.style.width=(Rr-L)+'px';thL=L;thR=Rr};
   if(instant||RM||!thumb.animate||thR<=thL){set(L1,R1);return}
   var right=L1>thL,lead=[620,30],tail=[300,26];   // 가는 쪽 끝: 탱탱(조금 넘침) · 뒤쪽 끝: 느긋
   var A=spring(thL,L1,(right?tail:lead)[0],(right?tail:lead)[1]),B=spring(thR,R1,(right?lead:tail)[0],(right?lead:tail)[1]);
-  var kf=A.map(function(a,i){var L=Math.max(lo,Math.min(hi-20,a)),Rr=Math.min(hi,Math.max(L+20,B[i]));return {transform:'translateX('+L.toFixed(2)+'px)',width:(Rr-L).toFixed(2)+'px'}});
+  var kf=A.map(function(a,i){var L=Math.max(lo,Math.min(hi-20,a)),Rr=Math.min(hi,Math.max(L+20,B[i]));return {left:L.toFixed(2)+'px',width:(Rr-L).toFixed(2)+'px'}});
   set(L1,R1);thAn=thumb.animate(kf,{duration:kf.length*1000/60,easing:'linear'});thAn.onfinish=function(){thAn=null}}
 
 /* 분류 바꾸기(5판). 바뀐 뒤 자리를 먼저 재 보고 두 가지 중 하나로 움직인다.

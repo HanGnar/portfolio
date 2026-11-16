@@ -1500,12 +1500,12 @@ html.hg-intro-t .intro-typed { display: block; }
 /* HG-VIDEO-CSS-END */
 /* HG-PJ-CSS-BEGIN · 11-15 4차: 프로젝트 영역 시트(디자인시스템/시트/projects 6판) → 웹. 제목 + 분류 막대(유리, 진한 알약이 막대 안에서 미끄러짐) · 박스 3열(≤960 2열 · ≤640 1열).
    값은 --ui- 토큰 · Pretendard 단계(Title 1 · Callout · Headline · Footnote · Caption). 움직이는 건 박스 안쪽(.pc .in)만, 누르는 자리(.pc)는 제자리 */
-#projects .wrap { max-width: 1120px; padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); font-family: var(--ui-font); color: var(--ui-label); }
+#projects .wrap { max-width: calc(var(--wrap) + 8px); padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); font-family: var(--ui-font); color: var(--ui-label); }
 #projects .pj-h { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
 #projects .pj-h h2 { font: 700 40px/1.2 var(--ui-font); letter-spacing: -.028em; text-wrap: balance; }
 #projects .pj-seg { position: relative; display: inline-flex; gap: 2px; padding: 4px; border-radius: 999px; background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur);
   box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh); }
-#projects .pj-thumb { position: absolute; left: 0; top: 4px; height: calc(100% - 8px); width: 0; border-radius: 999px; background: var(--ui-send-bg); pointer-events: none; will-change: transform, width; }
+#projects .pj-thumb { position: absolute; left: 0; top: 4px; height: calc(100% - 8px); width: 0; border-radius: 999px; background: var(--ui-send-bg); pointer-events: none; will-change: left, width; }   /* 11-16 QA: WebKit이 transform과 width를 따로 그려 알약이 막대 밖으로 1~3px 나가던 것 → left · width로 같이 움직임 */
 #projects .pj-seg button { position: relative; z-index: 1; height: 36px; padding: 0 16px; border-radius: 999px; white-space: nowrap; font: 500 15px/1.45 var(--ui-font); letter-spacing: -.008em; color: var(--ui-label-2);
   transition: color var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); -webkit-tap-highlight-color: transparent; }
 #projects .pj-seg button:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
@@ -1522,7 +1522,7 @@ html.hg-intro-t .intro-typed { display: block; }
 #projects .pc .th img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform var(--ui-d4) var(--ui-ease-out); }
 #projects .pc .th > span { font: 600 22px/1.4 var(--ui-font); letter-spacing: -.018em; color: var(--ui-label-3); }
 #projects .pc .tx { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 16px 20px 20px; }
-#projects .pc .k { font: 500 12px/1.4 var(--ui-font); color: var(--ui-label-3); }
+#projects .pc .k { font: 500 12px/1.4 var(--ui-font); color: var(--ui-label-2); }   /* 11-16 QA: 분류 글 대비 3.3 → 5.1(기준 4.5) */
 #projects .pc .n { font: 600 17px/1.5 var(--ui-font); letter-spacing: -.012em; color: var(--ui-label); }
 #projects .pc .l { margin-top: 2px; font: 400 13px/1.5 var(--ui-font); letter-spacing: -.004em; color: var(--ui-label-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 @media (hover: hover) {
@@ -2874,12 +2874,11 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   var FILTER = 'all', ORDER = P.map(function (p) { return p.id; });
   /* HG-PJ-JS-BEGIN · 11-15 4차: 프로젝트 영역 시트(시트/projects 6판) → 웹. 이름(renderFilter · renderWorks · animWorks · setFilter)은 그대로라
      AI 동작(@filter) · 팀 순서(fitTeam) · 원래 순서로(#fit-reset)가 같은 길로 부른다. 박스 누르면 data-open → 클릭 위임 → openDetail(주소 #id) 그대로.
-     분류: 대표 = PJ_REP(11-15 HPP3 결정, 사용자 "알아서해": PARALLAX · 코레일톡) · 협업/기획 = groups(kind 앞말) · 화면 설계 = 태그 화면설계서. FILTERS(AI에 보내는 목록)는 안 바꿈 */
-  var PJ_REP = ['parallax', 'korail'];
+     분류: 대표 = 사이트 knowledge groups의 featured(PARALLAX · 롯데시네마 — 허기 답 · PRESETS와 같은 값) · 협업/기획 = groups(kind 앞말) · 화면 설계 = 태그 화면설계서. FILTERS(AI에 보내는 목록)는 안 바꿈 */
   var PJ_SEG = [{ id: 'all', label: '전체' }, { id: 'featured', label: '대표' }, { id: 'collab', label: '협업' }, { id: 'plan', label: '기획' }, { id: 'screen', label: '화면 설계' }];
   function pjIn(p, f) {
     if (!p) return false; if (f === 'all') return true;
-    if (f === 'featured') return PJ_REP.indexOf(p.id) > -1;
+    if (f === 'featured') return (p.groups || []).indexOf('featured') > -1;
     if (f === 'screen') return (p.tags || []).indexOf('화면설계서') > -1;
     return (p.groups || []).indexOf(f) > -1 || (p.kind || '').indexOf(f === 'collab' ? '협업' : f === 'plan' ? '기획' : '\u0000') === 0;
   }
@@ -2892,11 +2891,11 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     if (!b) return;
     var r = b.getBoundingClientRect(), s = pjSeg.getBoundingClientRect(), lo = 4, hi = s.width - 4, L1 = r.left - s.left, R1 = r.right - s.left;
     if (pjAn) { var t = pjThumb.getBoundingClientRect(); pjL = t.left - s.left; pjR = t.right - s.left; pjAn.cancel(); pjAn = null; }
-    var set = function (L, Rr) { pjThumb.style.transform = 'translateX(' + L + 'px)'; pjThumb.style.width = Math.max(0, Rr - L) + 'px'; pjL = L; pjR = Rr; };
+    var set = function (L, Rr) { pjThumb.style.left = L + 'px'; pjThumb.style.width = Math.max(0, Rr - L) + 'px'; pjL = L; pjR = Rr; };
     if (instant || RM || !pjThumb.animate || pjR <= pjL || !s.width) { set(L1, R1); return; }
     var right = L1 > pjL, lead = [620, 30], tail = [300, 26];
     var A = pjSpring(pjL, L1, (right ? tail : lead)[0], (right ? tail : lead)[1]), B = pjSpring(pjR, R1, (right ? lead : tail)[0], (right ? lead : tail)[1]);
-    var kf = A.map(function (a, i) { var L = Math.max(lo, Math.min(hi - 20, a)), Rr = Math.min(hi, Math.max(L + 20, B[i])); return { transform: 'translateX(' + L.toFixed(2) + 'px)', width: (Rr - L).toFixed(2) + 'px' }; });
+    var kf = A.map(function (a, i) { var L = Math.max(lo, Math.min(hi - 20, a)), Rr = Math.min(hi, Math.max(L + 20, B[i])); return { left: L.toFixed(2) + 'px', width: (Rr - L).toFixed(2) + 'px' }; });
     set(L1, R1); pjAn = pjThumb.animate(kf, { duration: kf.length * 1000 / 60, easing: 'linear' }); pjAn.onfinish = function () { pjAn = null; };
   }
   function renderFilter(anim) {
@@ -8173,8 +8172,9 @@ html:has(#detail:not([hidden])) .hdr { z-index: 41; }
   var RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var T = null, raf = 0, hold = false, lastR = null, prevTs = 0;
   function yOf(el, edge) { var r = el.getBoundingClientRect(), tr = T.getBoundingClientRect(); return (edge === 'top' ? r.top : r.bottom) - tr.top + T.scrollTop; }
-  function target() {
+  function target() {   // 방금 한 질문이 대화창 맨 위에 걸리는 데까지만 내려감(읽던 답 앞부분이 위로 밀려나지 않게, 그 아래는 사용자가 스크롤)
     var max = T.scrollHeight - T.clientHeight, R = window.HG_REVEAL && window.HG_REVEAL.cur();
+    var qs = T.querySelectorAll(':scope > .msg-q'), lq = qs[qs.length - 1]; if (lq) max = Math.min(max, Math.max(0, yOf(lq, 'top') - 12));
     if (!R || !R.A || !R.A.isConnected || !T.contains(R.A)) return max;
     var now = performance.now();
     if (R.done && now >= (R.end || 0)) return max;
@@ -8190,7 +8190,7 @@ html:has(#detail:not([hidden])) .hdr { z-index: 41; }
     var d = target() - T.scrollTop;
     if (!hold && d > 0.5) {
       if (RM) T.scrollTop += d;
-      else T.scrollTop += Math.max(1, d * (1 - Math.exp(-dt / 140)));   // 남은 거리의 일정 비율씩(140ms 감속) → 끊기지 않고 미끄러지듯
+      else T.scrollTop += Math.max(1, d * (1 - Math.exp(-dt / 190)));   // 남은 거리의 일정 비율씩(190ms 감속) → 끊기지 않고 미끄러지듯
     }
     if (busy() || (!hold && d > 0.5)) raf = requestAnimationFrame(step); else prevTs = 0;
   }
