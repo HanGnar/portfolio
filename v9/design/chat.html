@@ -485,6 +485,7 @@ body.spec [data-spec]::after{content:attr(data-spec);position:absolute;right:0;t
 .cv-tl li{display:flex;flex-direction:column;gap:1px;padding:8px 12px}
 .cv-tl b{font:var(--t-label);letter-spacing:var(--ls-label)}
 .cv-tl span{font:var(--t-footnote);letter-spacing:var(--ls-footnote);color:var(--label-2)}
+.cv-kw .cv-t span{font:var(--t-subhead);letter-spacing:var(--ls-subhead);color:var(--label)}   /* 11-16 직무역량: 왼쪽 단계(Footnote label-3) + 키워드(Subhead label) */
 .cv-d br{display:block}
 /* 자기소개서: 세 묶음을 펼쳐 원문 보기(높이 0fr → 1fr 0.42초, 화살표 spring 회전) */
 .cl+.cl{border-top:1px solid var(--sep)}
@@ -1149,6 +1150,12 @@ html.kb .tv{bottom:var(--kb,0px)}
               <div class="cv-g"><h5>자격증</h5><ul>
                 <li><span class="cv-d">2025.03.25</span><span class="cv-t"><b>1종 보통 운전면허</b></span></li>
                 <li><span class="cv-d">2025.04.23</span><span class="cv-t"><b>2종 소형 운전면허</b></span></li>
+              </ul></div>
+              <div class="cv-g cv-kw"><h5>직무역량</h5><ul>
+                <li><span class="cv-d">조사 · 분석</span><span class="cv-t"><span>요구분석 · RFP&nbsp;분석 · 벤치마킹 · SWOT&nbsp;분석 · 회의록작성 · 마인드맵핑 · 에스노그라피 · 심층&nbsp;인터뷰(FGI) · 타운왓칭 · 조사보고서작성</span></span></li>
+                <li><span class="cv-d">발상 · 전략</span><span class="cv-t"><span>브레인스토밍 · 브레인라이팅 · 소셜매트릭스&nbsp;분석 · 포지셔닝 · 3Cs · 페르소나분석 · 유저저니맵 · 카드소팅 · 사용시나리오</span></span></li>
+                <li><span class="cv-d">설계 · 검증</span><span class="cv-t"><span>정보구조도 · 레이블링 · 플로우차트 · 와이어프레임 · 스토리보드 · 프로토타이핑 · 아이트래킹 · 사용성테스트</span></span></li>
+                <li><span class="cv-d">전달 · 협업</span><span class="cv-t"><span>사용자&nbsp;니즈 · 원츠&nbsp;도출 · 트렌드&nbsp;분석 · 경청 · 공감 · 커뮤니케이션 · 프레젠테이션 · SNS · 유튜브 · 블로그&nbsp;등&nbsp;운영</span></span></li>
               </ul></div>
               <div class="cv-g"><h5>툴 활용 능력</h5><ul class="cv-tl">
                 <li><b>ChatGPT</b><span>리서치 · 아이디어 정리</span></li>
