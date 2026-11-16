@@ -777,9 +777,10 @@ function filter(cat){
     var entering=[];
     cards.forEach(function(c){var w=want(c),o=c.classList.contains('out');c.classList.toggle('out',!w);if(w&&(o||fresh))entering.push(c)});
     if(RM)return;
+    var slid=false;   /* 7판(11-16 사용자 "옆 박스와 충돌 … 쫀득한 인터랙션 자체는 좋은데 겹쳐서 어색"): spring이 거리의 10%를 지나쳐 옆 박스 침범 → 감속 도착 + 최대 6px만 지나쳤다 돌아옴, 새 박스는 0.22초 뒤 · 1.006배까지만 */
     if(!fresh)cards.forEach(function(c){var a=before.get(c);if(!a||c.classList.contains('out')||entering.indexOf(c)>=0)return;var dx=a.left-c.getBoundingClientRect().left;
-      if(Math.abs(dx)>=1)busy.push(c.animate([{transform:'translateX('+dx+'px)'},{transform:'none'}],{duration:420,easing:'cubic-bezier(.34,1.56,.64,1)'}))});
-    entering.forEach(function(c,i){busy.push(c.animate([{opacity:0,transform:'scale(.92)'},{opacity:1,transform:'none'}],{duration:420,delay:i*40,easing:'cubic-bezier(.34,1.56,.64,1)',fill:'backwards'}))});
+      if(Math.abs(dx)>=1){slid=true;var ov=-Math.sign(dx)*Math.min(6,Math.abs(dx)*.04);busy.push(c.animate([{transform:'translateX('+dx+'px)',easing:'cubic-bezier(.22,1,.36,1)'},{transform:'translateX('+ov+'px)',offset:.72,easing:'cubic-bezier(.4,0,.2,1)'},{transform:'none'}],{duration:480}))}});
+    entering.forEach(function(c,i){busy.push(c.animate([{opacity:0,transform:'scale(.94)',easing:'cubic-bezier(.22,1,.36,1)'},{opacity:1,transform:'scale(1.006)',offset:.7,easing:'cubic-bezier(.4,0,.2,1)'},{opacity:1,transform:'none'}],{duration:460,delay:(slid?220:0)+i*40,fill:'backwards'}))});
   };
   if(RM||!leaving.length){go();return}
   var outs=leaving.map(function(c){return c.animate([{opacity:1,transform:'none'},{opacity:0,transform:'scale(.92)'}],{duration:240,easing:'cubic-bezier(.22,1,.36,1)',fill:'forwards'})});
