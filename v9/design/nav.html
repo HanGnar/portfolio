@@ -8655,8 +8655,10 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 
 /* 2. 햄버거 두 줄도 1.75 굵기(두 줄 ↔ X 움직임은 사이트 값 그대로, 겹치는 거리만 굵기에 맞춤) */
 /* 10판: 두 줄 굵기가 달라 보이던 것 — 칸 7 · 줄 1.75면 두 줄 위치 차가 5.25px라 한 줄은 화소 경계에 걸려 번져 보였음 → 칸 7.75로 차를 6px(정수)로 맞춰 두 줄이 같은 화소 위치에 그려지게 */
-.gpill i { height: 7.75px; }
-.gpill i::before, .gpill i::after { height: 1.75px; }
+/* 10판-2: 줄 굵기를 홈 · 소리 아이콘의 실제 선 굵기에 맞춤 — 아이콘은 24칸 그림을 18px로 줄여 그려 선 1.75 → 실제 1.3125px인데 햄버거만 1.75px라 혼자 진해(색이 달라) 보였음.
+   굵기 = 아이콘 크기 × 1.75 / 24(토큰 따라감), 두 줄 위치 차는 6px 정수 그대로(두 줄 같은 진하기) */
+.gpill i { height: calc(6px + var(--ui-nav-icon, 18px) * 1.75 / 24); }
+.gpill i::before, .gpill i::after { height: calc(var(--ui-nav-icon, 18px) * 1.75 / 24); }
 .gpill[aria-expanded="true"] i::before { transform: translateY(3px) rotate(45deg); }
 .gpill[aria-expanded="true"] i::after { transform: translateY(-3px) rotate(-45deg); }
 
