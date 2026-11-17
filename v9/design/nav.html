@@ -9410,6 +9410,9 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 #g-set:active { transition-delay: 0s !important; }
 @media (prefers-reduced-motion: reduce) { #g-set, .gnb:has(#g-menu[aria-expanded="false"]) #g-set { transition-duration: 1ms !important; transition-delay: 0s !important; } }
 .nv4-opt { background: transparent; }
+@media (min-width: 641px) { .nv4-opt { padding-left: 12px; } }   /* 상자가 없으니 항목 이름 왼쪽을 "설정" 제목 왼쪽 선에 맞춤(16 → 12) */
+/* 12판-2: 설정 머리의 뒤로 원 없앰(사용자 "뒤로가기 버튼도 지워") — 메뉴로는 상단 톱니 · Esc. 제목만 남음 */
+.nv4-sh { gap: 0; }
 
 </style>
 <script>
@@ -9454,7 +9457,7 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
     ['text', '글자 크기', '대화 글자', [['md', '기본'], ['lg', '크게']]]
   ];
   var set = document.createElement('section'); set.className = 'nv4-pane nv4-set'; set.id = 'nv4-set'; set.setAttribute('aria-hidden', 'true'); set.setAttribute('aria-labelledby', 'nv4-set-h');
-  set.innerHTML = '<div class="nv4-sh"><button class="nv4-back" type="button" aria-label="메뉴로 돌아가기">' + ic('back') + '</button><h2 id="nv4-set-h" data-t="set">설정</h2></div><ul class="nv4-opts">' +
+  set.innerHTML = '<div class="nv4-sh"><h2 id="nv4-set-h" data-t="set" tabindex="-1">설정</h2></div><ul class="nv4-opts">' +
     OPTS.map(function (o, k) { return '<li class="nv4-opt" style="--k:' + k + '"><div class="nv4-ol"><b id="nv4-l-' + o[0] + '" data-t="o_' + o[0] + '">' + o[1] + '</b><span data-t="d_' + o[0] + '">' + o[2] + '</span></div><div class="nv4-seg" role="radiogroup" aria-labelledby="nv4-l-' + o[0] + '" data-k="' + o[0] + '"><span class="th" aria-hidden="true"></span>' +
       o[3].map(function (c, i) { return '<button type="button" role="radio" data-v="' + c[0] + '"' + (o[0] === 'lang' ? ' lang="' + c[0] + '"' : ' data-t="v_' + o[0] + '_' + c[0] + '"') + ' aria-checked="' + (i === 0) + '">' + c[1] + '</button>'; }).join('') + '</div></li>'; }).join('') + '</ul>';
   views.appendChild(set);
@@ -9470,18 +9473,17 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
     list.querySelectorAll('.nv4-row.open').forEach(function (r) { if (r !== row) openRow(r, false); }); openRow(row, on); });
 
   // 5) 설정 화면: 판 안에서 옆으로(메뉴 왼쪽으로 24 비키며 흐려짐 · 설정 오른쪽 24에서 들어옴, 0.42초 ease-out). 뒤로 · Esc = 메뉴로
-  var back = set.querySelector('.nv4-back'), pend = false;
+  var pend = false;
   function more() { var o = set.querySelector('.nv4-opts'); o.classList.toggle('nv4-more', o.scrollTop + o.clientHeight < o.scrollHeight - 2); }
   function fit() { var o = set.querySelector('.nv4-opts'); if (!o) return; o.style.maxHeight = ''; var r = side.getBoundingClientRect(); o.style.maxHeight = Math.max(160, Math.floor(r.top + side.clientHeight - o.getBoundingClientRect().top - 16)) + 'px'; more(); if (!o.nv4m) { o.nv4m = 1; o.addEventListener('scroll', more, { passive: true }); } }
   function show(s) { side.classList.toggle('nv4-menu-on', !s); side.classList.toggle('nv4-set-on', !!s); if (s) fit(); menu.setAttribute('aria-hidden', s ? 'true' : 'false'); set.setAttribute('aria-hidden', s ? 'false' : 'true'); menu.inert = !!s; set.inert = !s; gear.setAttribute('aria-expanded', s ? 'true' : 'false');
-    if (s) { segAll(); setTimeout(function () { back.focus({ preventScroll: true, focusVisible: false }); }, RM ? 0 : 60); side.scrollTop = 0; } else gear.focus({ preventScroll: true, focusVisible: false }); }
+    if (s) { segAll(); setTimeout(function () { var f = set.querySelector('.nv4-seg [aria-checked="true"]') || set.querySelector('h2'); f.focus({ preventScroll: true, focusVisible: false }); }, RM ? 0 : 60);   /* 12판-2: 뒤로 원 없앰 → 첫 고르기 칸에 초점, 메뉴로는 상단 톱니 · Esc */ side.scrollTop = 0; } else gear.focus({ preventScroll: true, focusVisible: false }); }
   set.inert = true; side.classList.add('nv4-menu-on');
   gear.addEventListener('click', function (e) { e.stopPropagation();
     if (side.classList.contains('on') && !side.hidden) { show(set.getAttribute('aria-hidden') === 'true'); return; }
     // 닫혀 있으면: 판이 열리기 전에 설정 화면으로 바꿔 둠(옆으로 넘김 없이) → 판은 원래 여는 움직임 그대로, 항목만 차례로 들어옴
     pend = true; views.classList.add('nv4-now'); show(true); gm.click(); var n = 0;
     (function wait() { if (side.classList.contains('on') && !side.hidden || n++ > 30) { pend = false; fit(); segAll(); setTimeout(function () { fit(); segAll(); }, 700); requestAnimationFrame(function () { views.classList.remove('nv4-now'); }); } else requestAnimationFrame(wait); })(); });
-  back.addEventListener('click', function (e) { e.stopPropagation(); show(false); });
   addEventListener('keydown', function (e) { if (e.key === 'Escape' && side.classList.contains('on') && set.getAttribute('aria-hidden') === 'false') { e.preventDefault(); e.stopImmediatePropagation(); show(false); } }, true);
   // 판이 닫히면 다음에 열 때 늘 메뉴부터(펼친 줄도 접음)
   gear.inert = true;   // 10판-3: 톱니는 판이 열렸을 때만(닫히면 누름 · 초점 없음)
@@ -9531,7 +9533,6 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
         set.querySelectorAll('.nv4-seg').forEach(function (g) { seg(g, true); }); }; });
     gear.setAttribute('aria-label', tr('set')); gear.title = tr('set');
     var tg = list.querySelector('.nv4-tg'); if (tg) tg.setAttribute('aria-label', tr(tg.getAttribute('aria-expanded') === 'true' ? 'a_close' : 'a_open'));
-    back.setAttribute('aria-label', tr('a_back'));
     set.querySelectorAll('.nv4-seg').forEach(function (g) { seg(g, true); }); }
   applyLang(ST.lang || 'ko');
   addEventListener('resize', function () { if (set.getAttribute('aria-hidden') === 'false') fit(); if (set.getAttribute('aria-hidden') === 'false') set.querySelectorAll('.nv4-seg').forEach(function (g) { seg(g, true); }); });
