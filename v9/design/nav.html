@@ -9233,6 +9233,7 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 .gnb:has(#g-menu[aria-expanded="false"]) #g-set { width: 0; min-width: 0; padding: 0; border-width: 0; margin-right: -8px; opacity: 0; transform: scale(.6); pointer-events: none;
   transition: transform var(--ui-d2) var(--ui-ease-out), width var(--ui-d2) var(--ui-ease-out), margin var(--ui-d2) var(--ui-ease-out), opacity var(--ui-d1) var(--ui-ease-out) !important; }
 #g-set:active { transition-delay: 0s !important; }
+#g-set.nv4-in { overflow: visible; }   /* 15판: 다 나타난 뒤엔 바깥 누름 영역(::after -3px)이 잘리지 않게 */
 #g-set svg.gi { rotate: none !important; transition: none !important; }
 @media (hover: hover) { .gnb #g-set:hover:not(:active) { transform: none !important; box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh) !important; } }
 @media (max-width: 640px) { html:has(#detail:not([hidden])) #g-set { display: none; } }   /* 폰 프로젝트 상세: 홈 · 소리처럼 숨김 */
@@ -9326,18 +9327,27 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
     /* 14판-2: 폰은 목록 안 스크롤 없이 판 전체가 스크롤 — 겹쳐 둔 설정 화면 높이만큼 칸 높이를 잡아 줌 */
     if (innerWidth <= 640) { views.style.minHeight = set.offsetHeight + 'px'; o.classList.remove('nv4-more'); return; }
     views.style.minHeight = ''; var r = side.getBoundingClientRect(); o.style.maxHeight = Math.max(160, Math.floor(r.top + side.clientHeight - o.getBoundingClientRect().top - 16)) + 'px'; more(); if (!o.nv4m) { o.nv4m = 1; o.addEventListener('scroll', more, { passive: true }); } }
-  function show(s, kb) { side.classList.toggle('nv4-menu-on', !s); side.classList.toggle('nv4-set-on', !!s); if (s) { place(); fit(); } menu.setAttribute('aria-hidden', s ? 'true' : 'false'); set.setAttribute('aria-hidden', s ? 'false' : 'true'); menu.inert = !!s; set.inert = !s; gear.setAttribute('aria-expanded', s ? 'true' : 'false');
+  // 15판: 메뉴 칸(.mnav)은 글 폭만큼이라 언어를 바꾸면 폭이 바뀌어 가운데 자리가 옮겨짐(허기 · 설정이 최대 22px 밀림) →
+  //  설정 화면인 동안 칸 폭을 고정, 메뉴로 돌아갈 때 풀고 새 자리로 부드럽게(translate d3 spring)
+  var col = side.querySelector('.mnav');
+  function lockCol() { if (!col || col.style.width || side.hidden || !col.offsetWidth) return; col.style.width = col.getBoundingClientRect().width + 'px'; }
+  function unlockCol(anim) { if (!col || !col.style.width) return; var x0 = col.getBoundingClientRect().left; col.style.width = '';
+    if (!anim || RM || !col.animate) return; var dx = x0 - col.getBoundingClientRect().left;
+    if (Math.abs(dx) > .5) col.animate([{ translate: dx + 'px 0' }, { translate: '0 0' }], { duration: 420, easing: 'cubic-bezier(.34,1.56,.64,1)' }); }
+  function show(s, kb) { side.classList.toggle('nv4-menu-on', !s); side.classList.toggle('nv4-set-on', !!s); if (s) { lockCol(); place(); fit(); } else unlockCol(true); menu.setAttribute('aria-hidden', s ? 'true' : 'false'); set.setAttribute('aria-hidden', s ? 'false' : 'true'); menu.inert = !!s; set.inert = !s; gear.setAttribute('aria-expanded', s ? 'true' : 'false');
     if (s) { segAll(); if (kb) setTimeout(function () { var f = set.querySelector('.nv4-seg [aria-checked="true"]');   /* 13판-2: 키보드로 열 때만 첫 고른 칸에 초점(마우스로 열면 초점을 옮기지 않아 고리가 생기지 않음, 사용자 캡처) */ f.focus({ preventScroll: true, focusVisible: false }); }, RM ? 0 : 60);   /* 12판-2: 뒤로 원 없앰 → 첫 고르기 칸에 초점, 메뉴로는 상단 톱니 · Esc */ side.scrollTop = 0; } else { views.style.minHeight = ''; side.scrollTop = 0; gear.focus({ preventScroll: true, focusVisible: false }); } }
   set.inert = true; side.classList.add('nv4-menu-on');
   gear.addEventListener('click', function (e) { e.stopPropagation();
     if (side.classList.contains('on') && !side.hidden) { show(set.getAttribute('aria-hidden') === 'true', e.detail === 0); return; }
     // 닫혀 있으면: 판이 열리기 전에 설정 화면으로 바꿔 둠(옆으로 넘김 없이) → 판은 원래 여는 움직임 그대로, 항목만 차례로 들어옴
     pend = true; views.classList.add('nv4-now'); show(true, e.detail === 0); gm.click(); var n = 0;
-    (function wait() { if (side.classList.contains('on') && !side.hidden || n++ > 30) { pend = false; place(); fit(); segAll(); setTimeout(function () { place(); fit(); segAll(); }, 700); requestAnimationFrame(function () { views.classList.remove('nv4-now'); }); } else requestAnimationFrame(wait); })(); });
+    (function wait() { if (side.classList.contains('on') && !side.hidden || n++ > 30) { pend = false; lockCol(); place(); fit(); segAll(); setTimeout(function () { place(); fit(); segAll(); }, 700); requestAnimationFrame(function () { views.classList.remove('nv4-now'); }); } else requestAnimationFrame(wait); })(); });
   addEventListener('keydown', function (e) { if (e.key === 'Escape' && side.classList.contains('on') && set.getAttribute('aria-hidden') === 'false') { e.preventDefault(); e.stopImmediatePropagation(); show(false); } }, true);
   // 판이 닫히면 다음에 열 때 늘 메뉴부터(펼친 줄도 접음)
   gear.inert = true;   // 10판-3: 톱니는 판이 열렸을 때만(닫히면 누름 · 초점 없음)
-  new MutationObserver(function () { gear.inert = !(side.classList.contains('on') && !side.hidden); if (pend) return; if (side.hidden) {   /* 11판: 판이 다 사라진 뒤에만 메뉴로 되돌림(닫히는 동안 설정 → 메뉴 · 펼친 줄 접힘이 보이지 않게) */ if (set.getAttribute('aria-hidden') === 'false') { side.classList.add('nv4-menu-on'); side.classList.remove('nv4-set-on'); menu.setAttribute('aria-hidden', 'false'); set.setAttribute('aria-hidden', 'true'); menu.inert = false; set.inert = true; gear.setAttribute('aria-expanded', 'false'); views.style.minHeight = ''; }
+  // 15판: 톱니는 접힘 움직임 때문에 바깥을 자름(overflow hidden) → 사이트 버튼의 바깥 3px 누름 영역(::after)도 잘려 40×40. 다 나타난 뒤에만 자르지 않음(손가락 누름 46)
+  var gT; function gearIn(on) { clearTimeout(gT); if (!on) gear.classList.remove('nv4-in'); else gT = setTimeout(function () { if (side.classList.contains('on') && !side.hidden) gear.classList.add('nv4-in'); }, RM ? 0 : 520); }
+  new MutationObserver(function () { gear.inert = !(side.classList.contains('on') && !side.hidden); gearIn(!gear.inert); if (pend) return; if (side.hidden) {   /* 11판: 판이 다 사라진 뒤에만 메뉴로 되돌림(닫히는 동안 설정 → 메뉴 · 펼친 줄 접힘이 보이지 않게) */ if (set.getAttribute('aria-hidden') === 'false') { side.classList.add('nv4-menu-on'); side.classList.remove('nv4-set-on'); menu.setAttribute('aria-hidden', 'false'); set.setAttribute('aria-hidden', 'true'); menu.inert = false; set.inert = true; gear.setAttribute('aria-expanded', 'false'); views.style.minHeight = ''; } unlockCol(false);
     list.querySelectorAll('.nv4-row.open').forEach(function (r) { openRow(r, false); }); } }).observe(side, { attributes: true, attributeFilter: ['class', 'hidden'] });
 
   // 6) 고르기 알약: 진한 알약이 고른 칸으로 spring으로 미끄러짐. 소리는 상단 소리 버튼과 같은 상태(누르면 그 버튼을 대신 누름)
@@ -9380,7 +9390,7 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
     // 10판: 언어를 바꾸면 글이 흐려지며 사라졌다가(0.12초) 새 말이 흐림에서 또렷하게 차례로(0.42초, 20ms 간격) — 답 글이 나오는 모습과 같은 규칙
     // 15판: 글 · lang은 다 사라진 순간 한 번에 바꿈(전에는 글 하나마다 바꾸고 알약 다섯 개 자리를 다시 재서 배치를 수십 번 다시 계산 · 알약 움직임을 끊음). 빨리 연달아 누르면 마지막 언어만
     var ns = [].slice.call(side.querySelectorAll('[data-t]')).filter(function (n) { return n.textContent !== tr(n.getAttribute('data-t')); });
-    function swap() { side.setAttribute('lang', l || 'ko'); [].forEach.call(side.querySelectorAll('[data-t]'), function (n) { var t = tr(n.getAttribute('data-t')); if (n.textContent !== t) n.textContent = t; }); }
+    function swap() { side.setAttribute('lang', l || 'ko'); [].forEach.call(side.querySelectorAll('[data-t]'), function (n) { var t = tr(n.getAttribute('data-t')); if (n.textContent !== t) n.textContent = t; }); if (set.getAttribute('aria-hidden') === 'false') place(); }
     if (!anim || RM || !ns.length || !ns[0].animate) swap();
     else { var E = 'cubic-bezier(.22,1,.36,1)', outs = ns.map(function (n) { return n.animate([{ opacity: 1, filter: 'blur(0px)' }, { opacity: 0, filter: 'blur(4px)' }], { duration: 120, easing: E, fill: 'forwards' }); });
       outs[outs.length - 1].onfinish = function () { if (tk !== LT) { outs.forEach(function (o) { o.cancel(); }); return; }
@@ -9388,7 +9398,7 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
     gear.setAttribute('aria-label', tr('set')); gear.title = tr('set');
     var tg = list.querySelector('.nv4-tg'); if (tg) tg.setAttribute('aria-label', tr(tg.getAttribute('aria-expanded') === 'true' ? 'a_close' : 'a_open')); }
   applyLang(ST.lang || 'ko');
-  place(); segAll(); addEventListener('resize', function () { place(); if (set.getAttribute('aria-hidden') === 'false') fit(); });   // 15판: 알약은 CSS 비율이라 창 크기가 바뀌어도 다시 맞출 일 없음
+  place(); segAll(); addEventListener('resize', function () { if (col && col.style.width) { col.style.width = ''; lockCol(); } place(); if (set.getAttribute('aria-hidden') === 'false') fit(); });   // 15판: 알약은 CSS 비율이라 창 크기가 바뀌어도 다시 맞출 일 없음
 })();
 
 </script>
