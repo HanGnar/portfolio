@@ -3643,6 +3643,29 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     } catch (e) { return h; }
   };
   /* HG-VIDEO-TAIL-END */
+  /* HG-KW-TAIL · 11-17 HPP: 역량 키워드 상자(대화 시트 14판 6-8). tail() 본문은 그대로 두고 바깥에서 감싼다(영상 HG-VIDEO-TAIL 뒤).
+     역량 · 키워드 · 스킬 · 할 줄 아는 것을 물으면 답 아래 [기획 역량 · AI 역량] 탭 상자. 특정 프로젝트 이름이 들어간 질문은 빼서 그 프로젝트에 다 썼다고 보이지 않게 함 */
+  var HS_KW = [[["정의 · 기획", ["프리뷰(한 줄 소개, 문제정의, 매체, 사용자)", "프로젝트 브리프", "문제정의", "내 역할", "핵심가치", "유저 정의", "요구분석", "RFP 분석", "스코프 In/Out", "Value Proposition Canvas"]], ["조사 · 분석", ["데스크리서치(통계, 논문, 뉴스, 소셜매트릭스)", "필드리서치(1차, 2차)", "사용자 인터뷰(1차, 2차)", "심층 인터뷰", "에스노그라피", "타운워칭", "벤치마킹", "SWOT 분석", "3Cs", "트렌드 분석", "조사보고서 작성"]], ["발상 · 전략", ["페르소나 분석", "사용자 니즈·원츠 도출", "유저저니맵", "포지셔닝", "마인드매핑", "브레인스토밍", "브레인라이팅"]], ["설계 · 검증", ["요구사항 정의서", "기능 정의서", "정보구조도", "레이블링", "카드소팅", "사용 시나리오", "플로우차트", "와이어프레임", "스토리보드", "프로토타이핑", "사용성평가(1차, 2차)", "사용성테스트", "아이트래킹"]], ["협업 · 관리", ["스테이크홀더맵", "WBS", "R&R", "Decision Log", "운영정의서", "팀규칙", "회의록", "프레젠테이션", "경청", "공감", "커뮤니케이션", "SNS, 유튜브, 블로그 등 운영"]]], [["만들기", ["바이브 코딩", "백엔드 바이브 코딩", "웹 제작", "프로토타입", "디자인 시스템", "인터랙션"]], ["콘텐츠", ["장표 제작", "이미지 생성", "영상", "모션그래픽", "3D모델링"]], ["리서치 · 문서", ["딥리서치", "데이터 분석", "정보 문서화"]], ["자동화 · 검수", ["업무 자동화", "병렬 에이전트 작업", "QA"]]]];
+  var HS_KW_Q = /역량|키워드|스킬|skills?|할 ?줄 ?아|다룰 ?줄|무엇을 잘|뭘 잘|잘하는/i;
+  var hsKwTail0 = tail;
+  tail = function (r) {
+    var h = hsKwTail0.apply(this, arguments);
+    try {
+      var qs = TH ? TH.querySelectorAll('.msg-q') : [], q = qs.length ? qs[qs.length - 1].textContent : '';
+      if (!HS_KW_Q.test(q)) return h;
+      if (Object.keys(BY).some(function (k) { return BY[k] && BY[k].name && q.indexOf(BY[k].name) >= 0; }) || /parallax|패럴랙스|페럴렉스|롯데|lotte/i.test(q)) return h;
+      var id = 'hk' + Date.now().toString(36);
+      var pane = function (G, n) {
+        return '<div class="hs-kw-pn" id="' + id + '-p' + n + '" role="tabpanel" aria-labelledby="' + id + '-t' + n + '"' + (n ? ' hidden' : '') + '>' +
+          G.map(function (g, gi) { return '<div class="hs-kw-g" style="--g:' + gi + '"><h5>' + esc(g[0]) + '</h5><ul>' + g[1].map(function (k, j) { return '<li style="--j:' + j + '">' + esc(k) + '</li>'; }).join('') + '</ul></div>'; }).join('') + '</div>';
+      };
+      return '<section class="hs-kw" aria-label="역량 키워드"><div class="hs-kw-hd"><div class="hs-sg hs-kw-sg" role="tablist" aria-label="역량 고르기"><i class="hs-sg-ink" aria-hidden="true"></i>' +
+        '<button type="button" role="tab" id="' + id + '-t0" data-hs-kwtab="0" aria-selected="true" aria-controls="' + id + '-p0">기획 역량</button>' +
+        '<button type="button" role="tab" id="' + id + '-t1" data-hs-kwtab="1" aria-selected="false" aria-controls="' + id + '-p1" tabindex="-1">AI 역량</button></div></div>' +
+        '<div class="hs-kw-pv">' + pane(HS_KW[0], 0) + pane(HS_KW[1], 1) + '</div></section>' + h;
+    } catch (e) { return h; }
+  };
+  /* HG-KW-TAIL-END */
   // 11-15 시트 8단계: 답 복사(대화 영역 시트 3-10). 답 본문 글만(근거 이름 · 생각 중 점은 빼고, 목록은 줄머리 · 표는 칸 사이 탭)
   function ansText(B) {
     var c = B.cloneNode(true); c.querySelectorAll('.cite, .dots').forEach(function (n) { n.remove(); });
@@ -7582,3 +7605,48 @@ body { word-break: keep-all; overflow-wrap: break-word; }
   }, true);
 })();
 /* QA-1117-END */</script>
+<style>/* HG-KW-BEGIN · 11-17 HPP: 역량 키워드 상자(대화 시트 14판 6-8 · 18-7). 흰 상자 16 · 탭은 사이트 고르기 알약(.hs-sg) 그대로 · 키워드는 글로 이어 쓰고 가운뎃점(label-3)으로 나눔(알약 없음) */
+.hs-kw { margin: 14px 0 0; padding: 0 0 6px; border-radius: var(--ui-r-box); background: var(--ui-surface); box-shadow: var(--ui-card-sh); min-width: 0; }
+.hs-kw-hd { padding: 12px 16px 4px; }
+.hs-kw-pv { position: relative; }
+.hs-kw-g { display: grid; grid-template-columns: 104px minmax(0, 1fr); column-gap: 16px; align-items: start; padding: 8px 16px; min-width: 0; }
+.hs-kw-g h5 { margin: 0; padding-top: 2px; font-size: 13px; font-weight: 400; line-height: 1.5; letter-spacing: -.004em; color: var(--ui-label-3); word-break: keep-all; }
+.hs-kw-g ul { list-style: none; margin: 0; padding: 0; min-width: 0; line-height: 1.6; }
+.hs-kw-g li { display: inline-block; max-width: 100%; vertical-align: top; font-size: 15px; font-weight: 400; line-height: 1.6; letter-spacing: -.008em; color: var(--ui-label); word-break: keep-all;
+  animation: hs-kw-in var(--ui-d3) var(--ui-spring) backwards; animation-delay: calc(60ms + var(--g, 0) * 90ms + var(--j, 0) * 22ms); }
+.hs-kw-g li:not(:last-child)::after { content: "·"; margin: 0 8px; color: var(--ui-label-3); }
+@keyframes hs-kw-in { from { opacity: 0; filter: blur(4px); translate: 0 4px; } }
+@media (max-width: 640px) { .hs-kw-hd { padding: 12px 14px 2px; } .hs-kw-g { grid-template-columns: minmax(0, 1fr); row-gap: 8px; padding: 8px 14px; } .hs-kw-g h5 { padding-top: 0; } }
+@media (prefers-reduced-motion: reduce) { .hs-kw-g li { animation: none; } }
+/* HG-KW-END */</style>
+<script>/* HG-KW-BEGIN · 탭(기획 역량 · AI 역량): 흰 알약이 고른 탭으로(사이트 .hs-sg-ink 움직임 그대로) · 상자 높이 0.42초 ease-out · 새 키워드 차례로 흐림 → 또렷. 사이트 함수는 부르지도 고치지도 않음 */
+(function () {
+  var RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches, EO = 'cubic-bezier(.22,1,.36,1)', SP = 'cubic-bezier(.34,1.56,.64,1)';
+  function place(sg, instant) { var ink = sg && sg.querySelector('.hs-sg-ink'), cur = sg && sg.querySelector('[aria-selected="true"]'); if (!ink || !cur || !cur.offsetWidth) return;
+    if (instant) ink.style.transition = 'none'; ink.style.width = cur.offsetWidth + 'px'; ink.style.transform = 'translateX(' + cur.offsetLeft + 'px)'; if (instant) { void ink.offsetWidth; ink.style.transition = ''; } }
+  function pick(b, focus) {
+    var box = b.closest('.hs-kw'), sg = b.closest('.hs-kw-sg'), pv = box.querySelector('.hs-kw-pv'), i = +b.getAttribute('data-hs-kwtab');
+    if (focus) b.focus(); if (b.getAttribute('aria-selected') === 'true') return;
+    sg.querySelectorAll('[data-hs-kwtab]').forEach(function (x, k) { x.setAttribute('aria-selected', String(k === i)); x.tabIndex = k === i ? 0 : -1; });
+    place(sg);
+    var h0 = pv.offsetHeight, show = document.getElementById(b.getAttribute('aria-controls'));
+    pv.getAnimations && pv.getAnimations().forEach(function (a) { a.cancel(); });
+    pv.querySelectorAll('.hs-kw-pn').forEach(function (p) { p.hidden = p !== show; });
+    if (RM || !pv.animate) return;
+    var h1 = pv.offsetHeight; pv.style.overflow = 'hidden';
+    pv.animate([{ height: h0 + 'px' }, { height: h1 + 'px' }], { duration: 420, easing: EO }).finished.then(function () { pv.style.overflow = ''; }, function () {});
+    show.querySelectorAll('.hs-kw-g').forEach(function (g, gi) { g.querySelectorAll('li').forEach(function (li, j) { li.style.animation = 'none';
+      li.animate([{ opacity: 0, filter: 'blur(4px)', translate: '0 4px' }, { opacity: 1, filter: 'blur(0px)', translate: '0 0' }], { duration: 420, easing: SP, delay: 40 + gi * 70 + j * 18, fill: 'backwards' }); }); });
+  }
+  document.addEventListener('click', function (e) { var b = e.target && e.target.closest ? e.target.closest('[data-hs-kwtab]') : null; if (b) pick(b); });
+  document.addEventListener('keydown', function (e) { var b = e.target && e.target.closest ? e.target.closest('[data-hs-kwtab]') : null; if (!b) return;
+    var bs = [].slice.call(b.closest('.hs-kw-sg').querySelectorAll('[data-hs-kwtab]')), k = bs.indexOf(b);
+    var n = e.key === 'ArrowRight' ? k + 1 : e.key === 'ArrowLeft' ? k - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? bs.length - 1 : null; if (n === null) return;
+    e.preventDefault(); pick(bs[(n + bs.length) % bs.length], true); });
+  // 상자가 새로 그려지면 흰 알약 자리 잡기(답이 끝나 붙을 때 · 저장된 대화를 다시 그릴 때)
+  function scan() { document.querySelectorAll('.hs-kw-sg:not([data-hs-ok])').forEach(function (sg) { if (!sg.offsetWidth) return; sg.setAttribute('data-hs-ok', '1'); place(sg, true); }); }
+  if (window.MutationObserver) new MutationObserver(function () { if (document.querySelector('.hs-kw-sg:not([data-hs-ok])')) requestAnimationFrame(scan); }).observe(document.body, { childList: true, subtree: true });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { document.querySelectorAll('.hs-kw-sg').forEach(function (sg) { place(sg, true); }); });
+  window.addEventListener('resize', function () { document.querySelectorAll('.hs-kw-sg').forEach(function (sg) { place(sg, true); }); });
+})();
+/* HG-KW-END */</script>
