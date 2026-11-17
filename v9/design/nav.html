@@ -8456,8 +8456,8 @@ const b=HUGI_MAKE(document.getElementById('hugi-orb'),{prefix:'ho',hello:false,b
 @media (prefers-reduced-motion: reduce) { .hgb, .hgb.on { transition-duration: 1ms; } .hgb-m.wait::after { animation: none; width: auto; } }
 /* HG-PREFS-M{ */ .hgb:where(html[data-motion="less"], html[data-motion="less"] *), .hgb.on:where(html[data-motion="less"], html[data-motion="less"] *) {transition-duration: 1ms; } .hgb-m.wait:where(html[data-motion="less"], html[data-motion="less"] *)::after {animation: none; width: auto; } /* }HG-PREFS-M */
 /* 프로젝트 상세(화면을 덮는 판)를 보는 동안에도 허기 버튼으로 이어서 물을 수 있게 내비를 상세 위로. 모바일은 상세의 "← 프로젝트 목록"과 겹치지 않게 메뉴 · 허기만 오른쪽에 */
-html:has(#detail:not([hidden])) .hdr { z-index: 41; }
-@media (max-width: 640px) { html:has(#detail:not([hidden])) .hdr .wrap { justify-content: flex-end; padding-right: max(16px, env(safe-area-inset-right, 0px)); } html:has(#detail:not([hidden])) #g-home, html:has(#detail:not([hidden])) #g-voice { display: none; } }
+html:has(#detail:not([hidden])) .hdr { z-index: 50; }   /* 11-18: 41이면 메뉴 판(46) 뒤로 숨어 X를 못 누름 → 홈과 같은 50 */
+@media (max-width: 640px) { .dbar .back { width: 40px; height: 40px; margin-left: -8px; justify-content: center; gap: 0; font-size: 0; border-radius: 50%; } .dbar .back .ms { font-size: 22px; } .dbar .t { display: none; } }   /* 11-18: 폰 상세도 내비 버튼 그대로(홈 · 소리 숨김 없앰) → 뒤로는 화살표 원(이름은 화면 읽기용으로 남음) */
 /* HG-BUBBLE-END */</style>
 <script>/* HG-BUBBLE-BEGIN · 허기 말풍선 대화 + 홈 새로고침. 묻기는 첫 화면 질문 함수(HG_MAIN.ask)를 그대로 써서 대화 · 저장 · 허기 버튼 상태 · 소리가 첫 화면과 같다 */
 (function () {
@@ -8875,7 +8875,6 @@ html.hg-page { overflow: visible; }
 #g-set.nv4-in { overflow: visible; }   /* 15판: 다 나타난 뒤엔 바깥 누름 영역(::after -3px)이 잘리지 않게 */
 #g-set svg.gi { rotate: none !important; transition: none !important; }
 @media (hover: hover) { .gnb #g-set:hover:not(:active) { transform: none !important; box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh) !important; } }
-@media (max-width: 640px) { html:has(#detail:not([hidden])) #g-set { display: none; } }   /* 폰 프로젝트 상세: 홈 · 소리처럼 숨김 */
 #nv4-set-h:focus { outline: none; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -9626,7 +9625,6 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 #g-set.nv4-in { overflow: visible; }   /* 15판: 다 나타난 뒤엔 바깥 누름 영역(::after -3px)이 잘리지 않게 */
 #g-set svg.gi { rotate: none !important; transition: none !important; }
 @media (hover: hover) { .gnb #g-set:hover:not(:active) { transform: none !important; box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh) !important; } }
-@media (max-width: 640px) { html:has(#detail:not([hidden])) #g-set { display: none; } }   /* 폰 프로젝트 상세: 홈 · 소리처럼 숨김 */
 #nv4-set-h:focus { outline: none; }
 
 @media (prefers-reduced-motion: reduce) {
