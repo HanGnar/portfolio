@@ -22,6 +22,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://hungry-ai.publichk03.workers.dev" crossorigin><!-- QA 11-17 속도: 답 서버 연결 미리 -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap">
 <link rel="preload" href="files/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>   <!-- 11-15 시트 2차: 히어로 · 대화 영역 글꼴을 먼저 받아 첫 화면에서 글꼴이 바뀌어 보이는 것을 줄임 -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block">
@@ -3409,7 +3410,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     if (opt.doc) body.doc = opt.doc;
     if (opt.file) body.file = opt.file;
     if (opt.mode) body.mode = opt.mode;
-    return fetch(AI_ENDPOINT, { method: 'POST', headers: { 'content-type': 'application/json' }, signal: ctl.signal, body: JSON.stringify(body) })
+    return fetch(AI_ENDPOINT, { method: 'POST', headers: { 'content-type': 'text/plain;charset=UTF-8' }, signal: ctl.signal, body: JSON.stringify(body) })   // QA 11-17 속도: 사전 요청(OPTIONS) 없이 바로
       .then(function (r) {
         if (!r.ok) return null;
         if (!/event-stream/.test(r.headers.get('content-type') || '') || !r.body) return r.json();
@@ -4216,7 +4217,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     VOICE.play = api;
     var pend = A ? VOICE.pending : null; VOICE.pending = null;
     if (pend) ctl.signal.addEventListener('abort', function () { try { pend.rd.cancel(); } catch (e) {} });
-    var src = pend ? Promise.resolve(pend) : VOICE.relay ? Promise.resolve(relayReader(said || [text], voice)) : fetch(TTS_ENDPOINT, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: text, voice: voice }), signal: ctl.signal })
+    var src = pend ? Promise.resolve(pend) : VOICE.relay ? Promise.resolve(relayReader(said || [text], voice)) : fetch(TTS_ENDPOINT, { method: 'POST', headers: { 'content-type': 'text/plain;charset=UTF-8' }, body: JSON.stringify({ text: text, voice: voice }), signal: ctl.signal })
       .then(function (r) { if (!r.ok || !r.body) throw 0; return { rd: r.body.getReader(), dec: new TextDecoder(), buf: '' }; });
     return src
       .then(function (p) {
@@ -7660,3 +7661,20 @@ html.qa-fly #hugi-menu .hugi-char { pointer-events: none; }
   mb.addEventListener('click', function () { var R = document.documentElement; R.classList.add('qa-fly'); clearTimeout(t); t = setTimeout(function () { R.classList.remove('qa-fly'); }, 700); }, true);
 })();
 /* QA-1117B-END */</script>
+<script>/* QA-1117C-BEGIN · 속도: 질문창 · 말풍선 입력에 들어가면 답 서버(Worker) 연결을 미리 열어 둠.
+   11-17 측정: 첫 질문은 연결(TLS) 0.35초가 더 들었음. 주소는 사이트 AI_ENDPOINT와 같게 둘 것 */
+(function () {
+  var last = 0;   // 요청을 보내면 400이 콘솔 오류로 남아서, 연결만 다시 여는 preconnect를 씀(쓰지 않은 연결은 브라우저가 약 10초 뒤 닫으므로 들어갈 때마다 10초 간격으로)
+  document.addEventListener('focusin', function (e) {
+    if (!e.target || !e.target.matches || !e.target.matches('#ask-' + 'input, .hgb-in') || Date.now() - last < 9000) return; last = Date.now();
+    try { var l = document.createElement('link'); l.rel = 'preconnect'; l.href = 'https://hungry-ai.publichk03.workers.dev'; l.crossOrigin = ''; document.head.appendChild(l); setTimeout(function () { l.remove(); }, 9000); } catch (x) {}
+  });
+})();
+/* QA-1117C-END */</script>
+<style>/* QA-1117C 화면: 손가락 화면 누름 영역 44(QA R1) · PARALLAX "한눈에" 화살표 세로 가운데(QA V4) */
+@media (pointer: coarse) {
+  .plx button { position: relative; }
+  .plx button::after, #g-ai::after { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: max(100%, 44px); transform: translate(-50%, -50%); }
+}
+.plx .five li a .go { align-self: center; }
+/* QA-1117C 화면 끝 */</style>
