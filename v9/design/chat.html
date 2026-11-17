@@ -971,6 +971,15 @@ html.kb .tv{bottom:var(--kb,0px)}
 .kw-g{grid-template-columns:104px minmax(0,1fr)}
 .kw-pv{position:relative}
 @media (max-width:640px){.kw-hd{padding:12px 14px 2px}.kw-g{grid-template-columns:minmax(0,1fr)}}
+/* 14판(11-17): 알약 없앰 — 사용자 "알약처럼 디자인된 게 너무 많아서 더러워보여 알약 디자인 빼주고 깔끔하게 보이도록 해줘"
+   키워드는 이력서 직무역량 칸(.cv-kw)처럼 글로 이어 씀: Subhead 15/400 label, 사이에 가운뎃점 label-3(좌우 8). 바탕 · 높이 · 모서리 없음, 낱말 단위 줄바꿈
+   묶음 사이 안쪽 8 / 16(묶음 이름은 첫 줄과 같은 높이) */
+.kw-g{padding:8px 16px}
+.kw-g h5{padding-top:2px}
+.kw-g ul{display:block;line-height:1.6}
+.kw-g li{display:inline-block;min-height:0;padding:0;border-radius:0;background:none;vertical-align:top;line-height:1.6;max-width:100%}
+.kw-g li:not(:last-child)::after{content:"·";margin:0 8px;color:var(--label-3)}
+@media (max-width:640px){.kw-g{padding:8px 14px}.kw-g h5{padding-top:0}}
 
 /* HBTN-CSS-BEGIN */
 /* 허기 알약 버튼: 허기 몸을 가로로 늘린 알약이 그대로 버튼(11-13). 크기 · 비율은 rig.js 값 표의 pill에서(여기 크기는 JS가 덮음) */
@@ -1459,11 +1468,11 @@ html.kb .tv{bottom:var(--kb,0px)}
         </div></div>
         <div class="kw-pv">
         <div class="kw-pn" id="kw-p1" role="tabpanel" aria-labelledby="kw-t1">
-          <div class="kw-g" style="--g:0"><h5>정의 · 기획</h5><ul><li style="--j:0">프리뷰(한 줄 소개 · 문제정의 · 매체 · 사용자)</li><li style="--j:1">프로젝트 브리프</li><li style="--j:2">문제정의</li><li style="--j:3">내 역할</li><li style="--j:4">핵심가치</li><li style="--j:5">유저 정의</li><li style="--j:6">요구분석</li><li style="--j:7">RFP 분석</li><li style="--j:8">스코프 In · Out</li><li style="--j:9">Value Proposition Canvas</li></ul></div>
-          <div class="kw-g" style="--g:1"><h5>조사 · 분석</h5><ul><li style="--j:0">데스크리서치(통계 · 논문 · 뉴스 · 소셜매트릭스)</li><li style="--j:1">필드리서치(1차 · 2차)</li><li style="--j:2">사용자 인터뷰(1차 · 2차)</li><li style="--j:3">심층 인터뷰</li><li style="--j:4">에스노그라피</li><li style="--j:5">타운워칭</li><li style="--j:6">벤치마킹</li><li style="--j:7">SWOT 분석</li><li style="--j:8">3Cs</li><li style="--j:9">트렌드 분석</li><li style="--j:10">조사보고서 작성</li></ul></div>
-          <div class="kw-g" style="--g:2"><h5>발상 · 전략</h5><ul><li style="--j:0">페르소나 분석</li><li style="--j:1">사용자 니즈 · 원츠 도출</li><li style="--j:2">유저저니맵</li><li style="--j:3">포지셔닝</li><li style="--j:4">마인드매핑</li><li style="--j:5">브레인스토밍</li><li style="--j:6">브레인라이팅</li></ul></div>
-          <div class="kw-g" style="--g:3"><h5>설계 · 검증</h5><ul><li style="--j:0">요구사항 정의서</li><li style="--j:1">기능 정의서</li><li style="--j:2">정보구조도</li><li style="--j:3">레이블링</li><li style="--j:4">카드소팅</li><li style="--j:5">사용 시나리오</li><li style="--j:6">플로우차트</li><li style="--j:7">와이어프레임</li><li style="--j:8">스토리보드</li><li style="--j:9">프로토타이핑</li><li style="--j:10">사용성평가(1차 · 2차)</li><li style="--j:11">사용성테스트</li><li style="--j:12">아이트래킹</li></ul></div>
-          <div class="kw-g" style="--g:4"><h5>협업 · 관리</h5><ul><li style="--j:0">스테이크홀더맵</li><li style="--j:1">WBS</li><li style="--j:2">R&amp;R</li><li style="--j:3">Decision Log</li><li style="--j:4">운영정의서</li><li style="--j:5">팀규칙</li><li style="--j:6">회의록</li><li style="--j:7">프레젠테이션</li><li style="--j:8">경청</li><li style="--j:9">공감</li><li style="--j:10">커뮤니케이션</li><li style="--j:11">SNS · 유튜브 · 블로그 등 운영</li></ul></div>
+          <div class="kw-g" style="--g:0"><h5>정의 · 기획</h5><ul><li style="--j:0">프리뷰(한 줄 소개, 문제정의, 매체, 사용자)</li><li style="--j:1">프로젝트 브리프</li><li style="--j:2">문제정의</li><li style="--j:3">내 역할</li><li style="--j:4">핵심가치</li><li style="--j:5">유저 정의</li><li style="--j:6">요구분석</li><li style="--j:7">RFP 분석</li><li style="--j:8">스코프 In/Out</li><li style="--j:9">Value Proposition Canvas</li></ul></div>
+          <div class="kw-g" style="--g:1"><h5>조사 · 분석</h5><ul><li style="--j:0">데스크리서치(통계, 논문, 뉴스, 소셜매트릭스)</li><li style="--j:1">필드리서치(1차, 2차)</li><li style="--j:2">사용자 인터뷰(1차, 2차)</li><li style="--j:3">심층 인터뷰</li><li style="--j:4">에스노그라피</li><li style="--j:5">타운워칭</li><li style="--j:6">벤치마킹</li><li style="--j:7">SWOT 분석</li><li style="--j:8">3Cs</li><li style="--j:9">트렌드 분석</li><li style="--j:10">조사보고서 작성</li></ul></div>
+          <div class="kw-g" style="--g:2"><h5>발상 · 전략</h5><ul><li style="--j:0">페르소나 분석</li><li style="--j:1">사용자 니즈·원츠 도출</li><li style="--j:2">유저저니맵</li><li style="--j:3">포지셔닝</li><li style="--j:4">마인드매핑</li><li style="--j:5">브레인스토밍</li><li style="--j:6">브레인라이팅</li></ul></div>
+          <div class="kw-g" style="--g:3"><h5>설계 · 검증</h5><ul><li style="--j:0">요구사항 정의서</li><li style="--j:1">기능 정의서</li><li style="--j:2">정보구조도</li><li style="--j:3">레이블링</li><li style="--j:4">카드소팅</li><li style="--j:5">사용 시나리오</li><li style="--j:6">플로우차트</li><li style="--j:7">와이어프레임</li><li style="--j:8">스토리보드</li><li style="--j:9">프로토타이핑</li><li style="--j:10">사용성평가(1차, 2차)</li><li style="--j:11">사용성테스트</li><li style="--j:12">아이트래킹</li></ul></div>
+          <div class="kw-g" style="--g:4"><h5>협업 · 관리</h5><ul><li style="--j:0">스테이크홀더맵</li><li style="--j:1">WBS</li><li style="--j:2">R&amp;R</li><li style="--j:3">Decision Log</li><li style="--j:4">운영정의서</li><li style="--j:5">팀규칙</li><li style="--j:6">회의록</li><li style="--j:7">프레젠테이션</li><li style="--j:8">경청</li><li style="--j:9">공감</li><li style="--j:10">커뮤니케이션</li><li style="--j:11">SNS, 유튜브, 블로그 등 운영</li></ul></div>
         </div>
         <div class="kw-pn" id="kw-p2" role="tabpanel" aria-labelledby="kw-t2" hidden>
           <div class="kw-g" style="--g:0"><h5>만들기</h5><ul><li style="--j:0">바이브 코딩</li><li style="--j:1">백엔드 바이브 코딩</li><li style="--j:2">웹 제작</li><li style="--j:3">프로토타입</li><li style="--j:4">디자인 시스템</li><li style="--j:5">인터랙션</li></ul></div>
