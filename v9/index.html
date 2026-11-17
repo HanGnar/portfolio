@@ -17,6 +17,8 @@
   if (!seen && !saved && !location.hash) R.classList.add('hg-intro', 'hg-intro-t', 'hg-intro-wait', 'hg-intro-a', 'm-hugi-gone', 'm-hugi-out'); })();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">   <!-- 2026-11-13: 없어서 휴대폰이 데스크톱 폭(980px)으로 줄여 보여 줬음 -->
 <title>헝그리한정민</title>
+<link rel="icon" href="data:,"><!-- QA 11-17: 사이트 아이콘 파일이 없어 /favicon.ico 404가 콘솔 오류로 잡히던 것 막음 -->
+
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,7 +39,7 @@
   --img: #E9E9EB;
   --hero-bg: #F8F9FA; --glow: #CFE0FA; --mk: #FDE293;
   --md-shadow: rgba(0, 0, 0, .12);
-  --md-font: "Google Sans", "Noto Sans KR", "Apple SD Gothic Neo", system-ui, sans-serif;
+  --md-font: "Pretendard Variable", Pretendard, "Google Sans", "Noto Sans KR", "Apple SD Gothic Neo", system-ui, sans-serif;   /* QA 11-17: 디자인 시스템 글꼴 Pretendard를 소개 · 메뉴 · 상세에도 */
   --md-m: 12px; --md-l: 16px; --md-xl: 28px; --md-full: 999px;
   --md-ease: cubic-bezier(.2, 0, 0, 1); --ease-out: cubic-bezier(.05, .7, .1, 1); --ease-in: cubic-bezier(.3, 0, .8, .15);
   --sp-sec: 112px; --sp-head: 40px;
@@ -1657,7 +1659,7 @@ html.hg-intro-t .intro-typed { display: block; }
     <div class="modebar"><div class="seg" id="mode" role="group" aria-label="보기 방식"><button type="button" data-v="sum" aria-pressed="true">요약</button><button type="button" data-v="full" aria-pressed="false">자세히</button></div></div>
     <p class="kind">협업 · 서비스 기획</p>
     <h1 id="h1">PARALLAX</h1>
-    <p class="line">사건현장에서 본 것이 다음 사람에게 <span>빠지지 않고 넘어가도록</span> 만든 경찰 작전 지원 서비스입니다</p>
+    <p class="line">사건 현장에서 본 것이 다음 사람에게 <span>빠지지 않고 넘어가도록</span> 만든 경찰 작전 지원 서비스입니다</p>
     <dl class="attrs">
       <div><dt>기간</dt><dd><span class="ph">[입력] 0000.00 – 00</span></dd></div>
       <div><dt>팀</dt><dd>7명 · 계원예대</dd></div>
@@ -1991,7 +1993,7 @@ html.hg-intro-t .intro-typed { display: block; }
 <script type="application/json" id="knowledge">
 {
   "projects": [
-    {"id": "parallax", "name": "PARALLAX", "groups": ["featured", "collab"], "kind": "협업 · 서비스 기획", "line": "사건현장에서 본 것이 다음 사람에게 빠지지 않고 넘어가도록 만든 경찰 작전 지원 서비스", "period": "0000.00 – 00", "team": "7명", "role": "[더미] 담당 업무", "thumb": "plx/hero.jpg", "tags": ["리서치", "문제 정의", "정보구조", "프로토타입"]},
+    {"id": "parallax", "name": "PARALLAX", "groups": ["featured", "collab"], "kind": "협업 · 서비스 기획", "line": "사건 현장에서 본 것이 다음 사람에게 빠지지 않고 넘어가도록 만든 경찰 작전 지원 서비스", "period": "0000.00 – 00", "team": "7명", "role": "[더미] 담당 업무", "thumb": "plx/hero.jpg", "tags": ["리서치", "문제 정의", "정보구조", "프로토타입"]},
     {"id": "uuji", "name": "유지", "groups": ["collab"], "kind": "협업 · 앱 기획", "line": "[더미] 프로젝트 한 줄 소개가 들어갈 자리예요.", "period": "0000.00 – 00", "team": "0명", "role": "[더미] 담당 업무", "tags": ["AI 기획", "리서치"]},
     {"id": "lotte", "name": "롯데시네마", "groups": ["featured", "plan"], "kind": "기획 · UX 개선", "line": "[더미] 프로젝트 한 줄 소개가 들어갈 자리예요.", "period": "0000.00 – 00", "team": "0명", "role": "[더미] 담당 업무", "tags": ["사용성 평가", "아이트래킹", "화면설계서"]},
     {"id": "korail", "name": "코레일톡 UX 개선", "groups": ["plan"], "kind": "기획 · UX 개선", "line": "[더미] 프로젝트 한 줄 소개가 들어갈 자리예요.", "period": "0000.00 – 00", "team": "0명", "role": "[더미] 담당 업무", "tags": ["문제 정의", "사용성 평가"]},
@@ -2830,7 +2832,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     { q: '헝그리한의 대표 프로젝트가 뭔지 알고 싶어', keys: ['대표', '메인', '제일 자신'],
       s: [['대표 프로젝트는 롯데시네마와 PARALLAX예요.', []],
           ['롯데시네마는 [더미] 이런 문제를 풀었어요.', ['lotte-problem']],
-          ['PARALLAX는 사건현장의 정보가 다음 인력에게 빠짐없이 넘어가지 않는 문제를 풀었어요.', ['parallax-problem']]],
+          ['PARALLAX는 사건 현장의 정보가 다음 인력에게 빠짐없이 넘어가지 않는 문제를 풀었어요.', ['parallax-problem']]],
       act: ['open', 'lotte', '롯데시네마 자세히 보기'], ask: 'team' },
     { q: '어떤 기획자인지 짧게 알려줘', keys: ['어떤 기획자', '소개', '누구', '어떤 사람'],
       s: [['[더미] 한 문장 자기소개가 들어가요.', ['about-intro']],
@@ -2918,12 +2920,15 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   function animWorks() {
     if (RM || !pjGrid.animate) return;
     pjCards().filter(function (c) { return !c.classList.contains('out'); }).forEach(function (c, i) {
-      pjBusy.push(c.animate([{ opacity: 0, transform: 'scale(.92)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: i * 40, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'backwards' }));
+      pjBusy.push(c.animate([{ opacity: 0, transform: 'scale(.96)' }, { opacity: 1, transform: 'none' }], { duration: 480, delay: i * 40, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' }));   // 시트 8판: 지나침 없이 감속해 제자리
     });
   }
   /* 분류 바꾸기(시트 5판). 남는 박스가 모두 같은 줄이면: 빠지는 박스 줄며 사라짐(0.24초) → 남는 박스 옆으로 미끄러짐(spring 0.42초) → 새 박스 차례로 나타남.
      남는 박스 하나라도 줄을 바꾸면: 보이는 박스 모두 사라지고 → 새 분류 박스가 처음 화면처럼 나타남. 빨리 또 누르면 하던 움직임 지우고(gen 번호) 지금 자리에서 새로 */
   function pjFilter() {
+    /* QA 11-17: 빠르게 연달아 누르면 하던 움직임을 지울 때 박스가 한 프레임 다시 보였음 → 지우기 전에 지금 투명도 · 크기를 재 두고 거기서 이어 감 */
+    var cur = new Map();
+    pjBusy.forEach(function (a) { var t = a.effect && a.effect.target; if (t && !cur.has(t)) { var cs = getComputedStyle(t); cur.set(t, { opacity: +cs.opacity, transform: cs.transform && cs.transform !== 'none' ? cs.transform : 'none' }); } });
     var my = ++pjGen; pjBusy.forEach(function (a) { try { a.cancel(); } catch (e) {} }); pjBusy = [];
     var cards = pjCards(), want = function (c) { return pjIn(BY[c.dataset.open], FILTER); };
     var shown = cards.filter(function (c) { return !c.classList.contains('out'); });
@@ -2933,23 +2938,28 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var fresh = cards.some(function (c) { var a = before.get(c); return a && want(c) && Math.abs(c.getBoundingClientRect().top - a.top) >= 1; });
     cards.forEach(function (c, i) { c.classList.toggle('out', was[i]); });
     var leaving = fresh ? shown : shown.filter(function (c) { return !want(c); });
+    var holds = [];
+    cur.forEach(function (cv, c) { if (leaving.indexOf(c) < 0 && cv.opacity < .99 && c.animate) { var k = { opacity: cv.opacity, transform: cv.transform }; holds.push(c.animate([k, k], { duration: 1000, fill: 'forwards' })); } });
+    pjBusy = pjBusy.concat(holds);
     var go = function () {
+      holds.forEach(function (a) { try { a.cancel(); } catch (e) {} });
       var entering = [];
-      cards.forEach(function (c) { var w = want(c), o = c.classList.contains('out'); c.classList.toggle('out', !w); if (w && (o || fresh)) entering.push(c); });
+      cards.forEach(function (c) { var w = want(c), o = c.classList.contains('out'), cv = cur.get(c); c.classList.toggle('out', !w); if (w && (o || fresh || (cv && cv.opacity < .99))) entering.push(c); });
       if (RM || !pjGrid.animate) return;
       var slid = false;
       if (!fresh) cards.forEach(function (c) {
         var a = before.get(c); if (!a || c.classList.contains('out') || entering.indexOf(c) > -1) return;
         var dx = a.left - c.getBoundingClientRect().left;
-        // 11-16 사용자 "옆 박스와 충돌 … 쫀득한 인터랙션 자체는 좋은데 겹쳐서 어색": spring 곡선은 거리의 약 10%를 지나쳐(535px면 53px) 간격 24px를 넘어 옆 박스를 침범했음 → 감속해 도착 → 거리와 상관없이 최대 6px만 지나쳤다 돌아옴(간격 안)
-        if (Math.abs(dx) >= 1) { slid = true; var ov = -Math.sign(dx) * Math.min(6, Math.abs(dx) * .04);
-          pjBusy.push(c.animate([{ transform: 'translateX(' + dx + 'px)', easing: 'cubic-bezier(.22,1,.36,1)' }, { transform: 'translateX(' + ov + 'px)', offset: .72, easing: 'cubic-bezier(.4,0,.2,1)' }, { transform: 'none' }], { duration: 480 })); }
+        // 11-16 사용자 "옆 박스와 충돌 …" → 7판 최대 6px 지나침. 11-16 사용자 "조금 더 갔다가 제자리로 돌아오는 인터렉션 말고 바로 자리에서 멈추게 … 속도를 조절해서 자연스럽게" → 시트 8판: 지나침 없이 빠르게 출발해 길게 감속(0.56초)
+        if (Math.abs(dx) >= 1) { slid = true;
+          pjBusy.push(c.animate([{ transform: 'translateX(' + dx + 'px)' }, { transform: 'none' }], { duration: 560, easing: 'cubic-bezier(.22,1,.36,1)' })); }
       });
-      // 새로 나타나는 박스: 옆 박스가 미끄러져 거의 자리 잡은 뒤(0.22초) 나타남. 커지며 지나치는 크기도 1.006배까지만(옆 박스와 안 겹침)
-      entering.forEach(function (c, i) { pjBusy.push(c.animate([{ opacity: 0, transform: 'scale(.94)', easing: 'cubic-bezier(.22,1,.36,1)' }, { opacity: 1, transform: 'scale(1.006)', offset: .7, easing: 'cubic-bezier(.4,0,.2,1)' }, { opacity: 1, transform: 'none' }], { duration: 460, delay: (slid ? 220 : 0) + i * 40, fill: 'backwards' })); });
+      // 새로 나타나는 박스: 옆 박스가 거의 자리 잡은 뒤(0.2초) 1배를 넘지 않고 커지며 나타남(시트 8판). 사라지던 중이던 박스는 지금 투명도에서 이어 나타남
+      entering.forEach(function (c, i) { var cv = cur.get(c), from = cv && cv.opacity < .99 ? { opacity: cv.opacity, transform: cv.transform } : { opacity: 0, transform: 'scale(.96)' };
+        pjBusy.push(c.animate([from, { opacity: 1, transform: 'none' }], { duration: 480, easing: 'cubic-bezier(.22,1,.36,1)', delay: (slid ? 200 : 0) + i * 40, fill: 'backwards' })); });
     };
     if (RM || !pjGrid.animate || !leaving.length) { go(); return; }
-    var outs = leaving.map(function (c) { return c.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.92)' }], { duration: 240, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' }); });
+    var outs = leaving.map(function (c) { var cv = cur.get(c); return c.animate([cv ? { opacity: cv.opacity, transform: cv.transform } : { opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.92)' }], { duration: 240, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' }); });
     pjBusy = pjBusy.concat(outs);
     outs[0].finished.then(function () { if (my !== pjGen) return; outs.forEach(function (a) { try { a.cancel(); } catch (e) {} }); go(); }, function () {});
   }
@@ -3172,9 +3182,9 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   }
   var IA = {
     'AR 글래스': { t: '경찰의 시선으로 현장을 기록하고, 흩어진 장비를 하나로 합칩니다', x: '\n사건\n  현재 사건명\n  우선 확인 사항\n  알림\n  담당 임무 상태\n지도\n  현재 위치\n  이동 방향·거리\n  출입구·층·구역 표기\n공간*\n  히트맵\n  공간 트래킹\n  구역별 확인 상태\n기록\n  영상 기록 시작·종료\n  사진 캡처\n  음성 메모\n  빠른 상황 표식\n    확인 / 위험 / 지원 요청 / 미확인\n  회의록\n교신\n  짧은 지휘 지시\n  통화 상태\n  상황실 연결 상태\n인계\n  기록 전송 상태\n  공유 범위·공유 시작·종료\n  후속 인력 인계 여부\nAI\n  요약\n  탐색\n' },
-    '폴더블 업무폰': { t: '현장 기록을 큰 화면에서 검토하고, 복귀 전에 인계와 보고를 마칩니다', x: '\n공통\n  사건변경\n  현장 알림\n  내 프로필\n  PARALLAX 단추\n홈\n  사건 브리핑\n  현재 수행해야 할 임무\n  현재 현장 인력\n  사건 하이라이트\n  메모\n지도\n  표시 요소\n  지도 표식\n  현장 건물\n  이동 시연\n기록\n  인계 요청에 걸린 장면\n  원본 영상\n  장면 상세\n  장면 작업\n메시지\n  대화방 목록\n  대화\n  메시지 입력\n보고서*\n  현장 기록 전체\n  보고서 쓰기\n사건 되짚기\n  장면 카드\n  지도\n  장면 조작\nPARALLAX AI\n  PARALLAX AI에게 묻기\n  답\n  화면 조작 중\n' },
+    '폴더블 업무폰': { t: '현장 기록을 큰 화면에서 검토하고, 복귀 전에 인계와 보고를 마칩니다', x: '\n공통\n  사건 변경\n  현장 알림\n  내 프로필\n  PARALLAX 단추\n홈\n  사건 브리핑\n  현재 수행해야 할 임무\n  현재 현장 인력\n  사건 하이라이트\n  메모\n지도\n  표시 요소\n  지도 표식\n  현장 건물\n  이동 시연\n기록\n  인계 요청에 걸린 장면\n  원본 영상\n  장면 상세\n  장면 작업\n메시지\n  대화방 목록\n  대화\n  메시지 입력\n보고서*\n  현장 기록 전체\n  보고서 쓰기\n사건 되짚기\n  장면 카드\n  지도\n  장면 조작\nPARALLAX AI\n  PARALLAX AI에게 묻기\n  답\n  화면 조작 중\n' },
     '차량용 대시보드': { t: '이동 중에 상황을 파악하고, 도착 전에 대응을 준비합니다', x: '\n주행\n  주행 정보\n  길 안내\n  PARALLAX AI 단추\n작전 지도\n  구역 필터\n  3D 지도\n  지도 도구\n  구역 현황\n  사건 카드\n현장인력\n  인력 카드\n  긴급 연락\nPARALLAX AI*\n  음성 명령\n  작업 실행\n상황실 메시지\n  대화 기록\n  메시지 입력\n  음성 입력\nAR 글래스\n  공간 3D\n  하이라이트\n  타임라인\n하단 메뉴\n  앱 아이콘\n  패널 자리\n  공조\n  연결 상태·시각\n' },
-    '상황실 대시보드': { t: '여러 사건현장의 정보를 보고, 무엇이 먼저인지 빨리 판단합니다', x: '\n전체 상황*\n  상황 요약\n  사건 브리핑\n  사건 목록\n작전 지도\n  장소, 주소 검색\n  지도\n  사건 상세\n지도 화면\n  지도 종류\n  표식\n  지도 위 카드\n  현장 대화 말풍선\n공간 3D\n  공간 3D 보기\n  공간 3D 시점\n  공간 3D CCTV\n  공간 기록\n  후속팀에 인계\n현장 정보 전송\n  받는 대상 선택\n  대화 내역\n  알림 기록\n  작성\n기록·회의록\n  인계 기록\n  대화 기록\n  회의록\n  조치 기록\n하이라이트*\n  사건 선택\n  장면 화면\n  장면 정보·근거\n  타임라인\n  기록 초안 작성\nPARALLAX AI\n  대화\n  진행 단계 목록\n  답 카드\n화면 모드\n  지도만 보기\n  격자 모드\n  창\n' }
+    '상황실 대시보드': { t: '여러 사건 현장의 정보를 보고, 무엇이 먼저인지 빨리 판단합니다', x: '\n전체 상황*\n  상황 요약\n  사건 브리핑\n  사건 목록\n작전 지도\n  장소, 주소 검색\n  지도\n  사건 상세\n지도 화면\n  지도 종류\n  표식\n  지도 위 카드\n  현장 대화 말풍선\n공간 3D\n  공간 3D 보기\n  공간 3D 시점\n  공간 3D CCTV\n  공간 기록\n  후속팀에 인계\n현장 정보 전송\n  받는 대상 선택\n  대화 내역\n  알림 기록\n  작성\n기록·회의록\n  인계 기록\n  대화 기록\n  회의록\n  조치 기록\n하이라이트*\n  사건 선택\n  장면 화면\n  장면 정보·근거\n  타임라인\n  기록 초안 작성\nPARALLAX AI\n  대화\n  진행 단계 목록\n  답 카드\n화면 모드\n  지도만 보기\n  격자 모드\n  창\n' }
   };
   (function () {
     var names = Object.keys(IA), host = $('#iatabs'); host.dataset.panel = 'iapanel';
@@ -3237,7 +3247,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   })();
 
   /* 전시 체험 */
-  var EX = [['영상 프리뷰', '관객', '서비스 흐름 보기', '네 기기가 한 사건으로 이어지는 과정을 영상으로 먼저 봅니다.'], ['웹 쇼잉', '관객', '서비스 둘러보기', '웹사이트에서 기기마다 어떤 역할인지 미리 봅니다.'], ['상황실', '상황실 요원', '신고 확인 · 전달', '실종 신고와 선착팀 기록을 보고, 아직 확인하지 못한 구역을 AI 요약으로 정리합니다.'], ['차량용 대시보드', '후속 투입 경찰관', '이동 중 인계', 'AI 브리핑으로 지금까지의 상황을 듣고, 확인한 구역과 확인 안 된 구역을 받습니다.'], ['VR 사건현장', '후속 투입 경찰관', '탐색 · 구조', '글래스에 뜬 확인 안 된 구역으로 가서 단서를 확인하고 학생을 구조합니다.'], ['폴더블 업무폰', '후속 투입 경찰관', '검토 · 보고', '사건 유형을 바꾸고, AI가 채운 보고 칸을 확인해서 상황실로 보냅니다.']];
+  var EX = [['영상 프리뷰', '관객', '서비스 흐름 보기', '네 기기가 한 사건으로 이어지는 과정을 영상으로 먼저 봅니다.'], ['웹 쇼잉', '관객', '서비스 둘러보기', '웹사이트에서 기기마다 어떤 역할인지 미리 봅니다.'], ['상황실', '상황실 요원', '신고 확인 · 전달', '실종 신고와 선착팀 기록을 보고, 아직 확인하지 못한 구역을 AI 요약으로 정리합니다.'], ['차량용 대시보드', '후속 투입 경찰관', '이동 중 인계', 'AI 브리핑으로 지금까지의 상황을 듣고, 확인한 구역과 확인 안 된 구역을 받습니다.'], ['VR 사건 현장', '후속 투입 경찰관', '탐색 · 구조', '글래스에 뜬 확인 안 된 구역으로 가서 단서를 확인하고 학생을 구조합니다.'], ['폴더블 업무폰', '후속 투입 경찰관', '검토 · 보고', '사건 유형을 바꾸고, AI가 채운 보고 칸을 확인해서 상황실로 보냅니다.']];
   (function () {
     var h = $('#ex'), d = $('#exd');
     EX.forEach(function (x, i) { var b = el('button', '', '<b>' + (i + 1) + '</b>' + x[0]); b.type = 'button'; b.setAttribute('aria-pressed', 'false'); b.addEventListener('click', function () { $$('button', h).forEach(function (y, k) { y.setAttribute('aria-pressed', String(k === i)); }); d.innerHTML = '<p class="who">' + x[1] + ' · ' + x[2] + '</p><p style="margin-top:4px">' + x[3] + '</p>'; d.classList.remove('fdesc'); void d.offsetWidth; d.classList.add('fdesc'); }); h.appendChild(b); });
@@ -3293,18 +3303,19 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     }
     if (D.hidden) lastFocus = document.activeElement;
     D.hidden = false; document.body.style.overflow = 'hidden'; D.scrollTop = 0;
-    if (location.hash !== '#' + id) history.replaceState(null, '', '#' + id);
+    curDetail = id;   /* QA 11-17: 상세를 열면 기록을 하나 쌓아, 폰 · 브라우저 뒤로 가기가 사이트를 떠나지 않고 상세만 닫게 함 */
+    if (location.hash !== '#' + id) { if (history.state && history.state.hgDetail) history.replaceState({ hgDetail: 1 }, '', '#' + id); else history.pushState({ hgDetail: 1 }, '', '#' + id); }
     if (focusSec) { var el = document.getElementById(id + '-' + focusSec); if (el) { D.scrollTop = el.getBoundingClientRect().top - D.getBoundingClientRect().top + D.scrollTop - 72; } }
     else $('[data-close]', D).focus({ preventScroll: true });
   }
-  var closing = null;
+  var closing = null, curDetail = null, navBack = false;
   function closeDetail() {
     if (D.hidden || closing) return;
     document.body.style.overflow = '';
     var end = function () { closing = null; D.hidden = true; D.innerHTML = ''; };
     if (RM) end();
     else { closing = D.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(18px)' }], { duration: 220, easing: 'cubic-bezier(.3, 0, .8, .15)' }); closing.onfinish = end; }
-    history.replaceState(null, '', location.pathname + location.search);
+    if (history.state && history.state.hgDetail && location.hash) { navBack = true; history.back(); } else if (location.hash) history.replaceState(null, '', location.pathname + location.search);
     if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
   }
   D.addEventListener('scroll', function () { var b = $('#dbar'); if (b) b.classList.toggle('on', D.scrollTop > 120); });
@@ -3892,7 +3903,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     // [2026-11-13 "질문에 맞는 답변을 안 할 때가 많다"] 낱말 하나만 겹쳐도 미리 써 둔 답을 내보내서(예: "손흥민 누구야" → '누구' → 한정민 소개) 엉뚱한 답이 됐다.
     // 이제 미리 써 둔 답은 추천 질문을 그대로 눌렀을 때만 쓰고, 아니면 다시 물어봐 달라고 솔직하게 말한다.
     var p = matchPreset(q); if (p && norm(p.q) !== norm(q)) p = null;
-    if (!p) return '답이 안 와서 잠깐 끊겼어요. 지금 질문이 몰린 것 같아요. 같은 질문을 한 번 더 보내 주세요.\n@retry';   // 11-15: 아래에 "다시 보내기" 칩
+    if (!p) return '답이 안 와서 잠깐 끊겼어요. 같은 질문을 한 번 더 보내 주세요.\n@retry';   // 11-15: 아래에 "다시 보내기" 칩
     var t = p.s.map(function (x) { return x[0] + x[1].map(function (c) { return '[[' + c + ']]'; }).join(''); }).join(' ');
     if (p.act) t += '\n@' + p.act[0] + ' ' + p.act[1];
     if (p.ask) t += '\n@ask-team';
@@ -6272,14 +6283,23 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       sd.classList.remove('on'); sc.classList.remove('on'); sd.classList.add('out'); sc.classList.add('out');
       sideFly(false);
       sideT = setTimeout(function () { sd.hidden = sc.hidden = true; sd.classList.remove('out'); sc.classList.remove('out'); document.documentElement.classList.remove('m-calm'); if (!document.documentElement.classList.contains('hg-intro')) document.documentElement.classList.remove('m-hugi-out', 'm-hugi-gone'); Array.prototype.forEach.call(document.querySelectorAll('#side details[open]'), function (d) { d.open = false; }); }, RM ? 0 : 1000);
-      if (sideBack && sideBack.focus && sideBack !== mb) sideBack.focus({ preventScroll: true });
+      if (sideBack && sideBack.focus) sideBack.focus({ preventScroll: true });   // QA 11-17: 메뉴 버튼으로 열었어도 닫으면 초점이 메뉴 버튼으로 돌아옴
     }
   }
+  /* QA 11-17 접근성: 키보드로 메뉴를 열면 첫 항목으로 초점, 열린 동안 Tab은 메뉴 버튼 · 메뉴 안에서만 돎 */
+  function sideTabs() { return [$('#g-menu')].concat([].slice.call(document.querySelectorAll('#side summary, #side button, #side a[href]'))).filter(function (el) { return el && el.offsetParent !== null; }); }
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Tab' || !$('#side').classList.contains('on')) return;
+    var f = sideTabs(); if (!f.length) return;
+    var i = f.indexOf(document.activeElement), n = i < 0 ? (e.shiftKey ? f.length - 1 : 0) : (i + (e.shiftKey ? -1 : 1) + f.length) % f.length;
+    e.preventDefault(); f[n].focus({ preventScroll: true });
+  });
+  $('#g-menu').addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && !$('#side').classList.contains('on')) setTimeout(function () { var f = sideTabs(); if (f[1] && $('#side').classList.contains('on')) f[1].focus({ preventScroll: true }); }, 60); });
   window.addEventListener('scroll', function () { $('#hdr').classList.toggle('on', window.scrollY > 8); }, { passive: true });
 
   if (!VOICE.ok) { $('#auto-read').hidden = true; $('#g-voice').hidden = true; } else setAuto(VOICE.auto);
   renderVoices();
-  function fromHash() { var h = location.hash.slice(1); if (BY[h]) openDetail(h); else if (!h) closeDetail(); }
+  function fromHash() { var h = location.hash.slice(1); if (navBack) { navBack = false; if (!D.hidden && !closing && curDetail) history.pushState({ hgDetail: 1 }, '', '#' + curDetail); return; } if (BY[h]) openDetail(h); else if (!h) closeDetail(); }
   window.addEventListener('hashchange', fromHash); fromHash();
 })();
 </script>
@@ -7519,3 +7539,46 @@ html:has(#detail:not([hidden])) .hdr { z-index: 41; }
   };
 })();
 /* HG-FLOW-END */</script>
+<style>/* QA-1117-BEGIN · 11-17 사용자 "웹 전체 QA … 너가 고칠거 찾아서 고쳐". 사이트 규칙은 지우지 않고 값만 더함 */
+/* 줄바꿈: 낱말 중간에서 끊기지 않게(QA V2, PARALLAX 상세 "작|전" 등) */
+body { word-break: keep-all; overflow-wrap: break-word; }
+/* 태블릿 641~1080: 좌우 여백 32 이상(QA R7, 기준/반응형.md) */
+@media (min-width: 641px) and (max-width: 1080px) {
+  .wrap, .plx .wrap { padding-left: max(32px, env(safe-area-inset-left, 0px)); padding-right: max(32px, env(safe-area-inset-right, 0px)); }
+}
+/* 모바일 상세 제목: 글자 단계 Title1 32 · Title2 24 · Title3 20(QA R7) */
+@media (max-width: 640px) {
+  .dtop h1 { font-size: 32px; line-height: 1.25; }
+  .dsec h2 { font-size: 24px; line-height: 1.35; }
+  .dsec .item h3 { font-size: 20px; }
+}
+/* 손가락 화면: 상세 "프로젝트 목록" 누름 영역 44(QA R1 · R11) */
+@media (pointer: coarse) {
+  .dbar .back { position: relative; min-height: 44px; }
+}
+/* 동작 줄이기: 추천 목록도 움직이지 않게(QA A4) */
+@media (prefers-reduced-motion: reduce) { html .sug, html .hero.chat .sug { transition-duration: 1ms; } }
+/* 메뉴 01 프로젝트 펼침: 아래 항목이 한 번에 내려가지 않게 높이를 감속하며 늘림(QA F2) */
+#side details.nv-pj > .nv-sub.qa-anim { overflow: hidden; }
+</style>
+<script>/* QA-1117 메뉴 펼침 움직임. 사이트 함수는 부르지도 고치지도 않음 */
+(function () {
+  var RMq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  document.addEventListener('click', function (e) {
+    var sm = e.target && e.target.closest && e.target.closest('#side details.nv-pj > summary'); if (!sm || RMq.matches) return;
+    var d = sm.parentNode, ul = d.querySelector('.nv-sub'); if (!ul || !ul.animate) return;
+    e.preventDefault();
+    if (ul._qa) { try { ul._qa.cancel(); } catch (x) {} ul._qa = null; }
+    var ez = 'cubic-bezier(.22,1,.36,1)', h0 = d.open ? ul.offsetHeight : 0;
+    ul.classList.add('qa-anim');
+    if (!d.open) {
+      d.open = true; var h = ul.scrollHeight;
+      ul._qa = ul.animate([{ height: h0 + 'px', opacity: 0 }, { height: h + 'px', opacity: 1 }], { duration: 360, easing: ez });
+      ul._qa.onfinish = function () { ul._qa = null; ul.classList.remove('qa-anim'); };
+    } else {
+      ul._qa = ul.animate([{ height: h0 + 'px', opacity: 1 }, { height: '0px', opacity: 0 }], { duration: 260, easing: ez, fill: 'forwards' });
+      ul._qa.onfinish = function () { d.open = false; try { ul._qa.cancel(); } catch (x) {} ul._qa = null; ul.classList.remove('qa-anim'); };
+    }
+  }, true);
+})();
+/* QA-1117-END */</script>
