@@ -6280,6 +6280,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       t.split(/(\s+)/).forEach(function (w) { if (!w) return; if (/^\s+$/.test(w)) { b.appendChild(document.createTextNode(w)); return; } var s = document.createElement('span'); s.className = 'iw'; s.textContent = w; s.style.setProperty('--d', (110 + n * 26) + 'ms'); n++; b.appendChild(s); });
       b._n = n; box.appendChild(b); bs.push(b);
     });
+    var GAP = 20;   // 11-18 사용자 "캐릭터가 움직일 때 조금씩 겹치는데 … 조금만 더 띄워줘": 털 끝과 꼬리 끝 사이 12 → 20px(쉴 때 약 17px, 움직일 때 겹침 0)
     function hugi() { var c = ask.querySelector('.hugi-char'); return c && c.offsetParent ? c : null; }
     function place() {
       var c = hugi(); if (!c) return;
@@ -6287,12 +6288,12 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       var g = document.querySelector('.gnb'), gb = g ? g.getBoundingClientRect().bottom : 0;
       if (side === null) {   // 처음 한 번: 세 마디가 다 나왔을 때 높이로 자리를 정함(중간에 자리가 바뀌지 않게)
         box.style.left = box.style.maxWidth = ''; box.classList.add('measure'); hFull = tallest();   // 한 마디씩 보이므로 가장 큰 마디 높이로 자리를 정함
-        side = top - 12 - hFull < gb + 8;
+        side = top - GAP - hFull < gb + 8;
         if (side) { box.classList.add('sy-side'); }
       }
-      if (!side) { box.style.bottom = Math.round(ar.bottom - top + 12) + 'px'; box.classList.remove('measure'); return; }
+      if (!side) { box.style.bottom = Math.round(ar.bottom - top + GAP) + 'px'; box.classList.remove('measure'); return; }
       // 위가 모자라면(폰 가로 화면 등 낮은 화면) 허기 오른쪽 옆. 세 마디가 다 나왔을 때 몸 가운데 높이에 오게 아래 끝을 고정하고 위로 쌓음
-      var x = sg.left + c.offsetLeft + c.offsetWidth * .92 + 14, mid = sg.top + c.offsetTop + c.offsetHeight * .6;
+      var x = sg.left + c.offsetLeft + c.offsetWidth * .92 + GAP + 2, mid = sg.top + c.offsetTop + c.offsetHeight * .6;
       box.style.left = Math.round(x - ar.left) + 'px'; box.style.maxWidth = Math.max(160, Math.min(360, Math.round(innerWidth - x - 16))) + 'px';
       box.classList.add('measure'); hFull = tallest(); box.classList.remove('measure');
       var fm = ask.querySelector('form'), ft = fm ? fm.getBoundingClientRect().top : ar.bottom, hNow = box.offsetHeight || hFull;
@@ -6313,7 +6314,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       bs.forEach(function (x, k) { x.classList.toggle('last', k === i); });
       b.classList.remove('wait'); place(); box.classList.add('on');
       if (RM || !b.animate) return;
-      b.animate([{ opacity: 0, transform: 'translateY(10px) scale(.92)' }, { opacity: 1, transform: 'none' }], { duration: 460, delay: o ? 140 : 0, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' });   // 새 마디는 앞 마디가 빠지기 시작하고 0.14초 뒤 허기 쪽에서 커지며 나타남(넘침 없음)
+      b.animate([{ opacity: 0, transform: 'translateY(6px) scale(.92)' }, { opacity: 1, transform: 'none' }], { duration: 460, delay: o ? 140 : 0, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' });   // 새 마디는 앞 마디가 빠지기 시작하고 0.14초 뒤 허기 쪽에서 커지며 나타남(넘침 없음)
       b.classList.add('iw-run'); later(function () { b.classList.remove('iw-run'); }, 110 + b._n * 26 + 640);
     }
     function hide() {
@@ -9457,6 +9458,11 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 @media (min-width: 641px) { .nv4-opt { display: flex; padding: 0; } }
 @media (max-width: 640px) { .nv4-opts { gap: 14px; } }
 
+/* 13판-2(2026-11-18 HPP): 사용자 "세 번째 사진 설정 버튼 호버했을 때 인터랙션 나오는데 이거 안 나오게 해주고" — 톱니는 올려도 커지거나 그림자 · 바탕이 바뀌지 않음(누름은 그대로)
+   + 설정 화면을 열 때 첫 고른 칸에 생기던 초점 고리 없앰(menu4.js: 숨은 제목에 초점) */
+@media (hover: hover) { .gnb #g-set:hover:not(:active) { transform: none !important; box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh) !important; } }
+#nv4-set-h:focus { outline: none; }
+
 </style>
 <script>
 /* ═══ 4판(2026-11-15 HPP): 햄버거 메뉴 펼침 — 이름 = 이동, 펼침 원 = 상세, 맨 아래 설정 → 판 안에서 옆으로 넘어가는 설정 화면 ═══
@@ -9519,13 +9525,13 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
   var pend = false;
   function more() { var o = set.querySelector('.nv4-opts'); o.classList.toggle('nv4-more', o.scrollTop + o.clientHeight < o.scrollHeight - 2); }
   function fit() { var o = set.querySelector('.nv4-opts'); if (!o) return; o.style.maxHeight = ''; var r = side.getBoundingClientRect(); o.style.maxHeight = Math.max(160, Math.floor(r.top + side.clientHeight - o.getBoundingClientRect().top - 16)) + 'px'; more(); if (!o.nv4m) { o.nv4m = 1; o.addEventListener('scroll', more, { passive: true }); } }
-  function show(s) { side.classList.toggle('nv4-menu-on', !s); side.classList.toggle('nv4-set-on', !!s); if (s) fit(); menu.setAttribute('aria-hidden', s ? 'true' : 'false'); set.setAttribute('aria-hidden', s ? 'false' : 'true'); menu.inert = !!s; set.inert = !s; gear.setAttribute('aria-expanded', s ? 'true' : 'false');
-    if (s) { segAll(); setTimeout(function () { var f = set.querySelector('.nv4-seg [aria-checked="true"]') || set.querySelector('h2'); f.focus({ preventScroll: true, focusVisible: false }); }, RM ? 0 : 60);   /* 12판-2: 뒤로 원 없앰 → 첫 고르기 칸에 초점, 메뉴로는 상단 톱니 · Esc */ side.scrollTop = 0; } else gear.focus({ preventScroll: true, focusVisible: false }); }
+  function show(s, kb) { side.classList.toggle('nv4-menu-on', !s); side.classList.toggle('nv4-set-on', !!s); if (s) fit(); menu.setAttribute('aria-hidden', s ? 'true' : 'false'); set.setAttribute('aria-hidden', s ? 'false' : 'true'); menu.inert = !!s; set.inert = !s; gear.setAttribute('aria-expanded', s ? 'true' : 'false');
+    if (s) { segAll(); if (kb) setTimeout(function () { var f = set.querySelector('.nv4-seg [aria-checked="true"]');   /* 13판-2: 키보드로 열 때만 첫 고른 칸에 초점(마우스로 열면 초점을 옮기지 않아 고리가 생기지 않음, 사용자 캡처) */ f.focus({ preventScroll: true, focusVisible: false }); }, RM ? 0 : 60);   /* 12판-2: 뒤로 원 없앰 → 첫 고르기 칸에 초점, 메뉴로는 상단 톱니 · Esc */ side.scrollTop = 0; } else gear.focus({ preventScroll: true, focusVisible: false }); }
   set.inert = true; side.classList.add('nv4-menu-on');
   gear.addEventListener('click', function (e) { e.stopPropagation();
-    if (side.classList.contains('on') && !side.hidden) { show(set.getAttribute('aria-hidden') === 'true'); return; }
+    if (side.classList.contains('on') && !side.hidden) { show(set.getAttribute('aria-hidden') === 'true', e.detail === 0); return; }
     // 닫혀 있으면: 판이 열리기 전에 설정 화면으로 바꿔 둠(옆으로 넘김 없이) → 판은 원래 여는 움직임 그대로, 항목만 차례로 들어옴
-    pend = true; views.classList.add('nv4-now'); show(true); gm.click(); var n = 0;
+    pend = true; views.classList.add('nv4-now'); show(true, e.detail === 0); gm.click(); var n = 0;
     (function wait() { if (side.classList.contains('on') && !side.hidden || n++ > 30) { pend = false; fit(); segAll(); setTimeout(function () { fit(); segAll(); }, 700); requestAnimationFrame(function () { views.classList.remove('nv4-now'); }); } else requestAnimationFrame(wait); })(); });
   addEventListener('keydown', function (e) { if (e.key === 'Escape' && side.classList.contains('on') && set.getAttribute('aria-hidden') === 'false') { e.preventDefault(); e.stopImmediatePropagation(); show(false); } }, true);
   // 판이 닫히면 다음에 열 때 늘 메뉴부터(펼친 줄도 접음)
