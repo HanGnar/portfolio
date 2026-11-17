@@ -1138,6 +1138,10 @@ html.ui-lock { overflow: hidden; }
 .plx .rail { top: 84px; }
 .plx .mark-none { background: none; }
 .detail { scroll-padding-top: 72px; }
+/* 11-18 HPP3: 코레일톡 세부 페이지(iframe)는 상세 창을 스크롤하지 않고 뒤로 막대 아래를 꽉 채움 */
+.detail.is-frame { overflow: hidden; display: flex; flex-direction: column; }
+.detail.is-frame .dbar { flex: none; border-bottom-color: var(--md-outline-variant, rgba(0,0,0,.08)); }
+.detail.is-frame .kframe { flex: 1; min-height: 0; width: 100%; border: 0; display: block; background: var(--md-surface); }
 .plx * { box-sizing: border-box; }
 .plx { margin: 0; background: var(--md-surface); color: var(--md-on-surface); font-family: var(--md-font); font-size: var(--t-body); line-height: 1.65; -webkit-font-smoothing: antialiased; }
 .plx button { font: inherit; color: inherit; cursor: pointer; background: none; border: 0; padding: 0; }
@@ -3341,6 +3345,14 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
         document.getElementById('plx-tpl').innerHTML.replace('{{NEXT_ID}}', next.id).replace('{{NEXT_NAME}}', esc(next.name));
       initPlx($('.plx', D));
     }
+    /* 11-18 HPP3: 코레일톡은 디자인 시트 세부 페이지(시트/case → web_build.py → case_files/korail.html, deploy_sheets.py가 design/case_files/로 올림)를 상세 창 안에 띄움. 근거 카드 단계 → 페이지 단계(s1~s6) */
+    if (id === 'korail') {
+      var KSEC = { problem: 's2', solution: 's3', design: 's5', validation: 's4', retro: 's6' };
+      D.innerHTML = '<div class="dbar" id="dbar"><div class="wrap"><button class="back" type="button" data-close><span class="ms" aria-hidden="true">arrow_back</span>프로젝트 목록</button><span class="t">' + esc(p.name) + '</span></div></div>' +
+        '<iframe class="kframe" src="design/case_files/korail.html?v=' + KOR_V + (focusSec && KSEC[focusSec] ? '#' + KSEC[focusSec] : '') + '" title="' + esc(p.name) + ' 상세"></iframe>';
+      focusSec = null;
+    }
+    D.classList.toggle('is-frame', id === 'korail');
     if (D.hidden) lastFocus = document.activeElement;
     D.hidden = false; document.body.style.overflow = 'hidden'; D.scrollTop = 0;
     curDetail = id;   /* QA 11-17: 상세를 열면 기록을 하나 쌓아, 폰 · 브라우저 뒤로 가기가 사이트를 떠나지 않고 상세만 닫게 함 */
@@ -3349,10 +3361,13 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     else $('[data-close]', D).focus({ preventScroll: true });
   }
   var closing = null, curDetail = null, navBack = false;
+  var KOR_V = '20261118a';   /* 코레일톡 세부 페이지 판(바꿀 때 올림 — GitHub가 10분 저장해 이전 판이 열리지 않게) */
+  /* 코레일톡 세부 페이지(같은 출처 iframe) 안에서 Esc → 상세 창 닫기 */
+  window.addEventListener('message', function (e) { if (e.origin === location.origin && e.data && e.data.hgKorail === 'close') closeDetail(); });
   function closeDetail() {
     if (D.hidden || closing) return;
     document.body.style.overflow = '';
-    var end = function () { closing = null; D.hidden = true; D.innerHTML = ''; };
+    var end = function () { closing = null; D.hidden = true; D.innerHTML = ''; D.classList.remove('is-frame'); };
     if (RM) end();
     else { closing = D.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(18px)' }], { duration: 220, easing: 'cubic-bezier(.3, 0, .8, .15)' }); closing.onfinish = end; }
     if (history.state && history.state.hgDetail && location.hash) { navBack = true; history.back(); } else if (location.hash) history.replaceState(null, '', location.pathname + location.search);
