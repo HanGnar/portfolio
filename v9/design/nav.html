@@ -8923,7 +8923,7 @@ html, .thread, .sug, .vmenu { scrollbar-width: auto !important; scrollbar-color:
 
 /* 질문창 · 대화 폭: 640 → 680(+40), 대화 목록은 좌우 여백 20씩 포함 680 → 720으로 같이 늘려 가장자리 정렬 유지 */
 .ask { max-width: var(--ui-ask-maxw); }
-.hero.chat .thread { max-width: var(--ui-col-maxw); }
+/* 11-18: 대화 목록 폭은 사이트가 정함(HG-HEROFIX: 화면 폭 100vw + 안쪽 여백으로 글 기둥 720). 예전 덮개의 max-width 720이 남아 글 칸이 약 40px로 줄던 것(질문 한 글자씩 · 답 한두 낱말씩 꺾임) → 뺌 */
 
 /* 질문창 · 추천 목록: 사용자 첨부 화면(실제 사이트 질문창)과 같게 — 흰 바탕(유리 아님) · 테두리 없음 · 아래로 옅게 퍼지는 푸른 그림자.
    질문창 바탕 · 그림자는 공통 부품 토큰(대화 영역과 같은 값, 어두운 화면도 대화 영역 값). 추천 목록 그림자는 히어로에만 있음 */
@@ -9214,7 +9214,7 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 /* ── 3. 고르기 알약: 진한 알약이 고른 칸으로 spring으로 미끄러짐 · 안 고른 칸은 올리면 옅은 바탕 · 누르면 눌림 · 고른 칸 누르면 진한 알약이 눌림 */
 .nv4-seg { position: relative; container-type: inline-size; display: flex; width: 100%; padding: 3px; border-radius: 999px; background: var(--ui-bg); box-shadow: 0 0 0 1px var(--ui-sep); isolation: isolate; }
 .nv4-seg .th { position: absolute; z-index: -1; top: 3px; bottom: 3px; left: 3px; width: calc(100cqw / var(--n, 1)); translate: calc(var(--i, 0) * 100cqw / var(--n, 1)) 0;   /* 15판: % 대신 cqw(WebKit은 translate % 기준 폭을 정수로 반올림해 1.5px 어긋남) */ border-radius: 999px; background: var(--ui-label); box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
-  will-change: translate; transition: translate var(--ui-d3) var(--ui-spring), scale var(--ui-d3) var(--ui-spring); }
+  will-change: translate; transition: translate var(--ui-d3) var(--ui-ease-out), scale var(--ui-d3) var(--ui-spring); }   /* 16판: 옮김은 넘침 없이(spring은 먼 칸에서 약 30px 지나쳤다 돌아와 좌우로 흔들려 보임) */
 .nv4-th-now .th { transition: none !important; }   /* 15판: 설정 화면을 열 때 자리만 맞춤(움직임 없이) */
 .nv4-seg button { position: relative; flex: 1 1 0; min-width: 0; height: 30px; padding: 0 6px; border: 0; border-radius: 999px; background: transparent; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   font: var(--t-callout); font-family: inherit; letter-spacing: var(--ls-callout); color: var(--ui-label-2); -webkit-tap-highlight-color: transparent;
@@ -9386,15 +9386,20 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
   }, LI = { ko: 0, en: 1, ja: 2, zh: 3 }, CUR = 0;
   function tr(k) { return (T[k] || [])[CUR] || (T[k] || [])[0] || ''; }
   var LT = 0;
-  function applyLang(l, anim) { CUR = LI[l] || 0; var tk = ++LT;
+  function applyLang(l, anim) { CUR = LI[l] || 0; 
     // 10판: 언어를 바꾸면 글이 흐려지며 사라졌다가(0.12초) 새 말이 흐림에서 또렷하게 차례로(0.42초, 20ms 간격) — 답 글이 나오는 모습과 같은 규칙
     // 15판: 글 · lang은 다 사라진 순간 한 번에 바꿈(전에는 글 하나마다 바꾸고 알약 다섯 개 자리를 다시 재서 배치를 수십 번 다시 계산 · 알약 움직임을 끊음). 빨리 연달아 누르면 마지막 언어만
-    var ns = [].slice.call(side.querySelectorAll('[data-t]')).filter(function (n) { return n.textContent !== tr(n.getAttribute('data-t')); });
+    // 16판(11-18 사용자 "언어 클릭하게 되면은 프레임 나가면서 좌우로 움직이는데 이거 오류"): 흐림(blur) 없이 투명도만, 보이는 화면 글만 줄 단위로 짧게.
+    //  전에는 숨은 메뉴 글까지 20개를 20ms 간격 · 0.42초 흐림으로 내보내 글이 0.4초 넘게 비고(검은 알약만 남음) 글마다 흐림을 그려 프레임이 떨어짐
+    var vis = set.getAttribute('aria-hidden') === 'false' ? set : menu;
+    var ns = [].slice.call(vis.querySelectorAll('[data-t]')).filter(function (n) { return n.textContent !== tr(n.getAttribute('data-t')) && n.offsetParent; });
     function swap() { side.setAttribute('lang', l || 'ko'); [].forEach.call(side.querySelectorAll('[data-t]'), function (n) { var t = tr(n.getAttribute('data-t')); if (n.textContent !== t) n.textContent = t; }); if (set.getAttribute('aria-hidden') === 'false') place(); }
     if (!anim || RM || !ns.length || !ns[0].animate) swap();
-    else { var E = 'cubic-bezier(.22,1,.36,1)', outs = ns.map(function (n) { return n.animate([{ opacity: 1, filter: 'blur(0px)' }, { opacity: 0, filter: 'blur(4px)' }], { duration: 120, easing: E, fill: 'forwards' }); });
-      outs[outs.length - 1].onfinish = function () { if (tk !== LT) { outs.forEach(function (o) { o.cancel(); }); return; }
-        swap(); ns.forEach(function (n, i) { outs[i].cancel(); n.animate([{ opacity: 0, filter: 'blur(4px)' }, { opacity: 1, filter: 'blur(0px)' }], { duration: 420, delay: i * 20, easing: E, fill: 'backwards' }); }); }; }
+    else { var tk = ++LT, E = 'cubic-bezier(.22,1,.36,1)';   // 16판: 사라지는 단계 없이 새 글 → 줄마다 30ms 차례로 0.24초 나타남(글이 비는 틈 없음)
+      // 알약이 먼저 한 프레임 출발한 뒤(두 번째 프레임) 글 · lang을 바꿈 — 같은 프레임에 겹치면 첫 프레임이 늦게 그려져 알약이 한 번에 크게 뜀(WebKit)
+      requestAnimationFrame(function () { requestAnimationFrame(function () { if (tk !== LT) return; swap();
+        ns.forEach(function (n) { var r = n.closest('.nv4-opt'), k = r ? +getComputedStyle(r).getPropertyValue('--k') || 0 : 0;
+          n.animate([{ opacity: .15 }, { opacity: 1 }], { duration: 240, delay: k * 30, easing: E, fill: 'backwards' }); }); }); }); }
     gear.setAttribute('aria-label', tr('set')); gear.title = tr('set');
     var tg = list.querySelector('.nv4-tg'); if (tg) tg.setAttribute('aria-label', tr(tg.getAttribute('aria-expanded') === 'true' ? 'a_close' : 'a_open')); }
   applyLang(ST.lang || 'ko');
