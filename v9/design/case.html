@@ -488,7 +488,7 @@ html.rv-js .rv:not(.in) .donut .vl{stroke-dasharray:0 999}
 /* ── 가로 갤러리(쫀득: 버튼 · 끌기 뒤 spring으로 멈춤, 지금 장만 또렷) ── */
 .hs{position:relative;margin-top:var(--s-6)}
 .hs-sc{display:flex;gap:var(--s-5);overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
-  margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);padding:var(--s-3) max(var(--gut),calc((100vw - var(--wrap)) / 2)) var(--s-6);scroll-padding:0 max(var(--gut),calc((100vw - var(--wrap)) / 2))}
+  margin-left:calc(50% - var(--vw,100vw) / 2);margin-right:calc(50% - var(--vw,100vw) / 2);padding:var(--s-3) max(var(--gut),calc((var(--vw,100vw) - var(--wrap)) / 2)) var(--s-6);scroll-padding:0 max(var(--gut),calc((var(--vw,100vw) - var(--wrap)) / 2))}
 .hs-sc.free{scroll-snap-type:none}
 .hs-sc.drag{cursor:grabbing;user-select:none}
 .hs-sc::-webkit-scrollbar{display:none}
@@ -567,7 +567,7 @@ html.rv-js .rv:not(.in) .donut .vl{stroke-dasharray:0 999}
 /* ── 개선안 도출(5판): 애플 제품 보기처럼 넓은 흰 판 — 왼쪽 위아래 화살표 · 개선안 알약(누르면 그 알약이 둥근 상자로 커지며 설명이 나타남) · 오른쪽 큰 화면(개선 전 → 개선 후).
    화면은 제자리에서 흐림 → 또렷. 개선 전 = 회색 판 · 테두리 이름표, 개선 후 = 옅은 파랑 판 · 검은 이름표 ── */
 .ab{margin-top:var(--s-6);padding:var(--s-7);border-radius:var(--r-tile);display:grid;grid-template-columns:36px 300px minmax(0,1fr);gap:var(--s-6);align-items:center}
-@media (min-width:1081px){.ab{width:min(1260px,calc(100vw - 96px));margin-left:calc(50% - min(630px,50vw - 48px))}}
+@media (min-width:1081px){.ab{width:min(1260px,calc(var(--vw,100vw) - 96px));margin-left:calc(50% - min(630px,var(--vw,100vw) / 2 - 48px))}}
 .ab-nav{display:flex;flex-direction:column;gap:var(--s-3)}
 .ab-nav button{display:grid;place-items:center;width:36px;height:36px;padding:0;border:0;border-radius:50%;background:var(--bg-2);color:var(--label);cursor:pointer;transition:opacity var(--d2) var(--ease-out)}
 .ab-nav button:disabled{opacity:.35;cursor:default}
@@ -723,6 +723,9 @@ html.rv-js .rv:not(.in){filter:none!important;translate:0 12px}
   .find{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:640px){
+  /* 상단 막대: "프로젝트 목록" 글자는 숨기고 화살표만(제목이 "코레일톡 …"로 잘리던 것, 11-18 QA) */
+  .back-t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .back{padding:0 8px}
   /* 경로도 · 개선 전후 화면: 상자 양 끝까지 넓혀 옆으로 넘겨 보는 띠로(잘린 것처럼 보이지 않게), 오른쪽 끝은 흐리게 */
   .rt-sc,.ab-st{margin-left:calc(-1 * var(--s-5));margin-right:calc(-1 * var(--s-5))}
   .rt-sc{padding-left:var(--s-5);padding-right:var(--s-5)}
@@ -962,7 +965,7 @@ html.rv-js .rv:not(.in){filter:none!important;translate:0 12px}
 
 <main id="thread">
   <div class="dbar" id="dbar"><div class="wrap"><div class="dbar-in"><div class="dbar-l">
-    <button class="back press" type="button"><svg class="i"><use href="#i-back"/></svg>프로젝트 목록</button>
+    <button class="back press" type="button"><svg class="i"><use href="#i-back"/></svg><span class="back-t">프로젝트 목록</span></button>
     <span class="dbar-t" aria-hidden="true">코레일톡 기능 분산 구조 탐색 혼란 개선</span>
   </div></div></div></div>
   <div class="wrap">
@@ -2498,6 +2501,8 @@ addEventListener('keydown',function(e){
 (function(){
 var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return [].slice.call((r||document).querySelectorAll(s))};
 var RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* 스크롤바를 뺀 실제 폭을 --vw로(가로 꽉 찬 갤러리 · 넓은 판이 스크롤바 폭만큼 넘치지 않게, 11-18 QA) */
+(function(){var de=document.documentElement;function v(){de.style.setProperty('--vw',de.clientWidth+'px')}v();addEventListener('resize',v);if('ResizeObserver' in window)new ResizeObserver(v).observe(de)})();
 function seen(el,fn,th){if(!('IntersectionObserver' in window)){fn();return}var o=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){o.disconnect();fn()}})},{threshold:th||.35});o.observe(el)}
 
 /* ── 숫자 굴러가기(시작 값에서 장표 숫자까지, 1.2초 ease-out) ── */
@@ -2532,12 +2537,15 @@ function scrolly(wrap,n,onStep){var inn=$('.sy-in',wrap),cur=-1,act=false,r=0,do
 function fit(pin){var kp=$('.kp',pin);if(!kp)return;var k=pin.clientWidth/375;kp.style.setProperty('--k',k);pin._k=k}
 var pins=$$('.pf-in');pins.forEach(fit);
 if('ResizeObserver' in window){var ro=new ResizeObserver(function(es){es.forEach(function(e){fit(e.target)})});pins.forEach(function(p){ro.observe(p)})}else addEventListener('resize',function(){pins.forEach(fit)});
-function rings(){$$('.kp').forEach(function(kp){$$('.hot',kp).forEach(function(h){h.remove()});var pin=kp.parentNode,k=pin._k||(pin.clientWidth/375)||1,R=kp.getBoundingClientRect();
-  $$('[data-hot]',kp).forEach(function(el){var r=el.getBoundingClientRect();if(!r.width)return;var h=document.createElement('i'),pad=5;h.className='hot';h.dataset.key=el.dataset.hot;
-    /* 화면 끝에 붙은 요소는 테두리 · 번호가 폰 밖으로 잘리지 않게 안쪽으로 당김 */
-    var x0=Math.max((r.left-R.left)/k-pad,9),y0=Math.max((r.top-R.top)/k-pad,9),x1=Math.min((r.right-R.left)/k+pad,366),y1=Math.min((r.bottom-R.top)/k+pad,803);
-    h.style.left=x0+'px';h.style.top=y0+'px';h.style.width=(x1-x0)+'px';h.style.height=(y1-y0)+'px';if(x0<26||y0<26)h.classList.add('in');
-    kp.appendChild(h)})})}   /* 번호 동그라미는 뺌(사용자 11-18 "박스에 있는 숫자 빼도 돼") */
+function rings(){$$('.kp').forEach(function(kp){$$('.hot',kp).forEach(function(h){h.remove()});var pin=kp.parentNode,k=pin._k||(pin.clientWidth/375)||1,R=kp.getBoundingClientRect(),bw=3/k,G=bw*2+4,L=[];
+  /* 화면 끝에 붙은 요소는 테두리가 폰 밖으로 잘리지 않게 안쪽으로 당김(테두리 굵기 bw = 보이는 3px을 화면 좌표로) */
+  $$('[data-hot]',kp).forEach(function(el){var r=el.getBoundingClientRect();if(!r.width)return;var pad=5;
+    L.push({key:el.dataset.hot,x0:Math.max((r.left-R.left)/k-pad,bw+3),y0:Math.max((r.top-R.top)/k-pad,bw+3),x1:Math.min((r.right-R.left)/k+pad,372-bw),y1:Math.min((r.bottom-R.top)/k+pad,809-bw)})});
+  /* 테두리끼리 겹치거나 G(굵기 두 배 + 4)보다 가까우면, 겹친 쪽 방향(세로 · 가로 중 덜 겹친 쪽)으로 두 상자 사이 가운데에서 나눠 띄움 */
+  for(var it=0;it<3;it++)for(var i=0;i<L.length;i++)for(var j=i+1;j<L.length;j++){var a=L[i],c=L[j],ox=Math.min(a.x1,c.x1)-Math.max(a.x0,c.x0)+G,oy=Math.min(a.y1,c.y1)-Math.max(a.y0,c.y0)+G;if(ox<=0||oy<=0)continue;
+    if(oy<=ox){var t=a.y0+a.y1<c.y0+c.y1?a:c,u=t===a?c:a,m=(t.y1+u.y0)/2;t.y1=m-G/2;u.y0=m+G/2}
+    else{var l=a.x0+a.x1<c.x0+c.x1?a:c,q=l===a?c:a,m2=(l.x1+q.x0)/2;l.x1=m2-G/2;q.x0=m2+G/2}}
+  L.forEach(function(b){var h=document.createElement('i');h.className='hot';h.dataset.key=b.key;h.style.left=b.x0+'px';h.style.top=b.y0+'px';h.style.width=Math.max(10,b.x1-b.x0)+'px';h.style.height=Math.max(10,b.y1-b.y0)+'px';kp.appendChild(h)})})}
 function showRings(scope,test,stagger){$$('.hot',scope).forEach(function(h,i){var on=test?test(h):true;clearTimeout(h._t);if(on&&stagger&&!RM)h._t=setTimeout(function(){h.classList.add('on')},i*stagger);else h.classList.toggle('on',on)})}
 /* 화면 폭이 바뀌면 테두리 자리를 다시 잼(켜짐 상태는 유지) */
 function relayout(){var st=$$('.hot.on').map(function(h){return h.parentNode.closest('.pf')});rings();st.forEach(function(pf){if(pf)$$('.hot',pf).forEach(function(h){h.classList.add('on')})})}
@@ -2655,8 +2663,8 @@ if(rd&&RD&&RD.series&&RD.series.length){var sv=$('svg',rd),tg=$('.rd-tg',rd),rs=
     rs.innerHTML=k===0?'코레일톡 평균 <em>'+a0.toFixed(1)+'점</em> · 다섯 서비스 중 가장 낮음':RD.series[k].name+' 평균 <em>'+a.toFixed(1)+'점</em> · 코레일톡보다 '+(a-a0>=0?'+':'')+(a-a0).toFixed(1)+'점';
     if(rf){var hit=false;$$('[data-s]',rf).forEach(function(d){var on=+d.dataset.s===k;d.classList.toggle('on',on);if(on)hit=true});rf.classList.toggle('pick',hit)}}
   RD.series.forEach(function(s,k){var b=document.createElement('button');b.type='button';b.textContent=s.name;b.setAttribute('aria-pressed',k===0?'true':'false');tg.appendChild(b);bs.push(b);
-    b.addEventListener('click',function(){if(k!==sel)pick(k)})});
-  draw(zero);seen(rd,function(){pick(0)},.35)}
+    b.addEventListener('click',function(){touched=true;if(k!==sel||!shown)pick(k);shown=true})});
+  var touched=false,shown=false;draw(zero);seen(rd,function(){if(!touched){pick(0);shown=true}},.35)}
 
 /* ── 화면설계서 전체 보기 창 ── */
 var SD=window.CASE_SD||[],V=$('#sdv');

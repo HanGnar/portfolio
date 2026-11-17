@@ -9395,11 +9395,11 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
     var ns = [].slice.call(vis.querySelectorAll('[data-t]')).filter(function (n) { return n.textContent !== tr(n.getAttribute('data-t')) && n.offsetParent; });
     function swap() { side.setAttribute('lang', l || 'ko'); [].forEach.call(side.querySelectorAll('[data-t]'), function (n) { var t = tr(n.getAttribute('data-t')); if (n.textContent !== t) n.textContent = t; }); if (set.getAttribute('aria-hidden') === 'false') place(); }
     if (!anim || RM || !ns.length || !ns[0].animate) swap();
-    else { var tk = ++LT, E = 'cubic-bezier(.22,1,.36,1)';   // 16판: 사라지는 단계 없이 새 글 → 줄마다 30ms 차례로 0.24초 나타남(글이 비는 틈 없음)
+    else { var tk = ++LT, E = 'cubic-bezier(.22,1,.36,1)';   // 16판: 사라지는 단계 없이 새 글 → 줄마다 15ms 차례로 투명도 .4 → 1, 0.24초(옅은 시간 짧게)(글이 비는 틈 없음)
       // 알약이 먼저 한 프레임 출발한 뒤(두 번째 프레임) 글 · lang을 바꿈 — 같은 프레임에 겹치면 첫 프레임이 늦게 그려져 알약이 한 번에 크게 뜀(WebKit)
       requestAnimationFrame(function () { requestAnimationFrame(function () { if (tk !== LT) return; swap();
         ns.forEach(function (n) { var r = n.closest('.nv4-opt'), k = r ? +getComputedStyle(r).getPropertyValue('--k') || 0 : 0;
-          n.animate([{ opacity: .15 }, { opacity: 1 }], { duration: 240, delay: k * 30, easing: E, fill: 'backwards' }); }); }); }); }
+          n.animate([{ opacity: .4 }, { opacity: 1 }], { duration: 240, delay: k * 15, easing: E, fill: 'backwards' }); }); }); }); }
     gear.setAttribute('aria-label', tr('set')); gear.title = tr('set');
     var tg = list.querySelector('.nv4-tg'); if (tg) tg.setAttribute('aria-label', tr(tg.getAttribute('aria-expanded') === 'true' ? 'a_close' : 'a_open')); }
   applyLang(ST.lang || 'ko');
