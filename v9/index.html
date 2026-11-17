@@ -7650,3 +7650,13 @@ body { word-break: keep-all; overflow-wrap: break-word; }
   window.addEventListener('resize', function () { document.querySelectorAll('.hs-kw-sg').forEach(function (sg) { place(sg, true); }); });
 })();
 /* HG-KW-END */</script>
+
+<style>/* QA-1117B-BEGIN · 11-17 2차(에고라이트 폰 화면 QA): 메뉴를 연 뒤 0.27~0.47초 안에 X를 누르면 메뉴로 날아가던 허기(.hugi-char, 원래 잡아 끌 수 있음)가 누름을 받아 안 닫혔음(폰 15번 중 11번) → 날아가는 동안만 허기가 누름을 받지 않음 */
+html.qa-fly #hugi-menu .hugi-char { pointer-events: none; }
+</style>
+<script>
+(function () {
+  var mb = document.getElementById('g-menu'), t = 0; if (!mb) return;
+  mb.addEventListener('click', function () { var R = document.documentElement; R.classList.add('qa-fly'); clearTimeout(t); t = setTimeout(function () { R.classList.remove('qa-fly'); }, 700); }, true);
+})();
+/* QA-1117B-END */</script>
