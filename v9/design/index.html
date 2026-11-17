@@ -154,8 +154,8 @@ h2{margin:0;font:var(--t-title3);letter-spacing:var(--ls-title3)}
   background:var(--glass);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);box-shadow:0 1px 0 var(--sep);position:relative;z-index:1}
 .sv-bar .x{flex:none;background:var(--bg-2);color:var(--label)}
 .sv-tabs{position:relative;flex:1;min-width:0;display:flex;gap:2px;padding:3px;overflow-x:auto;scrollbar-width:none;overscroll-behavior-x:contain;
-  -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent)}
-.sv-tabs.end{-webkit-mask-image:none;mask-image:none}
+  --ml:0px;--mr:24px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 var(--ml),#000 calc(100% - var(--mr)),transparent);mask-image:linear-gradient(90deg,transparent,#000 var(--ml),#000 calc(100% - var(--mr)),transparent)}
+.sv-tabs.mid{--ml:24px}.sv-tabs.end{--mr:0px}
 .sv-tabs::-webkit-scrollbar{display:none}
 .sv-tabs .thumb{position:absolute;left:0;top:3px;height:calc(100% - 6px);border-radius:999px;background:var(--ink);pointer-events:none;transition:transform var(--d3) var(--spring),width var(--d3) var(--spring)}
 .sv-tabs button{position:relative;z-index:1;flex:none;height:32px;padding:0 14px;border-radius:999px;border:0;background:transparent;cursor:pointer;white-space:nowrap;
@@ -6895,9 +6895,9 @@ document.querySelectorAll('.card[data-sheet]').forEach(function(c){var h=c.getAt
   c.addEventListener('click',function(e){if(e.metaKey||e.ctrlKey||e.shiftKey||e.button)return;e.preventDefault();last=c;location.hash=c.dataset.sheet})});
 tabs.querySelectorAll('button').forEach(function(b){if(!files[b.dataset.sheet])b.remove()});
 var tbs=[].slice.call(tabs.querySelectorAll('button'));
-function tplace(b,anim){if(!b)return;if(!anim){tth.style.transition='none'}tth.style.width=b.offsetWidth+'px';tth.style.transform='translateX('+(b.offsetLeft-3)+'px)';if(!anim){tth.offsetWidth;tth.style.transition=''}
+function tplace(b,anim){if(!b)return;if(!anim){tth.style.transition='none'}tth.style.width=b.offsetWidth+'px';tth.style.transform='translateX('+b.offsetLeft+'px)';if(!anim){tth.offsetWidth;tth.style.transition=''}
   var l=b.offsetLeft-tabs.clientWidth/2+b.offsetWidth/2;tabs.scrollTo({left:l,behavior:anim?'smooth':'auto'})}
-function tend(){tabs.classList.toggle('end',tabs.scrollLeft+tabs.clientWidth>=tabs.scrollWidth-2)}
+function tend(){tabs.classList.toggle('end',tabs.scrollLeft+tabs.clientWidth>=tabs.scrollWidth-2);tabs.classList.toggle('mid',tabs.scrollLeft>2)}   // 양 끝: 더 있는 쪽만 흐리게
 tabs.addEventListener('scroll',tend,{passive:true});
 function show(id){var wasOn=sv.classList.contains('on');
   tbs.forEach(function(b){b.setAttribute('aria-selected',b.dataset.sheet===id);b.tabIndex=b.dataset.sheet===id?0:-1});
