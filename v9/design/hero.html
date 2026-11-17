@@ -851,6 +851,29 @@ html.ui-lock { overflow: hidden; }
 @media (hover: hover) { .hs-pc:hover { transform: translateY(-3px); box-shadow: var(--ui-card-sh-hi); } .hs-pc:hover .hs-th img { transform: scale(1.05); } .hs-pc:hover:active { transform: translateY(-3px) scale(.98); } }
 .hs-pc:active { transform: scale(.98); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
 
+/* ── 11-18 HS-ROW: "다른 프로젝트" 답의 카드 가로 줄(모든 화면에서 옆으로 넘김). 카드는 위 .hs-pc 그대로.
+   줄은 시트 chat 3-12 ≤640 값(바깥 −20 · 안쪽 위 4 · 좌우 20 · 아래 14 · 왼쪽 맞춤. 위 · 아래는 카드 그림자가 줄 끝에서 잘리지 않게 안쪽 12 · 30을 주고 바깥 −8 · −16으로 되돌려 자리는 같음), 좌우 버튼은 3-17-1 .gal-nav 값(36 유리 원 · 올리거나 초점일 때만 보임 · hover 없는 기기엔 없음) ── */
+.ans .hs-row { margin-top: 14px; }
+.hs-row { position: relative; }
+.hs-row-tr { display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-padding: 0 20px; overscroll-behavior-x: contain; margin: -8px -20px -16px; padding: 12px 20px 30px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+/* 대화 목록(#thread)이 화면 폭 전체 + 안쪽 여백으로 글 기둥을 맞추는 동안(HG-HEROFIX): 줄은 글 기둥 왼쪽에서 시작하고, 넘친 카드는 기둥 오른쪽 밖 화면 끝까지 보임.
+   오른쪽 바깥 여백 = 대화 목록 오른쪽 안쪽 여백과 같은 식이라 대화 목록 · 페이지가 옆으로 넘치지 않음(폰은 20 그대로). 끝까지 넘기면 마지막 카드 오른쪽 = 글 기둥 오른쪽 */
+.hero.chat .thread .hs-row-tr { --hs-row-r: max(20px, env(safe-area-inset-right, 0px), calc(50vw - (var(--ui-col-maxw) / 2) + 20px)); margin-right: calc(-1 * var(--hs-row-r)); padding-right: var(--hs-row-r); }
+.hs-row-tr::-webkit-scrollbar { display: none; }
+.hs-row-tr > .hs-pc { flex: 0 0 calc((100% - 24px) / 2.5); scroll-snap-align: start; }
+.hs-row-nav { position: absolute; top: var(--hs-row-y, 50%); z-index: 2; width: 36px; height: 36px; margin-top: -18px; padding: 0; border-radius: var(--md-full); border: 0; display: grid; place-items: center; color: var(--ui-label); opacity: 0; cursor: pointer;
+  background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh);
+  transition: opacity var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
+.hs-row-nav .ms { font-size: 18px; }
+.hs-row-nav.hs-prev { left: -8px; } .hs-row-nav.hs-nxt { right: -8px; }
+.hs-row:hover .hs-row-nav, .hs-row:focus-within .hs-row-nav { opacity: 1; }
+.hs-row .hs-row-nav:disabled { opacity: 0; pointer-events: none; }
+.hs-row-nav:active { transform: var(--ui-press); transition-duration: var(--ui-d1); }
+.hs-row-nav:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 2px; }
+@media (max-width: 640px) { .hs-row-tr { gap: 10px; } .hs-row-tr > .hs-pc { flex-basis: 74%; } }
+@media (any-hover: none) { .hs-row-nav { display: none; } }
+@media (prefers-reduced-motion: reduce) { .hs-row-nav { transition-duration: 1ms; } }
+
 /* ── 이미지 여러 장: 상자 안에서 옆으로 넘기기 · 점 · 좌우 버튼, 누르면 크게 보기(2차) ── */
 .hs-gal { margin: 0; display: flex; flex-direction: column; gap: 8px; max-width: 520px; }
 .hs-gal-box { position: relative; border-radius: var(--ui-r-box); overflow: hidden; box-shadow: var(--ui-card-sh); background: var(--ui-bg-2); }
@@ -4832,6 +4855,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     FAIL_MS: 3200,    // 올리기 실패 문구 보이는 시간
     CARDS_MAX: 3,     // 프로젝트 카드 최대
     CARDS_EXP_MAX: 2, // 역량 질문일 때 카드 최대
+    ROW_MAX: 8,       /* 11-18 HS-ROW: "다른 프로젝트" 가로 줄 카드 최대 */
     OUT_MAX: 1200,    // 결과 상자 글 최대(넘으면 파일)
     SMALL_MAX: 2      // 작은 붙임 최대
   };
@@ -4871,6 +4895,8 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     // 프로젝트 목록 · 개요
     PROJ_WORD: /(프로젝트|작업물|작업|포트폴리오)/,
     LIST: /(뭐|뭘|무슨|어떤\s?(게|거|것|프로젝트|작업)|목록|전부|모두|다\s?(보여|알려)|몇\s?개|대표|추천|보여\s?(줘|주세요|줄래)|알려\s?(줘|주세요)|소개(해|\s?좀))/,
+    /* 11-18 HS-ROW: 다른 프로젝트를 더 보겠다는 말("다른 프로젝트도 볼래요" · "나머지 작업은요?") → 프로젝트 카드 가로 줄(경로 D) */
+    OTHER: /(다른|딴|나머지)\s?(프로젝트|작업|포트폴리오)/,
     OVERVIEW: /(뭐(야|예요|에요|였|하는)|뭔가요|무엇|알려|소개|설명|어떤\s?(프로젝트|거|건|서비스|앱)|보여)/,
     EXP: /(해\s?보(셨|았|신)|경험\s?(있|이\s?있|해\s?보)|해\s?본\s?적|써\s?보(셨|신|았)|다뤄\s?보(셨|신)|할\s?줄\s?(아|알))/,
     RISK: /(약점|단점|실패|힘들었|힘든|어려웠|갈등|아쉬|후회|부족|실수|비판)/,
@@ -5014,7 +5040,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var a = inp.ans || null, Q = inp.q || {}, ui = inp.ui || {}, ctx = inp.ctx || {}, d = inp.data || {};
     var hold = (inp.opts && Array.isArray(inp.opts.hold)) ? inp.opts.hold : HOLD;
     var q = s(Q.text).trim(), why = {}, got = {};
-    var prev = ctx.prev || [];
+    var prev = ctx.prev || [], talk = [];   /* 11-18 HS-ROW: talk = 이번 질문 · 답에 나온 프로젝트(다음 답의 "다른 프로젝트"에서 뺌) */
     var ok = function (id, extra) { got[id] = extra || true; why[id] = 'ok'; };
     var no = function (id, r) { if (!(id in why)) why[id] = r; };
     var held = function (id) { if (has(hold, id)) { no(id, 'hold'); return true; } return false; };
@@ -5162,7 +5188,18 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var wantA = !named.length && RE.PROJ_WORD.test(q) && RE.LIST.test(q);
     var wantB = named.length === 1 && RE.OVERVIEW.test(q) && !(RE.VIS.test(q) && RE.SHOW.test(q));   // 그림을 보여 달라는 말은 개요가 아님(이미지 여러 장 쪽)
     var wantC = !wantA && !wantB && RE.EXP.test(q);
-    if (wantA) { route = 'A'; cand = uniq(filP.concat(actP, citedP, saidP)).slice(0, NUM.CARDS_MAX); }
+    talk = uniq(named.concat(actP, citedP, saidP));
+    /* 11-18 HS-ROW 경로 D("다른 프로젝트"): 질문에 이름 댄 것 · 바로 앞 답에서 이야기한 것(prev의 talk · cards)을 빼고, 답에 나온 것 먼저 · 나머지 전부.
+       뺄 것을 빼고 남는 게 없으면 질문에 이름 댄 것만 빼고 전부 */
+    if (RE.OTHER.test(q)) {
+      var before = [], allP = (d.projects || []).map(function (p) { return p.id; });
+      prev.forEach(function (k) { var m = /^(talk|cards):(.+)$/.exec(s(k)); if (m) before = before.concat(m[2].split(',')); });
+      var at = function (id) { var re = ALIAS[id], p = projById(d, id), m = re ? re.exec(s(a.text)) : null, i = m ? m.index : (p && p.name ? s(a.text).toLowerCase().indexOf(p.name.toLowerCase()) : -1); return i < 0 ? 1e9 : i; };   /* 답 글에 나온 차례대로 */
+      var rest = uniq(filP.concat(actP, citedP, saidP.slice().sort(function (x, y) { return at(x) - at(y); }), allP)).filter(function (id) { return has(allP, id) && !has(named, id) && !has(before, id); });
+      if (!rest.length) rest = allP.filter(function (id) { return !has(named, id); });
+      route = 'D'; cand = rest.slice(0, NUM.ROW_MAX);
+    }
+    else if (wantA) { route = 'A'; cand = uniq(filP.concat(actP, citedP, saidP)).slice(0, NUM.CARDS_MAX); }
     else if (wantB) { route = 'B'; cand = has(actP, named[0]) || has(citedP, named[0]) || has(saidP, named[0]) ? [named[0]] : []; }
     else if (wantC) { route = 'C'; cand = uniq(citedP.concat(saidP)).slice(0, NUM.CARDS_EXP_MAX); }
     if (!route) no('cards', 'no-intent');
@@ -5206,7 +5243,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
 
     function finish() {
       var parts = RENDER_ORDER.filter(function (x) { return got[x]; });
-      return { parts: parts, detail: got, why: why };
+      return { parts: parts, detail: got, why: why, talk: talk };
     }
   }
 
@@ -5218,6 +5255,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     if (d.cards && d.cards.ids) out.push('cards:' + d.cards.ids.join(','));
     if (d.gallery && d.gallery.at) out.push('gallery:' + d.gallery.at);
     if (d.profile) out.push('profile');
+    if (x && x.talk && x.talk.length) out.push('talk:' + x.talk.join(','));   /* 11-18 HS-ROW */
     return out;
   }
 
@@ -5386,7 +5424,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var big = null;
     if (on('profile')) big = hs3Profile();
     else if (on('gallery')) big = hs3Gallery(D.gallery.ids);
-    else if (on('cards')) big = hs3Cards(D.cards.ids);
+    else if (on('cards')) big = D.cards.route === 'D' ? hs3Row(D.cards.ids) : hs3Cards(D.cards.ids);   /* 11-18 HS-ROW: "다른 프로젝트"는 가로로 넘기는 카드 줄 */
     if (big) { A.insertBefore(big, body ? body.nextSibling : A.firstChild); if (on('gallery')) { var sh = A.querySelector('figure.shot'); if (sh) sh.remove(); hs3GalInit(big); } if (on('profile')) hs3PfInit(big, p.live); }
     if (on('cards') && r.act && r.act[0] === 'open' && D.cards.ids.indexOf(r.act[1]) > -1) hs3Unlink(A, 'open', r.act[1]);   // 같은 프로젝트 "자세히 보기 →"는 카드가 대신
     var mb = A.querySelector('.mailbox');
@@ -5501,6 +5539,43 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       b.type = 'button'; b.setAttribute('data-open', id); b.setAttribute('aria-label', p.name + ' 자세히 보기');
       w.appendChild(b);
     });
+    return w;
+  }
+  /* 11-18 HS-ROW: "다른 프로젝트" 답의 프로젝트 카드 가로 줄. 카드는 위 hs3Cards와 같은 .hs-pc(누르면 기존 [data-open] → 상세).
+     손가락 · 트랙패드 · Shift+휠: 브라우저 가로 스크롤 + 카드 왼쪽 맞춤 / 키보드: Tab으로 카드마다(초점 간 카드가 보이게 브라우저가 스크롤) /
+     마우스: 줄에 올리면 좌우 유리 원 버튼(카드 한 장씩). 이벤트를 막지 않는다 */
+  function hs3Row(ids) {
+    var cards = hs3Cards(ids), w = hs3El('div', 'hs-row'), tr = hs3El('div', 'hs-row-tr');
+    while (cards.firstChild) tr.appendChild(cards.firstChild);
+    w.setAttribute('role', 'group'); w.setAttribute('aria-label', '다른 프로젝트 ' + tr.children.length + '개, 옆으로 넘겨 보기');
+    w.appendChild(tr);
+    w.insertAdjacentHTML('beforeend', '<button class="hs-row-nav hs-prev" type="button" aria-label="이전 프로젝트" disabled><span class="ms" aria-hidden="true">chevron_left</span></button>' +
+      '<button class="hs-row-nav hs-nxt" type="button" aria-label="다음 프로젝트"><span class="ms" aria-hidden="true">chevron_right</span></button>');
+    var pv = w.querySelector('.hs-prev'), nv = w.querySelector('.hs-nxt'), raf = 0;
+    function sync() {
+      raf = 0; if (!document.contains(tr)) return;
+      var th = tr.querySelector('.hs-th'), had = document.activeElement, max = tr.scrollWidth - tr.clientWidth;
+      if (th) w.style.setProperty('--hs-row-y', (th.offsetTop + th.offsetHeight / 2) + 'px');   /* 버튼 = 썸네일 세로 가운데 */
+      pv.disabled = tr.scrollLeft <= 1; nv.disabled = tr.scrollLeft >= max - 1;
+      if ((had === pv && pv.disabled) || (had === nv && nv.disabled)) { var o = had === pv ? nv : pv; if (!o.disabled) o.focus({ preventScroll: true }); else if (tr.firstElementChild) tr.firstElementChild.focus({ preventScroll: true }); }   /* 끝에 닿아 숨는 버튼에 있던 초점은 반대쪽 버튼으로 */
+    }
+    function go(dir) {
+      var c = tr.querySelector('.hs-pc'); if (!c) return;
+      tr.scrollBy({ left: dir * (c.getBoundingClientRect().width + (parseFloat(getComputedStyle(tr).columnGap) || 0)), behavior: uiRM() ? 'auto' : 'smooth' });
+    }
+    pv.addEventListener('click', function () { go(-1); }); nv.addEventListener('click', function () { go(1); });
+    tr.addEventListener('focusin', function (e) {   /* 키보드로 간 카드가 반쯤 가려 있으면 그 카드를 줄 왼쪽(안쪽 20)에 맞춤(크롬은 반쯤 보이면 스크롤하지 않음) */
+      var c = e.target.closest && e.target.closest('.hs-pc'); if (!c || !c.matches(':focus-visible')) return;
+      requestAnimationFrame(function () {   /* 한 프레임 뒤: 사파리는 초점 직후 부른 부드러운 스크롤을 자기 초점 처리로 지움 */
+        if (document.activeElement !== c) return;
+        var R = tr.getBoundingClientRect(), b = c.getBoundingClientRect();
+        if (b.left < R.left + 19 || b.right > R.right - 19) tr.scrollBy({ left: b.left - R.left - 20, behavior: uiRM() ? 'auto' : 'smooth' });
+      });
+    });
+    tr.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(sync); }, { passive: true });
+    window.addEventListener('resize', function () { if (!raf && document.contains(tr)) raf = requestAnimationFrame(sync); });
+    tr.querySelectorAll('img').forEach(function (im) { if (!im.complete) im.addEventListener('load', function () { if (!raf) raf = requestAnimationFrame(sync); }); });
+    raf = requestAnimationFrame(sync);
     return w;
   }
   // 이미지 여러 장(고른 그림 먼저). 누르면 기존 [data-img] → 2차 크게 보기
