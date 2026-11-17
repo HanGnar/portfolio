@@ -9243,6 +9243,23 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
   #g-set, .gnb:has(#g-menu[aria-expanded="false"]) #g-set { transition-duration: 1ms !important; transition-delay: 0s !important; }
 }
 
+/* ═══ 14판-2(2026-11-18 HPP): 사용자 "이거 중앙 정렬 안 맞는 거 수정하고 반응형이면 반응형답게 설정창을 조금 넓게 펼쳐도 되지 않을까? … 웹이랑 태블릿 화면에서는 스크롤이 안 나왔으면 좋겠어. 모바일은 스크롤이 돼야 되는데 … 어색하게 잘리는 부분이 나오는 게 이상한 것 같아."
+   ① 설정 화면은 판 가운데(왼쪽 · 폭은 menu4.js place())
+   ② 641 이상(웹 · 태블릿): 폭 최대 720, 항목은 한 줄 [이름 · 설명 | 고르기 알약 400] → 다섯 줄이 판 안에 다 들어와 스크롤 없음
+   ③ 640 이하(폰): 항목 목록 안 스크롤 · 아래 흐림 없앰 → 판 전체가 끝까지 자연스럽게 스크롤(마지막 항목 아래 여백까지) ═══ */
+.nv4-opts.nv4-more { -webkit-mask-image: none; mask-image: none; }
+@media (min-width: 641px) {
+  .nv4-opts { gap: 10px; }
+  .nv4-opt { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 400px); align-items: center; column-gap: 32px; }
+}
+@media (max-width: 640px) {
+  .side.nv4-set-on { overflow-y: auto; overscroll-behavior: contain; }
+  .nv4-opts { overflow: visible; padding-bottom: 8px; }
+}
+/* 14판-3(2026-11-18 HPP): 사용자 "설정하면 설정 메인 설정 이름만 넣고 세부 설정 설명은 안 들어가도 될 것 같아." — 항목 설명 글 없앰(이름만). 641 이상 한 줄 사이 10 → 14
+   + 숨은 설정 화면이 처음 폭(400)에서 한 줄 배치로 글이 낱자로 꺾여 길어져 메뉴 판에 스크롤이 생기던 것 → 페이지가 열릴 때부터 place()로 폭을 맞춤 */
+@media (min-width: 641px) { .nv4-opts { gap: 14px; } }
+
 </style>
 <script>
 /* ═══ 4판(2026-11-15 HPP): 햄버거 메뉴 펼침 — 이름 = 이동, 펼침 원 = 상세, 맨 아래 설정 → 판 안에서 옆으로 넘어가는 설정 화면 ═══
@@ -9281,7 +9298,7 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
   ];
   var set = document.createElement('section'); set.className = 'nv4-pane nv4-set'; set.id = 'nv4-set'; set.setAttribute('aria-hidden', 'true'); set.setAttribute('aria-labelledby', 'nv4-set-h');
   set.innerHTML = '<div class="nv4-sh"><h2 id="nv4-set-h" data-t="set" tabindex="-1">설정</h2></div><ul class="nv4-opts">' +
-    OPTS.map(function (o, k) { return '<li class="nv4-opt" style="--k:' + k + '"><div class="nv4-ol"><b id="nv4-l-' + o[0] + '" data-t="o_' + o[0] + '">' + o[1] + '</b><span data-t="d_' + o[0] + '">' + o[2] + '</span></div><div class="nv4-seg" role="radiogroup" aria-labelledby="nv4-l-' + o[0] + '" data-k="' + o[0] + '"><span class="th" aria-hidden="true"></span>' +
+    OPTS.map(function (o, k) { return '<li class="nv4-opt" style="--k:' + k + '"><div class="nv4-ol"><b id="nv4-l-' + o[0] + '" data-t="o_' + o[0] + '">' + o[1] + '</b></div><div class="nv4-seg" role="radiogroup" aria-labelledby="nv4-l-' + o[0] + '" data-k="' + o[0] + '"><span class="th" aria-hidden="true"></span>' +
       o[3].map(function (c, i) { return '<button type="button" role="radio" data-v="' + c[0] + '"' + (o[0] === 'lang' ? ' lang="' + c[0] + '"' : ' data-t="v_' + o[0] + '_' + c[0] + '"') + ' aria-checked="' + (i === 0) + '">' + c[1] + '</button>'; }).join('') + '</div></li>'; }).join('') + '</ul>';
   views.appendChild(set);
   // 차례 등장 순서(사이트 방식 --i · --n)를 새 항목에 맞춤
@@ -9299,12 +9316,16 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
   var pend = false;
   function more() { var o = set.querySelector('.nv4-opts'); o.classList.toggle('nv4-more', o.scrollTop + o.clientHeight < o.scrollHeight - 2); }
   function place() {   /* 14판: 설정 화면은 메뉴 칸 위에 겹침 — 왼쪽은 허기 · 메뉴 글과 같은 선, 판 안에 안 들어가면 판 안쪽 20부터 */
-    var v = views.getBoundingClientRect(), sd = side.getBoundingClientRect(), L = sd.left + 20, R = sd.right - 20, left = v.left, w = Math.min(400, R - left);
-    if (w < 300) { left = L; w = Math.min(400, R - L); }
+    /* 14판-2: 판 가운데. 641 이상은 넓게(최대 720, 판 안쪽 40 띄움), 폰은 판 안쪽 20 띄움 */
+    var v = views.getBoundingClientRect(), sd = side.getBoundingClientRect(), wide = innerWidth > 640, pad = wide ? 40 : 20,
+      w = Math.min(wide ? 720 : 400, sd.width - pad * 2), left = sd.left + (sd.width - w) / 2;
     set.style.left = Math.round(left - v.left) + 'px'; set.style.width = Math.round(w) + 'px'; }
-  function fit() { var o = set.querySelector('.nv4-opts'); if (!o) return; o.style.maxHeight = ''; var r = side.getBoundingClientRect(); o.style.maxHeight = Math.max(160, Math.floor(r.top + side.clientHeight - o.getBoundingClientRect().top - 16)) + 'px'; more(); if (!o.nv4m) { o.nv4m = 1; o.addEventListener('scroll', more, { passive: true }); } }
+  function fit() { var o = set.querySelector('.nv4-opts'); if (!o) return; o.style.maxHeight = '';
+    /* 14판-2: 폰은 목록 안 스크롤 없이 판 전체가 스크롤 — 겹쳐 둔 설정 화면 높이만큼 칸 높이를 잡아 줌 */
+    if (innerWidth <= 640) { views.style.minHeight = set.offsetHeight + 'px'; o.classList.remove('nv4-more'); return; }
+    views.style.minHeight = ''; var r = side.getBoundingClientRect(); o.style.maxHeight = Math.max(160, Math.floor(r.top + side.clientHeight - o.getBoundingClientRect().top - 16)) + 'px'; more(); if (!o.nv4m) { o.nv4m = 1; o.addEventListener('scroll', more, { passive: true }); } }
   function show(s, kb) { side.classList.toggle('nv4-menu-on', !s); side.classList.toggle('nv4-set-on', !!s); if (s) { place(); fit(); } menu.setAttribute('aria-hidden', s ? 'true' : 'false'); set.setAttribute('aria-hidden', s ? 'false' : 'true'); menu.inert = !!s; set.inert = !s; gear.setAttribute('aria-expanded', s ? 'true' : 'false');
-    if (s) { segAll(); if (kb) setTimeout(function () { var f = set.querySelector('.nv4-seg [aria-checked="true"]');   /* 13판-2: 키보드로 열 때만 첫 고른 칸에 초점(마우스로 열면 초점을 옮기지 않아 고리가 생기지 않음, 사용자 캡처) */ f.focus({ preventScroll: true, focusVisible: false }); }, RM ? 0 : 60);   /* 12판-2: 뒤로 원 없앰 → 첫 고르기 칸에 초점, 메뉴로는 상단 톱니 · Esc */ side.scrollTop = 0; } else gear.focus({ preventScroll: true, focusVisible: false }); }
+    if (s) { segAll(); if (kb) setTimeout(function () { var f = set.querySelector('.nv4-seg [aria-checked="true"]');   /* 13판-2: 키보드로 열 때만 첫 고른 칸에 초점(마우스로 열면 초점을 옮기지 않아 고리가 생기지 않음, 사용자 캡처) */ f.focus({ preventScroll: true, focusVisible: false }); }, RM ? 0 : 60);   /* 12판-2: 뒤로 원 없앰 → 첫 고르기 칸에 초점, 메뉴로는 상단 톱니 · Esc */ side.scrollTop = 0; } else { views.style.minHeight = ''; side.scrollTop = 0; gear.focus({ preventScroll: true, focusVisible: false }); } }
   set.inert = true; side.classList.add('nv4-menu-on');
   gear.addEventListener('click', function (e) { e.stopPropagation();
     if (side.classList.contains('on') && !side.hidden) { show(set.getAttribute('aria-hidden') === 'true', e.detail === 0); return; }
@@ -9314,7 +9335,7 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
   addEventListener('keydown', function (e) { if (e.key === 'Escape' && side.classList.contains('on') && set.getAttribute('aria-hidden') === 'false') { e.preventDefault(); e.stopImmediatePropagation(); show(false); } }, true);
   // 판이 닫히면 다음에 열 때 늘 메뉴부터(펼친 줄도 접음)
   gear.inert = true;   // 10판-3: 톱니는 판이 열렸을 때만(닫히면 누름 · 초점 없음)
-  new MutationObserver(function () { gear.inert = !(side.classList.contains('on') && !side.hidden); if (pend) return; if (side.hidden) {   /* 11판: 판이 다 사라진 뒤에만 메뉴로 되돌림(닫히는 동안 설정 → 메뉴 · 펼친 줄 접힘이 보이지 않게) */ if (set.getAttribute('aria-hidden') === 'false') { side.classList.add('nv4-menu-on'); side.classList.remove('nv4-set-on'); menu.setAttribute('aria-hidden', 'false'); set.setAttribute('aria-hidden', 'true'); menu.inert = false; set.inert = true; gear.setAttribute('aria-expanded', 'false'); }
+  new MutationObserver(function () { gear.inert = !(side.classList.contains('on') && !side.hidden); if (pend) return; if (side.hidden) {   /* 11판: 판이 다 사라진 뒤에만 메뉴로 되돌림(닫히는 동안 설정 → 메뉴 · 펼친 줄 접힘이 보이지 않게) */ if (set.getAttribute('aria-hidden') === 'false') { side.classList.add('nv4-menu-on'); side.classList.remove('nv4-set-on'); menu.setAttribute('aria-hidden', 'false'); set.setAttribute('aria-hidden', 'true'); menu.inert = false; set.inert = true; gear.setAttribute('aria-expanded', 'false'); views.style.minHeight = ''; }
     list.querySelectorAll('.nv4-row.open').forEach(function (r) { openRow(r, false); }); } }).observe(side, { attributes: true, attributeFilter: ['class', 'hidden'] });
 
   // 6) 고르기 알약: 진한 알약이 고른 칸으로 spring으로 미끄러짐. 소리는 상단 소리 버튼과 같은 상태(누르면 그 버튼을 대신 누름)
@@ -9362,7 +9383,7 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
     var tg = list.querySelector('.nv4-tg'); if (tg) tg.setAttribute('aria-label', tr(tg.getAttribute('aria-expanded') === 'true' ? 'a_close' : 'a_open'));
     set.querySelectorAll('.nv4-seg').forEach(function (g) { seg(g, true); }); }
   applyLang(ST.lang || 'ko');
-  addEventListener('resize', function () { if (set.getAttribute('aria-hidden') === 'false') { place(); fit(); } if (set.getAttribute('aria-hidden') === 'false') set.querySelectorAll('.nv4-seg').forEach(function (g) { seg(g, true); }); });
+  place(); addEventListener('resize', function () { place(); if (set.getAttribute('aria-hidden') === 'false') { fit(); } if (set.getAttribute('aria-hidden') === 'false') set.querySelectorAll('.nv4-seg').forEach(function (g) { seg(g, true); }); });
 })();
 
 </script>
