@@ -8640,6 +8640,17 @@ html.hg-hero-in #hero { animation: hgHeroIn .28s var(--ui-ease-out, cubic-bezier
 .hero.chat .thread::-webkit-scrollbar-thumb { background: rgba(128, 128, 128, .22); border: 1px solid transparent; background-clip: padding-box; border-radius: 3px; }
 .hero.chat .thread::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, .36); background-clip: padding-box; }
 /* HG-HEROFIX-END */</style>
+<style>/* HG-NAVBAND-BEGIN · 11-18 사용자 "프로젝트 영역부터 내비게이션 바, 내비게이션 버튼에 라인 그어서 나누지 마. 그리고 스크롤 때도 내비게이션 버튼 영역은 항상 고정"
+   ① 아래 화면(프로젝트 · 소개 · 연락)은 구역 사이 선 없음(여백으로만 나눔)
+   ② 아래 화면에서 내비 버튼 줄(64 + 위 안전 영역)은 늘 맨 위에 고정, 페이지와 같은 바탕(살짝 비침 + 흐림)을 깔아 글이 버튼 밑으로 비쳐 보이지 않게. 선 · 그림자 없음
+   ③ 첫 방문 인사 중에 메뉴로 아래 화면에 가도 내용이 보이고 스크롤되게(인사는 첫 화면에 그대로 남음. 인사 묶음의 숨김 규칙이 id 선택자라 !important로만 이김) */
+html.hg-page main > .sec, html.hg-page #contact { border-top: 0; }
+html.hg-page .hdr, html.hg-page .hdr.on { position: sticky; top: 0; padding-top: env(safe-area-inset-top, 0px); border-bottom: 0; box-shadow: none;
+  background: color-mix(in srgb, var(--md-surface) 86%, transparent); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); }
+@supports not (background: color-mix(in srgb, red 50%, transparent)) { html.hg-page .hdr, html.hg-page .hdr.on { background: var(--md-surface); } }
+html.hg-page main > .sec, html.hg-page #contact { visibility: visible !important; }
+html.hg-page { overflow: visible; }
+/* HG-NAVBAND-END */</style>
 
 <style>
 /* ═══ 헝그리한정민 디자인 시스템 — 글자 기준(시안 공통) ═══
