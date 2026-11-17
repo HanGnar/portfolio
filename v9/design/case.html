@@ -316,14 +316,14 @@ body.spec [data-spec]::after{content:attr(data-spec);position:absolute;right:0;t
    글자 위계(다섯 단계만): 큰 단원 Title 1 / 묶음 제목 Title 2 / 카드 제목 Headline / 본문 Body · Subhead(400) / 이름표 Caption · Footnote
    굵기: 600은 제목 · 숫자에만. 본문 강조는 굵기 대신 진한 글자색(label, 500)
    상자: 모두 흰 바탕(surface) + 그림자(card-sh). 큰 판 28 · 카드 20 · 작은 상자 16. 회색 띠 없음 */
-:root{--wrap:1040px;--r-tile:28px;--hs-w:min(760px,80vw);--hot:#1D1D1F;--ab-tb:#EEF3FB}
+:root{--wrap:1040px;--r-tile:28px;--hs-w:min(760px,80vw);--hot:#E5484D;--ab-tb:#EEF3FB}
 /* 3판 움직임(사용자 11-18 "너무 쫀득하게 말고 싹 나오고 부드럽게 멈추게"): 넘침(오버슈트) 있는 spring 대신 빠르게 나와 천천히 서는 곡선 하나로 통일 */
 :root{--ui-spring:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.16,1,.3,1)}
 /* 목차 알약은 뺌(자리 0) */
 :root{--toc-h:0px}
 .toc{display:none!important}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ab-tb:#17202E}}
-:root[data-theme="dark"]{--ab-tb:#17202E}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ab-tb:#17202E;--hot:#FF6369}}
+:root[data-theme="dark"]{--ab-tb:#17202E;--hot:#FF6369}
 @media (max-width:640px){:root{--hs-w:86vw}}
 
 .bl,.tile-t,.ph-d,.ab-tx p,.rv-t,.mp-p{text-wrap:pretty}
@@ -427,18 +427,17 @@ html.rv-js .rv:not(.in) .donut .vl{stroke-dasharray:0 999}
 .pf-in>.kp{position:absolute;left:0;top:0;width:375px;height:812px;transform-origin:0 0;transform:scale(var(--k,.48));overflow:hidden}
 .pf-in>img{display:block;width:100%;height:100%;object-fit:cover}
 /* 불편 지점 표시: 요소 둘레 진한 테두리 + 번호(화면 좌표 안, 화면과 함께 줄어듦). 켜질 때 쫀득하게 */
-.hot{position:absolute;z-index:4;border-radius:10px;box-shadow:0 0 0 3px #fff,0 0 0 7px var(--hot);pointer-events:none;opacity:0;transform:scale(1.04);transition:opacity 240ms var(--ease-out),transform 420ms var(--spring)}
-.hot b{position:absolute;left:-16px;top:-16px;display:grid;place-items:center;min-width:32px;height:32px;padding:0 8px;border-radius:999px;background:var(--hot);color:#fff;box-shadow:0 0 0 3px #fff;font-weight:600;font-size:17px;line-height:1}
+.hot{position:absolute;z-index:4;border-radius:10px;box-shadow:0 0 0 2px #fff,0 0 0 5px var(--hot),0 0 18px 4px color-mix(in srgb,var(--hot) 30%,transparent);pointer-events:none;opacity:0;transform:scale(1.04);transition:opacity 240ms var(--ease-out),transform 420ms var(--spring)}
 .hot.on{opacity:1;transform:none}
-.hot.in b{left:8px;top:8px}
 .phs{display:flex;justify-content:space-between;gap:var(--s-4)}
 .ph{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0;flex:1}
 .ph .pf{--pw:min(100%,184px);transition:opacity 260ms var(--ease-out),transform 520ms var(--spring)}
-.ph-tag{display:inline-flex;align-items:center;height:24px;padding:0 10px;margin-bottom:var(--s-3);border-radius:999px;background:var(--ink);color:var(--on-ink);font:var(--t-caption);letter-spacing:var(--ls-caption)}
-.ph-sp{height:24px;margin-bottom:var(--s-3)}
-.ph-n{margin-top:var(--s-4);font:var(--t-caption);letter-spacing:var(--ls-caption);color:var(--label-3);font-variant-numeric:tabular-nums}
-.ph-t{margin-top:2px;font:var(--t-headline);letter-spacing:var(--ls-headline)}
-.ph-d{margin-top:2px;font:var(--t-footnote);letter-spacing:var(--ls-footnote);color:var(--label-2)}
+/* 폰 아래 캡션: 왼쪽 정렬 · 폰 폭에 맞춤 · 위 선(번호 줄)이 모든 폰에서 같은 높이. '문제 지점'은 번호 옆 빨간 표시 */
+.ph-c{width:min(100%,184px);margin-top:var(--s-4);text-align:left}
+.ph-n{display:flex;align-items:center;gap:8px;min-height:22px;font:var(--t-caption);letter-spacing:var(--ls-caption);color:var(--label-3);font-variant-numeric:tabular-nums}
+.ph-tag{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:999px;background:color-mix(in srgb,var(--hot) 12%,transparent);color:var(--hot);font:var(--t-caption);letter-spacing:var(--ls-caption);font-weight:500}
+.ph-t{margin-top:4px;font:var(--t-headline);letter-spacing:var(--ls-headline);text-wrap:balance}
+.ph-d{margin-top:4px;font:var(--t-footnote);letter-spacing:var(--ls-footnote);color:var(--label-2)}
 .phs.pick .ph:not(.sel) .pf{opacity:.35;transform:scale(.97)}
 .ph[data-step]{cursor:pointer}
 .pk{display:flex;justify-content:center;margin-bottom:var(--s-6)}
@@ -1027,7 +1026,7 @@ html.rv-js .rv:not(.in){filter:none!important;translate:0 12px}
     <h3 class="bh rv">직접 고르려던 좌석이 안내 없이 자동 배정됨</h3>
     <p class="bl rv">좌석을 고르지 않고 예매를 진행하면 <b>시스템이 안내 없이 좌석을 자동 배정한다.</b> 화면을 누르면 불편했던 지점이 보인다.</p>
     <div class="box phs scroll" id="flow5">
-      <div class="ph rv" data-step="1" role="button" tabindex="0" aria-pressed="false" style="--k:0"><span class="ph-sp"></span><div class="pf" role="img" aria-label="열차 조회 진행"><div class="pf-in"><div class="kp" data-id="a05-1"><div class="ka">
+      <div class="ph rv" data-step="1" role="button" tabindex="0" aria-pressed="false" style="--k:0"><div class="pf" role="img" aria-label="열차 조회 진행"><div class="pf-in"><div class="kp" data-id="a05-1"><div class="ka">
   <div class="ka-hd"></div>
   <div class="ka-sb"><div class="ka-sb-t">10:29<svg width="11" height="11" viewBox="0 0 12 12"><path d="M11.5.5 .8 5.2l4.9.9.9 5z" fill="currentColor"/></svg></div>
     <div class="ka-sb-r"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="7" width="3" height="4" rx=".8" fill="currentColor"/><rect x="5" y="4.7" width="3" height="6.3" rx=".8" fill="currentColor"/><rect x="10" y="2.3" width="3" height="8.7" rx=".8" fill="currentColor"/><rect x="15" y="0" width="3" height="11" rx=".8" fill="currentColor"/></svg><span>LTE</span><span class="ka-bat">53</span></div></div>
@@ -1092,7 +1091,7 @@ html.rv-js .rv:not(.in){filter:none!important;translate:0 12px}
     <div class="ka-tab-i" style="left:281px"><svg width="32" height="26" viewBox="0 0 32 26" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"><path d="M2 8h28v16H2z"/><path d="M5 8l17-6 2 6"/><path d="M11 16l3 3 6-6"/></svg><span>나의 티켓</span></div>
   </div>
 </div></div>
-</div></div><p class="ph-n">01</p><p class="ph-t">열차 조회 진행</p><p class="ph-d">원하는 열차와 좌석을 선택할 것으로 기대</p></div><div class="ph rv" data-step="2" role="button" tabindex="0" aria-pressed="false" style="--k:1"><span class="ph-tag">문제 지점</span><div class="pf" role="img" aria-label="좌석 선택 단계 인지 실패 가능성"><div class="pf-in"><div class="kp" data-id="a05-2"><div class="ka" style="background:#F5F5F5">
+</div></div><div class="ph-c"><p class="ph-n">01</p><p class="ph-t">열차 조회 진행</p><p class="ph-d">원하는 열차와 좌석을 선택할 것으로 기대</p></div></div><div class="ph rv" data-step="2" role="button" tabindex="0" aria-pressed="false" style="--k:1"><div class="pf" role="img" aria-label="좌석 선택 단계 인지 실패 가능성"><div class="pf-in"><div class="kp" data-id="a05-2"><div class="ka" style="background:#F5F5F5">
   <div class="ka-hd"></div>
   <div class="ka-sb"><div class="ka-sb-t">9:59<svg width="11" height="11" viewBox="0 0 12 12"><path d="M11.5.5 .8 5.2l4.9.9.9 5z" fill="currentColor"/></svg></div>
     <div class="ka-sb-r"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="7" width="3" height="4" rx=".8" fill="currentColor"/><rect x="5" y="4.7" width="3" height="6.3" rx=".8" fill="currentColor"/><rect x="10" y="2.3" width="3" height="8.7" rx=".8" fill="currentColor"/><rect x="15" y="0" width="3" height="11" rx=".8" fill="currentColor"/></svg><span>LTE</span><span class="ka-bat">55</span></div></div>
@@ -1159,7 +1158,7 @@ html.rv-js .rv:not(.in){filter:none!important;translate:0 12px}
     <div class="ka-tab-i" style="left:281px"><svg width="32" height="26" viewBox="0 0 32 26" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"><path d="M2 8h28v16H2z"/><path d="M5 8l17-6 2 6"/><path d="M11 16l3 3 6-6"/></svg><span>나의 티켓</span></div>
   </div>
 </div></div>
-</div></div><p class="ph-n">02</p><p class="ph-t">좌석 선택 단계 인지 실패 가능성</p><p class="ph-d">&#x27;예매&#x27; 버튼 선택 시 좌석 선택 없이 진행 가능</p></div><div class="ph rv" data-step="3" role="button" tabindex="0" aria-pressed="false" style="--k:2"><span class="ph-sp"></span><div class="pf" role="img" aria-label="좌석 선택 기회 제공"><div class="pf-in"><div class="kp" data-id="a05-3"><div class="ka" style="background:#F8F8F8">
+</div></div><div class="ph-c"><p class="ph-n">02<span class="ph-tag">문제 지점</span></p><p class="ph-t">좌석 선택 단계 인지 실패 가능성</p><p class="ph-d">&#x27;예매&#x27; 버튼 선택 시 좌석 선택 없이 진행 가능</p></div></div><div class="ph rv" data-step="3" role="button" tabindex="0" aria-pressed="false" style="--k:2"><div class="pf" role="img" aria-label="좌석 선택 기회 제공"><div class="pf-in"><div class="kp" data-id="a05-3"><div class="ka" style="background:#F8F8F8">
   <div class="ka-hd"></div>
   <div class="ka-sb"><div class="ka-sb-t">9:59<svg width="11" height="11" viewBox="0 0 12 12"><path d="M11.5.5 .8 5.2l4.9.9.9 5z" fill="currentColor"/></svg></div>
     <div class="ka-sb-r"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="7" width="3" height="4" rx=".8" fill="currentColor"/><rect x="5" y="4.7" width="3" height="6.3" rx=".8" fill="currentColor"/><rect x="10" y="2.3" width="3" height="8.7" rx=".8" fill="currentColor"/><rect x="15" y="0" width="3" height="11" rx=".8" fill="currentColor"/></svg><span>LTE</span><span class="ka-bat">55</span></div></div>
@@ -1229,7 +1228,7 @@ html.rv-js .rv:not(.in){filter:none!important;translate:0 12px}
   <div class="ka-cta" data-hot="h1" style="top:726px;height:54px"><span class="ka-c" style="left:187px;top:27px">선택 완료</span></div>
   <div class="ka-a" style="left:0;top:780px;width:375px;height:32px;background:#fff"></div>
 </div></div>
-</div></div><p class="ph-n">03</p><p class="ph-t">좌석 선택 기회 제공</p><p class="ph-d">원하는 좌석을 직접 선택할 수 있는 단계</p></div><div class="ph rv" data-step="4" role="button" tabindex="0" aria-pressed="false" style="--k:3"><span class="ph-tag">문제 지점</span><div class="pf" role="img" aria-label="자동 배정 사실 미인지"><div class="pf-in"><div class="kp" data-id="a05-4"><div class="ka" style="background:#FBFBFB">
+</div></div><div class="ph-c"><p class="ph-n">03</p><p class="ph-t">좌석 선택 기회 제공</p><p class="ph-d">원하는 좌석을 직접 선택할 수 있는 단계</p></div></div><div class="ph rv" data-step="4" role="button" tabindex="0" aria-pressed="false" style="--k:3"><div class="pf" role="img" aria-label="자동 배정 사실 미인지"><div class="pf-in"><div class="kp" data-id="a05-4"><div class="ka" style="background:#FBFBFB">
   <div class="ka-hd"></div>
   <div class="ka-sb"><div class="ka-sb-t">9:59<svg width="11" height="11" viewBox="0 0 12 12"><path d="M11.5.5 .8 5.2l4.9.9.9 5z" fill="currentColor"/></svg></div>
     <div class="ka-sb-r"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="7" width="3" height="4" rx=".8" fill="currentColor"/><rect x="5" y="4.7" width="3" height="6.3" rx=".8" fill="currentColor"/><rect x="10" y="2.3" width="3" height="8.7" rx=".8" fill="currentColor"/><rect x="15" y="0" width="3" height="11" rx=".8" fill="currentColor"/></svg><span>LTE</span><span class="ka-bat">55</span></div></div>
@@ -1264,7 +1263,7 @@ html.rv-js .rv:not(.in){filter:none!important;translate:0 12px}
   <span class="ka-nt ka-lk" style="top:666.5px;white-space:pre">▶  열차 내 물품 휴대기준 확인하기</span>
   <div class="ka-cta" data-hot="h1" style="top:726px;height:54px;font-weight:500"><span class="ka-c" style="left:187px;top:27px">결제하기</span></div>
 </div></div>
-</div></div><p class="ph-n">04</p><p class="ph-t">자동 배정 사실 미인지</p><p class="ph-d">좌석 미선택 시 자동 배정 여부를 인지하기 어려움</p></div><div class="ph rv" data-step="5" role="button" tabindex="0" aria-pressed="false" style="--k:4"><span class="ph-sp"></span><div class="pf" role="img" aria-label="결제 단계 진입"><div class="pf-in"><div class="kp" data-id="a05-5"><div class="ka" style="background:#F8F8F8">
+</div></div><div class="ph-c"><p class="ph-n">04<span class="ph-tag">문제 지점</span></p><p class="ph-t">자동 배정 사실 미인지</p><p class="ph-d">좌석 미선택 시 자동 배정 여부를 인지하기 어려움</p></div></div><div class="ph rv" data-step="5" role="button" tabindex="0" aria-pressed="false" style="--k:4"><div class="pf" role="img" aria-label="결제 단계 진입"><div class="pf-in"><div class="kp" data-id="a05-5"><div class="ka" style="background:#F8F8F8">
   <div class="ka-hd" style="height:97px;background:#7B5DB3"></div>
   <div class="ka-sb"><div class="ka-sb-t">8:58<svg width="11" height="11" viewBox="0 0 12 12"><path d="M11.5.5 .8 5.2l4.9.9.9 5z" fill="currentColor"/></svg></div>
     <div class="ka-sb-r" style="gap:7px"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="7" width="3" height="4" rx=".8" fill="#fff"/><rect x="5" y="4.7" width="3" height="6.3" rx=".8" fill="#fff"/><rect x="10" y="2.3" width="3" height="8.7" rx=".8" fill="rgba(255,255,255,.45)"/><rect x="15" y="0" width="3" height="11" rx=".8" fill="rgba(255,255,255,.45)"/></svg>
@@ -1308,7 +1307,7 @@ html.rv-js .rv:not(.in){filter:none!important;translate:0 12px}
   <div class="ka-cta" style="top:726px;height:54px;font-size:17px"><span class="ka-c" style="left:93px;top:27px">예약취소</span><span class="ka-a" style="left:187px;top:0;width:1px;height:54px;background:#B5C6D4"></span><span class="ka-c" style="left:281px;top:27px">다음</span></div>
   <div class="ka-a" style="left:0;top:780px;width:375px;height:32px;background:#fff"></div>
 </div></div>
-</div></div><p class="ph-n">05</p><p class="ph-t">결제 단계 진입</p><p class="ph-d">자동 배정된 좌석으로 결제 진행</p></div>
+</div></div><div class="ph-c"><p class="ph-n">05</p><p class="ph-t">결제 단계 진입</p><p class="ph-d">자동 배정된 좌석으로 결제 진행</p></div></div>
     </div>
   </div>
 
@@ -1398,7 +1397,7 @@ html.rv-js .rv:not(.in){filter:none!important;translate:0 12px}
     <div class="ka-tab-i" style="left:281px"><svg width="32" height="26" viewBox="0 0 32 26" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"><path d="M2 8h28v16H2z"/><path d="M5 8l17-6 2 6"/><path d="M11 16l3 3 6-6"/></svg><span>나의 티켓</span></div>
   </div>
 </div></div>
-</div></div><p class="ph-n">Task 1 · 2 시작</p><p class="ph-d">코레일톡 홈 · 승차권 예매</p></div><div class="ph rv" style="--k:1"><div class="pf" role="img" aria-label="출발역 선택"><div class="pf-in"><div class="kp" data-id="a08-2"><div class="ka">
+</div></div><div class="ph-c"><p class="ph-n">Task 1 · 2 시작</p><p class="ph-d">코레일톡 홈 · 승차권 예매</p></div></div><div class="ph rv" style="--k:1"><div class="pf" role="img" aria-label="출발역 선택"><div class="pf-in"><div class="kp" data-id="a08-2"><div class="ka">
   <div class="ka-hd"></div>
   <div class="ka-sb"><div class="ka-sb-t">10:29<svg width="11" height="11" viewBox="0 0 12 12"><path d="M11.5.5 .8 5.2l4.9.9.9 5z" fill="currentColor"/></svg></div>
     <div class="ka-sb-r"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="7" width="3" height="4" rx=".8" fill="currentColor"/><rect x="5" y="4.7" width="3" height="6.3" rx=".8" fill="currentColor"/><rect x="10" y="2.3" width="3" height="8.7" rx=".8" fill="currentColor"/><rect x="15" y="0" width="3" height="11" rx=".8" fill="currentColor"/></svg><span>LTE</span><span class="ka-bat">53</span></div></div>
@@ -1453,7 +1452,7 @@ html.rv-js .rv:not(.in){filter:none!important;translate:0 12px}
     <div class="ka-tab-i" style="left:281px"><svg width="32" height="26" viewBox="0 0 32 26" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"><path d="M2 8h28v16H2z"/><path d="M5 8l17-6 2 6"/><path d="M11 16l3 3 6-6"/></svg><span>나의 티켓</span></div>
   </div>
 </div></div>
-</div></div><p class="ph-n">Task 1 · 목적지 설정</p><p class="ph-d">출발역 선택</p></div><div class="ph rv" style="--k:2"><div class="pf" role="img" aria-label="가는날 선택"><div class="pf-in"><div class="kp" data-id="a08-3"><div class="ka" style="background:#fff">
+</div></div><div class="ph-c"><p class="ph-n">Task 1 · 목적지 설정</p><p class="ph-d">출발역 선택</p></div></div><div class="ph rv" style="--k:2"><div class="pf" role="img" aria-label="가는날 선택"><div class="pf-in"><div class="kp" data-id="a08-3"><div class="ka" style="background:#fff">
   <div class="ka-hd"></div>
   <div class="ka-sb"><div class="ka-sb-t">10:29<svg width="11" height="11" viewBox="0 0 12 12"><path d="M11.5.5 .8 5.2l4.9.9.9 5z" fill="currentColor"/></svg></div>
     <div class="ka-sb-r"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="7" width="3" height="4" rx=".8" fill="currentColor"/><rect x="5" y="4.7" width="3" height="6.3" rx=".8" fill="currentColor"/><rect x="10" y="2.3" width="3" height="8.7" rx=".8" fill="currentColor"/><rect x="15" y="0" width="3" height="11" rx=".8" fill="currentColor"/></svg><span>LTE</span><span class="ka-bat">53</span></div></div>
@@ -1526,7 +1525,7 @@ html.rv-js .rv:not(.in){filter:none!important;translate:0 12px}
     <div class="ka-tab-i" style="left:281px"><svg width="32" height="26" viewBox="0 0 32 26" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"><path d="M2 8h28v16H2z"/><path d="M5 8l17-6 2 6"/><path d="M11 16l3 3 6-6"/></svg><span>나의 티켓</span></div>
   </div>
 </div></div>
-</div></div><p class="ph-n">Task 2 · 날짜 선택</p><p class="ph-d">가는날 선택</p></div><div class="ph rv" style="--k:3"><div class="pf" role="img" aria-label="열차 조회 · 열차 선택 후 아래 시트"><div class="pf-in"><div class="kp" data-id="a08-4"><div class="ka" style="background:#F5F5F5">
+</div></div><div class="ph-c"><p class="ph-n">Task 2 · 날짜 선택</p><p class="ph-d">가는날 선택</p></div></div><div class="ph rv" style="--k:3"><div class="pf" role="img" aria-label="열차 조회 · 열차 선택 후 아래 시트"><div class="pf-in"><div class="kp" data-id="a08-4"><div class="ka" style="background:#F5F5F5">
   <div class="ka-hd"></div>
   <div class="ka-sb"><div class="ka-sb-t">9:59<svg width="11" height="11" viewBox="0 0 12 12"><path d="M11.5.5 .8 5.2l4.9.9.9 5z" fill="currentColor"/></svg></div>
     <div class="ka-sb-r"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="7" width="3" height="4" rx=".8" fill="currentColor"/><rect x="5" y="4.7" width="3" height="6.3" rx=".8" fill="currentColor"/><rect x="10" y="2.3" width="3" height="8.7" rx=".8" fill="currentColor"/><rect x="15" y="0" width="3" height="11" rx=".8" fill="currentColor"/></svg><span>LTE</span><span class="ka-bat">55</span></div></div>
@@ -1593,7 +1592,7 @@ html.rv-js .rv:not(.in){filter:none!important;translate:0 12px}
     <div class="ka-tab-i" style="left:281px"><svg width="32" height="26" viewBox="0 0 32 26" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"><path d="M2 8h28v16H2z"/><path d="M5 8l17-6 2 6"/><path d="M11 16l3 3 6-6"/></svg><span>나의 티켓</span></div>
   </div>
 </div></div>
-</div></div><p class="ph-n">Task 3 · 열차 선택</p><p class="ph-d">열차 조회 · 열차 선택 후 아래 시트</p></div><div class="ph rv" style="--k:4"><div class="pf" role="img" aria-label="9호차 좌석 선택"><div class="pf-in"><div class="kp" data-id="a08-5"><div class="ka" style="background:#F8F8F8">
+</div></div><div class="ph-c"><p class="ph-n">Task 3 · 열차 선택</p><p class="ph-d">열차 조회 · 열차 선택 후 아래 시트</p></div></div><div class="ph rv" style="--k:4"><div class="pf" role="img" aria-label="9호차 좌석 선택"><div class="pf-in"><div class="kp" data-id="a08-5"><div class="ka" style="background:#F8F8F8">
   <div class="ka-hd"></div>
   <div class="ka-sb"><div class="ka-sb-t">9:59<svg width="11" height="11" viewBox="0 0 12 12"><path d="M11.5.5 .8 5.2l4.9.9.9 5z" fill="currentColor"/></svg></div>
     <div class="ka-sb-r"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="7" width="3" height="4" rx=".8" fill="currentColor"/><rect x="5" y="4.7" width="3" height="6.3" rx=".8" fill="currentColor"/><rect x="10" y="2.3" width="3" height="8.7" rx=".8" fill="currentColor"/><rect x="15" y="0" width="3" height="11" rx=".8" fill="currentColor"/></svg><span>LTE</span><span class="ka-bat">55</span></div></div>
@@ -1663,7 +1662,7 @@ html.rv-js .rv:not(.in){filter:none!important;translate:0 12px}
   <div class="ka-cta" data-hot="p2" style="top:726px;height:54px"><span class="ka-c" style="left:187px;top:27px">선택 완료</span></div>
   <div class="ka-a" style="left:0;top:780px;width:375px;height:32px;background:#fff"></div>
 </div></div>
-</div></div><p class="ph-n">Task 4 · 창가 자리 선택</p><p class="ph-d">9호차 좌석 선택</p></div><div class="ph rv" style="--k:5"><div class="pf" role="img" aria-label="승차권 정보 확인"><div class="pf-in"><div class="kp" data-id="a08-6"><div class="ka" style="background:#FBFBFB">
+</div></div><div class="ph-c"><p class="ph-n">Task 4 · 창가 자리 선택</p><p class="ph-d">9호차 좌석 선택</p></div></div><div class="ph rv" style="--k:5"><div class="pf" role="img" aria-label="승차권 정보 확인"><div class="pf-in"><div class="kp" data-id="a08-6"><div class="ka" style="background:#FBFBFB">
   <div class="ka-hd"></div>
   <div class="ka-sb"><div class="ka-sb-t">9:59<svg width="11" height="11" viewBox="0 0 12 12"><path d="M11.5.5 .8 5.2l4.9.9.9 5z" fill="currentColor"/></svg></div>
     <div class="ka-sb-r"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="7" width="3" height="4" rx=".8" fill="currentColor"/><rect x="5" y="4.7" width="3" height="6.3" rx=".8" fill="currentColor"/><rect x="10" y="2.3" width="3" height="8.7" rx=".8" fill="currentColor"/><rect x="15" y="0" width="3" height="11" rx=".8" fill="currentColor"/></svg><span>LTE</span><span class="ka-bat">55</span></div></div>
@@ -1698,7 +1697,7 @@ html.rv-js .rv:not(.in){filter:none!important;translate:0 12px}
   <span class="ka-nt ka-lk" style="top:666.5px;white-space:pre">▶  열차 내 물품 휴대기준 확인하기</span>
   <div class="ka-cta" style="top:726px;height:54px;font-weight:500"><span class="ka-c" style="left:187px;top:27px">결제하기</span></div>
 </div></div>
-</div></div><p class="ph-n">Task 5 · 예약 내역 확인</p><p class="ph-d">승차권 정보 확인</p></div>
+</div></div><div class="ph-c"><p class="ph-n">Task 5 · 예약 내역 확인</p><p class="ph-d">승차권 정보 확인</p></div></div>
     </div>
   </div>
 
@@ -2480,13 +2479,12 @@ function seg(sg,onSet,start){var bs=$$('button',sg),ink=document.createElement('
 function fit(pin){var kp=$('.kp',pin);if(!kp)return;var k=pin.clientWidth/375;kp.style.setProperty('--k',k);pin._k=k}
 var pins=$$('.pf-in');pins.forEach(fit);
 if('ResizeObserver' in window){var ro=new ResizeObserver(function(es){es.forEach(function(e){fit(e.target)})});pins.forEach(function(p){ro.observe(p)})}else addEventListener('resize',function(){pins.forEach(fit)});
-function badge(el){var v=el.dataset.hot||'',m=v.match(/^p(\d)$/);if(m)return m[1];var ph=el.closest('#flow5 .ph');return ph?ph.dataset.step:''}
 function rings(){$$('.kp').forEach(function(kp){$$('.hot',kp).forEach(function(h){h.remove()});var pin=kp.parentNode,k=pin._k||(pin.clientWidth/375)||1,R=kp.getBoundingClientRect();
   $$('[data-hot]',kp).forEach(function(el){var r=el.getBoundingClientRect();if(!r.width)return;var h=document.createElement('i'),pad=5;h.className='hot';h.dataset.key=el.dataset.hot;
     /* 화면 끝에 붙은 요소는 테두리 · 번호가 폰 밖으로 잘리지 않게 안쪽으로 당김 */
     var x0=Math.max((r.left-R.left)/k-pad,9),y0=Math.max((r.top-R.top)/k-pad,9),x1=Math.min((r.right-R.left)/k+pad,366),y1=Math.min((r.bottom-R.top)/k+pad,803);
     h.style.left=x0+'px';h.style.top=y0+'px';h.style.width=(x1-x0)+'px';h.style.height=(y1-y0)+'px';if(x0<26||y0<26)h.classList.add('in');
-    var n=badge(el);if(n){var b=document.createElement('b');b.textContent=n;h.appendChild(b)}kp.appendChild(h)})})}
+    kp.appendChild(h)})})}   /* 번호 동그라미는 뺌(사용자 11-18 "박스에 있는 숫자 빼도 돼") */
 function showRings(scope,test,stagger){$$('.hot',scope).forEach(function(h,i){var on=test?test(h):true;clearTimeout(h._t);if(on&&stagger&&!RM)h._t=setTimeout(function(){h.classList.add('on')},i*stagger);else h.classList.toggle('on',on)})}
 /* 화면 폭이 바뀌면 테두리 자리를 다시 잼(켜짐 상태는 유지) */
 function relayout(){var st=$$('.hot.on').map(function(h){return h.parentNode.closest('.pf')});rings();st.forEach(function(pf){if(pf)$$('.hot',pf).forEach(function(h){h.classList.add('on')})})}
