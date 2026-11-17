@@ -9213,8 +9213,9 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 
 /* ── 3. 고르기 알약: 진한 알약이 고른 칸으로 spring으로 미끄러짐 · 안 고른 칸은 올리면 옅은 바탕 · 누르면 눌림 · 고른 칸 누르면 진한 알약이 눌림 */
 .nv4-seg { position: relative; display: flex; width: 100%; padding: 3px; border-radius: 999px; background: var(--ui-bg); box-shadow: 0 0 0 1px var(--ui-sep); isolation: isolate; }
-.nv4-seg .th { position: absolute; z-index: -1; top: 3px; bottom: 3px; left: 0; width: 0; border-radius: 999px; background: var(--ui-label); box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
-  transition: translate var(--ui-d3) var(--ui-spring), width var(--ui-d3) var(--ui-spring), scale var(--ui-d3) var(--ui-spring); }
+.nv4-seg .th { position: absolute; z-index: -1; top: 3px; bottom: 3px; left: 3px; width: calc((100% - 6px) / var(--n, 1)); translate: calc(var(--i, 0) * 100%) 0; border-radius: 999px; background: var(--ui-label); box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
+  will-change: translate; transition: translate var(--ui-d3) var(--ui-spring), scale var(--ui-d3) var(--ui-spring); }
+.nv4-th-now .th { transition: none !important; }   /* 15판: 설정 화면을 열 때 자리만 맞춤(움직임 없이) */
 .nv4-seg button { position: relative; flex: 1 1 0; min-width: 0; height: 30px; padding: 0 6px; border: 0; border-radius: 999px; background: transparent; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   font: var(--t-callout); font-family: inherit; letter-spacing: var(--ls-callout); color: var(--ui-label-2); -webkit-tap-highlight-color: transparent;
   transition: color var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
@@ -9222,13 +9223,13 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 @media (hover: hover) { .nv4-seg button:not([aria-checked="true"]):hover { color: var(--ui-label); background: color-mix(in srgb, var(--ui-label) 6%, transparent); } }
 .nv4-seg button:not([aria-checked="true"]):active { background: color-mix(in srgb, var(--ui-label) 9%, transparent); }
 .nv4-seg button:active { transform: var(--ui-press); transition-duration: var(--ui-d2), var(--ui-d2), var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
-.nv4-seg:has(button[aria-checked="true"]:active) .th { scale: .95 .9; transition-duration: var(--ui-d3), var(--ui-d3), var(--ui-d1); transition-timing-function: var(--ui-spring), var(--ui-spring), var(--ui-ease-out); }
+.nv4-seg:has(button[aria-checked="true"]:active) .th { scale: .95 .9; transition-duration: var(--ui-d3), var(--ui-d1); transition-timing-function: var(--ui-spring), var(--ui-ease-out); }
 .nv4-seg button:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 2px; }
 @media (pointer: coarse) { .nv4-seg button::after { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: 44px; translate: -50% -50%; border-radius: 999px; } }
 
 /* ── 4. 상단 톱니(#g-set): 메뉴를 열었을 때만 보임. 열 때 소리와 X 사이가 벌어지며 들어옴(d3 spring, 60ms 늦게), 닫을 때 d2 ease-out으로 접힘
    히어로 덮개 .gbtn transition(!important)이 폭 · 여백 움직임을 지우므로 톱니만 같은 세기로 되살림(12판). 아이콘 회전 없음 · 올림 반응 없음(13판 · 13판-2) */
-#g-set { overflow: hidden; transition: transform var(--ui-d3) var(--ui-spring) 60ms, width var(--ui-d3) var(--ui-spring) 60ms, margin var(--ui-d3) var(--ui-spring) 60ms, opacity var(--ui-d2) var(--ui-ease-out) 60ms, box-shadow var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out) !important; }
+#g-set { overflow: hidden; transition: transform var(--ui-d3) var(--ui-spring), width var(--ui-d3) var(--ui-spring) 60ms, margin var(--ui-d3) var(--ui-spring) 60ms, opacity var(--ui-d2) var(--ui-ease-out) 60ms, box-shadow var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out) !important; }
 .gnb:has(#g-menu[aria-expanded="false"]) #g-set { width: 0; min-width: 0; padding: 0; border-width: 0; margin-right: -8px; opacity: 0; transform: scale(.6); pointer-events: none;
   transition: transform var(--ui-d2) var(--ui-ease-out), width var(--ui-d2) var(--ui-ease-out), margin var(--ui-d2) var(--ui-ease-out), opacity var(--ui-d1) var(--ui-ease-out) !important; }
 #g-set:active { transition-delay: 0s !important; }
@@ -9299,7 +9300,7 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
   ];
   var set = document.createElement('section'); set.className = 'nv4-pane nv4-set'; set.id = 'nv4-set'; set.setAttribute('aria-hidden', 'true'); set.setAttribute('aria-labelledby', 'nv4-set-h');
   set.innerHTML = '<div class="nv4-sh"><h2 id="nv4-set-h" data-t="set" tabindex="-1">설정</h2></div><ul class="nv4-opts">' +
-    OPTS.map(function (o, k) { return '<li class="nv4-opt" style="--k:' + k + '"><div class="nv4-ol"><b id="nv4-l-' + o[0] + '" data-t="o_' + o[0] + '">' + o[1] + '</b></div><div class="nv4-seg" role="radiogroup" aria-labelledby="nv4-l-' + o[0] + '" data-k="' + o[0] + '"><span class="th" aria-hidden="true"></span>' +
+    OPTS.map(function (o, k) { return '<li class="nv4-opt" style="--k:' + k + '"><div class="nv4-ol"><b id="nv4-l-' + o[0] + '" data-t="o_' + o[0] + '">' + o[1] + '</b></div><div class="nv4-seg" role="radiogroup" aria-labelledby="nv4-l-' + o[0] + '" data-k="' + o[0] + '" style="--n:' + o[3].length + ';--i:0"><span class="th" aria-hidden="true"></span>' +
       o[3].map(function (c, i) { return '<button type="button" role="radio" data-v="' + c[0] + '"' + (o[0] === 'lang' ? ' lang="' + c[0] + '"' : ' data-t="v_' + o[0] + '_' + c[0] + '"') + ' aria-checked="' + (i === 0) + '">' + c[1] + '</button>'; }).join('') + '</div></li>'; }).join('') + '</ul>';
   views.appendChild(set);
   // 차례 등장 순서(사이트 방식 --i · --n)를 새 항목에 맞춤
@@ -9342,8 +9343,10 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
   // 6) 고르기 알약: 진한 알약이 고른 칸으로 spring으로 미끄러짐. 소리는 상단 소리 버튼과 같은 상태(누르면 그 버튼을 대신 누름)
   var ST = {}; try { ST = JSON.parse(localStorage.getItem('nv4-set') || '{}') || {}; } catch (_) {}
   var vb = document.getElementById('g-voice');
-  function seg(g, instant) { var b = g.querySelector('[aria-checked="true"]'), th = g.querySelector('.th'); if (!b || !b.offsetWidth) return;
-    if (instant) th.style.transition = 'none'; th.style.width = b.offsetWidth + 'px'; th.style.translate = b.offsetLeft + 'px 0'; if (instant) { void th.offsetWidth; th.style.transition = ''; } }
+  // 15판(11-18): 진한 알약 자리는 CSS가 칸 순서(--i)로 정함(폭 = 칸 폭, 옮김 = translate만) → 위치를 재지 않아 화면 배치를 다시 계산하지 않고, 언어 · 창 크기가 바뀌어도 어긋나지 않음. instant = 움직임 없이(설정 화면을 열 때만)
+  function seg(g, instant) { var bs = [].slice.call(g.querySelectorAll('button')), i = bs.findIndex(function (b) { return b.getAttribute('aria-checked') === 'true'; }); if (i < 0) return;
+    if (String(i) === g.style.getPropertyValue('--i').trim()) return;
+    if (instant) g.classList.add('nv4-th-now'); g.style.setProperty('--i', i); if (instant) { getComputedStyle(g.querySelector('.th')).translate; g.classList.remove('nv4-th-now'); } }
   function pick(g, v) { g.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-checked', b.dataset.v === v); }); }
   function segAll() { set.querySelectorAll('.nv4-seg').forEach(function (g) { var k = g.dataset.k;
       if (k === 'voice' && vb) pick(g, vb.getAttribute('aria-pressed') === 'true' ? 'on' : 'off'); else if (ST[k]) pick(g, ST[k]);
@@ -9372,19 +9375,20 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
     a_open: ['프로젝트 목록 펼치기', 'Show projects', 'プロジェクトを開く', '展开项目'], a_close: ['프로젝트 목록 접기', 'Hide projects', 'プロジェクトを閉じる', '收起项目'], a_back: ['메뉴로 돌아가기', 'Back to menu', 'メニューに戻る', '返回菜单']
   }, LI = { ko: 0, en: 1, ja: 2, zh: 3 }, CUR = 0;
   function tr(k) { return (T[k] || [])[CUR] || (T[k] || [])[0] || ''; }
-  function applyLang(l, anim) { CUR = LI[l] || 0; side.setAttribute('lang', l || 'ko');
+  var LT = 0;
+  function applyLang(l, anim) { CUR = LI[l] || 0; var tk = ++LT;
     // 10판: 언어를 바꾸면 글이 흐려지며 사라졌다가(0.12초) 새 말이 흐림에서 또렷하게 차례로(0.42초, 20ms 간격) — 답 글이 나오는 모습과 같은 규칙
+    // 15판: 글 · lang은 다 사라진 순간 한 번에 바꿈(전에는 글 하나마다 바꾸고 알약 다섯 개 자리를 다시 재서 배치를 수십 번 다시 계산 · 알약 움직임을 끊음). 빨리 연달아 누르면 마지막 언어만
     var ns = [].slice.call(side.querySelectorAll('[data-t]')).filter(function (n) { return n.textContent !== tr(n.getAttribute('data-t')); });
-    function put(n) { n.textContent = tr(n.getAttribute('data-t')); }
-    if (!anim || RM || !ns.length || !ns[0].animate) ns.forEach(put);
-    else ns.forEach(function (n, i) { var o = n.animate([{ opacity: 1, filter: 'blur(0px)' }, { opacity: 0, filter: 'blur(4px)' }], { duration: 120, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' });
-      o.onfinish = function () { put(n); o.cancel(); n.animate([{ opacity: 0, filter: 'blur(4px)' }, { opacity: 1, filter: 'blur(0px)' }], { duration: 420, delay: i * 20, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' });
-        set.querySelectorAll('.nv4-seg').forEach(function (g) { seg(g, true); }); }; });
+    function swap() { side.setAttribute('lang', l || 'ko'); [].forEach.call(side.querySelectorAll('[data-t]'), function (n) { var t = tr(n.getAttribute('data-t')); if (n.textContent !== t) n.textContent = t; }); }
+    if (!anim || RM || !ns.length || !ns[0].animate) swap();
+    else { var E = 'cubic-bezier(.22,1,.36,1)', outs = ns.map(function (n) { return n.animate([{ opacity: 1, filter: 'blur(0px)' }, { opacity: 0, filter: 'blur(4px)' }], { duration: 120, easing: E, fill: 'forwards' }); });
+      outs[outs.length - 1].onfinish = function () { if (tk !== LT) { outs.forEach(function (o) { o.cancel(); }); return; }
+        swap(); ns.forEach(function (n, i) { outs[i].cancel(); n.animate([{ opacity: 0, filter: 'blur(4px)' }, { opacity: 1, filter: 'blur(0px)' }], { duration: 420, delay: i * 20, easing: E, fill: 'backwards' }); }); }; }
     gear.setAttribute('aria-label', tr('set')); gear.title = tr('set');
-    var tg = list.querySelector('.nv4-tg'); if (tg) tg.setAttribute('aria-label', tr(tg.getAttribute('aria-expanded') === 'true' ? 'a_close' : 'a_open'));
-    set.querySelectorAll('.nv4-seg').forEach(function (g) { seg(g, true); }); }
+    var tg = list.querySelector('.nv4-tg'); if (tg) tg.setAttribute('aria-label', tr(tg.getAttribute('aria-expanded') === 'true' ? 'a_close' : 'a_open')); }
   applyLang(ST.lang || 'ko');
-  place(); addEventListener('resize', function () { place(); if (set.getAttribute('aria-hidden') === 'false') { fit(); } if (set.getAttribute('aria-hidden') === 'false') set.querySelectorAll('.nv4-seg').forEach(function (g) { seg(g, true); }); });
+  place(); segAll(); addEventListener('resize', function () { place(); if (set.getAttribute('aria-hidden') === 'false') fit(); });   // 15판: 알약은 CSS 비율이라 창 크기가 바뀌어도 다시 맞출 일 없음
 })();
 
 </script>

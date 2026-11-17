@@ -1,0 +1,168 @@
+{
+ "gal_et1": [
+  {
+   "file": "case_files/gal/gal_et1_01.webp",
+   "slide": "s16",
+   "head": "Task Time"
+  },
+  {
+   "file": "case_files/gal/gal_et1_02.webp",
+   "slide": "s17",
+   "head": "접근 경로"
+  },
+  {
+   "file": "case_files/gal/gal_et1_03.webp",
+   "slide": "s18",
+   "head": "성공률"
+  },
+  {
+   "file": "case_files/gal/gal_et1_04.webp",
+   "slide": "s19",
+   "head": "기능 인지 여부 – 심각성을 수치화"
+  },
+  {
+   "file": "case_files/gal/gal_et1_05.webp",
+   "slide": "s20",
+   "head": "Real Voice"
+  },
+  {
+   "file": "case_files/gal/gal_et1_06.webp",
+   "slide": "s21",
+   "head": "Eyetracking에서 얻을 수 있는 데이터"
+  },
+  {
+   "file": "case_files/gal/gal_et1_07.webp",
+   "slide": "s22",
+   "head": "Eyetracking에서 얻을 수 있는 데이터"
+  },
+  {
+   "file": "case_files/gal/gal_et1_08.webp",
+   "slide": "s23",
+   "head": "Eyetracking에서 얻을 수 있는 데이터"
+  },
+  {
+   "file": "case_files/gal/gal_et1_09.webp",
+   "slide": "s24",
+   "head": "1차 사용성 평가 결과 (좌석 선택 기능 중심)"
+  },
+  {
+   "file": "case_files/gal/gal_et1_10.webp",
+   "slide": "s25",
+   "head": "개선할 기능을 좌석 기능에서 예약된 조회 기능으로 재선정"
+  },
+  {
+   "file": "case_files/gal/gal_et1_11.webp",
+   "slide": "s26",
+   "head": "사용성 평가 결과를 바탕으로 개선 기능 재선정"
+  },
+  {
+   "file": "case_files/gal/gal_et1_12.webp",
+   "slide": "s27",
+   "head": "1차 사용성 평가 결과 (예약된 승차권 조회 기능 중심)"
+  },
+  {
+   "file": "case_files/gal/gal_et1_13.webp",
+   "slide": "s28",
+   "head": "문제 정의 및 개선 방향"
+  }
+ ],
+ "gal_bench": [
+  {
+   "file": "case_files/gal/gal_bench_01.webp",
+   "slide": "s35",
+   "head": "벤치마킹 분석 기준"
+  },
+  {
+   "file": "case_files/gal/gal_bench_02.webp",
+   "slide": "s36",
+   "head": "코레일톡"
+  },
+  {
+   "file": "case_files/gal/gal_bench_03.webp",
+   "slide": "s37",
+   "head": "야놀자"
+  },
+  {
+   "file": "case_files/gal/gal_bench_04.webp",
+   "slide": "s38",
+   "head": "SRT"
+  },
+  {
+   "file": "case_files/gal/gal_bench_05.webp",
+   "slide": "s39",
+   "head": "티머니GO"
+  },
+  {
+   "file": "case_files/gal/gal_bench_06.webp",
+   "slide": "s40",
+   "head": "네이버지도"
+  },
+  {
+   "file": "case_files/gal/gal_bench_07.webp",
+   "slide": "s41",
+   "head": "벤치마킹 결과 분석"
+  },
+  {
+   "file": "case_files/gal/gal_bench_08.webp",
+   "slide": "s42",
+   "head": "벤치마킹 종합 비교"
+  }
+ ],
+ "gal_et2": [
+  {
+   "file": "case_files/gal/gal_et2_01.webp",
+   "slide": "s52",
+   "head": "Task Time 분석"
+  },
+  {
+   "file": "case_files/gal/gal_et2_02.webp",
+   "slide": "s53",
+   "head": "접근 경로 분석"
+  },
+  {
+   "file": "case_files/gal/gal_et2_03.webp",
+   "slide": "s54",
+   "head": "성공률 분석"
+  },
+  {
+   "file": "case_files/gal/gal_et2_04.webp",
+   "slide": "s55",
+   "head": "기능 인지 여부 분석 – 심각성을 수치화"
+  },
+  {
+   "file": "case_files/gal/gal_et2_05.webp",
+   "slide": "s56",
+   "head": "Real Voice 분석"
+  },
+  {
+   "file": "case_files/gal/gal_et2_06.webp",
+   "slide": "s57",
+   "head": "아이트레킹 분석 기준표"
+  },
+  {
+   "file": "case_files/gal/gal_et2_07.webp",
+   "slide": "s58",
+   "head": "2차 사용성 테스트 분석 결과"
+  },
+  {
+   "file": "case_files/gal/gal_et2_08.webp",
+   "slide": "s59",
+   "head": ""
+  },
+  {
+   "file": "case_files/gal/gal_et2_09.webp",
+   "slide": "s60",
+   "head": ""
+  },
+  {
+   "file": "case_files/gal/gal_et2_10.webp",
+   "slide": "s61",
+   "head": ""
+  },
+  {
+   "file": "case_files/gal/gal_et2_11.webp",
+   "slide": "s62",
+   "head": "2차 아이트레킹 분석 결과"
+  }
+ ]
+}
