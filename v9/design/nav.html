@@ -9399,6 +9399,18 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 .nv4-now > .nv4-pane { transition: none; }
 @media (prefers-reduced-motion: reduce) { .nv4-pane[aria-hidden="true"], .nv4-pane[aria-hidden="false"] { transition-duration: 1ms; transition-delay: 0s; } }
 
+/* ═══ 12판(2026-11-18 HPP): 사용자 "X버튼 지금 비대칭인 거 수정해주고 … 햄버거 메뉴 열었을 때 인터랙션 끊겨서 하나가 추가가 되는데, 자연스럽게 옆으로 밀려나도록 인터랙션 추가해줘. 추가적으로 설정 안에 각 설정 메뉴별로 흐린 회색 박스 처리가 되어 있는데, 이 부분 제거해줘."
+   (버튼별 호버 인터랙션은 사용자가 "그냥 다 넣지마"로 뺌)
+   ① X 비대칭: nav.css 햄버거 줄 기준점(fill-box 가운데)
+   ② 톱니가 끊기며 끼어듦: 히어로 덮개 .gbtn transition(!important)이 #g-set의 폭 · 여백 움직임을 지워 폭이 0 → 40으로 한 번에 바뀌고 버튼 줄이 24 튐
+      → #g-set만 같은 세기(!important)로 폭 · 여백 · 크기를 움직이게 해 홈 · 소리는 왼쪽, X는 오른쪽으로 밀려나며 톱니가 자리를 벌림(열 때 d3 spring 60ms 늦게, 닫을 때 d2 ease-out)
+   ③ 설정 항목 회색 바탕 상자 없앰(글 · 알약 자리는 그대로) ═══ */
+#g-set { transition: transform var(--ui-d3) var(--ui-spring) 60ms, width var(--ui-d3) var(--ui-spring) 60ms, margin var(--ui-d3) var(--ui-spring) 60ms, opacity var(--ui-d2) var(--ui-ease-out) 60ms, box-shadow var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out) !important; }
+.gnb:has(#g-menu[aria-expanded="false"]) #g-set { transition: transform var(--ui-d2) var(--ui-ease-out), width var(--ui-d2) var(--ui-ease-out), margin var(--ui-d2) var(--ui-ease-out), opacity var(--ui-d1) var(--ui-ease-out) !important; }
+#g-set:active { transition-delay: 0s !important; }
+@media (prefers-reduced-motion: reduce) { #g-set, .gnb:has(#g-menu[aria-expanded="false"]) #g-set { transition-duration: 1ms !important; transition-delay: 0s !important; } }
+.nv4-opt { background: transparent; }
+
 </style>
 <script>
 /* ═══ 4판(2026-11-15 HPP): 햄버거 메뉴 펼침 — 이름 = 이동, 펼침 원 = 상세, 맨 아래 설정 → 판 안에서 옆으로 넘어가는 설정 화면 ═══
@@ -9522,10 +9534,6 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
     back.setAttribute('aria-label', tr('a_back'));
     set.querySelectorAll('.nv4-seg').forEach(function (g) { seg(g, true); }); }
   applyLang(ST.lang || 'ko');
-  /* 11판: 처음 메뉴를 열 때 한 번 멈칫하던 것(판 첫 배치 · 유리 흐림 준비, 크롬 측정 최대 0.25초) → 쉬는 동안 보이지 않게 한 번 배치해 둠 */
-  function warm() { if (!side.hidden || side.classList.contains('on')) return; side.style.visibility = 'hidden'; side.hidden = false;
-    requestAnimationFrame(function () { requestAnimationFrame(function () { if (!side.classList.contains('on')) side.hidden = true; side.style.visibility = ''; }); }); }
-  setTimeout(function () { (window.requestIdleCallback || function (f) { setTimeout(f, 0); })(warm, { timeout: 2000 }); }, 2500);
   addEventListener('resize', function () { if (set.getAttribute('aria-hidden') === 'false') fit(); if (set.getAttribute('aria-hidden') === 'false') set.querySelectorAll('.nv4-seg').forEach(function (g) { seg(g, true); }); });
 })();
 
