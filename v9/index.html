@@ -358,6 +358,7 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
 @media (hover: hover) { .cite:hover { background: var(--ui-send-bg); color: var(--ui-send-fg); transform: scale(1.12); } }
 .cite:active { transform: scale(.95); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
 @media (any-pointer: coarse) { .cite::after { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, var(--ui-tap)); height: var(--ui-tap); translate: -50% -50%; border-radius: var(--md-full); } }   /* 보이는 18 그대로, 누름 영역 44 */
+.ans .cite { display: none; }   /* 11-18 사용자 "숫자로 찝어주는 부분이 있는데 이거 안 나오게 해줘. 제거해": 번호 알약은 화면에서만 숨김. 근거 데이터(data-cite)는 남겨 답 아래 프로젝트 카드 고르기는 그대로 */
 .ui-tip { position: fixed; left: 0; top: 0; z-index: 35; width: 232px; max-width: calc(100vw - 24px); padding: 12px 14px; border-radius: 14px; text-align: left; pointer-events: none;
   font-size: 13px; line-height: 1.5; letter-spacing: -.004em; color: var(--ui-label-2); word-break: keep-all; overflow-wrap: break-word;
   background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh-hi);
