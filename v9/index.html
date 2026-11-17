@@ -6270,7 +6270,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   function introType() {   // 11-18 말풍선 3차(사용자 "히어로 페이지 말풍선 안예뻐 다시 제작해줘 그리고 말이 한 번에 다 나오니깐 이상해 조금만 나눠서 나오게 하자 그리고 캐릭터 던지면 말풍선이 사라지거나 해야 자연스럽겠지"):
     // 인사 세 마디를 유리 말풍선으로 하나씩(0 · 1.1 · 2.8초) 아래에서 올라오게, 앞 마디는 위로 밀려 올라감. 마지막 마디 뒤 5초 머문 뒤 사라짐. 질문창을 누르거나 허기를 끌어 던지면 바로 사라짐
     var box = $('#intro-typed'), ask = $('#ask'); if (!box || !ask) return;
-    var my = [], done = false, side = null, hFull = 0, bs = [], dn = null, AT = [0, 1100, 2800], STAY = 5000;
+    var my = [], done = false, side = null, hFull = 0, bs = [], dn = null, AT = [0, 1400, 3400], STAY = 5000;   // 11-18 4차: 사용자 "쌓여서 올라가게 하지 말고 바로바로 사라지게 … 아주 조금만 더 느리게 바뀌도록" → 한 마디씩 바꿔 보임, 간격 1.1 · 1.7초 → 1.4 · 2.0초
     box.textContent = ''; box.classList.remove('sy-side');
     INTRO_L.forEach(function (t) {
       var b = document.createElement('div'), n = 0; b.className = 'ib wait';
@@ -6283,7 +6283,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       var sg = c.offsetParent.getBoundingClientRect(), ar = ask.getBoundingClientRect(), top = sg.top + c.offsetTop + c.offsetHeight * .23;   // 그림 상자 위 23%는 빈 자리(뛰는 자리) → 털 끝 바로 위
       var g = document.querySelector('.gnb'), gb = g ? g.getBoundingClientRect().bottom : 0;
       if (side === null) {   // 처음 한 번: 세 마디가 다 나왔을 때 높이로 자리를 정함(중간에 자리가 바뀌지 않게)
-        box.style.left = box.style.maxWidth = ''; box.classList.add('measure'); hFull = box.offsetHeight;
+        box.style.left = box.style.maxWidth = ''; box.classList.add('measure'); hFull = tallest();   // 한 마디씩 보이므로 가장 큰 마디 높이로 자리를 정함
         side = top - 12 - hFull < gb + 8;
         if (side) { box.classList.add('sy-side'); }
       }
@@ -6291,19 +6291,26 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       // 위가 모자라면(폰 가로 화면 등 낮은 화면) 허기 오른쪽 옆. 세 마디가 다 나왔을 때 몸 가운데 높이에 오게 아래 끝을 고정하고 위로 쌓음
       var x = sg.left + c.offsetLeft + c.offsetWidth * .92 + 14, mid = sg.top + c.offsetTop + c.offsetHeight * .6;
       box.style.left = Math.round(x - ar.left) + 'px'; box.style.maxWidth = Math.max(160, Math.min(360, Math.round(innerWidth - x - 16))) + 'px';
-      box.classList.add('measure'); hFull = box.offsetHeight; box.classList.remove('measure');
-      var fm = ask.querySelector('form'), ft = fm ? fm.getBoundingClientRect().top : ar.bottom;
-      var y = ar.bottom - mid - hFull / 2; y = Math.min(y, ar.bottom - gb - 8 - hFull); y = Math.max(y, ar.bottom - ft + 8); box.style.bottom = Math.round(y) + 'px';   // 위쪽 버튼 아래 8px ~ 질문창 위 8px 안
+      box.classList.add('measure'); hFull = tallest(); box.classList.remove('measure');
+      var fm = ask.querySelector('form'), ft = fm ? fm.getBoundingClientRect().top : ar.bottom, hNow = box.offsetHeight || hFull;
+      var y = ar.bottom - mid - hNow / 2; y = Math.min(y, ar.bottom - gb - 8 - hFull); y = Math.max(y, ar.bottom - ft + 8); box.style.bottom = Math.round(y) + 'px';   // 위쪽 버튼 아래 8px ~ 질문창 위 8px 안
     }
+    function tallest() { return Math.max.apply(null, bs.map(function (o) { return o.offsetHeight; }).concat([0])); }
     function later(f, ms) { var t = setTimeout(f, ms); my.push(t); introTy.push(t); }
     function show(i) {
       var b = bs[i]; if (!b || done) return;
-      var olds = bs.slice(0, i), y0 = olds.map(function (o) { return o.getBoundingClientRect().top; });
-      bs.forEach(function (o, k) { o.classList.toggle('last', k === i); });
+      var o = bs[i - 1];   // 앞 마디: 쌓지 않고 그 자리에서 흐려지며 위로 살짝 빠짐(자리를 차지하지 않게 겹쳐 둔 채)
+      if (o && !o.classList.contains('wait')) {
+        var w = o.offsetWidth; o.style.position = 'absolute'; o.style.bottom = '0'; o.style.width = w + 'px';
+        if (side) { o.style.left = '0'; } else { o.style.left = '50%'; o.style.translate = '-50% 0'; }
+        var off = function () { o.classList.add('wait'); o.style.position = o.style.bottom = o.style.width = o.style.left = o.style.translate = ''; };
+        if (RM || !o.animate) off();
+        else o.animate([{ opacity: 1, transform: 'none', filter: 'none' }, { opacity: 0, transform: 'translateY(-6px) scale(.97)', filter: 'blur(3px)' }], { duration: 260, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' }).finished.then(off, off);
+      }
+      bs.forEach(function (x, k) { x.classList.toggle('last', k === i); });
       b.classList.remove('wait'); place(); box.classList.add('on');
       if (RM || !b.animate) return;
-      olds.forEach(function (o, k) { var d = y0[k] - o.getBoundingClientRect().top; if (Math.abs(d) > .5) o.animate([{ transform: 'translateY(' + d + 'px)' }, { transform: 'none' }], { duration: 460, easing: 'cubic-bezier(.22,1,.36,1)' }); });   // 앞 마디는 새 마디 높이만큼 부드럽게 위로
-      b.animate([{ opacity: 0, transform: 'translateY(10px) scale(.92)' }, { opacity: 1, transform: 'none' }], { duration: 460, easing: 'cubic-bezier(.22,1,.36,1)' });   // 새 마디는 허기 쪽에서 커지며 올라옴(넘침 없음)
+      b.animate([{ opacity: 0, transform: 'translateY(10px) scale(.92)' }, { opacity: 1, transform: 'none' }], { duration: 460, delay: o ? 140 : 0, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' });   // 새 마디는 앞 마디가 빠지기 시작하고 0.14초 뒤 허기 쪽에서 커지며 나타남(넘침 없음)
       b.classList.add('iw-run'); later(function () { b.classList.remove('iw-run'); }, 110 + b._n * 26 + 640);
     }
     function hide() {
@@ -6319,7 +6326,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     function pu() { dn = null; }
     document.addEventListener('pointerdown', pd, true); document.addEventListener('pointermove', pm, { capture: true, passive: true }); document.addEventListener('pointerup', pu, true); document.addEventListener('pointercancel', pu, true);
     place(); addEventListener('resize', place); ask.addEventListener('focusin', hide);   // 질문창 · 첨부 · 마이크를 누르면 바로 사라짐(질문 쓰는 데 방해 안 되게)
-    if (RM) { bs.forEach(function (b, k) { b.classList.remove('wait'); b.classList.toggle('last', k === bs.length - 1); }); place(); box.classList.add('on'); later(hide, 9000); return; }
+    // 동작 줄이기: 같은 시간에 한 마디씩 바뀌되 움직임 없이(show 안에서 RM이면 바로 바꿈)
     // 인사 동작에서 한 번 뛰어오르는 것이 끝나는 때(인사 시작 약 2.5초)에 첫 마디: 그 전이면 머리가 말풍선 속으로 들어감(11-17 QA)
     AT.forEach(function (ms, i) { later(function () { show(i); }, 1500 + ms); });
     later(hide, 1500 + AT[AT.length - 1] + STAY);
