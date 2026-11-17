@@ -314,7 +314,7 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
 
 /* 답변: 상자 없이 글로 */
 .ans { width: 100%; word-break: keep-all; overflow-wrap: break-word; }   /* 11-15 시트 1단계: 한글은 낱말 단위로 줄바꿈("풀었 / 어요" 막음), 긴 주소는 상자 안에서 끊김 */
-.ans .body { display: grid; gap: var(--ui-ans-gap); font-size: 17px; line-height: 1.7; letter-spacing: -.012em; }   /* Body 17 · 400 · 1.7 · -1.2%, 문단 사이 12 */
+.ans .body { display: grid; gap: var(--ui-ans-gap); font-size: 17px; line-height: 1.7; letter-spacing: -.012em; text-wrap: pretty; }   /* 11-18 사용자 "LLM에서 줄바꿈 오류 났는데 안 그러게 개선해": 낱말 단위 줄바꿈(keep-all)에서 마지막 줄에 낱말 하나만 떨어지던 것("들려드릴까요?") 막음 — 앞 줄에서 낱말을 함께 내림 */   /* Body 17 · 400 · 1.7 · -1.2%, 문단 사이 12 */
 .ans .body ul, .ans .body ol { margin: 0; padding-left: 0; list-style: none; display: grid; gap: var(--ui-ans-list-gap); }
 .ans .body li { position: relative; padding-left: 22px; }
 .ans .body ul > li::before { content: ""; position: absolute; left: 8px; top: calc(.85em - 2px); width: 4px; height: 4px; border-radius: 50%; background: var(--ui-label-3); }   /* 점 가운데 = 첫 줄 가운데 */
@@ -9212,8 +9212,8 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 .nv4-ol span { font: var(--t-footnote); font-family: inherit; letter-spacing: var(--ls-footnote); color: var(--ui-label-3); word-break: keep-all; }
 
 /* ── 3. 고르기 알약: 진한 알약이 고른 칸으로 spring으로 미끄러짐 · 안 고른 칸은 올리면 옅은 바탕 · 누르면 눌림 · 고른 칸 누르면 진한 알약이 눌림 */
-.nv4-seg { position: relative; display: flex; width: 100%; padding: 3px; border-radius: 999px; background: var(--ui-bg); box-shadow: 0 0 0 1px var(--ui-sep); isolation: isolate; }
-.nv4-seg .th { position: absolute; z-index: -1; top: 3px; bottom: 3px; left: 3px; width: calc((100% - 6px) / var(--n, 1)); translate: calc(var(--i, 0) * 100%) 0; border-radius: 999px; background: var(--ui-label); box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
+.nv4-seg { position: relative; container-type: inline-size; display: flex; width: 100%; padding: 3px; border-radius: 999px; background: var(--ui-bg); box-shadow: 0 0 0 1px var(--ui-sep); isolation: isolate; }
+.nv4-seg .th { position: absolute; z-index: -1; top: 3px; bottom: 3px; left: 3px; width: calc(100cqw / var(--n, 1)); translate: calc(var(--i, 0) * 100cqw / var(--n, 1)) 0;   /* 15판: % 대신 cqw(WebKit은 translate % 기준 폭을 정수로 반올림해 1.5px 어긋남) */ border-radius: 999px; background: var(--ui-label); box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
   will-change: translate; transition: translate var(--ui-d3) var(--ui-spring), scale var(--ui-d3) var(--ui-spring); }
 .nv4-th-now .th { transition: none !important; }   /* 15판: 설정 화면을 열 때 자리만 맞춤(움직임 없이) */
 .nv4-seg button { position: relative; flex: 1 1 0; min-width: 0; height: 30px; padding: 0 6px; border: 0; border-radius: 999px; background: transparent; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
