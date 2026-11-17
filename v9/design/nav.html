@@ -3556,6 +3556,42 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       return r || new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return askOnce(q, false, opt, onPart); });
     });
   }
+  /* 11-18 사용자 "히어로 페이지에서 나가서 허기 버튼 기능중에 허기가 내가 지금 무슨 화면을 보고 있는 지 같이 보게" (② 화면 위치 + 보이는 글):
+     대화 화면(히어로)을 떠나 아래 화면 · 프로젝트 상세(코레일톡은 같은 주소 iframe 안)를 보고 있을 때만, 화면 이름과 지금 보이는 글 약 800자를 질문과 함께 보냄. 읽기만 함 */
+  function hgView() {
+    try {
+      var Dd = document.getElementById('detail'), doc = document, roots = [], vh = innerHeight, where = [];
+      if (Dd && !Dd.hidden) {
+        var pd = curDetail && BY[curDetail]; where.push(pd ? pd.name : '프로젝트 상세');
+        var kf = Dd.querySelector('iframe.kframe');
+        if (kf) { try { doc = kf.contentDocument; vh = kf.contentWindow.innerHeight; if (doc && doc.body) roots.push(doc.body); } catch (e) {} }
+        else roots.push(Dd);
+      } else if (window.HG_PAGE && window.HG_PAGE.on()) {
+        roots = [].slice.call(document.querySelectorAll('main > .sec, #contact'));
+      } else return null;   // 대화 화면: 보낼 것 없음
+      var seen = {}, out = [], len = 0, head = null, lastB = null, BL = 'p,li,td,th,h1,h2,h3,h4,h5,h6,dt,dd,figcaption,blockquote,div,section,article,a,button,label';
+      var shown = function (el) { try { return !el.checkVisibility || el.checkVisibility({ visibilityProperty: true, opacityProperty: true }); } catch (e) { return true; } };   // 숨은 도구 판(글자 기준 등)은 뺌
+      var vis = function (el) { var r = el.getBoundingClientRect(); return r.height > 0 && r.width > 0 && r.bottom > 0 && r.top < vh && shown(el) ? r : null; };
+      roots.forEach(function (root) {
+        [].forEach.call(root.querySelectorAll('h1,h2,h3'), function (h) { var hr = h.getBoundingClientRect(); if (hr.height && hr.top <= vh * .4 && shown(h) && !h.closest('[hidden], [aria-hidden="true"]')) head = h; });
+        var tw = doc.createTreeWalker(root, 4), n;   // 보이는 글 조각을 화면 순서대로(태그 모양과 상관없이)
+        while ((n = tw.nextNode()) && len < 820) {
+          var t = n.nodeValue.replace(/\s+/g, ' ').trim(), el = n.parentElement; if (t.length < 2 || !el) continue;
+          if (el.closest('nav, #hdr, header.top, script, style, noscript, svg, [hidden], [aria-hidden="true"], .dbar')) continue;   // 사이트 · 세부 페이지 위쪽 막대만 빼고 단계 머리(header)는 읽음
+          if (!vis(el)) continue;
+          var b = el.closest(BL) || el;
+          if (seen[t] && b !== lastB) continue; seen[t] = 1;
+          if (b === lastB && out.length) out[out.length - 1] += ' ' + t; else out.push(t);
+          lastB = b; len += t.length + 3;
+        }
+      });
+      if (!head) { roots.some(function (root) { return [].some.call(root.querySelectorAll('h1,h2,h3'), function (h) { if (vis(h)) { head = h; return true; } }); }); }
+      var ht = head ? (head.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 60) : '';
+      if (ht && where.indexOf(ht) < 0) where.push(ht);
+      var txt = out.join(' / ').slice(0, 800);
+      return where.length || txt ? { where: where.join(' · '), text: txt } : null;
+    } catch (e) { return null; }
+  }
   // 서버는 SSE로 {p: 지금까지 나온 문장들} 여러 번 → {a: 완성된 답} → (읽어 주기가 켜져 있으면) 소리를 보낸다
   function askOnce(q, first, opt, onPart) {
     if (!AI_ENDPOINT) return Promise.resolve(null);
@@ -3563,6 +3599,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var say = first && VOICE.ok && VOICE.auto && TTS_ENDPOINT ? VOICE.name : null;
     var ctl = new AbortController(); var t = setTimeout(function () { ctl.abort(); }, 90000);
     var body = { q: q, stream: 1, history: HIST.slice(-12), team: CTX.team, seen: CTX.seen, say: say };
+    var vw0 = hgView(); if (vw0) body.view = vw0;   // 11-18 지금 보는 화면(대화 화면이면 없음)
     if (opt.doc) body.doc = opt.doc;
     if (opt.file) body.file = opt.file;
     if (opt.mode) body.mode = opt.mode;
