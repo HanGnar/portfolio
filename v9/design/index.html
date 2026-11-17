@@ -193,6 +193,8 @@ h2{margin:0;font:var(--t-headline);letter-spacing:var(--ls-headline);color:var(-
 .sv.on .sv-stage{transform:none}
 .sv-stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--bg);opacity:0;transition:opacity var(--d2) var(--ease-out)}
 .sv-stage iframe.on{opacity:1}
+/* 11-18 사용자 "태블릿이나 모바일 눌러서 디자인 시트로 들어가게 되면 해당 화면 영역에 맞게 줄여가지고 건들 수 있게": 카드에서 고른 화면 크기(태블릿 820×1180 · 모바일 390×844)로 시트를 열고, 보기 칸에 다 들어가게 줄임(늘리지는 않음). 줄여도 누르기 · 스크롤 · 입력 그대로 */
+.sv-stage iframe.dev{inset:auto;left:50%;top:50%;transform-origin:50% 50%;border-radius:28px;box-shadow:0 0 0 1px var(--sep),var(--shadow-hi)}
 .sv-load{position:absolute;inset:0;display:grid;place-items:center;font:var(--t-footnote);letter-spacing:var(--ls-footnote);color:var(--label-3);pointer-events:none;opacity:0;transition:opacity var(--d2) var(--ease-out)}
 .sv-load.on{opacity:1;transition-delay:300ms}
 
@@ -10439,10 +10441,11 @@ function close(){view.classList.remove('on');view.setAttribute('aria-hidden','tr
 document.querySelectorAll('[data-md]').forEach(function(b){b.addEventListener('click',function(){open(b.dataset.md,b.dataset.name)})});
 $('#v-x').addEventListener('click',close);view.addEventListener('click',function(e){if(e.target===view)close()});addEventListener('keydown',function(e){if(e.key==='Escape')close()});
 /* 화면 고르기: 누르면 그 화면 캡처로 바뀜(0.24초 겹쳐 바뀜), 진한 알약이 spring으로 옮겨 감 */
+var DEV={},SZ={tablet:[820,1180],mobile:[390,844]};   // 시트마다 카드에서 고른 화면(시트 보기가 그 크기로 열림)
 document.querySelectorAll('.vs').forEach(function(vs){var th=vs.querySelector('.thumb'),card=vs.closest('.sheet').querySelector('.card');
   function place(b){th.style.width=b.offsetWidth+'px';th.style.transform='translateX('+(b.offsetLeft)+'px)'}
   vs.querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){
-    vs.querySelectorAll('button').forEach(function(o){o.setAttribute('aria-pressed',o===b)});place(b);
+    vs.querySelectorAll('button').forEach(function(o){o.setAttribute('aria-pressed',o===b)});place(b);if(card&&card.dataset.sheet)DEV[card.dataset.sheet]=b.dataset.v;
     card.querySelectorAll('.th img').forEach(function(i){i.classList.toggle('on',i.dataset.v===b.dataset.v)})})});
   vs._place=function(){th.style.transition='none';place(vs.querySelector('[aria-pressed="true"]'));th.offsetWidth;th.style.transition=''};vs._place();
   (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){place(vs.querySelector('[aria-pressed="true"]'))});
@@ -10463,10 +10466,14 @@ function show(id){var wasOn=sv.classList.contains('on');
   tbs.forEach(function(b){b.setAttribute('aria-selected',b.dataset.sheet===id);b.tabIndex=b.dataset.sheet===id?0:-1});
   var f=frames[id];if(!f){f=document.createElement('iframe');f.title=(tbs.filter(function(b){return b.dataset.sheet===id})[0]||{}).textContent+' 시트';
     f.addEventListener('load',function(){f.dataset.ok='1';if(f.classList.contains('on'))load.classList.remove('on')});f.src=files[id];stage.appendChild(f);frames[id]=f}
+  f.dataset.dev=DEV[id]||'web';fit(f);
   Object.keys(frames).forEach(function(k){frames[k].classList.toggle('on',k===id)});load.classList.toggle('on',!f.dataset.ok);
   if(!wasOn){sv.removeAttribute('inert');sv.setAttribute('aria-hidden','false');sv.classList.add('on');document.documentElement.style.overflow='hidden';requestAnimationFrame(function(){tplace(tabs.querySelector('[aria-selected="true"]'),false);tend()})}
   else tplace(tabs.querySelector('[aria-selected="true"]'),true);
   document.title=f.title.replace(/ 시트$/,'')+' · '+TITLE}
+function fit(f){var S=SZ[f.dataset.dev];if(!S){f.classList.remove('dev');f.style.width=f.style.height=f.style.transform='';return}
+  if(stage.clientWidth<100&&!f._wait){f._wait=1;requestAnimationFrame(function(){f._wait=0;fit(f)})}
+  var k=Math.max(.1,Math.min(1,(stage.clientWidth-32)/S[0],(stage.clientHeight-32)/S[1]));f.classList.add('dev');f.style.width=S[0]+'px';f.style.height=S[1]+'px';f.style.transform='translate(-50%,-50%) scale('+k.toFixed(4)+')'}
 function hide(){if(!sv.classList.contains('on'))return;sv.classList.remove('on');sv.setAttribute('aria-hidden','true');sv.setAttribute('inert','');document.documentElement.style.overflow='';document.title=TITLE;
   var c=last||document.querySelector('.card[data-sheet]');if(c)c.focus({preventScroll:true})}
 var TITLE=document.title;
@@ -10492,7 +10499,7 @@ tbs.forEach(function(b,i){b.addEventListener('click',function(){location.replace
   b.addEventListener('keydown',function(e){var d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(!d)return;e.preventDefault();var n=tbs[(i+d+tbs.length)%tbs.length];n.focus();n.click()})});
 $('#sv-x').addEventListener('click',function(){if(history.length>1&&last){history.back()}else{history.replaceState(null,'',location.pathname+location.search);hide()}});
 addEventListener('keydown',function(e){if(e.key==='Escape'&&sv.classList.contains('on')&&!view.classList.contains('on'))$('#sv-x').click()},true);   // 먼저 듣기: MD 보기가 열려 있으면 MD만 닫힘
-addEventListener('resize',function(){if(sv.classList.contains('on'))tplace(tabs.querySelector('[aria-selected="true"]'),false)});
+addEventListener('resize',function(){if(sv.classList.contains('on')){tplace(tabs.querySelector('[aria-selected="true"]'),false);Object.keys(frames).forEach(function(k){fit(frames[k])})}});
 route();
 var cp=$('#v-copy');cp.addEventListener('click',function(){var done=function(){cp.classList.add('ok');cp.querySelector('use').setAttribute('href','#i-check');cp.querySelector('span').textContent='복사했어요';setTimeout(function(){cp.classList.remove('ok');cp.querySelector('use').setAttribute('href','#i-copy');cp.querySelector('span').textContent='복사'},1600)};
   try{navigator.clipboard.writeText(cur).then(done,function(){var r=document.createRange();r.selectNodeContents(md);var s=getSelection();s.removeAllRanges();s.addRange(r)})}catch(e){}});
