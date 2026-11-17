@@ -6398,6 +6398,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     hgr.__hgBox = function () { var f = $('#ask-form'); if (!f || hgr.classList.contains('hg-float')) return null; var r = f.getBoundingClientRect(), s = hgr.getBoundingClientRect(), cx = s.left + s.width / 2; return (r.width && cx > r.left && cx < r.right) ? { left: r.left, right: r.right } : null; };
   })();
   function introStopType() { introTy.forEach(clearTimeout); introTy = []; }
+  window.HG_INTRO_SKIP = function () { introSkip(); };   // 11-18 HG-PAGE: 인사 중에 메뉴로 아래 화면에 가면 인사를 끝내 허기 버튼이 나오게(질문 없이 가도 허기 버튼으로 대화를 이어 감)
   function introSkip() {   // 이동 없이 바로 일반 화면(모션 줄이기 · 그림 없음일 때만 introDock이 부름)
     var R2 = document.documentElement; if (!R2.classList.contains('hg-intro')) return;
     introStopType(); R2.classList.remove('hg-intro', 'hg-intro-t', 'hg-intro-wait', 'hg-intro-a', 'hg-intro-away', 'm-hugi-out', 'm-hugi-gone'); introRestore();
@@ -7899,6 +7900,7 @@ html.hg-hero-in #hero { animation: hgHeroIn .28s var(--ui-ease-out, cubic-bezier
     if (isPage() === on) return;
     if (on) heroY = window.scrollY || 0;
     R.classList.toggle('hg-page', on);
+    if (on && window.HG_INTRO_SKIP) { try { window.HG_INTRO_SKIP(); } catch (e) {} }   // 인사 중이면 끝냄 → 허기 버튼 보임
     if (!on) {
       clearTimeout(inT); R.classList.add('hg-hero-in'); inT = setTimeout(function () { R.classList.remove('hg-hero-in'); }, 400);
       window.scrollTo(0, heroY);
@@ -7953,9 +7955,7 @@ html.hg-hero-in #hero { animation: hgHeroIn .28s var(--ui-ease-out, cubic-bezier
    ② 아래 화면에서 내비 버튼 줄(64 + 위 안전 영역)은 늘 맨 위에 고정, 페이지와 같은 바탕(살짝 비침 + 흐림)을 깔아 글이 버튼 밑으로 비쳐 보이지 않게. 선 · 그림자 없음
    ③ 첫 방문 인사 중에 메뉴로 아래 화면에 가도 내용이 보이고 스크롤되게(인사는 첫 화면에 그대로 남음. 인사 묶음의 숨김 규칙이 id 선택자라 !important로만 이김) */
 html.hg-page main > .sec, html.hg-page #contact { border-top: 0; }
-html.hg-page .hdr, html.hg-page .hdr.on { position: sticky; top: 0; padding-top: env(safe-area-inset-top, 0px); border-bottom: 0; box-shadow: none;
-  background: color-mix(in srgb, var(--md-surface) 86%, transparent); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); }
-@supports not (background: color-mix(in srgb, red 50%, transparent)) { html.hg-page .hdr, html.hg-page .hdr.on { background: var(--md-surface); } }
+/* ② 11-18 사용자 "내비게이션 바 영역이 없고 내비게이션 버튼만 있어. 내비게이션 바 영역은 지워줘": 버튼 줄 바탕(흐림)은 뺐다. 버튼은 원래대로 sticky로 늘 위에 */
 html.hg-page main > .sec, html.hg-page #contact { visibility: visible !important; }
 html.hg-page { overflow: visible; }
 /* HG-NAVBAND-END */</style>
