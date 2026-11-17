@@ -1,0 +1,114 @@
+[
+ {
+  "file": "case_files/sd/sd_01.webp",
+  "title": "코레일톡 어플리케이션 모바일 화면설계서 · -예약된 승차권 조회-"
+ },
+ {
+  "file": "case_files/sd/sd_02.webp",
+  "title": "문서 개정 이력 정보"
+ },
+ {
+  "file": "case_files/sd/sd_03.webp",
+  "title": "Gesture Behaviors"
+ },
+ {
+  "file": "case_files/sd/sd_04.webp",
+  "title": "정보구조도 (As-is) · 하단 탭 메뉴"
+ },
+ {
+  "file": "case_files/sd/sd_05.webp",
+  "title": "정보구조도 (As-is) · 사이드  탭 메뉴"
+ },
+ {
+  "file": "case_files/sd/sd_06.webp",
+  "title": "정보구조도 (To-be)"
+ },
+ {
+  "file": "case_files/sd/sd_07.webp",
+  "title": "공통 UI 정의 · 기본 레이아웃"
+ },
+ {
+  "file": "case_files/sd/sd_08.webp",
+  "title": "공통 UI 정의 · Modal"
+ },
+ {
+  "file": "case_files/sd/sd_09.webp",
+  "title": "공통 UI 정의 · UI 요소"
+ },
+ {
+  "file": "case_files/sd/sd_10.webp",
+  "title": "공통 UI 정의 · Transition"
+ },
+ {
+  "file": "case_files/sd/sd_11.webp",
+  "title": "공통 UI 정의 · Transition"
+ },
+ {
+  "file": "case_files/sd/sd_12.webp",
+  "title": "서비스 흐름도 · Beyond screen bounds"
+ },
+ {
+  "file": "case_files/sd/sd_13.webp",
+  "title": "Screen Definition · 홈 (1/2)"
+ },
+ {
+  "file": "case_files/sd/sd_14.webp",
+  "title": "Screen Definition · 홈 (2/2)"
+ },
+ {
+  "file": "case_files/sd/sd_15.webp",
+  "title": "Screen Definition · 나의 티켓-승차권"
+ },
+ {
+  "file": "case_files/sd/sd_16.webp",
+  "title": "Screen Definition · 나의 티켓-장바구니 (1/2)"
+ },
+ {
+  "file": "case_files/sd/sd_17.webp",
+  "title": "Screen Definition · 나의 티켓-장바구니 (2/2)"
+ },
+ {
+  "file": "case_files/sd/sd_18.webp",
+  "title": "Screen Definition · 결제"
+ },
+ {
+  "file": "case_files/sd/sd_19.webp",
+  "title": "Screen Definition · 사이드 GNB"
+ },
+ {
+  "file": "case_files/sd/sd_20.webp",
+  "title": "General Rule · 앱 진입- 로그인이 되어있는 경우 / 로그인이 안 되어있는 경우"
+ },
+ {
+  "file": "case_files/sd/sd_21.webp",
+  "title": "General Rule · 로그인_ 소셜 로그인을 통한 로그인"
+ },
+ {
+  "file": "case_files/sd/sd_22.webp",
+  "title": "General Rule · 창 닫기"
+ },
+ {
+  "file": "case_files/sd/sd_23.webp",
+  "title": "General Rule · 모달 닫기"
+ },
+ {
+  "file": "case_files/sd/sd_24.webp",
+  "title": "General Rule · 모달 닫기"
+ },
+ {
+  "file": "case_files/sd/sd_25.webp",
+  "title": "General Rule · 사이드 탭 메뉴를 통한 예약된 승차권 조회 (로그인이 안 되어있는 경우)"
+ },
+ {
+  "file": "case_files/sd/sd_26.webp",
+  "title": "General Rule · 사이드 탭 메뉴를 통한 예약된 승차권 조회 (로그인이 되어있는 경우)"
+ },
+ {
+  "file": "case_files/sd/sd_27.webp",
+  "title": "General Rule · 하단 네비게이션 바 ‘나의 티켓’ 을 통한 예약된 승차권 조회 (로그인이 안 되어있는 경우)"
+ },
+ {
+  "file": "case_files/sd/sd_28.webp",
+  "title": "General Rule · 사이드 탭 메뉴를 통한 예약된 승차권 조회 (로그인이  되어있는 경우)"
+ }
+]
