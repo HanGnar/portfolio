@@ -3343,10 +3343,11 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     if (c.at.indexOf('/') > -1) { var a = c.at.split('/'); openDetail(a[0], a[1]); return; }
     closeDetail();
     var el = document.getElementById(c.at); if (!el) return;
+    if (window.HG_PAGE) window.HG_PAGE.show(el);   // 11-18 히어로 분리: 아래 화면 안 근거면 그 화면을 먼저 연다
     el.scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'center' });
     setTimeout(function () { flash(el.querySelector('.fx') || el); }, RM ? 0 : 450);
   }
-  function scrollTo(id) { closeDetail(); var el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'start' }); }
+  function scrollTo(id) { closeDetail(); var el = document.getElementById(id); if (el && window.HG_PAGE) window.HG_PAGE.show(el); if (el) el.scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'start' }); }
 
   // AI가 고른 동작은 이 목록 안에서만 실행한다
   var ACTIONS = {
@@ -5956,7 +5957,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     else if (t.dataset.q) ask(t.dataset.q);
     else if (t.dataset.f) setFilter(t.dataset.f);
     else if (t.dataset.scroll) { e.preventDefault(); scrollTo(t.dataset.scroll); }
-    else if (t.hasAttribute('data-top')) { e.preventDefault(); closeDetail(); window.scrollTo({ top: 0, behavior: RM ? 'auto' : 'smooth' }); }
+    else if (t.hasAttribute('data-top')) { e.preventDefault(); var wasOpen = !D.hidden; closeDetail(); if (window.HG_PAGE && window.HG_PAGE.hero(wasOpen)) return; window.scrollTo({ top: 0, behavior: RM ? 'auto' : 'smooth' }); }   // 11-18 홈: 아래 화면이면 대화(첫 화면)로 돌아감, 새로고침 없이 대화 유지
     else if (t.id === 'fit-reset') { ORDER = P.map(function (p) { return p.id; }); renderWorks(); $('#fit').hidden = true; }
     else if (t.id === 'email') {
       var sub = $('#email-sub');
@@ -5972,6 +5973,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     // 11-15 내비 시트 1판: 01 프로젝트(펼치면 이름만) · 02 헝그리한정민 · 03 연락(연락 섹션이 아직 없어 기능 없음)
     var CHEV = '<svg class="nv-chev" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9.5 6 6 6-6"/></svg>';
     var h = '<li class="mi"><details class="nv-pj"><summary><span class="no">' + pad() + '</span><span class="nm">프로젝트</span>' + CHEV + '</summary><ul class="nv-sub">' +
+      '<li><button type="button" data-scroll="projects">전체 보기</button></li>' +   // 11-18 히어로 분리: 프로젝트 화면으로 가는 메뉴 길
       P.map(function (p) { return '<li><button type="button" data-open="' + p.id + '">' + esc(p.name) + '</button></li>'; }).join('') + '</ul></details></li>';
     h += '<li class="mi"><button class="mrow" type="button" data-scroll="about"><span class="no">' + pad() + '</span><span>헝그리한정민</span></button></li>';
     h += '<li class="mi"><button class="mrow" type="button" aria-disabled="true"><span class="no">' + pad() + '</span><span>연락</span></button></li>';
@@ -7611,16 +7613,9 @@ html:has(#detail:not([hidden])) .hdr { z-index: 41; }
     close: function () { show(false); }
   };
 
-  // 홈: 대화가 있으면 새로고침처럼 처음(허기 인사)부터. 대화가 없으면 원래대로 맨 위로
+  // 11-18 사용자 "홈버튼이 LLM으로 돌아가는 걸로 … 새로고침은 안되게 … 대화내용도 유지 … 새로고침 웹에서 할 때만": 홈 새로고침은 뺐다(홈은 data-top → HG_PAGE.hero, HG-PAGE 묶음)
   var home = document.getElementById('g-home');
-  if (home) home.addEventListener('click', function () {
-    var talked = !!document.querySelector('#thread .ans, #thread .msg-q');
-    try { talked = talked || !!sessionStorage.getItem('hj-chat-v1'); } catch (e) {}
-    if (!talked) return;
-    var ic = home.querySelector('svg'); if (ic && ic.animate && !RM) ic.animate([{ transform: 'rotate(0)' }, { transform: 'rotate(-360deg)' }], { duration: 420, easing: 'cubic-bezier(.22,1,.36,1)' });
-    try { window.scrollTo(0, 0); } catch (e) {}
-    setTimeout(function () { location.reload(); }, RM ? 0 : 260);
-  }, true);
+  if (home) home.addEventListener('click', function () { show(false); }, true);
 })();
 /* HG-BUBBLE-END */</script>
 <style>/* HG-FLOW-BEGIN · 11-15 사용자 "대화입력하면 인터렉션 뚝뚝 끊기는데 안 끊어져보이게". 답 아래 부분(다음 질문 · 버튼 · 파일)은 낱말이 다 나타난 뒤 살짝 떠오름 */
@@ -7802,3 +7797,54 @@ html.qa-fly #hugi-menu .hugi-char { pointer-events: none; }
   }, true);
 })();
 /* QA-1117D-END */</script>
+<style>/* HG-PAGE-BEGIN · 11-18 사용자 "히어로랑 밑에 페이지를 분리하자 … 스크롤해서 프로젝트 페이지로 이동하는 동작 자체가 어색 … 햄버거 버튼에서 클릭했을 때 이동하거나 LLM에서 … 버튼" · "홈버튼이 LLM으로 돌아가는 걸로 … 새로고침은 안되게 … 대화내용도 유지".
+   첫 화면(허기 대화)과 아래 화면(프로젝트 · 소개 · 연락)을 따로 보여 준다. 첫 화면에서는 스크롤해도 아래 화면이 나오지 않고, 메뉴 · 답 버튼으로만 가며, 홈은 대화로 돌아온다 */
+html:not(.hg-page) main > .sec, html:not(.hg-page) #contact { display: none; }
+html.hg-page #hero { display: none; }
+html.hg-page main > .sec, html.hg-page #contact { animation: hgPageIn .36s var(--ui-ease-out, cubic-bezier(.22, 1, .36, 1)) backwards; }
+html.hg-hero-in #hero { animation: hgHeroIn .28s var(--ui-ease-out, cubic-bezier(.22, 1, .36, 1)) backwards; }
+@keyframes hgPageIn { from { opacity: 0; transform: translateY(12px); } }
+@keyframes hgHeroIn { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { html.hg-page main > .sec, html.hg-page #contact, html.hg-hero-in #hero { animation: none; } }
+/* HG-PAGE-END */</style>
+<script>/* HG-PAGE-BEGIN · 화면 바꾸기. 아래 화면으로 갈 때 기록을 하나 쌓아(주소는 그대로) 브라우저 뒤로 가기로도 대화로 돌아온다. 대화 · 허기 상태는 그대로 두고 화면만 바꾼다(새로고침 없음) */
+(function () {
+  var R = document.documentElement, heroY = 0, wantHero = false, inT = 0;
+  function isPage() { return R.classList.contains('hg-page'); }
+  function inLower(el) { return !!(el && el.closest && el.closest('main > .sec, #contact')); }
+  function setPage(on) {
+    if (isPage() === on) return;
+    if (on) heroY = window.scrollY || 0;
+    R.classList.toggle('hg-page', on);
+    if (!on) {
+      clearTimeout(inT); R.classList.add('hg-hero-in'); inT = setTimeout(function () { R.classList.remove('hg-hero-in'); }, 400);
+      window.scrollTo(0, heroY);
+    }
+    try { window.dispatchEvent(new Event('resize')); } catch (e) {}   // 프로젝트 분류 막대처럼 숨어 있다 나타난 것의 자리 다시 재기
+  }
+  window.HG_PAGE = {
+    show: function (el) {   // 아래 화면 안 요소로 갈 때 부름(scrollTo · goCard)
+      if (!inLower(el)) return false;
+      if (!isPage()) { setPage(true); try { history.pushState({ hgPage: 1 }, ''); } catch (e) {} }
+      return true;
+    },
+    hero: function (detailWasOpen) {   // 홈: 아래 화면이면 대화로(돌아왔으면 true)
+      if (!isPage()) return false;
+      setPage(false);
+      if (detailWasOpen) wantHero = true;   // 상세가 닫히며 뒤로 한 칸 간 뒤 한 칸 더
+      else if (history.state && history.state.hgPage) { try { history.back(); } catch (e) {} }
+      return true;
+    },
+    on: isPage
+  };
+  window.addEventListener('popstate', function (e) {
+    var st = e.state || {};
+    if (st.hgPage) { if (wantHero) { wantHero = false; try { history.back(); } catch (er) {} return; } setPage(true); }
+    else if (!st.hgDetail) setPage(false);
+  });
+  try {   // 뒤로 · 앞으로 가기로 들어왔을 때만 아래 화면을 되살림. 새로고침 · 새로 들어옴은 첫 화면(대화)부터
+    var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+    if (history.state && history.state.hgPage) { if (nav && nav.type === 'back_forward') setPage(true); else history.replaceState(null, ''); }
+  } catch (e) {}
+})();
+/* HG-PAGE-END */</script>
