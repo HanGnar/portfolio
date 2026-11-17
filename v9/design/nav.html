@@ -6273,7 +6273,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   function introType() {   // 11-18 말풍선 3차(사용자 "히어로 페이지 말풍선 안예뻐 다시 제작해줘 그리고 말이 한 번에 다 나오니깐 이상해 조금만 나눠서 나오게 하자 그리고 캐릭터 던지면 말풍선이 사라지거나 해야 자연스럽겠지"):
     // 인사 세 마디를 유리 말풍선으로 하나씩(0 · 1.1 · 2.8초) 아래에서 올라오게, 앞 마디는 위로 밀려 올라감. 마지막 마디 뒤 5초 머문 뒤 사라짐. 질문창을 누르거나 허기를 끌어 던지면 바로 사라짐
     var box = $('#intro-typed'), ask = $('#ask'); if (!box || !ask) return;
-    var my = [], done = false, side = null, hFull = 0, bs = [], dn = null, AT = [0, 1100, 2800], STAY = 5000;
+    var my = [], done = false, side = null, hFull = 0, bs = [], dn = null, AT = [0, 1400, 3400], STAY = 5000;   // 11-18 4차: 사용자 "쌓여서 올라가게 하지 말고 바로바로 사라지게 … 아주 조금만 더 느리게 바뀌도록" → 한 마디씩 바꿔 보임, 간격 1.1 · 1.7초 → 1.4 · 2.0초
     box.textContent = ''; box.classList.remove('sy-side');
     INTRO_L.forEach(function (t) {
       var b = document.createElement('div'), n = 0; b.className = 'ib wait';
@@ -6286,7 +6286,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       var sg = c.offsetParent.getBoundingClientRect(), ar = ask.getBoundingClientRect(), top = sg.top + c.offsetTop + c.offsetHeight * .23;   // 그림 상자 위 23%는 빈 자리(뛰는 자리) → 털 끝 바로 위
       var g = document.querySelector('.gnb'), gb = g ? g.getBoundingClientRect().bottom : 0;
       if (side === null) {   // 처음 한 번: 세 마디가 다 나왔을 때 높이로 자리를 정함(중간에 자리가 바뀌지 않게)
-        box.style.left = box.style.maxWidth = ''; box.classList.add('measure'); hFull = box.offsetHeight;
+        box.style.left = box.style.maxWidth = ''; box.classList.add('measure'); hFull = tallest();   // 한 마디씩 보이므로 가장 큰 마디 높이로 자리를 정함
         side = top - 12 - hFull < gb + 8;
         if (side) { box.classList.add('sy-side'); }
       }
@@ -6294,19 +6294,26 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       // 위가 모자라면(폰 가로 화면 등 낮은 화면) 허기 오른쪽 옆. 세 마디가 다 나왔을 때 몸 가운데 높이에 오게 아래 끝을 고정하고 위로 쌓음
       var x = sg.left + c.offsetLeft + c.offsetWidth * .92 + 14, mid = sg.top + c.offsetTop + c.offsetHeight * .6;
       box.style.left = Math.round(x - ar.left) + 'px'; box.style.maxWidth = Math.max(160, Math.min(360, Math.round(innerWidth - x - 16))) + 'px';
-      box.classList.add('measure'); hFull = box.offsetHeight; box.classList.remove('measure');
-      var fm = ask.querySelector('form'), ft = fm ? fm.getBoundingClientRect().top : ar.bottom;
-      var y = ar.bottom - mid - hFull / 2; y = Math.min(y, ar.bottom - gb - 8 - hFull); y = Math.max(y, ar.bottom - ft + 8); box.style.bottom = Math.round(y) + 'px';   // 위쪽 버튼 아래 8px ~ 질문창 위 8px 안
+      box.classList.add('measure'); hFull = tallest(); box.classList.remove('measure');
+      var fm = ask.querySelector('form'), ft = fm ? fm.getBoundingClientRect().top : ar.bottom, hNow = box.offsetHeight || hFull;
+      var y = ar.bottom - mid - hNow / 2; y = Math.min(y, ar.bottom - gb - 8 - hFull); y = Math.max(y, ar.bottom - ft + 8); box.style.bottom = Math.round(y) + 'px';   // 위쪽 버튼 아래 8px ~ 질문창 위 8px 안
     }
+    function tallest() { return Math.max.apply(null, bs.map(function (o) { return o.offsetHeight; }).concat([0])); }
     function later(f, ms) { var t = setTimeout(f, ms); my.push(t); introTy.push(t); }
     function show(i) {
       var b = bs[i]; if (!b || done) return;
-      var olds = bs.slice(0, i), y0 = olds.map(function (o) { return o.getBoundingClientRect().top; });
-      bs.forEach(function (o, k) { o.classList.toggle('last', k === i); });
+      var o = bs[i - 1];   // 앞 마디: 쌓지 않고 그 자리에서 흐려지며 위로 살짝 빠짐(자리를 차지하지 않게 겹쳐 둔 채)
+      if (o && !o.classList.contains('wait')) {
+        var w = o.offsetWidth; o.style.position = 'absolute'; o.style.bottom = '0'; o.style.width = w + 'px';
+        if (side) { o.style.left = '0'; } else { o.style.left = '50%'; o.style.translate = '-50% 0'; }
+        var off = function () { o.classList.add('wait'); o.style.position = o.style.bottom = o.style.width = o.style.left = o.style.translate = ''; };
+        if (RM || !o.animate) off();
+        else o.animate([{ opacity: 1, transform: 'none', filter: 'none' }, { opacity: 0, transform: 'translateY(-6px) scale(.97)', filter: 'blur(3px)' }], { duration: 260, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' }).finished.then(off, off);
+      }
+      bs.forEach(function (x, k) { x.classList.toggle('last', k === i); });
       b.classList.remove('wait'); place(); box.classList.add('on');
       if (RM || !b.animate) return;
-      olds.forEach(function (o, k) { var d = y0[k] - o.getBoundingClientRect().top; if (Math.abs(d) > .5) o.animate([{ transform: 'translateY(' + d + 'px)' }, { transform: 'none' }], { duration: 460, easing: 'cubic-bezier(.22,1,.36,1)' }); });   // 앞 마디는 새 마디 높이만큼 부드럽게 위로
-      b.animate([{ opacity: 0, transform: 'translateY(10px) scale(.92)' }, { opacity: 1, transform: 'none' }], { duration: 460, easing: 'cubic-bezier(.22,1,.36,1)' });   // 새 마디는 허기 쪽에서 커지며 올라옴(넘침 없음)
+      b.animate([{ opacity: 0, transform: 'translateY(10px) scale(.92)' }, { opacity: 1, transform: 'none' }], { duration: 460, delay: o ? 140 : 0, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' });   // 새 마디는 앞 마디가 빠지기 시작하고 0.14초 뒤 허기 쪽에서 커지며 나타남(넘침 없음)
       b.classList.add('iw-run'); later(function () { b.classList.remove('iw-run'); }, 110 + b._n * 26 + 640);
     }
     function hide() {
@@ -6322,7 +6329,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     function pu() { dn = null; }
     document.addEventListener('pointerdown', pd, true); document.addEventListener('pointermove', pm, { capture: true, passive: true }); document.addEventListener('pointerup', pu, true); document.addEventListener('pointercancel', pu, true);
     place(); addEventListener('resize', place); ask.addEventListener('focusin', hide);   // 질문창 · 첨부 · 마이크를 누르면 바로 사라짐(질문 쓰는 데 방해 안 되게)
-    if (RM) { bs.forEach(function (b, k) { b.classList.remove('wait'); b.classList.toggle('last', k === bs.length - 1); }); place(); box.classList.add('on'); later(hide, 9000); return; }
+    // 동작 줄이기: 같은 시간에 한 마디씩 바뀌되 움직임 없이(show 안에서 RM이면 바로 바꿈)
     // 인사 동작에서 한 번 뛰어오르는 것이 끝나는 때(인사 시작 약 2.5초)에 첫 마디: 그 전이면 머리가 말풍선 속으로 들어감(11-17 QA)
     AT.forEach(function (ms, i) { later(function () { show(i); }, 1500 + ms); });
     later(hide, 1500 + AT[AT.length - 1] + STAY);
@@ -9413,6 +9420,42 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 @media (min-width: 641px) { .nv4-opt { padding-left: 12px; } }   /* 상자가 없으니 항목 이름 왼쪽을 "설정" 제목 왼쪽 선에 맞춤(16 → 12) */
 /* 12판-2: 설정 머리의 뒤로 원 없앰(사용자 "뒤로가기 버튼도 지워") — 메뉴로는 상단 톱니 · Esc. 제목만 남음 */
 .nv4-sh { gap: 0; }
+
+/* ═══ 13판(2026-11-18 HPP): 사용자 "내비게이션 버튼 설정 인터랙션 빼주고 설정에 설정이라고 써있는 텍스트 지워주고 알약 버튼 인터랙션 안 들어가 있어서 인터랙션 반영해줘. 햄버거 메뉴 펼쳤을 때 페이지 정리된 영역 이 부분 디자인 다시 할 필요가 있어. 일단 중앙 정렬 느낌으로 만들어줘야 될 것 같아."
+   ① 상단 톱니: 아이콘 회전(올림 45° · 열림 90°) 없앰. 누름 · 올림은 다른 원 버튼과 같은 .gbtn 그대로, 메뉴 열 때 자리를 벌리며 들어오는 것(12판)도 그대로
+   ② 설정 제목 "설정" 글 없앰(화면 읽기용 이름은 남김)
+   ③ 고르기 알약: 올리면 안 고른 칸에 옅은 바탕(글자 4 → 6%), 누르면 그 칸이 눌림(--ui-press) · 고른 칸을 누르면 진한 알약이 눌림, 놓으면 d3 spring
+   ④ 메뉴 판 가운데 정렬: 허기 · 줄 · 펼친 이름 · 설정 항목을 판 가운데 세로 줄에 맞춤. 줄 이름이 정확히 가운데(번호는 이름 왼쪽, 펼침 원은 오른쪽에 같은 폭 빈칸으로 균형)
+      세로: 허기 자리가 메뉴 · 설정에서 같도록 칸 위 여백을 화면 높이로 정함(max(64, 50vh − 260)) — 메뉴는 화면 가운데쯤, 설정은 같은 자리에서 아래로 ═══ */
+#g-set svg.gi { rotate: none !important; transition: none !important; }
+
+.nv4-sh { position: absolute; width: 1px; height: 1px; min-height: 0; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.nv4-seg button { background: transparent; transition: color var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
+@media (hover: hover) { .nv4-seg button:not([aria-checked="true"]):hover { background: color-mix(in srgb, var(--ui-label) 6%, transparent); } }
+.nv4-seg button:not([aria-checked="true"]):active { background: color-mix(in srgb, var(--ui-label) 9%, transparent); }
+.nv4-seg .th { transition: translate var(--ui-d3) var(--ui-spring), width var(--ui-d3) var(--ui-spring), scale var(--ui-d3) var(--ui-spring); }
+.nv4-seg:has(button[aria-checked="true"]:active) .th { scale: .95 .9; transition-duration: var(--ui-d3), var(--ui-d3), var(--ui-d1); transition-timing-function: var(--ui-spring), var(--ui-spring), var(--ui-ease-out); }
+@media (prefers-reduced-motion: reduce) { .nv4-seg .th { transition-duration: 1ms !important; } .nv4-seg:has(button[aria-checked="true"]:active) .th { scale: none; } }
+
+/* 가운데 정렬 */
+.side .mnav { align-items: center; text-align: center; padding-top: max(64px, calc(50dvh - 260px)); }
+.side .mnav > div, .nv4-views { width: 100%; }
+.side .mhead { display: flex; justify-content: center; }
+.side .mhugi { margin-inline: 0; }   /* 왼쪽 정렬 때 글 줄에 맞추던 -18 여백 없앰 → 허기가 판 가운데 */
+.side .mlist { width: min(360px, 100%); margin: 0 auto; align-items: stretch; }
+.nv4-line { justify-content: center; position: relative; }
+.nv4-line .mrow { position: relative; flex: 0 1 auto; justify-content: center; }
+.nv4-line .mrow .no { position: absolute; right: 100%; top: 50%; translate: 0 -50%; width: auto; margin-right: 10px; }
+.nv4-line:has(.nv4-tg)::before { content: ""; flex: none; width: 34px; }   /* 펼침 원(32 + 사이 2)만큼 왼쪽에 빈칸 → 이름이 가운데 */
+.nv4-sub ul { padding: 0 0 12px; justify-items: center; }
+.nv4-sub button { position: relative; justify-content: center; }
+.nv4-sub button svg.i { position: absolute; left: 100%; margin-left: 6px; }
+.nv4-opts { width: min(400px, 100%); margin: 0 auto; gap: 18px; }
+.nv4-opt, .nv4-opt:is(*) { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 0; text-align: center; }
+.nv4-ol { align-items: center; }
+@media (min-width: 641px) { .nv4-opt { display: flex; padding: 0; } }
+@media (max-width: 640px) { .nv4-opts { gap: 14px; } }
 
 </style>
 <script>
