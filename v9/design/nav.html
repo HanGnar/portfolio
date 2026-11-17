@@ -6401,6 +6401,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     hgr.__hgBox = function () { var f = $('#ask-form'); if (!f || hgr.classList.contains('hg-float')) return null; var r = f.getBoundingClientRect(), s = hgr.getBoundingClientRect(), cx = s.left + s.width / 2; return (r.width && cx > r.left && cx < r.right) ? { left: r.left, right: r.right } : null; };
   })();
   function introStopType() { introTy.forEach(clearTimeout); introTy = []; }
+  window.HG_INTRO_SKIP = function () { introSkip(); };   // 11-18 HG-PAGE: 인사 중에 메뉴로 아래 화면에 가면 인사를 끝내 허기 버튼이 나오게(질문 없이 가도 허기 버튼으로 대화를 이어 감)
   function introSkip() {   // 이동 없이 바로 일반 화면(모션 줄이기 · 그림 없음일 때만 introDock이 부름)
     var R2 = document.documentElement; if (!R2.classList.contains('hg-intro')) return;
     introStopType(); R2.classList.remove('hg-intro', 'hg-intro-t', 'hg-intro-wait', 'hg-intro-a', 'hg-intro-away', 'm-hugi-out', 'm-hugi-gone'); introRestore();
@@ -8599,6 +8600,7 @@ html.hg-hero-in #hero { animation: hgHeroIn .28s var(--ui-ease-out, cubic-bezier
     if (isPage() === on) return;
     if (on) heroY = window.scrollY || 0;
     R.classList.toggle('hg-page', on);
+    if (on && window.HG_INTRO_SKIP) { try { window.HG_INTRO_SKIP(); } catch (e) {} }   // 인사 중이면 끝냄 → 허기 버튼 보임
     if (!on) {
       clearTimeout(inT); R.classList.add('hg-hero-in'); inT = setTimeout(function () { R.classList.remove('hg-hero-in'); }, 400);
       window.scrollTo(0, heroY);
@@ -8653,9 +8655,7 @@ html.hg-hero-in #hero { animation: hgHeroIn .28s var(--ui-ease-out, cubic-bezier
    ② 아래 화면에서 내비 버튼 줄(64 + 위 안전 영역)은 늘 맨 위에 고정, 페이지와 같은 바탕(살짝 비침 + 흐림)을 깔아 글이 버튼 밑으로 비쳐 보이지 않게. 선 · 그림자 없음
    ③ 첫 방문 인사 중에 메뉴로 아래 화면에 가도 내용이 보이고 스크롤되게(인사는 첫 화면에 그대로 남음. 인사 묶음의 숨김 규칙이 id 선택자라 !important로만 이김) */
 html.hg-page main > .sec, html.hg-page #contact { border-top: 0; }
-html.hg-page .hdr, html.hg-page .hdr.on { position: sticky; top: 0; padding-top: env(safe-area-inset-top, 0px); border-bottom: 0; box-shadow: none;
-  background: color-mix(in srgb, var(--md-surface) 86%, transparent); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); }
-@supports not (background: color-mix(in srgb, red 50%, transparent)) { html.hg-page .hdr, html.hg-page .hdr.on { background: var(--md-surface); } }
+/* ② 11-18 사용자 "내비게이션 바 영역이 없고 내비게이션 버튼만 있어. 내비게이션 바 영역은 지워줘": 버튼 줄 바탕(흐림)은 뺐다. 버튼은 원래대로 sticky로 늘 위에 */
 html.hg-page main > .sec, html.hg-page #contact { visibility: visible !important; }
 html.hg-page { overflow: visible; }
 /* HG-NAVBAND-END */</style>
@@ -9181,287 +9181,67 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
 </script>
 
 <style>
-/* ═══ 4판(2026-11-15 HPP): 햄버거 메뉴 펼침 다시 짜기 ═══
-   사용자 "텍스트를 누르면 해당 페이지로 이동하는 기능 드롭다운을 눌러야 상세가 뜨는 느낌으로 하고 싶고 설정버튼도 넣고싶은데 어디다가 넣고 어떻게 인터렉션이 나와야 자연스러울까"
-   + "햄버거 메뉴의 느낌을 살려서 디자인해줘 지금은 채팅창같아"
-   - 판 가운데 좁은 칸(채팅처럼 보임) → 판 폭을 쓰는 메뉴 칸(최대 960): 큰 글자 줄(Title 1)을 머리카락 선으로 나눔, 펼침 원은 줄 오른쪽 끝
-   - 한 줄 = [번호 · 이름(누르면 이동)] + [펼침 원(누르면 상세)]. 올리면 이름이 오른쪽으로 6 밀림(메뉴다운 반응)
-   - 설정 = 판 맨 아래 유리 알약. 누르면 판 안에서 옆으로 넘어가는 설정 화면(같은 줄 모양). 판을 닫았다 열면 늘 메뉴부터 */
+/* ═══ 내비게이션 버튼 시트 — 상단 톱니 · 판 안 설정 화면 (14판, 2026-11-18 HPP)
+   사용자 "그냥 디자인 시트에서 내비게이션 버튼 햄버거 클릭했을 때 디자인은 기존 앱의 웹의 내용과 동일하게 하자. 상단의 내비게이션 버튼은 그대로 유지해줘."
+   → 메뉴 판(허기 · 01 프로젝트 · 02 헝그리한정민 · 03 연락 · 프로젝트 펼침 · 전체 보기)은 사이트 그대로 둔다(4판 ~ 13판의 메뉴 줄 · 칸 · 가운데 정렬 규칙은 모두 뺌).
+   남긴 것: 상단 버튼 줄(톱니 · X 대칭 · 톱니가 자리를 벌리며 들어옴 · 톱니 올림 반응 없음) · 톱니로 여는 판 안 설정 화면(제목 없음 · 상자 없음 · 고르기 알약 반응 · 언어 바꿈 움직임).
+   예전 판: 이전판/nav_v13_2026-11-18/menu4.css · menu4.js */
 
-/* 판 안 칸: 가운데 좁은 칸 → 넓은 메뉴 칸(왼쪽 정렬) */
-.side .mnav { width: min(720px, 100%); min-height: 0; padding: 88px clamp(24px, 6vw, 72px) 24px; justify-content: flex-start; gap: 0; }
-/* 5판: 메뉴 화면은 스크롤 없음(판 안에 다 들어오게 줄임). 설정 화면만 길면 스크롤 */
-.side.nv4-menu-on { overflow-y: hidden; }
-.side .mnav > div { width: 100%; }
-.side .mhead { margin-bottom: 8px; }
-
-/* 두 화면(메뉴 · 설정): 같은 칸에 겹쳐 두고 옆으로 넘김 */
-.nv4-views { position: relative; display: grid; width: 100%; }
-.nv4-pane { grid-area: 1 / 1; min-width: 0; width: 100%; transition: opacity var(--ui-d3) var(--ui-ease-out), translate var(--ui-d3) var(--ui-ease-out), visibility 0s; }
-.nv4-pane[aria-hidden="true"] { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity var(--ui-d2) var(--ui-ease-out), translate var(--ui-d3) var(--ui-ease-out), visibility 0s var(--ui-d3); }
-.nv4-pane[aria-hidden="true"] { position: absolute; inset: 0; overflow: hidden; }   /* 5판: 숨은 화면은 높이 셈에서 뺌(폰에서 긴 설정 화면 때문에 메뉴가 스크롤되던 것) */
+/* ── 1. 두 화면(메뉴 · 설정): 메뉴는 사이트 칸 그대로 흐름에 두고, 설정은 그 위에 겹쳐 둠(칸 폭이 바뀌지 않아 허기 · 메뉴 글이 움직이지 않음) */
+.nv4-views { position: relative; }
+.nv4-pane { min-width: 0; }
+.nv4-set { position: absolute; top: 0; left: 0; width: min(400px, calc(100vw - 40px)); }   /* 왼쪽 · 폭은 menu4.js place()가 판 안에 맞춰 다시 정함 */
+.nv4-pane { transition: opacity var(--ui-d2) var(--ui-ease-out) 80ms, translate var(--ui-d3) var(--ui-spring) 80ms, visibility 0s; }
+.nv4-pane[aria-hidden="true"] { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity var(--ui-d1) var(--ui-ease-out), translate var(--ui-d2) var(--ui-ease-out), visibility 0s var(--ui-d2); }
 .nv4-menu[aria-hidden="true"] { translate: -32px 0; }
 .nv4-set[aria-hidden="true"] { translate: 32px 0; }
-
-/* 메뉴 줄: 위아래 머리카락 선, 번호 칸 48 · 이름 Title 1 · 펼침 원은 오른쪽 끝 */
-/* 6판: 줄 사이 가로선 없앰(사용자 "가로선 빼줘") — 줄 높이와 여백만으로 나눔 */
-.nv4-line { display: flex; align-items: center; gap: 8px; min-height: 56px; }
-.nv4-line .mrow { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 0; padding: 12px 0; font: var(--t-title3); font-family: inherit; letter-spacing: var(--ls-title3); color: var(--ui-label); }
-.nv4-line .mrow .no { flex: none; width: 36px; font: var(--t-footnote); font-family: inherit; letter-spacing: var(--ls-footnote); color: var(--ui-label-3); font-variant-numeric: tabular-nums; translate: 0 -0.1em; }
-.nv4-line .mrow .nm4 { display: inline-block; transition: translate var(--ui-d3) var(--ui-spring), color var(--ui-d2) var(--ui-ease-out); }
-.nv4-line .mrow[aria-disabled="true"] { color: var(--ui-label-3); cursor: default; }
-@media (hover: hover) { .nv4-line .mrow:not([aria-disabled="true"]):hover .nm4 { translate: 4px 0; } }
-.nv4-line .mrow:active { scale: none; }
-.nv4-line .mrow:not([aria-disabled="true"]):active .nm4 { translate: 3px 0; transition-duration: var(--ui-d1); }
-.nv4-line .mrow:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 4px; border-radius: 8px; }
-
-/* 펼침 원: 평소엔 투명 · 올리면 유리가 떠오름(내비 아이콘 버튼과 같음) · 열리면 화살표 뒤집힘(spring) */
-.nv4-tg { position: relative; flex: none; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 999px; display: grid; place-items: center; background: transparent; color: var(--ui-label-2); cursor: pointer;
-  -webkit-tap-highlight-color: transparent; transition: background-color var(--ui-d2) var(--ui-ease-out), box-shadow var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
-.nv4-tg svg.i { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; transition: rotate var(--ui-d3) var(--ui-spring); }
-.nv4-tg[aria-expanded="true"] { color: var(--ui-label); background: var(--ui-bg-2); }
-.nv4-tg[aria-expanded="true"] svg.i { rotate: 180deg; }
-@media (hover: hover) { .nv4-tg:hover { color: var(--ui-label); background: var(--ui-glass); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh); transform: scale(1.06); } }
-.nv4-tg:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
-.nv4-tg:focus-visible, .nv4-gear:focus-visible, .nv4-back:focus-visible, .nv4-seg button:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 2px; }
-
-/* 상세: 높이 0 → 내용만큼(grid 0fr → 1fr, 0.42초 ease-out), 이름들은 아래에서 차례로(30ms 간격). 웹은 두 줄 칸, 폰은 한 줄 */
-.nv4-sub { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--ui-d3) var(--ui-ease-out); }
-.nv4-row.open .nv4-sub { grid-template-rows: 1fr; }
-.nv4-sub > div { overflow: hidden; min-height: 0; }
-.nv4-sub ul { list-style: none; margin: 0; padding: 0 0 14px 36px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; }
-.nv4-sub button { display: inline-flex; align-items: center; gap: 8px; background: none; border: 0; padding: 6px 0; font: var(--t-subhead); font-family: inherit; letter-spacing: var(--ls-subhead); color: var(--ui-label-2); text-align: left; word-break: keep-all; cursor: pointer;
-  opacity: 0; translate: 0 8px; -webkit-tap-highlight-color: transparent;
-  transition: opacity var(--ui-d2) var(--ui-ease-out), translate var(--ui-d3) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out); }
-.nv4-sub button svg.i { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; opacity: 0; translate: -4px 0; transition: opacity var(--ui-d2) var(--ui-ease-out), translate var(--ui-d3) var(--ui-spring); }
-.nv4-row.open .nv4-sub button { opacity: 1; translate: none; transition-delay: calc(60ms + var(--j, 0) * 30ms), calc(60ms + var(--j, 0) * 30ms), 0s; }
-@media (hover: hover) { .nv4-sub button:hover { color: var(--ui-label); } .nv4-sub button:hover svg.i { opacity: 1; translate: none; } }
-.nv4-sub button:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 2px; border-radius: 6px; }
-
-/* 맨 아래: 설정 알약(톱니 + "설정") */
-.nv4-foot { margin-top: 20px; display: flex; align-items: center; gap: 12px; }
-.nv4-gear, .nv4-back { position: relative; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px 0 12px; border: 0; border-radius: 999px; cursor: pointer; color: var(--ui-label);
-  font: var(--t-callout); font-family: inherit; letter-spacing: var(--ls-callout); -webkit-tap-highlight-color: transparent;
-  background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh);
-  transition: transform var(--ui-d3) var(--ui-spring), box-shadow var(--ui-d2) var(--ui-ease-out); }
-.nv4-gear svg.i, .nv4-back svg.i { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
-.nv4-gear svg.i { transition: rotate var(--ui-d4) var(--ui-ease-out); }
-@media (hover: hover) { .nv4-gear:hover, .nv4-back:hover { transform: var(--ui-lift); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh-hi); } .nv4-gear:hover svg.i { rotate: 60deg; } }
-.nv4-gear:active, .nv4-back:active { transform: var(--ui-press); transition-duration: var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
-.nv4-back { width: 36px; padding: 0; justify-content: center; }
-@media (pointer: coarse) { .nv4-tg::after, .nv4-gear::after, .nv4-back::after { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: 44px; translate: -50% -50%; border-radius: 999px; } }
-
-/* 설정 화면: 메뉴와 같은 줄 모양(머리 = 뒤로 원 + Title 1 "설정", 항목 줄 = 이름 · 설명 + 고르기 알약 오른쪽 끝) */
-.nv4-sh { display: flex; align-items: center; gap: 16px; min-height: 88px; border-bottom: 1px solid var(--ui-sep); }
-.nv4-sh h2 { margin: 0; font: var(--t-title1); font-family: inherit; letter-spacing: var(--ls-title1); color: var(--ui-label); }
-.nv4-opts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-.nv4-opt { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 80px; padding: 16px 0; border-bottom: 1px solid var(--ui-sep); min-width: 0; }
-.nv4-ol { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.nv4-ol b { font: var(--t-title3); font-family: inherit; letter-spacing: var(--ls-title3); color: var(--ui-label); }
-.nv4-ol span { font: var(--t-footnote); font-family: inherit; letter-spacing: var(--ls-footnote); color: var(--ui-label-3); }
-
-/* 고르기 알약: 진한 알약이 고른 칸으로 spring으로 미끄러짐(프로젝트 시트 분류 버튼과 같은 움직임) */
-.nv4-seg { position: relative; flex: none; display: inline-flex; padding: 4px; border-radius: 999px; background: var(--ui-bg-2); isolation: isolate; }
-.nv4-seg .th { position: absolute; z-index: -1; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 999px; background: var(--ui-label); box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
-  transition: translate var(--ui-d3) var(--ui-spring), width var(--ui-d3) var(--ui-spring); }
-.nv4-seg button { position: relative; height: 36px; padding: 0 16px; border: 0; border-radius: 999px; background: none; cursor: pointer; white-space: nowrap;
-  font: var(--t-callout); font-family: inherit; letter-spacing: var(--ls-callout); color: var(--ui-label-2); -webkit-tap-highlight-color: transparent; transition: color var(--ui-d2) var(--ui-ease-out), scale var(--ui-d3) var(--ui-spring); }
-.nv4-seg button[aria-checked="true"] { color: var(--ui-bg); }
-.nv4-seg button:active { scale: .95; transition-duration: var(--ui-d1); }
-@media (hover: hover) { .nv4-seg button:not([aria-checked="true"]):hover { color: var(--ui-label); } }
-
-/* 손가락 화면: 보이는 크기 그대로, 누름 영역 44 */
-@media (pointer: coarse) {
-  .nv4-seg button::after { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: 44px; translate: -50% -50%; border-radius: 999px; }
-  .nv4-sub button { min-height: 44px; }
-}
-/* 태블릿 · 폰: 이름 Title 1 모바일 값(type.css 32), 줄 높이 72, 상세 한 줄 · 번호 칸 36 */
-@media (max-width: 1080px) { .nv4-sh { min-height: 76px; } }
-@media (max-width: 640px) {
-  .nv4-seg button { padding: 0 11px; }
-  .side .mnav { padding: 72px 20px 12px; }
-  .nv4-line { min-height: 48px; }
-  .nv4-line .mrow { padding: 8px 0; }
-  .nv4-sub button { padding: 4px 0; }
-  .nv4-sub ul { padding-bottom: 10px; }
-  .nv4-foot { margin-top: 12px; }
-  .nv4-line .mrow .no { width: 32px; }
-  .nv4-sub ul { padding-left: 32px; grid-template-columns: minmax(0, 1fr); }
-  .nv4-sh { min-height: 68px; }
-  .nv4-opt { flex-direction: column; align-items: flex-start; gap: 12px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .nv4-pane, .nv4-pane[aria-hidden="true"], .nv4-sub, .nv4-sub button, .nv4-sub button svg.i, .nv4-tg, .nv4-tg svg.i, .nv4-seg .th, .nv4-gear svg.i, .nv4-line .mrow .nm4 { transition-duration: 1ms !important; transition-delay: 0s !important; }
-  .nv4-menu[aria-hidden="true"], .nv4-set[aria-hidden="true"] { translate: none; }
-}
-
-/* ═══ 7판(2026-11-15 HPP): 가로선 없는 메뉴로 다시 맞춤 — 사용자 "가로라인을 지웠으니깐 다시 그에 맞게 디자인 해야겠지"
-   선이 없으니 화살표가 오른쪽 끝에 홀로 떨어져 보이고 줄 묶음이 흐려짐 →
-   ① 칸 폭 720 → 480, ② 펼침 원을 이름 바로 옆으로, ③ 줄은 둥근 바탕(14)으로 묶음: 올리면 옅은 바탕, 펼친 줄은 상세까지 한 상자(16)로 ═══ */
-.side .mnav { width: min(480px, 100%); }
-.side .mlist { display: flex; flex-direction: column; gap: 2px; margin: 0 -12px; }
-.nv4-row { border-radius: 16px; padding: 0 12px; transition: background-color var(--ui-d2) var(--ui-ease-out); }
-.nv4-row.open { background: color-mix(in srgb, var(--ui-label) 4%, transparent); }
-.nv4-line { min-height: 48px; gap: 2px; justify-content: flex-start; }
-.nv4-line .mrow { flex: 0 1 auto; padding: 10px 0; }
-.nv4-line .mrow .no { width: 36px; translate: none; }
-.nv4-tg { width: 32px; height: 32px; }
-.nv4-tg svg.i { width: 16px; height: 16px; }
-.nv4-tg[aria-expanded="true"] { background: transparent; }
-@media (hover: hover) {
-  .nv4-row:not(.open):has(.mrow:not([aria-disabled="true"]):hover), .nv4-row:not(.open):has(.nv4-tg:hover) { background: color-mix(in srgb, var(--ui-label) 4%, transparent); }
-  .nv4-line .mrow:not([aria-disabled="true"]):hover .nm4 { translate: none; }
-  .nv4-tg:hover { background: var(--ui-glass); }
-}
-.nv4-sub ul { padding: 0 0 12px 36px; grid-template-columns: minmax(0, 1fr); gap: 0; }
-.nv4-sub button { padding: 5px 0; }
-.nv4-foot { margin-top: 16px; }
-@media (max-width: 640px) {
-  .nv4-line { min-height: 46px; }
-  .nv4-line .mrow { padding: 8px 0; }
-  .nv4-line .mrow .no { width: 32px; }
-  .nv4-sub ul { padding-left: 32px; }
-}
-@media (prefers-reduced-motion: reduce) { .nv4-row { transition-duration: 1ms; } }
-
-/* ═══ 8판(2026-11-15 HPP): 설정 화면도 메뉴(7판)와 같은 규칙 — 사용자 "여기는 인터렉션이랑 반응형 왜 적용이 안 되었어 반영해"
-   7판에서 칸이 480으로 좁아졌는데 설정 줄은 [이름 | 알약] 가로 배치 그대로라 이름이 한 글자씩 끊겼음(Language → La/ng/ua/ge) →
-   ① 선 없앰 · 항목마다 둥근 바탕 상자(16, label 4%) ② 머리 = 뒤로 원 32 + 제목 Title 3(메뉴 이름과 같은 크기)
-   ③ 항목은 늘 [이름 · 설명] 위, 고르기 알약 아래(칸 폭 가득, 칸 같은 폭) ④ 설정 화면이 열리면 항목이 메뉴처럼 차례로(40ms 간격) 들어옴 ═══ */
-.nv4-sh { min-height: 48px; gap: 8px; margin: 0 0 8px; border-bottom: 0; }
-.nv4-sh h2 { font: var(--t-title3); font-family: inherit; letter-spacing: var(--ls-title3); }
-.nv4-back { width: 32px; height: 32px; }
-.nv4-opts { gap: 8px; margin: 0 -12px; }
-.nv4-opt { flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 10px; min-height: 0; padding: 12px; border-bottom: 0; border-radius: 16px; background: color-mix(in srgb, var(--ui-label) 4%, transparent);
-  opacity: 0; translate: 0 8px; transition: opacity var(--ui-d3) var(--ui-ease-out), translate var(--ui-d3) var(--ui-ease-out); }
-.nv4-set[aria-hidden="false"] .nv4-opt { opacity: 1; translate: none; transition-delay: calc(60ms + var(--k, 0) * 40ms); }
-.nv4-ol b { font: var(--t-headline); font-family: inherit; letter-spacing: var(--ls-headline); word-break: keep-all; overflow-wrap: normal; }
-.nv4-ol span { word-break: keep-all; overflow-wrap: normal; }
-.nv4-seg { display: flex; width: 100%; background: var(--ui-bg); box-shadow: 0 0 0 1px var(--ui-sep); }
-.nv4-seg button { flex: 1 1 0; min-width: 0; height: 34px; padding: 0 8px; overflow: hidden; text-overflow: ellipsis; }
-@media (max-width: 640px) { .nv4-opt { flex-direction: column; } .nv4-seg button { padding: 0 6px; } }
-@media (prefers-reduced-motion: reduce) { .nv4-opt { transition-duration: 1ms !important; transition-delay: 0s !important; translate: none; } }
-
-/* ═══ 9판(2026-11-15 HPP): 웹 · 태블릿은 폰처럼 좁을 필요 없음 · 허기는 제자리 · 불필요한 스크롤 없음
-   사용자 "웹이랑 테블릿은 모바일처럼 저렇게 가로길이가 작게 나올 필요가 있을까 허기 캐릭터도 같이 올라가면 안돼고 불필요한 스크롤이 생기는 것 같아"
-   ① 641 이상: 칸 480 → 720(메뉴 · 설정 같은 폭이라 넘어갈 때 허기 · 글 왼쪽 선이 그대로), 설정 항목은 한 줄 [이름 · 설명 | 고르기 알약 360]
-   ② 판(.side)은 설정 화면에서도 스크롤 없음 → 허기(판 위 머리)는 움직이지 않음. 항목이 판보다 길면(폰 · 낮은 화면) 항목 목록만 안에서 스크롤 ═══ */
-.side.nv4-set-on { overflow-y: hidden; }
-.nv4-opts { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
-.nv4-opts::-webkit-scrollbar { display: none; }
-.nv4-opts > .nv4-opt { flex-shrink: 0; }   /* 목록 높이를 줄여도 상자가 눌리지 않고 안에서 스크롤 */
-@media (min-width: 641px) {
-  .side .mnav { width: min(720px, 100%); }
-  .nv4-opt { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 360px); align-items: center; column-gap: 24px; padding: 12px 12px 12px 16px; }
-  .nv4-opt .nv4-seg { width: 100%; }
-}
-
-/* ═══ 10판(2026-11-15 HPP): 설정 버튼 상단으로 · 톱니 아이콘 · 설정 화면 조금 작게 · 언어 바꿈 움직임
-   사용자 "언어 바꾸는 부분은 인터렉션이 안 들어갔네 적용시켜주고 웹 설정부분 조금 잘리네 조금만 더 작아져도 됄 것 같아 설정버튼은 상단 탭 버튼에 들어가는 게 더 자연스러울 것 같아 거기로 옮겨줘 아이콘은 톱니바퀴가 설정 아이콘이 더 자연스러우니깐 기존 스타일에 맞게 제작해"
-   ① 판 아래 "설정" 알약 없앰 → 상단 버튼 줄(홈 · 소리 · 설정 · 메뉴 · 허기) 톱니 원 #g-set. 모양 · 크기 · 유리 · 누름은 다른 원(.gbtn) 그대로
-      판이 닫혀 있으면 판을 열면서 바로 설정 화면, 열려 있으면 메뉴 ↔ 설정. 설정 화면이면 aria-expanded true + 톱니 90° 돎(spring)
-   ② 설정 화면: 머리 48 → 40 · 상자 사이 8 → 6 · 상자 안쪽 12 → 10 · 고르기 알약 높이 34 → 30(안쪽 4 → 3). 화면 높이 820 이하(641 이상)는 칸 위 여백 88 → 64
-   ③ 목록이 판보다 길면 아래 끝 28을 흐리게(더 있다는 표시), 끝까지 내리면 없어짐 ═══ */
-#g-set svg.gi { transition: rotate var(--ui-d4) var(--ui-spring); }
-#g-set[aria-expanded="true"] svg.gi { rotate: 90deg; }
-@media (hover: hover) { #g-set:hover svg.gi { rotate: 45deg; } #g-set[aria-expanded="true"]:hover svg.gi { rotate: 135deg; } }
-@media (max-width: 640px) { html:has(#detail:not([hidden])) #g-set { display: none; } }   /* 폰 프로젝트 상세: 홈 · 소리처럼 숨김(사이트 규칙과 같이) */
-.nv4-sh { min-height: 40px; margin-bottom: 6px; }
-.nv4-opts { gap: 6px; }
-.nv4-opt { padding: 10px 12px; gap: 8px; }
-.nv4-seg { padding: 3px; }
-.nv4-seg .th { top: 3px; bottom: 3px; }
-.nv4-seg button { height: 30px; }
-@media (min-width: 641px) { .nv4-opt { padding: 10px 10px 10px 16px; column-gap: 20px; } }
-@media (min-width: 641px) and (max-height: 820px) { .side .mnav { padding-top: 64px; } }
-.nv4-opts.nv4-more { -webkit-mask-image: linear-gradient(#000 calc(100% - 28px), transparent); mask-image: linear-gradient(#000 calc(100% - 28px), transparent); }
-@media (prefers-reduced-motion: reduce) { #g-set svg.gi { transition-duration: 1ms; } }
 .nv4-now > .nv4-pane { transition: none; }   /* 판이 닫힌 채 톱니를 누르면 화면 바꿈은 즉시(판 여는 움직임만 보임) */
-/* 10판 움직임(사용자 "인터렉션은 기존에 시트들 참고해서 부드럽고 쫀득하게 우리 스타일에 맞게"): 공통 규칙 그대로 — 들어오는 것은 spring(살짝 넘쳤다 돌아옴), 나가는 것은 ease-out
-   ① 들어오는 화면(메뉴 ↔ 설정): 옆 32 → 0을 d3 spring, 투명도는 d2 ease-out ② 설정 항목: 아래 8 → 0을 d3 spring(차례 60 + 40ms)
-   ③ 고르기 칸 누름: .95 → 다른 버튼과 같은 --ui-press(.95, .93, 세로가 더 눌림), 놓으면 d3 spring */
-.nv4-pane[aria-hidden="false"] { transition: opacity var(--ui-d2) var(--ui-ease-out), translate var(--ui-d3) var(--ui-spring), visibility 0s; }
-.nv4-opt { transition: opacity var(--ui-d3) var(--ui-ease-out), translate var(--ui-d3) var(--ui-spring); }
-.nv4-seg button { transition: color var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
-.nv4-seg button:active { scale: none; transform: var(--ui-press); transition-duration: var(--ui-d2), var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
-.nv4-now > .nv4-pane { transition: none; }
-@media (prefers-reduced-motion: reduce) { .nv4-pane[aria-hidden="false"], .nv4-seg button { transition-duration: 1ms; } }
+.side.nv4-set-on { overflow-y: hidden; }      /* 설정 화면에서 판이 스크롤되지 않음 → 허기 제자리, 길면 항목 목록만 안에서 스크롤 */
 
-/* 10판-3: 톱니는 햄버거 메뉴를 열었을 때만 — 사용자 "설정 버튼은 햄버거 메뉴 열었을 때 나오게 해줘"
-   닫힘: 폭 0 · 간격 상쇄(-8) · 투명 · .6배(누를 수 없음, 초점 없음 inert). 열림: 소리와 X 사이가 벌어지며 톱니가 spring으로 커져 나옴(햄버거가 X로 바뀌는 것보다 0.06초 늦게)
-   닫을 때는 d2 ease-out으로 빠르게 접힘(나가는 것은 ease-out 규칙) */
-#g-set { overflow: hidden; transition: transform var(--ui-d3) var(--ui-spring) 60ms, width var(--ui-d3) var(--ui-spring) 60ms, margin var(--ui-d3) var(--ui-spring) 60ms, opacity var(--ui-d2) var(--ui-ease-out) 60ms, box-shadow var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out); }
-.gnb:has(#g-menu[aria-expanded="false"]) #g-set { width: 0; min-width: 0; padding: 0; border-width: 0; margin-right: -8px; opacity: 0; transform: scale(.6); pointer-events: none;
-  transition: transform var(--ui-d2) var(--ui-ease-out), width var(--ui-d2) var(--ui-ease-out), margin var(--ui-d2) var(--ui-ease-out), opacity var(--ui-d1) var(--ui-ease-out); }
-#g-set:active { transition-delay: 0s; }
-@media (prefers-reduced-motion: reduce) { #g-set, .gnb:has(#g-menu[aria-expanded="false"]) #g-set { transition-duration: 1ms; transition-delay: 0s; } }
+/* ── 2. 설정 화면: 제목 글 없음(화면 읽기용 이름만), 항목 상자 없음, 이름 · 설명 위 · 고르기 알약 아래(왼쪽 맞춤 — 허기 · 메뉴 글과 같은 왼쪽 선) */
+.nv4-sh { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.nv4-opts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; text-align: left; }
+.nv4-opts::-webkit-scrollbar { display: none; }
+.nv4-opts.nv4-more { -webkit-mask-image: linear-gradient(#000 calc(100% - 28px), transparent); mask-image: linear-gradient(#000 calc(100% - 28px), transparent); }
+.nv4-opt { flex-shrink: 0; display: flex; flex-direction: column; align-items: stretch; gap: 8px; min-width: 0;
+  opacity: 0; translate: 0 8px; transition: opacity var(--ui-d3) var(--ui-ease-out), translate var(--ui-d3) var(--ui-spring); }
+.nv4-set[aria-hidden="false"] .nv4-opt { opacity: 1; translate: none; transition-delay: calc(140ms + var(--k, 0) * 40ms); }
+.nv4-ol { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.nv4-ol b { font: var(--t-headline); font-family: inherit; letter-spacing: var(--ls-headline); color: var(--ui-label); word-break: keep-all; }
+.nv4-ol span { font: var(--t-footnote); font-family: inherit; letter-spacing: var(--ls-footnote); color: var(--ui-label-3); word-break: keep-all; }
 
-/* ═══ 11판(2026-11-18 HPP): 인터랙션 자연스럽게 — 사용자 "Navigation sheet 인터랙션 자연스럽게 만들어줘. 스킬 파일 기존에 만들었던 걸 읽어서 참고하고"
-   측정(크롬, 프레임마다): ① 메뉴 화면 ↔ 설정 화면이 같은 자리에서 겹쳐 보임(나가는 화면이 d2 동안 남아 있는데 들어오는 화면이 바로 시작)
-   ② 설정 화면에서 닫으면 판이 사라지는 동안 메뉴로 바뀌어 보임 · 펼친 줄이 접히며 아래 줄이 올라옴(menu4.js에서 판이 다 숨은 뒤 되돌림)
-   ③ 처음 열 때 첫 프레임 멈칫(menu4.js warm)
-   → 나가는 화면은 d1에 빠르게 흐려지고(옆 이동 d2 ease-out), 들어오는 화면은 80ms 뒤 시작(옆 32 → 0 d3 spring 그대로). 설정 항목 차례도 80ms 늦춤 ═══ */
-.nv4-pane[aria-hidden="true"] { transition: opacity var(--ui-d1) var(--ui-ease-out), translate var(--ui-d2) var(--ui-ease-out), visibility 0s var(--ui-d2); }
-.nv4-pane[aria-hidden="false"] { transition: opacity var(--ui-d2) var(--ui-ease-out) 80ms, translate var(--ui-d3) var(--ui-spring) 80ms, visibility 0s; }
-.nv4-set[aria-hidden="false"] .nv4-opt { transition-delay: calc(140ms + var(--k, 0) * 40ms); }
-.nv4-now > .nv4-pane { transition: none; }
-@media (prefers-reduced-motion: reduce) { .nv4-pane[aria-hidden="true"], .nv4-pane[aria-hidden="false"] { transition-duration: 1ms; transition-delay: 0s; } }
-
-/* ═══ 12판(2026-11-18 HPP): 사용자 "X버튼 지금 비대칭인 거 수정해주고 … 햄버거 메뉴 열었을 때 인터랙션 끊겨서 하나가 추가가 되는데, 자연스럽게 옆으로 밀려나도록 인터랙션 추가해줘. 추가적으로 설정 안에 각 설정 메뉴별로 흐린 회색 박스 처리가 되어 있는데, 이 부분 제거해줘."
-   (버튼별 호버 인터랙션은 사용자가 "그냥 다 넣지마"로 뺌)
-   ① X 비대칭: nav.css 햄버거 줄 기준점(fill-box 가운데)
-   ② 톱니가 끊기며 끼어듦: 히어로 덮개 .gbtn transition(!important)이 #g-set의 폭 · 여백 움직임을 지워 폭이 0 → 40으로 한 번에 바뀌고 버튼 줄이 24 튐
-      → #g-set만 같은 세기(!important)로 폭 · 여백 · 크기를 움직이게 해 홈 · 소리는 왼쪽, X는 오른쪽으로 밀려나며 톱니가 자리를 벌림(열 때 d3 spring 60ms 늦게, 닫을 때 d2 ease-out)
-   ③ 설정 항목 회색 바탕 상자 없앰(글 · 알약 자리는 그대로) ═══ */
-#g-set { transition: transform var(--ui-d3) var(--ui-spring) 60ms, width var(--ui-d3) var(--ui-spring) 60ms, margin var(--ui-d3) var(--ui-spring) 60ms, opacity var(--ui-d2) var(--ui-ease-out) 60ms, box-shadow var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out) !important; }
-.gnb:has(#g-menu[aria-expanded="false"]) #g-set { transition: transform var(--ui-d2) var(--ui-ease-out), width var(--ui-d2) var(--ui-ease-out), margin var(--ui-d2) var(--ui-ease-out), opacity var(--ui-d1) var(--ui-ease-out) !important; }
-#g-set:active { transition-delay: 0s !important; }
-@media (prefers-reduced-motion: reduce) { #g-set, .gnb:has(#g-menu[aria-expanded="false"]) #g-set { transition-duration: 1ms !important; transition-delay: 0s !important; } }
-.nv4-opt { background: transparent; }
-@media (min-width: 641px) { .nv4-opt { padding-left: 12px; } }   /* 상자가 없으니 항목 이름 왼쪽을 "설정" 제목 왼쪽 선에 맞춤(16 → 12) */
-/* 12판-2: 설정 머리의 뒤로 원 없앰(사용자 "뒤로가기 버튼도 지워") — 메뉴로는 상단 톱니 · Esc. 제목만 남음 */
-.nv4-sh { gap: 0; }
-
-/* ═══ 13판(2026-11-18 HPP): 사용자 "내비게이션 버튼 설정 인터랙션 빼주고 설정에 설정이라고 써있는 텍스트 지워주고 알약 버튼 인터랙션 안 들어가 있어서 인터랙션 반영해줘. 햄버거 메뉴 펼쳤을 때 페이지 정리된 영역 이 부분 디자인 다시 할 필요가 있어. 일단 중앙 정렬 느낌으로 만들어줘야 될 것 같아."
-   ① 상단 톱니: 아이콘 회전(올림 45° · 열림 90°) 없앰. 누름 · 올림은 다른 원 버튼과 같은 .gbtn 그대로, 메뉴 열 때 자리를 벌리며 들어오는 것(12판)도 그대로
-   ② 설정 제목 "설정" 글 없앰(화면 읽기용 이름은 남김)
-   ③ 고르기 알약: 올리면 안 고른 칸에 옅은 바탕(글자 4 → 6%), 누르면 그 칸이 눌림(--ui-press) · 고른 칸을 누르면 진한 알약이 눌림, 놓으면 d3 spring
-   ④ 메뉴 판 가운데 정렬: 허기 · 줄 · 펼친 이름 · 설정 항목을 판 가운데 세로 줄에 맞춤. 줄 이름이 정확히 가운데(번호는 이름 왼쪽, 펼침 원은 오른쪽에 같은 폭 빈칸으로 균형)
-      세로: 허기 자리가 메뉴 · 설정에서 같도록 칸 위 여백을 화면 높이로 정함(max(64, 50vh − 260)) — 메뉴는 화면 가운데쯤, 설정은 같은 자리에서 아래로 ═══ */
-#g-set svg.gi { rotate: none !important; transition: none !important; }
-
-.nv4-sh { position: absolute; width: 1px; height: 1px; min-height: 0; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-
-.nv4-seg button { background: transparent; transition: color var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
-@media (hover: hover) { .nv4-seg button:not([aria-checked="true"]):hover { background: color-mix(in srgb, var(--ui-label) 6%, transparent); } }
+/* ── 3. 고르기 알약: 진한 알약이 고른 칸으로 spring으로 미끄러짐 · 안 고른 칸은 올리면 옅은 바탕 · 누르면 눌림 · 고른 칸 누르면 진한 알약이 눌림 */
+.nv4-seg { position: relative; display: flex; width: 100%; padding: 3px; border-radius: 999px; background: var(--ui-bg); box-shadow: 0 0 0 1px var(--ui-sep); isolation: isolate; }
+.nv4-seg .th { position: absolute; z-index: -1; top: 3px; bottom: 3px; left: 0; width: 0; border-radius: 999px; background: var(--ui-label); box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
+  transition: translate var(--ui-d3) var(--ui-spring), width var(--ui-d3) var(--ui-spring), scale var(--ui-d3) var(--ui-spring); }
+.nv4-seg button { position: relative; flex: 1 1 0; min-width: 0; height: 30px; padding: 0 6px; border: 0; border-radius: 999px; background: transparent; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font: var(--t-callout); font-family: inherit; letter-spacing: var(--ls-callout); color: var(--ui-label-2); -webkit-tap-highlight-color: transparent;
+  transition: color var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out), transform var(--ui-d3) var(--ui-spring); }
+.nv4-seg button[aria-checked="true"] { color: var(--ui-bg); }
+@media (hover: hover) { .nv4-seg button:not([aria-checked="true"]):hover { color: var(--ui-label); background: color-mix(in srgb, var(--ui-label) 6%, transparent); } }
 .nv4-seg button:not([aria-checked="true"]):active { background: color-mix(in srgb, var(--ui-label) 9%, transparent); }
-.nv4-seg .th { transition: translate var(--ui-d3) var(--ui-spring), width var(--ui-d3) var(--ui-spring), scale var(--ui-d3) var(--ui-spring); }
+.nv4-seg button:active { transform: var(--ui-press); transition-duration: var(--ui-d2), var(--ui-d2), var(--ui-d1); transition-timing-function: var(--ui-ease-out); }
 .nv4-seg:has(button[aria-checked="true"]:active) .th { scale: .95 .9; transition-duration: var(--ui-d3), var(--ui-d3), var(--ui-d1); transition-timing-function: var(--ui-spring), var(--ui-spring), var(--ui-ease-out); }
-@media (prefers-reduced-motion: reduce) { .nv4-seg .th { transition-duration: 1ms !important; } .nv4-seg:has(button[aria-checked="true"]:active) .th { scale: none; } }
+.nv4-seg button:focus-visible { outline: 2px solid var(--ui-label-3); outline-offset: 2px; }
+@media (pointer: coarse) { .nv4-seg button::after { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: 44px; translate: -50% -50%; border-radius: 999px; } }
 
-/* 가운데 정렬 */
-.side .mnav { align-items: center; text-align: center; padding-top: max(64px, calc(50dvh - 260px)); }
-.side .mnav > div, .nv4-views { width: 100%; }
-.side .mhead { display: flex; justify-content: center; }
-.side .mhugi { margin-inline: 0; }   /* 왼쪽 정렬 때 글 줄에 맞추던 -18 여백 없앰 → 허기가 판 가운데 */
-.side .mlist { width: min(360px, 100%); margin: 0 auto; align-items: stretch; }
-.nv4-line { justify-content: center; position: relative; }
-.nv4-line .mrow { position: relative; flex: 0 1 auto; justify-content: center; }
-.nv4-line .mrow .no { position: absolute; right: 100%; top: 50%; translate: 0 -50%; width: auto; margin-right: 10px; }
-.nv4-line:has(.nv4-tg)::before { content: ""; flex: none; width: 34px; }   /* 펼침 원(32 + 사이 2)만큼 왼쪽에 빈칸 → 이름이 가운데 */
-.nv4-sub ul { padding: 0 0 12px; justify-items: center; }
-.nv4-sub button { position: relative; justify-content: center; }
-.nv4-sub button svg.i { position: absolute; left: 100%; margin-left: 6px; }
-.nv4-opts { width: min(400px, 100%); margin: 0 auto; gap: 18px; }
-.nv4-opt, .nv4-opt:is(*) { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 0; text-align: center; }
-.nv4-ol { align-items: center; }
-@media (min-width: 641px) { .nv4-opt { display: flex; padding: 0; } }
-@media (max-width: 640px) { .nv4-opts { gap: 14px; } }
-
-/* 13판-2(2026-11-18 HPP): 사용자 "세 번째 사진 설정 버튼 호버했을 때 인터랙션 나오는데 이거 안 나오게 해주고" — 톱니는 올려도 커지거나 그림자 · 바탕이 바뀌지 않음(누름은 그대로)
-   + 설정 화면을 열 때 첫 고른 칸에 생기던 초점 고리 없앰(menu4.js: 숨은 제목에 초점) */
+/* ── 4. 상단 톱니(#g-set): 메뉴를 열었을 때만 보임. 열 때 소리와 X 사이가 벌어지며 들어옴(d3 spring, 60ms 늦게), 닫을 때 d2 ease-out으로 접힘
+   히어로 덮개 .gbtn transition(!important)이 폭 · 여백 움직임을 지우므로 톱니만 같은 세기로 되살림(12판). 아이콘 회전 없음 · 올림 반응 없음(13판 · 13판-2) */
+#g-set { overflow: hidden; transition: transform var(--ui-d3) var(--ui-spring) 60ms, width var(--ui-d3) var(--ui-spring) 60ms, margin var(--ui-d3) var(--ui-spring) 60ms, opacity var(--ui-d2) var(--ui-ease-out) 60ms, box-shadow var(--ui-d2) var(--ui-ease-out), background-color var(--ui-d2) var(--ui-ease-out), color var(--ui-d2) var(--ui-ease-out) !important; }
+.gnb:has(#g-menu[aria-expanded="false"]) #g-set { width: 0; min-width: 0; padding: 0; border-width: 0; margin-right: -8px; opacity: 0; transform: scale(.6); pointer-events: none;
+  transition: transform var(--ui-d2) var(--ui-ease-out), width var(--ui-d2) var(--ui-ease-out), margin var(--ui-d2) var(--ui-ease-out), opacity var(--ui-d1) var(--ui-ease-out) !important; }
+#g-set:active { transition-delay: 0s !important; }
+#g-set svg.gi { rotate: none !important; transition: none !important; }
 @media (hover: hover) { .gnb #g-set:hover:not(:active) { transform: none !important; box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh) !important; } }
+@media (max-width: 640px) { html:has(#detail:not([hidden])) #g-set { display: none; } }   /* 폰 프로젝트 상세: 홈 · 소리처럼 숨김 */
 #nv4-set-h:focus { outline: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .nv4-pane, .nv4-pane[aria-hidden="true"], .nv4-opt, .nv4-seg .th, .nv4-seg button { transition-duration: 1ms !important; transition-delay: 0s !important; }
+  .nv4-menu[aria-hidden="true"], .nv4-set[aria-hidden="true"], .nv4-opt { translate: none; }
+  .nv4-seg:has(button[aria-checked="true"]:active) .th { scale: none; }
+  #g-set, .gnb:has(#g-menu[aria-expanded="false"]) #g-set { transition-duration: 1ms !important; transition-delay: 0s !important; }
+}
 
 </style>
 <script>
@@ -9482,14 +9262,8 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
   var pj = [].map.call(list.querySelectorAll('.nv-sub [data-open]'), function (b) { return { id: b.getAttribute('data-open'), name: b.textContent.trim() }; });
   if (!pj.length) pj = [].map.call(list.querySelectorAll('details'), function (d) { var nm = d.querySelector('summary .nm'), a = d.querySelector('[data-open]'); return nm && a ? { id: a.getAttribute('data-open'), name: nm.textContent } : null; }).filter(Boolean);
 
-  // 2) 메뉴 줄: 01 프로젝트(이름 → 프로젝트 영역 · 원 → 이름 목록) · 02 헝그리한정민(이동만) · 03 연락(아직 기능 없음)
-  list.innerHTML =
-    '<li class="mi nv4-row" data-k="pj"><div class="nv4-line"><button class="mrow" type="button" data-scroll="projects"><span class="no">01</span><span class="nm4" data-t="pj">프로젝트</span></button>' +
-      '<button class="nv4-tg" type="button" aria-expanded="false" aria-controls="nv4-sub-pj" aria-label="프로젝트 목록 펼치기">' + ic('chev') + '</button></div>' +
-      '<div class="nv4-sub" id="nv4-sub-pj"><div><ul>' + pj.map(function (p, j) { return '<li><button type="button" data-open="' + esc(p.id) + '" style="--j:' + j + '" tabindex="-1"><span>' + esc(p.name) + '</span>' + ic('go') + '</button></li>'; }).join('') + '</ul></div></div></li>' +
-    '<li class="mi nv4-row"><div class="nv4-line"><button class="mrow" type="button" data-scroll="about"><span class="no">02</span><span class="nm4" data-t="about">헝그리한정민</span></button></div></li>' +
-    '<li class="mi nv4-row"><div class="nv4-line"><button class="mrow" type="button" aria-disabled="true"><span class="no">03</span><span class="nm4" data-t="contact">연락</span></button></div></li>';
-
+  // 2) 14판(11-18): 메뉴 줄은 사이트 그대로(사용자 "햄버거 클릭했을 때 디자인은 기존 웹의 내용과 동일하게"). 다시 짜지 않고 언어 바꿈용 이름표(data-t)만 붙임
+  [].forEach.call(list.querySelectorAll('.nm, .mrow > span:not(.no), .nv-sub button'), function (n) { var k = { '프로젝트': 'pj', '헝그리한정민': 'about', '연락': 'contact', '전체 보기': 'all' }[n.textContent.trim()]; if (k && !n.children.length) n.setAttribute('data-t', k); });
   // 3) 두 화면으로 감쌈: 메뉴(목록 + 설정 알약) · 설정
   var views = document.createElement('div'); views.className = 'nv4-views';
   var menu = document.createElement('div'); menu.className = 'nv4-pane nv4-menu'; menu.setAttribute('aria-hidden', 'false');
@@ -9524,15 +9298,19 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
   // 5) 설정 화면: 판 안에서 옆으로(메뉴 왼쪽으로 24 비키며 흐려짐 · 설정 오른쪽 24에서 들어옴, 0.42초 ease-out). 뒤로 · Esc = 메뉴로
   var pend = false;
   function more() { var o = set.querySelector('.nv4-opts'); o.classList.toggle('nv4-more', o.scrollTop + o.clientHeight < o.scrollHeight - 2); }
+  function place() {   /* 14판: 설정 화면은 메뉴 칸 위에 겹침 — 왼쪽은 허기 · 메뉴 글과 같은 선, 판 안에 안 들어가면 판 안쪽 20부터 */
+    var v = views.getBoundingClientRect(), sd = side.getBoundingClientRect(), L = sd.left + 20, R = sd.right - 20, left = v.left, w = Math.min(400, R - left);
+    if (w < 300) { left = L; w = Math.min(400, R - L); }
+    set.style.left = Math.round(left - v.left) + 'px'; set.style.width = Math.round(w) + 'px'; }
   function fit() { var o = set.querySelector('.nv4-opts'); if (!o) return; o.style.maxHeight = ''; var r = side.getBoundingClientRect(); o.style.maxHeight = Math.max(160, Math.floor(r.top + side.clientHeight - o.getBoundingClientRect().top - 16)) + 'px'; more(); if (!o.nv4m) { o.nv4m = 1; o.addEventListener('scroll', more, { passive: true }); } }
-  function show(s, kb) { side.classList.toggle('nv4-menu-on', !s); side.classList.toggle('nv4-set-on', !!s); if (s) fit(); menu.setAttribute('aria-hidden', s ? 'true' : 'false'); set.setAttribute('aria-hidden', s ? 'false' : 'true'); menu.inert = !!s; set.inert = !s; gear.setAttribute('aria-expanded', s ? 'true' : 'false');
+  function show(s, kb) { side.classList.toggle('nv4-menu-on', !s); side.classList.toggle('nv4-set-on', !!s); if (s) { place(); fit(); } menu.setAttribute('aria-hidden', s ? 'true' : 'false'); set.setAttribute('aria-hidden', s ? 'false' : 'true'); menu.inert = !!s; set.inert = !s; gear.setAttribute('aria-expanded', s ? 'true' : 'false');
     if (s) { segAll(); if (kb) setTimeout(function () { var f = set.querySelector('.nv4-seg [aria-checked="true"]');   /* 13판-2: 키보드로 열 때만 첫 고른 칸에 초점(마우스로 열면 초점을 옮기지 않아 고리가 생기지 않음, 사용자 캡처) */ f.focus({ preventScroll: true, focusVisible: false }); }, RM ? 0 : 60);   /* 12판-2: 뒤로 원 없앰 → 첫 고르기 칸에 초점, 메뉴로는 상단 톱니 · Esc */ side.scrollTop = 0; } else gear.focus({ preventScroll: true, focusVisible: false }); }
   set.inert = true; side.classList.add('nv4-menu-on');
   gear.addEventListener('click', function (e) { e.stopPropagation();
     if (side.classList.contains('on') && !side.hidden) { show(set.getAttribute('aria-hidden') === 'true', e.detail === 0); return; }
     // 닫혀 있으면: 판이 열리기 전에 설정 화면으로 바꿔 둠(옆으로 넘김 없이) → 판은 원래 여는 움직임 그대로, 항목만 차례로 들어옴
     pend = true; views.classList.add('nv4-now'); show(true, e.detail === 0); gm.click(); var n = 0;
-    (function wait() { if (side.classList.contains('on') && !side.hidden || n++ > 30) { pend = false; fit(); segAll(); setTimeout(function () { fit(); segAll(); }, 700); requestAnimationFrame(function () { views.classList.remove('nv4-now'); }); } else requestAnimationFrame(wait); })(); });
+    (function wait() { if (side.classList.contains('on') && !side.hidden || n++ > 30) { pend = false; place(); fit(); segAll(); setTimeout(function () { place(); fit(); segAll(); }, 700); requestAnimationFrame(function () { views.classList.remove('nv4-now'); }); } else requestAnimationFrame(wait); })(); });
   addEventListener('keydown', function (e) { if (e.key === 'Escape' && side.classList.contains('on') && set.getAttribute('aria-hidden') === 'false') { e.preventDefault(); e.stopImmediatePropagation(); show(false); } }, true);
   // 판이 닫히면 다음에 열 때 늘 메뉴부터(펼친 줄도 접음)
   gear.inert = true;   // 10판-3: 톱니는 판이 열렸을 때만(닫히면 누름 · 초점 없음)
@@ -9559,7 +9337,7 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
   // 7) 언어(6판, 사용자 "설정에는 영어 일본어 중국어로 설정가능하게 해줘"): 고르면 메뉴 · 설정 글이 그 언어로 바뀜. 프로젝트 이름은 그대로.
   //    사이트에 반영할 때는 답 언어(Worker 지시)와 화면 글 전체를 같이 바꿔야 함 — 시트는 메뉴 · 설정만 보여 줌
   var T = {
-    pj: ['프로젝트', 'Projects', 'プロジェクト', '项目'], about: ['헝그리한정민', 'About', 'プロフィール', '关于'], contact: ['연락', 'Contact', 'お問い合わせ', '联系'], set: ['설정', 'Settings', '設定', '设置'],
+    pj: ['프로젝트', 'Projects', 'プロジェクト', '项目'], all: ['전체 보기', 'View all', 'すべて見る', '查看全部'], about: ['헝그리한정민', 'About', 'プロフィール', '关于'], contact: ['연락', 'Contact', 'お問い合わせ', '联系'], set: ['설정', 'Settings', '設定', '设置'],
     o_lang: ['언어', 'Language', '言語', '语言'], d_lang: ['메뉴와 답 언어', 'Menu and answers', 'メニューと回答', '菜单和回答'],
     o_theme: ['화면', 'Appearance', '表示', '外观'], d_theme: ['자동은 기기 설정을 따라요', 'Auto follows your device', '自動は端末の設定に従います', '自动跟随设备设置'],
     v_theme_auto: ['자동', 'Auto', '自動', '自动'], v_theme_light: ['밝게', 'Light', 'ライト', '浅色'], v_theme_dark: ['어둡게', 'Dark', 'ダーク', '深色'],
@@ -9584,7 +9362,7 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
     var tg = list.querySelector('.nv4-tg'); if (tg) tg.setAttribute('aria-label', tr(tg.getAttribute('aria-expanded') === 'true' ? 'a_close' : 'a_open'));
     set.querySelectorAll('.nv4-seg').forEach(function (g) { seg(g, true); }); }
   applyLang(ST.lang || 'ko');
-  addEventListener('resize', function () { if (set.getAttribute('aria-hidden') === 'false') fit(); if (set.getAttribute('aria-hidden') === 'false') set.querySelectorAll('.nv4-seg').forEach(function (g) { seg(g, true); }); });
+  addEventListener('resize', function () { if (set.getAttribute('aria-hidden') === 'false') { place(); fit(); } if (set.getAttribute('aria-hidden') === 'false') set.querySelectorAll('.nv4-seg').forEach(function (g) { seg(g, true); }); });
 })();
 
 </script>
