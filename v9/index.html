@@ -6277,6 +6277,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       t.split(/(\s+)/).forEach(function (w) { if (!w) return; if (/^\s+$/.test(w)) { b.appendChild(document.createTextNode(w)); return; } var s = document.createElement('span'); s.className = 'iw'; s.textContent = w; s.style.setProperty('--d', (110 + n * 26) + 'ms'); n++; b.appendChild(s); });
       b._n = n; box.appendChild(b); bs.push(b);
     });
+    var GAP = 20;   // 11-18 사용자 "캐릭터가 움직일 때 조금씩 겹치는데 … 조금만 더 띄워줘": 털 끝과 꼬리 끝 사이 12 → 20px(쉴 때 약 17px, 움직일 때 겹침 0)
     function hugi() { var c = ask.querySelector('.hugi-char'); return c && c.offsetParent ? c : null; }
     function place() {
       var c = hugi(); if (!c) return;
@@ -6284,12 +6285,12 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       var g = document.querySelector('.gnb'), gb = g ? g.getBoundingClientRect().bottom : 0;
       if (side === null) {   // 처음 한 번: 세 마디가 다 나왔을 때 높이로 자리를 정함(중간에 자리가 바뀌지 않게)
         box.style.left = box.style.maxWidth = ''; box.classList.add('measure'); hFull = tallest();   // 한 마디씩 보이므로 가장 큰 마디 높이로 자리를 정함
-        side = top - 12 - hFull < gb + 8;
+        side = top - GAP - hFull < gb + 8;
         if (side) { box.classList.add('sy-side'); }
       }
-      if (!side) { box.style.bottom = Math.round(ar.bottom - top + 12) + 'px'; box.classList.remove('measure'); return; }
+      if (!side) { box.style.bottom = Math.round(ar.bottom - top + GAP) + 'px'; box.classList.remove('measure'); return; }
       // 위가 모자라면(폰 가로 화면 등 낮은 화면) 허기 오른쪽 옆. 세 마디가 다 나왔을 때 몸 가운데 높이에 오게 아래 끝을 고정하고 위로 쌓음
-      var x = sg.left + c.offsetLeft + c.offsetWidth * .92 + 14, mid = sg.top + c.offsetTop + c.offsetHeight * .6;
+      var x = sg.left + c.offsetLeft + c.offsetWidth * .92 + GAP + 2, mid = sg.top + c.offsetTop + c.offsetHeight * .6;
       box.style.left = Math.round(x - ar.left) + 'px'; box.style.maxWidth = Math.max(160, Math.min(360, Math.round(innerWidth - x - 16))) + 'px';
       box.classList.add('measure'); hFull = tallest(); box.classList.remove('measure');
       var fm = ask.querySelector('form'), ft = fm ? fm.getBoundingClientRect().top : ar.bottom, hNow = box.offsetHeight || hFull;
@@ -6310,7 +6311,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
       bs.forEach(function (x, k) { x.classList.toggle('last', k === i); });
       b.classList.remove('wait'); place(); box.classList.add('on');
       if (RM || !b.animate) return;
-      b.animate([{ opacity: 0, transform: 'translateY(10px) scale(.92)' }, { opacity: 1, transform: 'none' }], { duration: 460, delay: o ? 140 : 0, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' });   // 새 마디는 앞 마디가 빠지기 시작하고 0.14초 뒤 허기 쪽에서 커지며 나타남(넘침 없음)
+      b.animate([{ opacity: 0, transform: 'translateY(6px) scale(.92)' }, { opacity: 1, transform: 'none' }], { duration: 460, delay: o ? 140 : 0, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' });   // 새 마디는 앞 마디가 빠지기 시작하고 0.14초 뒤 허기 쪽에서 커지며 나타남(넘침 없음)
       b.classList.add('iw-run'); later(function () { b.classList.remove('iw-run'); }, 110 + b._n * 26 + 640);
     }
     function hide() {
