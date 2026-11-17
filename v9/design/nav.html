@@ -7466,6 +7466,10 @@ const b=HUGI_MAKE(document.getElementById('hugi-orb'),{prefix:'ho',hello:false,b
 .hg4d-fv .ui-tv-sc.pdf { background: var(--ui-bg-2); }
 .hg4d-pdf { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 16px; }
 .hg4d-pdf canvas { display: block; width: 100%; max-width: 620px; height: auto; border-radius: 4px; background: #fff; box-shadow: var(--ui-card-sh); }
+.hg4d-sk { position: relative; overflow: hidden; width: 100%; max-width: 620px; aspect-ratio: 1 / 1.414; border-radius: 4px; background: #fff; box-shadow: var(--ui-card-sh); }   /* 11-17 첫 쪽이 그려지기 전 쪽 모양 자리 */
+.hg4d-sk::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(0, 0, 0, .05) 50%, transparent 70%); transform: translateX(-100%); animation: hg4dSk 1.2s ease-in-out infinite; }
+@keyframes hg4dSk { to { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .hg4d-sk::after { animation: none; } }
 .hg4d-fv-note { margin: 0; padding: 32px 24px; font-size: 15px; line-height: 1.6; color: var(--ui-label-2); text-align: center; }
 .hg4d-pg { position: absolute; left: 50%; bottom: max(20px, env(safe-area-inset-bottom, 0px)); z-index: 3; padding: 6px 12px; border-radius: var(--md-full); font-size: 12px; font-weight: 500; line-height: 1.4; color: var(--ui-label); font-variant-numeric: tabular-nums; pointer-events: none;
   background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur); box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh);
@@ -7594,6 +7598,7 @@ const b=HUGI_MAKE(document.getElementById('hugi-orb'),{prefix:'ho',hello:false,b
     w.appendChild(fo); w.appendChild(b);
     w.insertAdjacentHTML('beforeend', '<svg class="hg4d-ring" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16" pathLength="100"/></svg>');
     var m = $('.af-meta', b); if (m) m.setAttribute('data-hg4d-o', m.textContent);
+    pdfWarm(b);   // 11-17 미리 보기가 바로 뜨게 PDF를 미리 그려 둠
   }
   // 받기 원을 누름: 사이트가 받기를 하기 전에 차오름 원을 시작(사이트 클릭 처리보다 먼저 = 문서 캡처 단계). 받기 자체는 사이트가 함
   function ringStart(b) {
@@ -7691,21 +7696,53 @@ const b=HUGI_MAKE(document.getElementById('hugi-orb'),{prefix:'ho',hello:false,b
   function loadScript(u) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = u; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
   var PDFLIB = null;
   function pdfjs() { if (!PDFLIB) PDFLIB = (window.pdfjsLib ? Promise.resolve() : loadScript(PDFJS + 'pdf.min.js')).then(function () { window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS + 'pdf.worker.min.js'; return window.pdfjsLib; }); PDFLIB.catch(function () { PDFLIB = null; }); return PDFLIB; }
-  function pdfPages(url, title) {   // 원본 PDF를 쪽마다 그림으로(pdf.js, 열 때만 불러옴)
-    var seq = ++FV.pdfSeq, w = document.createElement('div'); w.className = 'hg4d-pdf'; FV.sc.appendChild(w);
-    pdfjs().then(function (L) { return L.getDocument({ url: url }).promise; }).then(function (doc) {
-      if (seq !== FV.pdfSeq) return;
-      var W = Math.min(620, Math.max(280, FV.sc.clientWidth - 32)), dpr = Math.min(2, window.devicePixelRatio || 1), job = Promise.resolve(), made = [];
+  /* 11-17 사용자 "PDF나 첨부 자료들 미리 보기 클릭했을 때 바로 안 뜨는데 바로 뜰 수 있도록 해줘".
+     예전: 누른 뒤에야 pdf.js(약 1.3MB)와 PDF(이력서 2.4MB)를 받아 첫 쪽까지 1.4~2.4초 빈 판.
+     지금: 파일 상자가 나타나면 쉬는 틈에 PDF를 받아 쪽마다 그림(canvas)으로 미리 그려 둠 → 누르면 그려 둔 쪽을 바로 붙임.
+     아직 덜 그렸으면 쪽 모양 자리(.hg4d-sk)를 먼저 보이고 그려지는 대로 바꿈. 그린 쪽은 닫았다 다시 열어도 다시 씀 */
+  var PDOC = {}, PCV = {}, PNAME = { '한정민_이력서': 'resume', '한정민_자기소개서': 'cover', '한정민_이력서_자기소개서': 'resume_set' };
+  function pdfUrl(b) { var f = fileOf(b), k = f && f.kind; if (!k || !ORIG[k]) k = PNAME[nm(b).replace(/\.[a-z0-9]+$/i, '').trim()]; return (k && ORIG[k]) || null; }
+  function pdfW() {   // 쪽 폭: 판이 열렸으면 판 폭으로, 닫혔으면 화면 폭으로 짐작(판 760 · 여백 8 · 쪽 여백 16)
+    var sw = FV.sc && FV.sc.clientWidth; if (!sw) sw = (innerWidth > 640 ? Math.min(760, innerWidth - 48) : innerWidth) - 16;
+    return Math.min(620, Math.max(280, sw - 32));
+  }
+  function pdfDoc(url) { if (!PDOC[url]) { PDOC[url] = pdfjs().then(function (L) { return L.getDocument({ url: url }).promise; }); PDOC[url].catch(function () { delete PDOC[url]; }); } return PDOC[url]; }
+  function pdfMake(url, title, W, idle) {   // 쪽마다 canvas를 그려 둠. 이미 같은 폭 이상으로 그렸으면 그대로 씀
+    var dpr = Math.min(2, window.devicePixelRatio || 1), o = PCV[url];
+    if (o && o.W >= W * .98 && o.dpr >= dpr) return o;
+    o = PCV[url] = { W: W, dpr: dpr, pages: [], end: false, idle: idle, on: null };
+    var rest = function () { return o.idle ? new Promise(function (ok) { o.kick = ok; if (window.requestIdleCallback) requestIdleCallback(ok, { timeout: 800 }); else setTimeout(ok, 60); }) : null; };   // 쉬는 틈을 기다리다 누르면 kick으로 바로 이어 그림
+    pdfDoc(url).then(function (doc) {
+      var job = Promise.resolve();
       for (var k = 1; k <= doc.numPages; k++) (function (k) {
-        job = job.then(function () { if (seq !== FV.pdfSeq) return; return doc.getPage(k).then(function (pg) {
-          var v0 = pg.getViewport({ scale: 1 }), v = pg.getViewport({ scale: W / v0.width * dpr }), c = document.createElement('canvas');
+        job = job.then(rest).then(function () { if (PCV[url] !== o) return; return doc.getPage(k).then(function (pg) {
+          var v0 = pg.getViewport({ scale: 1 }), v = pg.getViewport({ scale: o.W / v0.width * o.dpr }), c = document.createElement('canvas');
           c.width = Math.round(v.width); c.height = Math.round(v.height); c.setAttribute('role', 'img'); c.setAttribute('aria-label', title + ' ' + k + '쪽');
-          w.appendChild(c); made.push(c); if (k === 1) rise([c], 180); else rise([c], 0);
-          return pg.render({ canvasContext: c.getContext('2d'), viewport: v }).promise;
+          return pg.render({ canvasContext: c.getContext('2d'), viewport: v }).promise.then(function () { o.pages.push(c); if (o.on) o.on(c); });
         }); });
       })(k);
-      return job.then(function () { if (seq === FV.pdfSeq && FV.open) setTimeout(FV.pgShow, 520); });
-    }).catch(function () { if (seq === FV.pdfSeq) { w.remove(); note('미리 보기를 불러오지 못했어요. 오른쪽 위 받기로 파일을 받아 주세요.'); } });
+      return job.then(function () { o.end = true; if (o.on) o.on(null); });
+    }).catch(function () { if (PCV[url] === o) delete PCV[url]; if (o.on) o.on(false); });
+    return o;
+  }
+  function pdfWarm(b) {   // 파일 상자가 나타나면(또는 손 · 마우스가 닿으면) 미리 그리기 시작
+    var url = pdfUrl(b); if (!url || PCV[url]) return;
+    var go = function () { if (!PCV[url]) pdfMake(url, nm(b), pdfW(), true); };
+    if (window.requestIdleCallback) requestIdleCallback(go, { timeout: 1000 }); else setTimeout(go, 600);
+  }
+  function pdfPages(url, title) {   // 원본 PDF를 쪽마다 그림으로(미리 그려 둔 쪽을 바로 붙임)
+    var seq = ++FV.pdfSeq, w = document.createElement('div'), t0 = performance.now(), sk = null; w.className = 'hg4d-pdf'; FV.sc.appendChild(w);
+    var o = pdfMake(url, title, pdfW(), false); o.idle = false; if (o.kick) o.kick();
+    var put = function (c) {
+      if (seq !== FV.pdfSeq) return;
+      if (c === false) { w.remove(); note('미리 보기를 불러오지 못했어요. 오른쪽 위 받기로 파일을 받아 주세요.'); return; }
+      if (c === null) { if (sk) { sk.remove(); sk = null; } if (FV.open) setTimeout(FV.pgShow, 520); return; }
+      if (sk) { sk.remove(); sk = null; }
+      w.appendChild(c); rise([c], performance.now() - t0 < 300 ? 180 : 0);
+    };
+    if (!o.pages.length) { sk = document.createElement('div'); sk.className = 'hg4d-sk'; sk.setAttribute('aria-hidden', 'true'); w.appendChild(sk); }   // 첫 쪽 전에는 쪽 모양 자리부터
+    o.pages.forEach(put);
+    if (o.end) put(null); else o.on = put;
   }
   function flip() { var cur = FV.p.style.transform; FV.p.style.transform = 'none'; var F = FV.p.getBoundingClientRect(), S = FV.src.getBoundingClientRect(); FV.p.style.transform = cur;
     return 'translate(' + (S.left - F.left) + 'px, ' + (S.top - F.top) + 'px) scale(' + (S.width / F.width) + ', ' + (S.height / F.height) + ')'; }
@@ -7864,6 +7901,9 @@ const b=HUGI_MAKE(document.getElementById('hugi-orb'),{prefix:'ho',hello:false,b
     var ib = t.closest && t.closest('[data-img]');
     if (ib && !G.self) setFrom(ib);
   }, true);
+  ['pointerover', 'pointerdown', 'focusin'].forEach(function (ev) {   // 11-17 손 · 마우스 · 키보드가 열어 보기에 닿으면 바로 미리 그리기(상자가 나타날 때 못 했으면)
+    document.addEventListener(ev, function (e) { var fo = e.target.closest && e.target.closest('.hg4d-file'), b = fo && $('.ans-file[data-file]', fo); if (b) pdfWarm(b); }, { passive: true, capture: true });
+  });
   // 버블 단계(사이트 클릭 처리 뒤): 열어 보기 판 · 크게 보기가 열렸으면 장 표시
   document.addEventListener('click', function (e) {
     var t = e.target, fo = t.closest && t.closest('[data-hg4d-open]');
