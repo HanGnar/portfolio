@@ -1442,21 +1442,25 @@ html.hg-intro #vpick { display: none; }
 html.hg-intro main > section:not(#hero), html.hg-intro footer { visibility: hidden; }
 html.hg-intro #hugi-root { --hg-w: 184px; left: 50%; right: auto; margin-left: calc(var(--hg-w) * -.85); bottom: calc(100% + 40px); width: calc(var(--hg-w) * 1.7); height: calc(var(--hg-w) * 2.3); }
 html.hg-intro #hg-bubble { display: none !important; }   /* 인트로에서만 말풍선 끔(인사는 아래 타이핑 글로) */
-.intro-typed { display: none; position: absolute; z-index: 2; left: 50%; bottom: calc(100% + 240px); translate: -50% 0; transform-origin: 50% 100%; box-sizing: border-box; width: max-content; max-width: min(560px, calc(100vw - 48px)); padding: 12px 18px; border-radius: 20px;
-  background: var(--ui-surface); color: var(--ui-label); box-shadow: var(--ui-card-sh); font-size: 15px; line-height: 1.6; font-weight: 400; letter-spacing: -.008em; text-align: center; word-break: keep-all; overflow-wrap: break-word; pointer-events: none; opacity: 0; }   /* 11-17 사용자 "Hero 페이지 대사를 말풍선으로 하고 시간이 지나면 말풍선이 사라지게": 허기 머리 위 말풍선. 자리(bottom)는 introType이 허기 쉬는 자리로 잼 */
-.intro-typed::after { content: ""; position: absolute; left: 50%; bottom: -5px; width: 12px; height: 12px; margin-left: -6px; border-radius: 0 0 4px 0; background: inherit; rotate: 45deg; }   /* 꼬리: 허기 쪽 */
+.intro-typed { display: none; position: absolute; z-index: 2; left: 50%; bottom: calc(100% + 240px); translate: -50% 0; box-sizing: border-box; width: max-content; max-width: min(400px, calc(100vw - 48px)); flex-direction: column; align-items: center; gap: 6px;
+  color: var(--ui-label); word-break: keep-all; overflow-wrap: break-word; pointer-events: none; opacity: 0; }   /* 11-18 사용자 "히어로 페이지 말풍선 안예뻐 다시 제작해줘 … 조금만 나눠서 나오게": 흰 상자 하나 → 유리 말풍선 세 마디(메신저처럼 차례로 올라옴). 자리(bottom)는 introType이 허기 쉬는 자리로 잼 */
+html.hg-intro-t .intro-typed { display: flex; }
 .intro-typed.on { opacity: 1; }
-.intro-typed.sy-side { translate: 0 0; transform-origin: 0 50%; text-align: left; padding: 10px 14px; font-size: 13px; line-height: 1.5; letter-spacing: -.004em; }   /* 옆 자리는 좁아서 Footnote 단계 · 세 줄을 이어 씀 */
-.intro-typed.sy-side div { display: inline; }
-.intro-typed.sy-side div + div::before { content: " "; }
-.intro-typed.sy-side::after { left: -5px; top: 50%; bottom: auto; margin: -6px 0 0; border-radius: 0 0 0 4px; }   /* 옆 자리: 꼬리가 왼쪽(허기 쪽) */
-.intro-typed div { min-height: 0; }   /* 인사 세 줄(한 번에 보임) */
-html.hg-intro-t .intro-typed { display: block; }
 .intro-typed { transition: opacity var(--ui-d2) var(--ui-ease-out); }
-.intro-typed:not(.on) { transition-duration: 320ms; }   /* 11-17 사라짐은 흐림과 같은 0.32초 */
-.intro-typed.iw-run .iw { animation: introWIn .6s var(--ui-ease-out) both; animation-delay: var(--d, 0ms); }   /* 11-17 낱말 차례로 흐림 → 또렷(답 글 hgwIn과 같은 결) */
+.intro-typed:not(.on) { transition-duration: 320ms; }
+.intro-typed .ib { position: relative; box-sizing: border-box; max-width: 100%; padding: 9px 16px 10px; border-radius: 20px; background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur);
+  box-shadow: inset 0 0 0 1px var(--ui-glass-edge), 0 0 0 1px var(--ui-glass-line), var(--ui-glass-sh); font-size: 15px; line-height: 1.45; font-weight: 400; letter-spacing: -.008em; text-align: center; text-wrap: balance; transform-origin: 50% 100%; }   /* 유리 = 위쪽 버튼과 같은 재질 · Subhead. 두 줄이면 줄 길이를 고르게(한 낱말만 아래로 떨어지지 않게) */
+.intro-typed .ib.wait { display: none; }
+.intro-typed.measure .ib.wait { display: block; visibility: hidden; }   /* 자리 정할 때만 세 마디 높이를 잼 */
+.intro-typed .ib::after { content: ""; position: absolute; left: 50%; top: calc(100% - 1px); width: 16px; height: 8px; margin-left: -8px; background: var(--ui-glass); -webkit-backdrop-filter: var(--ui-glass-blur); backdrop-filter: var(--ui-glass-blur);
+  clip-path: path('M0 0 H16 C11.5 0 9.6 8 8 8 C6.4 8 4.5 0 0 0 Z'); opacity: 0; transition: opacity var(--ui-d2) var(--ui-ease-out); }   /* 꼬리: 둥근 물방울, 허기 쪽(가장 아래 마디에만) */
+.intro-typed .ib.last::after { opacity: 1; }
+.intro-typed.sy-side { translate: 0 0; align-items: flex-start; }   /* 낮은 화면(폰 가로 등): 허기 오른쪽 옆 */
+.intro-typed.sy-side .ib { padding: 7px 13px 8px; border-radius: 17px; font-size: 13px; line-height: 1.45; letter-spacing: -.004em; text-align: left; transform-origin: 0 100%; }   /* 옆 자리는 좁아서 Footnote 단계 */
+.intro-typed.sy-side .ib::after { left: -7px; top: auto; bottom: 9px; width: 8px; height: 16px; margin: 0; clip-path: path('M8 0 V16 C8 11.5 0 9.6 0 8 C0 6.4 8 4.5 8 0 Z'); }   /* 옆 자리: 꼬리가 왼쪽(허기 쪽) */
+.intro-typed .iw-run .iw { animation: introWIn .56s var(--ui-ease-out) both; animation-delay: var(--d, 0ms); }   /* 마디 안 낱말은 흐림 → 또렷이 빠르게 차례로(답 글 hgwIn과 같은 결) */
 @keyframes introWIn { from { opacity: .001; filter: blur(5px); } }
-@media (prefers-reduced-motion: reduce) { .intro-typed.iw-run .iw { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .intro-typed .iw-run .iw { animation: none; } .intro-typed .ib::after { transition: none; } }
 .ask.kb.open .intro-typed { opacity: 0; }   /* 11-15 모바일 4차 #3: 키보드로 추천 목록이 위로 펼쳐진 동안만 허기 인사 글을 숨김(목록 뒤로 비쳐 겹치던 것) */
 @media (max-width: 1080px) { html.hg-intro #hugi-root { --hg-w: 148px; bottom: calc(100% + 34px); } }   /* 11-15 사용자: 아주 조금 더 크게(두 번째) · 11-17 말풍선으로 바꾸며 115 → 148 */
 @media (max-width: 480px) { html.hg-intro #hugi-root { bottom: calc(100% + 34px); } }   /* 11-17: 아래 글이 말풍선으로 바뀌어 폰도 같은 자리 */
@@ -6187,39 +6191,62 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
   /* 11-14 인트로: 첫인사 타이핑 · 건너뛰기 · 첫 질문 때 허기가 AI 버튼으로(dockFly 'in' — 메뉴 닫기와 같은 길 · 도착 교체 · 알약 늘어남) */
   var introAn = null, introT = 0, introTy = [];
   var INTRO_L = ['오..! 안녕하세요.', '저는 허기라고 해요. 한정민 님이 저를 만들었어요.', '이제부터 이 포트폴리오 안내는 제가 도와드릴 거예요. 어디부터 볼까요?'];
-  function introType() {   // 11-17 말풍선 2차(사용자 "텍스트 나오는 동작이 너무 느려 … 전체 한 번에 다 나와도"): 인사 세 줄을 한 번에 띄우고, 읽을 시간(6.5초) 뒤 사라짐. 질문창을 누르면 바로 비킴
+  function introType() {   // 11-18 말풍선 3차(사용자 "히어로 페이지 말풍선 안예뻐 다시 제작해줘 그리고 말이 한 번에 다 나오니깐 이상해 조금만 나눠서 나오게 하자 그리고 캐릭터 던지면 말풍선이 사라지거나 해야 자연스럽겠지"):
+    // 인사 세 마디를 유리 말풍선으로 하나씩(0 · 1.1 · 2.8초) 아래에서 올라오게, 앞 마디는 위로 밀려 올라감. 마지막 마디 뒤 5초 머문 뒤 사라짐. 질문창을 누르거나 허기를 끌어 던지면 바로 사라짐
     var box = $('#intro-typed'), ask = $('#ask'); if (!box || !ask) return;
-    var my = [], done = false; box.textContent = '';
-    var nw = 0;   // 11-17 사용자 "인터렉션 고려해서 택스트 부드럽게 나오게": 낱말마다 span.iw로 감싸 흐림 → 또렷이 차례로(답 글 hgwIn과 같은 결). 띄어쓰기는 글로 남겨 줄바꿈(keep-all)이 같음
-    INTRO_L.forEach(function (t) { var d = document.createElement('div'); t.split(/(\s+)/).forEach(function (w) { if (!w) return; if (/^\s+$/.test(w)) { d.appendChild(document.createTextNode(w)); return; } var s = document.createElement('span'); s.className = 'iw'; s.textContent = w; s.style.setProperty('--d', (140 + nw * 26) + 'ms'); nw++; d.appendChild(s); }); box.appendChild(d); });
-    function place() {   // 허기 쉬는 자리(움직이는 모양 말고 배치) 머리 위 12px(꼬리 포함)
-      var c = ask.querySelector('.hugi-char'); if (!c || !c.offsetParent) return;
+    var my = [], done = false, side = null, hFull = 0, bs = [], dn = null, AT = [0, 1100, 2800], STAY = 5000;
+    box.textContent = ''; box.classList.remove('sy-side');
+    INTRO_L.forEach(function (t) {
+      var b = document.createElement('div'), n = 0; b.className = 'ib wait';
+      t.split(/(\s+)/).forEach(function (w) { if (!w) return; if (/^\s+$/.test(w)) { b.appendChild(document.createTextNode(w)); return; } var s = document.createElement('span'); s.className = 'iw'; s.textContent = w; s.style.setProperty('--d', (110 + n * 26) + 'ms'); n++; b.appendChild(s); });
+      b._n = n; box.appendChild(b); bs.push(b);
+    });
+    function hugi() { var c = ask.querySelector('.hugi-char'); return c && c.offsetParent ? c : null; }
+    function place() {
+      var c = hugi(); if (!c) return;
       var sg = c.offsetParent.getBoundingClientRect(), ar = ask.getBoundingClientRect(), top = sg.top + c.offsetTop + c.offsetHeight * .23;   // 그림 상자 위 23%는 빈 자리(뛰는 자리) → 털 끝 바로 위
-      box.classList.remove('sy-side'); box.style.left = box.style.maxWidth = ''; box.style.bottom = Math.round(ar.bottom - top + 12) + 'px';
       var g = document.querySelector('.gnb'), gb = g ? g.getBoundingClientRect().bottom : 0;
-      if (top - 12 - box.offsetHeight >= gb + 8) return;
-      // 위가 모자라면(폰 가로 화면 등 낮은 화면) 허기 오른쪽 옆, 몸 가운데 높이에 띄우고 꼬리는 왼쪽(11-17 QA: 844x390에서 위쪽 버튼을 덮던 것)
-      var x = sg.left + c.offsetLeft + c.offsetWidth * .92 + 12, mid = sg.top + c.offsetTop + c.offsetHeight * .6;
-      box.classList.add('sy-side'); box.style.left = Math.round(x - ar.left) + 'px'; box.style.maxWidth = Math.max(160, Math.round(innerWidth - x - 16)) + 'px';
+      if (side === null) {   // 처음 한 번: 세 마디가 다 나왔을 때 높이로 자리를 정함(중간에 자리가 바뀌지 않게)
+        box.style.left = box.style.maxWidth = ''; box.classList.add('measure'); hFull = box.offsetHeight;
+        side = top - 12 - hFull < gb + 8;
+        if (side) { box.classList.add('sy-side'); }
+      }
+      if (!side) { box.style.bottom = Math.round(ar.bottom - top + 12) + 'px'; box.classList.remove('measure'); return; }
+      // 위가 모자라면(폰 가로 화면 등 낮은 화면) 허기 오른쪽 옆. 세 마디가 다 나왔을 때 몸 가운데 높이에 오게 아래 끝을 고정하고 위로 쌓음
+      var x = sg.left + c.offsetLeft + c.offsetWidth * .92 + 14, mid = sg.top + c.offsetTop + c.offsetHeight * .6;
+      box.style.left = Math.round(x - ar.left) + 'px'; box.style.maxWidth = Math.max(160, Math.min(360, Math.round(innerWidth - x - 16))) + 'px';
+      box.classList.add('measure'); hFull = box.offsetHeight; box.classList.remove('measure');
       var fm = ask.querySelector('form'), ft = fm ? fm.getBoundingClientRect().top : ar.bottom;
-      var h = box.offsetHeight, y = ar.bottom - mid - h / 2; y = Math.min(y, ar.bottom - gb - 8 - h); y = Math.max(y, ar.bottom - ft + 8); box.style.bottom = Math.round(y) + 'px';   // 위쪽 버튼 아래 8px ~ 질문창 위 8px 안
+      var y = ar.bottom - mid - hFull / 2; y = Math.min(y, ar.bottom - gb - 8 - hFull); y = Math.max(y, ar.bottom - ft + 8); box.style.bottom = Math.round(y) + 'px';   // 위쪽 버튼 아래 8px ~ 질문창 위 8px 안
     }
     function later(f, ms) { var t = setTimeout(f, ms); my.push(t); introTy.push(t); }
+    function show(i) {
+      var b = bs[i]; if (!b || done) return;
+      var olds = bs.slice(0, i), y0 = olds.map(function (o) { return o.getBoundingClientRect().top; });
+      bs.forEach(function (o, k) { o.classList.toggle('last', k === i); });
+      b.classList.remove('wait'); place(); box.classList.add('on');
+      if (RM || !b.animate) return;
+      olds.forEach(function (o, k) { var d = y0[k] - o.getBoundingClientRect().top; if (Math.abs(d) > .5) o.animate([{ transform: 'translateY(' + d + 'px)' }, { transform: 'none' }], { duration: 460, easing: 'cubic-bezier(.22,1,.36,1)' }); });   // 앞 마디는 새 마디 높이만큼 부드럽게 위로
+      b.animate([{ opacity: 0, transform: 'translateY(10px) scale(.92)' }, { opacity: 1, transform: 'none' }], { duration: 460, easing: 'cubic-bezier(.22,1,.36,1)' });   // 새 마디는 허기 쪽에서 커지며 올라옴(넘침 없음)
+      b.classList.add('iw-run'); later(function () { b.classList.remove('iw-run'); }, 110 + b._n * 26 + 640);
+    }
     function hide() {
       if (done) return; done = true; my.forEach(clearTimeout); removeEventListener('resize', place); ask.removeEventListener('focusin', hide);
+      document.removeEventListener('pointerdown', pd, true); document.removeEventListener('pointermove', pm, true); document.removeEventListener('pointerup', pu, true); document.removeEventListener('pointercancel', pu, true);
       var was = box.classList.contains('on'); box.classList.remove('on');
-      setTimeout(function () { box.style.visibility = 'hidden'; }, was ? 260 : 0); /* 다 사라진 뒤 숨김: 첫 질문 때 introDock의 사라짐 움직임(1 → 0)이 지난 말풍선을 다시 보이게 하던 것 막음 */
-      if (was && !RM && box.animate) box.animate([{ transform: 'none', filter: 'none' }, { transform: 'translateY(-4px) scale(.97)', filter: 'blur(3px)' }], { duration: 320, easing: 'cubic-bezier(.4,0,.2,1)' });   // 사라질 때도 흐려지며 빠짐(나올 때와 짝)
+      setTimeout(function () { box.style.visibility = 'hidden'; }, was ? 340 : 0); /* 다 사라진 뒤 숨김: 첫 질문 때 introDock의 사라짐 움직임(1 → 0)이 지난 말풍선을 다시 보이게 하던 것 막음 */
+      if (was && !RM && box.animate) box.animate([{ transform: 'none', filter: 'none' }, { transform: 'translateY(-6px) scale(.96)', filter: 'blur(4px)' }], { duration: 320, easing: 'cubic-bezier(.4,0,.2,1)' });   // 흐려지며 위로 살짝 빠짐
     }
+    // 허기를 잡아 6px 넘게 끌면(던지기) 말풍선이 바로 사라짐. 톡 누르기(콕 찌르기)는 그대로 둠. 허기 엔진은 건드리지 않고 문서에서 손 · 마우스 움직임만 봄
+    function pd(e) { var r = e.target && e.target.closest && e.target.closest('#hugi-' + 'root'); dn = r && ask.contains(r) ? { x: e.clientX, y: e.clientY } : null; }
+    function pm(e) { if (dn && Math.hypot(e.clientX - dn.x, e.clientY - dn.y) > 6) { dn = null; hide(); } }
+    function pu() { dn = null; }
+    document.addEventListener('pointerdown', pd, true); document.addEventListener('pointermove', pm, { capture: true, passive: true }); document.addEventListener('pointerup', pu, true); document.addEventListener('pointercancel', pu, true);
     place(); addEventListener('resize', place); ask.addEventListener('focusin', hide);   // 질문창 · 첨부 · 마이크를 누르면 바로 사라짐(질문 쓰는 데 방해 안 되게)
-    if (RM) { box.classList.add('on'); later(hide, 9000); return; }
-    later(function () {   // 인사 동작에서 한 번 뛰어오르는 것이 끝나는 때(인사 시작 약 2.5초)에 띄움: 그 전이면 머리가 말풍선 속으로 들어감(11-17 QA)
-      place(); box.classList.add('on', 'iw-run');   // 11-17 3차: 말풍선은 넘침 없이 허기 쪽(꼬리)에서 부드럽게 커지고, 글은 낱말마다 0.026초 차이로 0.6초 동안 흐림 → 또렷(첫 낱말 0.14초, 마지막 낱말 약 1.4초)
-      later(function () { box.classList.remove('iw-run'); }, 140 + nw * 26 + 700);
-      if (!box.animate) return;
-      box.animate([{ transform: 'translateY(6px) scale(.94)' }, { transform: 'none' }], { duration: 560, easing: 'cubic-bezier(.22,1,.36,1)' });
-    }, 1500);
-    later(hide, 1500 + 6500);
+    if (RM) { bs.forEach(function (b, k) { b.classList.remove('wait'); b.classList.toggle('last', k === bs.length - 1); }); place(); box.classList.add('on'); later(hide, 9000); return; }
+    // 인사 동작에서 한 번 뛰어오르는 것이 끝나는 때(인사 시작 약 2.5초)에 첫 마디: 그 전이면 머리가 말풍선 속으로 들어감(11-17 QA)
+    AT.forEach(function (ms, i) { later(function () { show(i); }, 1500 + ms); });
+    later(hide, 1500 + AT[AT.length - 1] + STAY);
   }
 
   if (document.documentElement.classList.contains('hg-intro')) {
