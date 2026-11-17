@@ -235,7 +235,7 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.75;str
 
 /* 동작 줄: 마지막 답은 늘 보이고, 지난 답은 마우스를 올릴 때 나타남. 11-15 선 맞춤: 왼쪽 음수 여백 없음(듣기 · 멈추기 알약 왼쪽 끝 = 답 글 왼쪽 선) */
 .acts{display:flex;align-items:center;gap:2px;margin:-4px 0 0;transition:opacity var(--d2) var(--ease-out)}
-@media (hover:hover){.turn:not(:last-of-type) .acts{opacity:0}.turn:not(:last-of-type):hover .acts,.turn:not(:last-of-type) .acts:focus-within{opacity:1}}
+/* 17판(11-18): 지난 답 동작 줄도 늘 보임(올릴 때만 보이던 것 뺌) */
 .play{height:32px;display:inline-flex;align-items:center;gap:6px;padding:0 12px 0 9px;border-radius:999px;background:transparent;color:var(--label-3);font:var(--t-caption);letter-spacing:var(--ls-caption)}
 .play svg.i{width:15px;height:15px}
 .play .pl{min-width:3em;text-align:left}   /* 11-15 웹과 같게: "듣기 ↔ 멈추기"로 바뀌어도 폭 같음(옆 버튼 안 밀림) */
