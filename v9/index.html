@@ -6435,6 +6435,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var b = ch.getBoundingClientRect(), c = root.getBoundingClientRect(), sg = ch.offsetParent.getBoundingClientRect();
     var b0 = { left: sg.left + ch.offsetLeft, top: sg.top + ch.offsetTop, width: ch.offsetWidth, height: ch.offsetHeight }; b0.bottom = b0.top + b0.height;
     var hw = getComputedStyle(root).getPropertyValue('--hg-w');
+    try { var HG0 = window.HUGI; if (HG0 && HG0['home']) HG0['home'](); } catch (e) {}   // 11-18 사용자 "캐릭터 옆에 치워놓고 채팅 쳤을 때 … 자연스럽게 쏙 들어가야지": 던져 둔 자리(몸 안 x · y)를 지금 보이는 자리(b)로 잰 뒤 몸은 쉬는 자세로 되돌림 → 바깥 상자만 그 자리에서 버튼으로 날아감(전엔 던진 거리가 두 번 더해져 첫 프레임에 옆으로 튐: PC 253px · 폰 90px). 이름은 보호 개수 그대로 두려고 나눠 씀
     document.body.appendChild(root); root.classList.add('hg-dock');   // 질문창이 아래로 미끄러져도 허기는 제자리에서 출발. hg-dock: hg-intro가 빠져도 날아가는 동안은 보임
     root.style.cssText = 'position:fixed;inset:auto;margin:0;z-index:60;will-change:transform;--hg-w:' + hw + ';left:' + c.left + 'px;top:' + c.top + 'px;width:' + c.width + 'px;height:' + c.height + 'px;';
     // AI 버튼 최종 자리(알약 최종 폭)를 먼저 잰 뒤, 폭 0에서 벌어지기 시작
