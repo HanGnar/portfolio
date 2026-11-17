@@ -2615,11 +2615,11 @@ var SY_TOP=88;
 function scrolly(wrap,n,onStep){var inn=$('.sy-in',wrap),cur=-1,act=false,r=0,dots=null,top=SY_TOP;
   if(n>1){dots=document.createElement('div');dots.className='sy-p';dots.setAttribute('aria-hidden','true');for(var i=0;i<n;i++)dots.appendChild(document.createElement('i'));inn.appendChild(dots)}
   function ok(){return matchMedia('(min-width:861px)').matches&&inn.offsetHeight+SY_TOP+24<innerHeight}
-  function lay(){act=ok();wrap.classList.toggle('on',act);top=act?Math.max(SY_TOP,Math.round((innerHeight+64-inn.offsetHeight)/2)):SY_TOP;inn.style.top=act?top+'px':'';wrap.style.height=act?Math.round(inn.offsetHeight+n*innerHeight*.55)+'px':'';upd()}
+  function lay(){act=ok();wrap.classList.toggle('on',act);top=act?Math.max(SY_TOP,Math.min(Math.round((innerHeight+64-inn.offsetHeight)/2),innerHeight-(window.__syRes||0)-inn.offsetHeight)):SY_TOP;   /* 7판: 허기 안내 자막 자리(__syRes)만큼 위로 */inn.style.top=act?top+'px':'';wrap.style.height=act?Math.round(inn.offsetHeight+n*innerHeight*.55)+'px':'';upd()}
   function upd(){if(!act)return;var R=wrap.getBoundingClientRect(),span=wrap.offsetHeight-inn.offsetHeight,p=(top-R.top)/Math.max(1,span),i=Math.max(0,Math.min(n-1,Math.floor(p*n)));
     if(i!==cur){cur=i;if(dots)$$('i',dots).forEach(function(d,k){d.classList.toggle('on',k===i)});onStep(i)}}
   addEventListener('scroll',function(){if(!r)r=requestAnimationFrame(function(){r=0;upd()})},{passive:true});
-  var rt=0;addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(lay,150)});if(document.fonts&&document.fonts.ready)document.fonts.ready.then(lay);lay();
+  var rt=0;addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(lay,150)});addEventListener('ht-lay',lay);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(lay);lay();
   return {active:function(){return act},go:function(i){var span=wrap.offsetHeight-inn.offsetHeight,y=wrap.getBoundingClientRect().top+scrollY-top+span*(i+.5)/n;scrollTo({top:y,behavior:RM?'auto':'smooth'})}}}
 
 /* ── 폰: HTML 화면(375×812)을 틀 폭에 맞춰 줄임 + 불편 지점 테두리를 화면 좌표로 얹음 ── */
@@ -2901,11 +2901,12 @@ function speak(){if(!on||!playing)return;var s=STEPS[i];
 function finish(){ended=true;playing=false;si=STEPS[i].say.length;mark();tx.innerHTML='';var sp=document.createElement('span');sp.className='now';sp.textContent=END;tx.appendChild(sp);ppUI();hb('idle')}
 function pause(){if(!playing)return;playing=false;clear();ppUI();hb('idle');lab.classList.remove('on');aim=null;if(STEPS[i].act&&si<=(STEPS[i].at||0))acted=false}
 function resume(){if(playing||!on)return;playing=true;ppUI();var el=STEPS[i].t();if(!el){go(i+1,true);return}hb('thinking');bring(el,function(){later(speak,RM?0:200)})}
-function start(k){build();on=true;playing=true;root.classList.add('ht-on');spot.classList.add('on');hand.classList.add('on');
+function room(px){window.__syRes=px;document.body.style.paddingBottom=px?px+'px':'';dispatchEvent(new Event('ht-lay'))}   /* 마지막 단계도 자막 위로 올라오게 아래 여백 + 스크롤 고정 판 위치 다시 */
+function start(k){build();on=true;playing=true;root.classList.add('ht-on');room(botSafe());spot.classList.add('on');hand.classList.add('on');
   var g=$('#g-ai').getBoundingClientRect();H.x=g.left+g.width/2;H.y=g.top+g.height/2;H.vx=H.vy=0;
   var el=STEPS[k].t();if(el){var r=el.getBoundingClientRect();P.x=r.left;P.y=r.top;P.w=r.width;P.h=r.height;P.vx=P.vy=P.vw=P.vh=0}
   loop();go(k,true);requestAnimationFrame(function(){pp.focus({preventScroll:true})})}
-function stop(){if(!on)return;clear();on=false;playing=false;root.classList.remove('ht-on');spot.classList.remove('on');hand.classList.remove('on');hb('idle');var g=$('#g-ai');if(g)g.focus({preventScroll:true})}
+function stop(){if(!on)return;clear();on=false;playing=false;root.classList.remove('ht-on');room(0);spot.classList.remove('on');hand.classList.remove('on');hb('idle');var g=$('#g-ai');if(g)g.focus({preventScroll:true})}
 
 /* 사용자가 직접 움직이면 멈춤(자막 · 메뉴 안 조작은 빼고) */
 function mine(e){return e.target&&e.target.closest&&e.target.closest('.ht-cap,.ht-menu')}
