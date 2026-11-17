@@ -9051,7 +9051,7 @@ body { font: var(--t-body); letter-spacing: var(--ls-body); word-break: keep-all
   }).filter(Boolean);
   list.innerHTML =
     '<li class="mi"><details class="nv-pj"><summary><span class="no">01</span><span class="nm">프로젝트</span>' + icon('chev', 'nv-chev') + '</summary>' +
-      '<ul class="nv-sub">' + pj.map(function (p) { return '<li><button type="button" data-open="' + esc(p.id) + '">' + esc(p.name) + '</button></li>'; }).join('') + '</ul></details></li>' +
+      '<ul class="nv-sub">' + '<li><button type="button" data-scroll="projects">전체 보기</button></li>' + pj.map(function (p) { return '<li><button type="button" data-open="' + esc(p.id) + '">' + esc(p.name) + '</button></li>'; }).join('') + '</ul></details></li>' +
     '<li class="mi"><button class="mrow" type="button" data-scroll="about"><span class="no">02</span><span>헝그리한정민</span></button></li>' +
     '<li class="mi"><button class="mrow" type="button" data-nv-contact aria-disabled="true"><span class="no">03</span><span>연락</span></button></li>';   // 연락 섹션은 아직 없어 기능을 넣지 않음(사용자 11-15)
   // 차례 등장 순서(--i · --n)를 새 항목 수에 맞춤(사이트와 같은 방식, 메일 · 이력서 줄은 없어져 셈에서 뺌)
