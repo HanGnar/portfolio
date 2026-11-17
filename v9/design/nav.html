@@ -6582,7 +6582,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     var skip = 0;
     function frame(now) {
       if (!running) return;
-      var calm = mode === 'idle' && !emo && !special && !pressMode && !(ptr.has && ptr.inside) && !RM;
+      var calm = mode === 'idle' && !emo && !special && !pressMode && !(ptr.has && ptr.inside) && !RM && now - kick > 900;   // 11-17 사용자 확인: 손가락 · 키보드로 누른 뒤 0.9초는 튕김을 60프레임으로(태블릿 끊김)
       if (calm && ++skip % 2) { requestAnimationFrame(frame); return; }   // 가만히 숨만 쉴 때는 30프레임
       var dt = Math.min(.05, (now - last) / 1000); last = now;
       /* 깜빡임 · 슬쩍 보기 */
