@@ -311,7 +311,7 @@ html.m-hugi-morph #g-ai { width: var(--gai-w, 64px) !important; }   /* 버튼 �
 
 /* 답변: 상자 없이 글로 */
 .ans { width: 100%; word-break: keep-all; overflow-wrap: break-word; }   /* 11-15 시트 1단계: 한글은 낱말 단위로 줄바꿈("풀었 / 어요" 막음), 긴 주소는 상자 안에서 끊김 */
-.ans .body { display: grid; gap: var(--ui-ans-gap); font-size: 17px; line-height: 1.7; letter-spacing: -.012em; }   /* Body 17 · 400 · 1.7 · -1.2%, 문단 사이 12 */
+.ans .body { display: grid; gap: var(--ui-ans-gap); font-size: 17px; line-height: 1.7; letter-spacing: -.012em; text-wrap: pretty; }   /* 11-18 사용자 "LLM에서 줄바꿈 오류 났는데 안 그러게 개선해": 낱말 단위 줄바꿈(keep-all)에서 마지막 줄에 낱말 하나만 떨어지던 것("들려드릴까요?") 막음 — 앞 줄에서 낱말을 함께 내림 */   /* Body 17 · 400 · 1.7 · -1.2%, 문단 사이 12 */
 .ans .body ul, .ans .body ol { margin: 0; padding-left: 0; list-style: none; display: grid; gap: var(--ui-ans-list-gap); }
 .ans .body li { position: relative; padding-left: 22px; }
 .ans .body ul > li::before { content: ""; position: absolute; left: 8px; top: calc(.85em - 2px); width: 4px; height: 4px; border-radius: 50%; background: var(--ui-label-3); }   /* 점 가운데 = 첫 줄 가운데 */
