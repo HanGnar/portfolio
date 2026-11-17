@@ -8546,6 +8546,23 @@ html.hg-hero-in #hero { animation: hgHeroIn .28s var(--ui-ease-out, cubic-bezier
   } catch (e) {}
 })();
 /* HG-PAGE-END */</script>
+<style>/* HG-HEROFIX-BEGIN · 11-18 사용자 "히어로 영역 자체는 제일 큰 배경은 이제 스크롤이 되지 않아서 고정 … 채팅 부분만 스크롤 … 스크롤바 우측에 있는 거 영역도 제일 오른쪽으로 … 반응형 … 스크롤바 두께 좀 얇게 … 색상도 조금만 더 연하게"
+   ① 첫 화면(아래 화면을 안 볼 때)은 페이지 자체가 스크롤되지 않음 — 대화 목록(#thread)만 스크롤. 높이 500 미만(가로 폰)은 질문창이 잘리지 않게 예전처럼 페이지 스크롤 허용
+   ② 대화 목록을 화면 폭 끝까지 넓히고 안쪽 여백으로 글 기둥(720 − 좌우 20)은 그대로 → 스크롤바가 화면 맨 오른쪽에. 폰(≤640)은 원래도 화면 끝이라 값이 같음
+   ③ 대화 스크롤바: 보이는 막대 4px, 색 rgba(128,128,128,.22)(밝은 · 어두운 화면 같이, 예전 기본 회색보다 연함), 올리면 .36 */
+@media (min-height: 500px) {
+  html:not(.hg-page) { overflow: hidden; overscroll-behavior: none; scrollbar-gutter: auto; }
+  html:not(.hg-page) body { overflow: hidden; overscroll-behavior: none; }
+}
+.hero.chat .thread { max-width: none; width: 100vw; margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw);
+  padding-left: max(20px, env(safe-area-inset-left, 0px), calc(50vw - (var(--ui-col-maxw) / 2) + 20px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px), calc(50vw - (var(--ui-col-maxw) / 2) + 20px));
+  scrollbar-width: thin; scrollbar-color: rgba(128, 128, 128, .22) transparent; }
+.hero.chat .thread:hover { scrollbar-color: rgba(128, 128, 128, .36) transparent; }
+.hero.chat .thread::-webkit-scrollbar { width: 6px; background: transparent; }
+.hero.chat .thread::-webkit-scrollbar-thumb { background: rgba(128, 128, 128, .22); border: 1px solid transparent; background-clip: padding-box; border-radius: 3px; }
+.hero.chat .thread::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, .36); background-clip: padding-box; }
+/* HG-HEROFIX-END */</style>
 
 <style>
 /* ═══ 헝그리한정민 디자인 시스템 — 글자 기준(시안 공통) ═══
