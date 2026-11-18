@@ -6177,7 +6177,23 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
     if (e.target.closest('#g-menu')) { sideOpen(!$('#side').classList.contains('on')); return; }   // 열려 있으면 X로 닫기
     if (e.target.closest('#side-mail')) { var mb2 = e.target.closest('#side-mail'), ad = mb2.dataset.mail, sh = function (t) { mb2.textContent = t; setTimeout(function () { mb2.textContent = ad; }, 1600); }; try { navigator.clipboard.writeText(ad).then(function () { sh('복사했어요'); hgEvent('copyOk'); }, function () { sh(ad); }); } catch (err) { sh(ad); } return; }
     if (e.target.closest('#side-scrim')) { sideOpen(false); return; }
-    if (e.target.closest('#side') && e.target.closest('[data-open],[data-scroll],[data-top]')) sideOpen(false);   // 메뉴에서 고르면 닫고 이동
+    if (e.target.closest('#side') && e.target.closest('[data-open],[data-scroll],[data-top]')) {   // 메뉴에서 고르면 닫고 이동
+      // 11-18 사용자 "히어로페이지에서 아무 채팅도 입력하지 않고 햄버거 메뉴를 통해 프로젝트로 이동하게 되면 … 허공으로 사라지는 오류": 인사 중(질문 전)에 히어로 밖(프로젝트 · 상세 · 소개)으로 가면
+      // 인사를 먼저 끝내고, 메뉴가 닫힌 뒤 허기 버튼의 최종 자리를 재 둔 채(버튼은 접어 둠) 닫음 → 메뉴 허기가 히어로 가운데(곧 가려짐)가 아니라 상단 허기 버튼으로 날아 들어감. 홈(data-top)은 그대로 히어로로
+      var gai = $('#g-ai');
+      if (!e.target.closest('[data-top]') && window.HG_INTRO_SKIP && gai) {   // 인사 중이 아니면 HG_INTRO_SKIP은 아무것도 안 함 → 클래스가 바뀌었을 때만(= 인사 중이었음) 자리를 잼
+        try {
+          var c9 = document.documentElement.className; window.HG_INTRO_SKIP();
+          if (document.documentElement.className !== c9) {
+          var R9 = document.documentElement, st9 = document.createElement('style'); st9.textContent = '.gnb, .gnb *, #g-set#g-set#g-set { transition: none !important; }'; document.head.appendChild(st9);
+          var had9 = ['m-shift', 'm-open'].filter(function (c) { return R9.classList.contains(c); }); had9.forEach(function (c) { R9.classList.remove(c); }); R9.classList.remove('m-hugi-gone'); var mb9 = $('#g-menu'), ex9 = mb9.getAttribute('aria-expanded'); mb9.setAttribute('aria-expanded', 'false'); void gai.offsetWidth;   // 닫힌 뒤 자리(톱니 접힘)로 잼
+          var v9 = gai.querySelector('svg') || gai; sideFly.home = { r: v9.getBoundingClientRect(), w: innerWidth, bw: gai.getBoundingClientRect().width }; R9.style.setProperty('--gai-w', sideFly.home.bw + 'px');
+          R9.classList.add('m-hugi-gone'); had9.forEach(function (c) { R9.classList.add(c); }); mb9.setAttribute('aria-expanded', ex9); void gai.offsetWidth; st9.remove();
+          }
+        } catch (er) {}
+      }
+      sideOpen(false);
+    }
     if (e.target.closest('#vchip')) { if (VM.hidden) openVoices(); else closeVoices(); return; }
     var vo = e.target.closest('.vopt'); if (vo) { chooseVoice(vo.dataset.voice, vo); return; }
     var fb = e.target.closest('[data-file]'); if (fb) { saveFile(FILEQ[+fb.dataset.file], fb); return; }
