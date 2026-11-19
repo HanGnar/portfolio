@@ -3817,7 +3817,7 @@ ChatGPT(리서치 · 아이디어 정리) · Claude(바이브 코딩 · 논리 �
      역량 · 키워드 · 스킬 · 할 줄 아는 것을 물으면 답 아래 [기획 역량 · AI 역량] 탭 상자. 특정 프로젝트 이름이 들어간 질문은 빼서 그 프로젝트에 다 썼다고 보이지 않게 함 */
   var HS_KW = [[["정의 · 기획", ["프리뷰(한 줄 소개, 문제정의, 매체, 사용자)", "프로젝트 브리프", "문제정의", "내 역할", "핵심가치", "유저 정의", "요구분석", "RFP 분석", "스코프 In/Out", "Value Proposition Canvas"]], ["조사 · 분석", ["데스크리서치(통계, 논문, 뉴스, 소셜매트릭스)", "필드리서치(1차, 2차)", "사용자 인터뷰(1차, 2차)", "심층 인터뷰", "에스노그라피", "타운워칭", "벤치마킹", "SWOT 분석", "3Cs", "트렌드 분석", "조사보고서 작성"]], ["발상 · 전략", ["페르소나 분석", "사용자 니즈·원츠 도출", "유저저니맵", "포지셔닝", "마인드매핑", "브레인스토밍", "브레인라이팅"]], ["설계 · 검증", ["요구사항 정의서", "기능 정의서", "정보구조도", "레이블링", "카드소팅", "사용 시나리오", "플로우차트", "와이어프레임", "스토리보드", "프로토타이핑", "사용성평가(1차, 2차)", "사용성테스트", "아이트래킹"]], ["협업 · 관리", ["스테이크홀더맵", "WBS", "R&R", "Decision Log", "운영정의서", "팀규칙", "회의록", "프레젠테이션", "경청", "공감", "커뮤니케이션", "SNS, 유튜브, 블로그 등 운영"]]], [["만들기", ["바이브 코딩", "백엔드 바이브 코딩", "웹 제작", "프로토타입", "디자인 시스템", "인터랙션"]], ["콘텐츠", ["장표 제작", "이미지 생성", "영상", "모션그래픽", "3D모델링"]], ["리서치 · 문서", ["딥리서치", "데이터 분석", "정보 문서화"]], ["자동화 · 검수", ["업무 자동화", "병렬 에이전트 작업", "QA"]]]];
   /* 11-19 사용자 "LLM 내 역량에 툴 역량도 넣어줘": 세 번째 탭 [툴] — 소개 시트(시트/about) 툴 칸과 같은 목록 · 실제 로고(../files/tools/v2) */
-  var HS_TOOLS = [["ChatGPT", "리서치 · 아이디어 정리", "chatgpt.svg"], ["Claude", "바이브 코딩 · 논리 고도화", "claude.svg"], ["Gemini", "자료 조사", "gemini.svg"], ["NotebookLM", "자료 종합 · 근거 기반 인사이트", "notebooklm.svg"], ["Midjourney", "이미지 시안", "midjourney.svg"], ["Figma", "와이어프레임 · 화면 설계", "figma.svg"], ["Notion", "문서 · 일정 · 회의록", "notion.png"], ["PowerPoint", "기획서 · 발표자료", "powerpoint.svg"], ["Excel", "데이터 정리", "excel.svg"], ["Word", "문서 · 회의록", "word.svg"], ["한글", "문서 · 회의록", "hangul.png", 1], ["Visual Studio Code", "코드 작성 · 프로토타이핑", "vscode.svg"]];
+  var HS_TOOLS = [["ChatGPT", "리서치 · 아이디어 정리", "chatgpt.svg"], ["Claude", "바이브 코딩 · 논리 고도화", "claude.svg"], ["Gemini", "자료 조사", "gemini.svg"], ["NotebookLM", "자료 종합 · 근거 기반 인사이트", "notebooklm.svg"], ["Midjourney", "이미지 시안", "midjourney.svg"], ["Figma", "와이어프레임 · 화면 설계", "figma.svg"], ["Notion", "문서 · 일정 · 회의록", "notion.png"], ["PowerPoint", "기획서 · 발표자료", "powerpoint.svg"], ["Excel", "데이터 정리", "excel.svg"], ["Word", "문서 · 회의록", "word.svg"], ["한글", "문서 · 회의록", "hangul.png"], ["Visual Studio Code", "코드 작성 · 프로토타이핑", "vscode.svg"]];
   var HS_KW_Q = /역량|키워드|스킬|skills?|할 ?줄 ?아|다룰 ?줄|무엇을 잘|뭘 잘|잘하는|툴|도구|tools?/i;
   var hsKwTail0 = tail;
   tail = function (r) {
@@ -8661,7 +8661,7 @@ body { word-break: keep-all; overflow-wrap: break-word; }
 @media (max-width: 640px) { .hs-kw-hd { padding: 12px 14px 2px; } .hs-kw-g { grid-template-columns: minmax(0, 1fr); row-gap: 8px; padding: 8px 14px; } .hs-kw-g h5 { padding-top: 0; } }
 @media (prefers-reduced-motion: reduce) { .hs-kw-g li { animation: none; } }
 /* HG-PREFS-M{ */ .hs-kw-g:where(html[data-motion="less"], html[data-motion="less"] *) li {animation: none; } /* }HG-PREFS-M */
-/* 11-19 툴 탭: 소개 시트 툴 칸(디자인.md 툴 로고)과 같은 값 */
+/* 11-19 툴 탭: 소개 시트 툴 칸(디자인.md 툴 로고)과 같은 값. 한글도 다른 로고처럼 흰 칸 안 26(사용자 "한글만 사진 위치랑 크기가 조금 다른 것 같아 통일시켜") */
 .hs-kw-tl { list-style: none; margin: 0; padding: 8px 16px 10px; display: grid; grid-template-columns: repeat(auto-fill, minmax(196px, 1fr)); gap: 14px 16px; min-width: 0; }
 .hs-kw-tl li { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .hs-kw-lg { flex: none; width: 40px; height: 40px; border-radius: 10px; background: #FFFFFF; box-shadow: inset 0 0 0 1px var(--ui-sep); display: grid; place-items: center; overflow: hidden; }
