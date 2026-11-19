@@ -784,74 +784,63 @@ html.rv-js .rv:not(.in){filter:none!important;translate:0 12px}
   .nd{transition-delay:0s!important}
 }
 
-/* ══ 허기 안내(7판 · 2026-11-18): 상단 허기 버튼 → 허기가 페이지를 직접 내려가며 중요한 곳을 비추고 · 누르고 · 읽어 줌 ══
-   층: 비춤(28, 상단 바 30 아래 → 허기 버튼은 밝게) · 허기 손(31) · 자막(32) · 메뉴(33). 색은 토큰만. */
-:root{--ht-ring:#4285F4;--ht-dim:rgba(16,18,24,.34);--ht-hand:#1D1D1F;--ht-hand-edge:#FFFFFF}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ht-ring:#8AB4F8;--ht-dim:rgba(0,0,0,.52);--ht-hand:#F5F5F7;--ht-hand-edge:#1D1D1F}}
-:root[data-theme="dark"]{--ht-ring:#8AB4F8;--ht-dim:rgba(0,0,0,.52);--ht-hand:#F5F5F7;--ht-hand-edge:#1D1D1F}
+/* ══ 허기 안내 8판(2026-11-19): 짚어 주기 — 형광펜(글) · 얇은 빛 테두리(덩어리) · 바탕색 베일(단계 밖) · 허기 말풍선(버튼 아래) ══
+   층: 베일 27 · 표시 28 · 상단 바 30(허기 버튼은 늘 또렷) · 말풍선 32. 색은 토큰만. */
+:root{--ht-ink:#4285F4;--ht-mark:rgba(66,133,244,.22);--ht-veil:rgba(251,251,253,.62)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ht-ink:#8AB4F8;--ht-mark:rgba(138,180,248,.26);--ht-veil:rgba(11,11,13,.62)}}
+:root[data-theme="dark"]{--ht-ink:#8AB4F8;--ht-mark:rgba(138,180,248,.26);--ht-veil:rgba(11,11,13,.62)}
 
-/* 메뉴: 허기 버튼 바로 아래에서 버튼 쪽으로부터 커지며 나옴 */
-.ht-menu{position:fixed;z-index:33;width:min(300px,calc(100vw - 32px));padding:16px;border-radius:22px;display:flex;flex-direction:column;gap:12px;
-  transform-origin:var(--ox,90%) 0;opacity:0;transform:translateY(-6px) scale(.94);transition:opacity 200ms var(--ui-spring),transform 420ms var(--ui-spring);pointer-events:none}
-.ht-menu.on{opacity:1;transform:none;pointer-events:auto}
-.ht-menu p{margin:0;font:var(--t-subhead);letter-spacing:var(--ls-subhead);color:var(--label)}
-.ht-menu small{display:block;margin-top:2px;font:var(--t-footnote);letter-spacing:var(--ls-footnote);color:var(--label-3)}
-.ht-menu .ht-go{display:flex;gap:8px}
-.ht-menu .ht-go button{flex:1;height:40px;padding:0 14px;border-radius:999px;font:var(--t-callout);letter-spacing:var(--ls-callout);font-weight:600;white-space:nowrap}
-.ht-menu .ht-go .a{background:var(--ink);color:var(--on-ink)}
-.ht-menu .ht-go .b{background:var(--bg-3);color:var(--label)}
+/* 베일: 지금 단계 밖을 바탕색으로 옅게 덮어 단계만 남김(검정으로 어둡게 하지 않음) */
+.ht-veil{position:fixed;left:0;top:0;z-index:27;pointer-events:none;opacity:0;box-shadow:0 0 0 200vmax var(--ht-veil);transition:opacity 480ms var(--ui-spring)}
+.ht-veil.on{opacity:1}
 
-/* 비춤: 지금 짚는 곳만 밝고 나머지는 어둡게(모서리는 대상 모양 따라) */
-.ht-spot{position:fixed;left:0;top:0;width:0;height:0;z-index:28;pointer-events:none;border-radius:20px;opacity:0;
-  box-shadow:0 0 0 2px var(--ht-ring),0 0 0 7px color-mix(in srgb,var(--ht-ring) 22%,transparent),0 0 0 200vmax var(--ht-dim);transition:opacity 320ms ease-out}
-.ht-on .ht-spot.on{opacity:1}
+/* 표시 */
+.ht-marks{position:fixed;inset:0;z-index:28;pointer-events:none}
+.ht-mk{position:absolute;left:0;top:0;display:block}
+/* 글: 아랫부분만 칠하는 형광펜, 왼쪽에서 오른쪽으로 쓸려 칠해짐(줄마다 차례) */
+.ht-mk.t{background:var(--ht-mark);border-radius:3px;mix-blend-mode:multiply;transform-origin:0 50%;clip-path:inset(0 100% 0 0 round 3px);
+  transition:clip-path 640ms var(--ui-spring) var(--d,0ms),opacity 320ms ease-out}
+.ht-mk.t.on{clip-path:inset(0 0 0 0 round 3px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ht-mk.t{mix-blend-mode:screen}}
+:root[data-theme="dark"] .ht-mk.t{mix-blend-mode:screen}
+/* 덩어리: 얇은 하늘색 테두리 + 옅은 빛이 살짝 커지며 자리잡음 */
+.ht-mk.b{border-radius:16px;opacity:0;box-shadow:0 0 0 1.5px var(--ht-ink),0 0 0 6px color-mix(in srgb,var(--ht-ink) 14%,transparent),0 10px 30px color-mix(in srgb,var(--ht-ink) 16%,transparent);
+  transition:opacity 360ms ease-out}
+.ht-mk.b.on{opacity:1}
+.ht-mk:not(.on){opacity:0}
 
-/* 허기 손(커서): 대상으로 미끄러져 가고, 누를 때 살짝 눌림 + 퍼지는 원. 옆에 지금 하는 일 이름 */
-.ht-hand{position:fixed;left:0;top:0;z-index:31;pointer-events:none;opacity:0;transition:opacity 240ms ease-out;will-change:transform}
-.ht-on .ht-hand.on{opacity:1}
-.ht-hand svg{display:block;width:24px;height:24px;transform-origin:4px 3px;transition:transform 160ms var(--ui-spring);filter:drop-shadow(0 2px 6px rgba(0,0,0,.22))}
-.ht-hand svg path{fill:var(--ht-hand);stroke:var(--ht-hand-edge);stroke-width:1.5;stroke-linejoin:round}
-.ht-hand.press svg{transform:scale(.84)}
-.ht-hand .ht-lab{position:absolute;left:22px;top:20px;height:26px;padding:0 10px;border-radius:999px;display:flex;align-items:center;white-space:nowrap;
-  font:var(--t-caption);letter-spacing:0;font-weight:600;color:var(--label);opacity:0;transform:translateY(-2px);transition:opacity 200ms,transform 300ms var(--ui-spring)}
-.ht-hand .ht-lab.on{opacity:1;transform:none}
-.ht-hand .ht-rip{position:absolute;left:-14px;top:-15px;width:36px;height:36px;border-radius:50%;border:2px solid var(--ht-ring);opacity:0}
-.ht-hand.press .ht-rip{animation:htRip 520ms ease-out}
-@keyframes htRip{from{opacity:.9;transform:scale(.3)}to{opacity:0;transform:scale(1.4)}}
-
-/* 자막: 화면 아래 가운데 유리 판. 지금 읽는 문장만 진하게, 읽은 문장은 회색 2, 안 읽은 문장은 회색 3 */
-.ht-cap{position:fixed;z-index:32;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));width:min(600px,calc(100vw - 48px));padding:14px 16px 12px 18px;border-radius:24px;
-  transform:translate(-50%,16px);opacity:0;pointer-events:none;transition:opacity 240ms ease-out,transform 520ms var(--ui-spring)}
-.ht-on .ht-cap{transform:translate(-50%,0);opacity:1;pointer-events:auto}
-.ht-hd{display:flex;align-items:center;gap:8px;min-height:32px}
-.ht-no{font:var(--t-caption);letter-spacing:0;font-weight:600;color:var(--label-2);font-variant-numeric:tabular-nums}
-.ht-sec{font:var(--t-caption);letter-spacing:0;color:var(--label-3);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ht-bar{height:2px;border-radius:2px;background:var(--bg-3);margin:6px 0 10px;overflow:hidden}
-.ht-bar i{display:block;height:100%;width:0;background:var(--label);border-radius:2px;transition:width 520ms var(--ui-spring)}
-.ht-tx{margin:0;font:var(--t-body);letter-spacing:var(--ls-body);color:var(--label-3);min-height:3.2em;text-wrap:pretty}
-.ht-tx span{transition:color 260ms ease-out}
-.ht-tx span.rd{color:var(--label-2)}
-.ht-tx span.now{color:var(--label)}
-.ht-ft{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
-.ht-ft .ht-mid{display:flex;align-items:center;gap:4px}
-.ht-cap button{color:var(--label)}
-.ht-cap .ib{width:36px;height:36px;color:var(--label-2)}
-.ht-cap .ib:disabled{opacity:.35}
-.ht-cap .ib svg,.ht-pp svg{width:18px;height:18px}
-.ht-pp{height:36px;padding:0 14px 0 11px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;background:var(--ink);color:var(--on-ink)!important;font:var(--t-caption);letter-spacing:0;font-weight:600;font-variant-numeric:tabular-nums}
+/* 허기 말풍선: 허기 버튼 아래, 꼬리가 버튼을 가리킴 */
+.ht-bub{position:fixed;z-index:32;width:min(380px,calc(100vw - 32px));padding:14px 14px 10px 18px;border-radius:22px;
+  transform-origin:var(--tx,70%) 0;opacity:0;transform:translateY(-6px) scale(.96);pointer-events:none;transition:opacity 220ms ease-out,transform 460ms var(--ui-spring)}
+.ht-bub.open{opacity:1;transform:none;pointer-events:auto}
+.ht-tail{position:absolute;top:-6px;left:var(--tx,70%);width:12px;height:12px;margin-left:-6px;transform:rotate(45deg);border-radius:3px 0 0 0;background:inherit;
+  box-shadow:-1px -1px 0 0 var(--glass-line)}
+.ht-sub{margin:0 0 2px;font:var(--t-caption);letter-spacing:0;color:var(--label-3)}
+.ht-sub[hidden]{display:none}
+.ht-say{margin:0;font:var(--t-callout);letter-spacing:var(--ls-callout);color:var(--label);text-wrap:pretty}
+.ht-say.in{animation:htIn 520ms var(--ui-spring) both}
+@keyframes htIn{from{opacity:0;transform:translateY(5px);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+.ht-row{display:flex;align-items:center;gap:2px;margin-top:8px}
+.ht-sp{flex:1}
+.ht-dots{display:flex;gap:5px;align-items:center}
+.ht-dots[hidden]{display:none}
+.ht-dots i{width:5px;height:5px;border-radius:3px;background:var(--bg-3);transition:width 420ms var(--ui-spring),background 240ms}
+.ht-dots i.rd{background:var(--label-3)}
+.ht-dots i.now{width:16px;background:var(--label)}
+.ht-bub .ib{width:34px;height:34px;color:var(--label-2)}
+.ht-bub .ib[hidden]{display:none}
+.ht-bub .ib:disabled{opacity:.35}
+.ht-bub svg.i{width:17px;height:17px}
+.ht-pp{height:34px;min-width:34px;padding:0 12px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--ink);color:var(--on-ink);font:var(--t-caption);letter-spacing:0;font-weight:600}
+.ht-bub.run .ht-pp{padding:0}
+.ht-bub:not(.run) .ht-pp{padding:0 16px;height:36px;font:var(--t-callout);font-weight:600;margin-left:4px}
 .ht-snd[aria-pressed="false"]{color:var(--label-3)}
-.ht-snd[aria-pressed="false"] .w{display:none}
-.ht-snd[aria-pressed="true"] .m{display:none}
-.ht-on .ctl{display:none}
-@media (hover:hover){.ht-cap .ib:hover:not(:disabled){background:var(--hover);color:var(--label)}}
-@media (max-width:640px){
-  .ht-cap{left:12px;right:12px;width:auto;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateY(16px);padding:12px 12px 10px 16px;border-radius:22px}
-  .ht-on .ht-cap{transform:none}
-  .ht-tx{font:var(--t-callout);letter-spacing:var(--ls-callout);min-height:4.4em}
-  .ht-hand .ht-lab{display:none}
-}
-@media (any-pointer:coarse){.ht-cap .ib{width:44px;height:44px}.ht-pp{height:44px}.ht-menu .ht-go button{height:44px}}
-@media (prefers-reduced-motion:reduce){.ht-menu,.ht-cap,.ht-bar i,.ht-hand svg{transition:none}.ht-hand.press .ht-rip{animation:none}}
+.ht-snd[aria-pressed="false"] .w,.ht-snd[aria-pressed="true"] .m{display:none}
+.ht-open .ctl{display:none}
+@media (hover:hover){.ht-bub .ib:hover:not(:disabled){background:var(--hover);color:var(--label)}}
+@media (max-width:640px){.ht-bub{left:12px;right:12px;width:auto}}
+@media (any-pointer:coarse){.ht-bub .ib,.ht-pp{width:44px;height:44px}.ht-bub:not(.run) .ht-pp{width:auto;height:44px}}
+@media (prefers-reduced-motion:reduce){.ht-bub,.ht-veil,.ht-mk.t,.ht-dots i{transition:none}.ht-say.in{animation:none}.ht-mk.t{clip-path:none}}
 
 /* ── 폰 화면(HTML로 다시 만든 앱 화면, screens/) ── */
 /* 그룹 A(코레일톡 화면 · 접두어 ka-) — 화면 375×812 안 내용만. 원본: Figma s05 · s08 장표 캡처 */
@@ -2584,7 +2573,7 @@ addEventListener('keydown',function(e){
   if(e.key!=='Escape')return;if(LB.open){lbClose();return}if(sh.classList.contains('on')){openS(false);return}});
 })();
 </script>
-<script>window.CASE_LINKS=[["b1", "i1"], ["b2", "i3"], ["b3", "i2"], ["b3", "i4"], ["b4", "i1"], ["b4", "i3"], ["i1", "g1"], ["i1", "g2"], ["i2", "g3"], ["i3", "g3"], ["i4", "g4"]];window.CASE_RADAR={"source": "PPT s42 차트 원본 수치", "axes": ["이해도", "정보 위계논리성", "인지 중심의 설계", "내비게이션 효율성", "정보 가공 최소화"], "max": 5, "series": [{"name": "코레일톡", "values": [3.0, 2.0, 2.0, 3.0, 1.0]}, {"name": "야놀자", "values": [4.0, 4.0, 3.0, 5.0, 5.0]}, {"name": "SRT", "values": [4.0, 5.0, 3.0, 5.0, 4.0]}, {"name": "티머니고", "values": [3.0, 3.0, 4.0, 3.0, 5.0]}, {"name": "네이버 지도", "values": [4.0, 3.0, 5.0, 3.0, 5.0]}]};window.CASE_SD=[{"title": "\ucf54\ub808\uc77c\ud1a1 \uc5b4\ud50c\ub9ac\ucf00\uc774\uc158 \ubaa8\ubc14\uc77c \ud654\uba74\uc124\uacc4\uc11c \u00b7 -\uc608\uc57d\ub41c \uc2b9\ucc28\uad8c \uc870\ud68c-", "src": "case_files/sd/sd_01.webp"}, {"title": "\ubb38\uc11c \uac1c\uc815 \uc774\ub825 \uc815\ubcf4", "src": "case_files/sd/sd_02.webp"}, {"title": "Gesture Behaviors", "src": "case_files/sd/sd_03.webp"}, {"title": "\uc815\ubcf4\uad6c\uc870\ub3c4 (As-is) \u00b7 \ud558\ub2e8 \ud0ed \uba54\ub274", "src": "case_files/sd/sd_04.webp"}, {"title": "\uc815\ubcf4\uad6c\uc870\ub3c4 (As-is) \u00b7 \uc0ac\uc774\ub4dc  \ud0ed \uba54\ub274", "src": "case_files/sd/sd_05.webp"}, {"title": "\uc815\ubcf4\uad6c\uc870\ub3c4 (To-be)", "src": "case_files/sd/sd_06.webp"}, {"title": "\uacf5\ud1b5 UI \uc815\uc758 \u00b7 \uae30\ubcf8 \ub808\uc774\uc544\uc6c3", "src": "case_files/sd/sd_07.webp"}, {"title": "\uacf5\ud1b5 UI \uc815\uc758 \u00b7 Modal", "src": "case_files/sd/sd_08.webp"}, {"title": "\uacf5\ud1b5 UI \uc815\uc758 \u00b7 UI \uc694\uc18c", "src": "case_files/sd/sd_09.webp"}, {"title": "\uacf5\ud1b5 UI \uc815\uc758 \u00b7 Transition", "src": "case_files/sd/sd_10.webp"}, {"title": "\uacf5\ud1b5 UI \uc815\uc758 \u00b7 Transition", "src": "case_files/sd/sd_11.webp"}, {"title": "\uc11c\ube44\uc2a4 \ud750\ub984\ub3c4 \u00b7 Beyond screen bounds", "src": "case_files/sd/sd_12.webp"}, {"title": "Screen Definition \u00b7 \ud648 (1/2)", "src": "case_files/sd/sd_13.webp"}, {"title": "Screen Definition \u00b7 \ud648 (2/2)", "src": "case_files/sd/sd_14.webp"}, {"title": "Screen Definition \u00b7 \ub098\uc758 \ud2f0\ucf13-\uc2b9\ucc28\uad8c", "src": "case_files/sd/sd_15.webp"}, {"title": "Screen Definition \u00b7 \ub098\uc758 \ud2f0\ucf13-\uc7a5\ubc14\uad6c\ub2c8 (1/2)", "src": "case_files/sd/sd_16.webp"}, {"title": "Screen Definition \u00b7 \ub098\uc758 \ud2f0\ucf13-\uc7a5\ubc14\uad6c\ub2c8 (2/2)", "src": "case_files/sd/sd_17.webp"}, {"title": "Screen Definition \u00b7 \uacb0\uc81c", "src": "case_files/sd/sd_18.webp"}, {"title": "Screen Definition \u00b7 \uc0ac\uc774\ub4dc GNB", "src": "case_files/sd/sd_19.webp"}, {"title": "General Rule \u00b7 \uc571 \uc9c4\uc785- \ub85c\uadf8\uc778\uc774 \ub418\uc5b4\uc788\ub294 \uacbd\uc6b0 / \ub85c\uadf8\uc778\uc774 \uc548 \ub418\uc5b4\uc788\ub294 \uacbd\uc6b0", "src": "case_files/sd/sd_20.webp"}, {"title": "General Rule \u00b7 \ub85c\uadf8\uc778_ \uc18c\uc15c \ub85c\uadf8\uc778\uc744 \ud1b5\ud55c \ub85c\uadf8\uc778", "src": "case_files/sd/sd_21.webp"}, {"title": "General Rule \u00b7 \ucc3d \ub2eb\uae30", "src": "case_files/sd/sd_22.webp"}, {"title": "General Rule \u00b7 \ubaa8\ub2ec \ub2eb\uae30", "src": "case_files/sd/sd_23.webp"}, {"title": "General Rule \u00b7 \ubaa8\ub2ec \ub2eb\uae30", "src": "case_files/sd/sd_24.webp"}, {"title": "General Rule \u00b7 \uc0ac\uc774\ub4dc \ud0ed \uba54\ub274\ub97c \ud1b5\ud55c \uc608\uc57d\ub41c \uc2b9\ucc28\uad8c \uc870\ud68c (\ub85c\uadf8\uc778\uc774 \uc548 \ub418\uc5b4\uc788\ub294 \uacbd\uc6b0)", "src": "case_files/sd/sd_25.webp"}, {"title": "General Rule \u00b7 \uc0ac\uc774\ub4dc \ud0ed \uba54\ub274\ub97c \ud1b5\ud55c \uc608\uc57d\ub41c \uc2b9\ucc28\uad8c \uc870\ud68c (\ub85c\uadf8\uc778\uc774 \ub418\uc5b4\uc788\ub294 \uacbd\uc6b0)", "src": "case_files/sd/sd_26.webp"}, {"title": "General Rule \u00b7 \ud558\ub2e8 \ub124\ube44\uac8c\uc774\uc158 \ubc14 \u2018\ub098\uc758 \ud2f0\ucf13\u2019 \uc744 \ud1b5\ud55c \uc608\uc57d\ub41c \uc2b9\ucc28\uad8c \uc870\ud68c (\ub85c\uadf8\uc778\uc774 \uc548 \ub418\uc5b4\uc788\ub294 \uacbd\uc6b0)", "src": "case_files/sd/sd_27.webp"}, {"title": "General Rule \u00b7 \uc0ac\uc774\ub4dc \ud0ed \uba54\ub274\ub97c \ud1b5\ud55c \uc608\uc57d\ub41c \uc2b9\ucc28\uad8c \uc870\ud68c (\ub85c\uadf8\uc778\uc774  \ub418\uc5b4\uc788\ub294 \uacbd\uc6b0)", "src": "case_files/sd/sd_28.webp"}];
+<script>window.CASE_TOUR=[{"stop": 1, "sec": "첫 화면", "target": "#d-title", "lines": [{"say": "코레일톡에서 예약한 승차권을 찾는 기능이 여러 메뉴에 흩어져 있던 문제를 다뤘어요.", "mark": {"sel": "#d-title", "text": "기능 분산 구조", "kind": "text"}}]}, {"stop": 2, "sec": "01 프로젝트 개요", "target": "#s1 .meth", "lines": [{"say": "한정민은 버튼 위치만 바꾸면 될 거라 바로 정하지 않고, 사용성 평가로 먼저 확인했어요.", "mark": {"sel": "#s1 .meth", "text": "사용성평가 1차", "kind": "text"}}]}, {"stop": 3, "sec": "02 문제정의", "target": "#s2 .rt-box", "tn": 1, "lines": [{"say": "1차 평가에서 참가자들은 서로 다른 메뉴로 예약 내역을 찾아 헤맸어요.", "mark": {"sel": "#s2 .find li", "text": "참가자마다 서로 다른 메뉴와 경로로 탐색", "kind": "text"}}]}, {"stop": 4, "sec": "03 개선안 설계", "target": "#s3 .tiles.t3", "lines": [{"say": "'나의 티켓'이나 '장바구니'에 모든 티켓이 있을 거라 기대하지만, 예약된 승차권 조회는 거기 없었어요.", "mark": {"sel": "#s3 .tiles.t3 .tile", "nth": 1, "kind": "box"}}]}, {"stop": 5, "sec": "03 개선안 설계", "target": ".ab", "prep": "ab0", "lines": [{"say": "그래서 흩어진 장바구니와 예약 조회를 '나의 티켓' 메뉴 하나로 모았어요.", "mark": {"sel": "#ab-sc0 .ab-g", "nth": 1, "kind": "box"}}]}, {"stop": 6, "sec": "04 사용성 검증 및 개선", "target": "#s4 .bk2", "lines": [{"say": "다시 평가하니 기능 인지 점수가 37.5점에서 100점이 됐어요.", "mark": {"sel": "#s4 .hb", "kind": "box"}}, {"say": "대부분의 참가자가 같은 경로로 예약 내역을 찾았어요.", "mark": {"sel": "#s4 .rt-box", "nth": 1, "kind": "box"}}]}];window.CASE_LINKS=[["b1", "i1"], ["b2", "i3"], ["b3", "i2"], ["b3", "i4"], ["b4", "i1"], ["b4", "i3"], ["i1", "g1"], ["i1", "g2"], ["i2", "g3"], ["i3", "g3"], ["i4", "g4"]];window.CASE_RADAR={"source": "PPT s42 차트 원본 수치", "axes": ["이해도", "정보 위계논리성", "인지 중심의 설계", "내비게이션 효율성", "정보 가공 최소화"], "max": 5, "series": [{"name": "코레일톡", "values": [3.0, 2.0, 2.0, 3.0, 1.0]}, {"name": "야놀자", "values": [4.0, 4.0, 3.0, 5.0, 5.0]}, {"name": "SRT", "values": [4.0, 5.0, 3.0, 5.0, 4.0]}, {"name": "티머니고", "values": [3.0, 3.0, 4.0, 3.0, 5.0]}, {"name": "네이버 지도", "values": [4.0, 3.0, 5.0, 3.0, 5.0]}]};window.CASE_SD=[{"title": "\ucf54\ub808\uc77c\ud1a1 \uc5b4\ud50c\ub9ac\ucf00\uc774\uc158 \ubaa8\ubc14\uc77c \ud654\uba74\uc124\uacc4\uc11c \u00b7 -\uc608\uc57d\ub41c \uc2b9\ucc28\uad8c \uc870\ud68c-", "src": "case_files/sd/sd_01.webp"}, {"title": "\ubb38\uc11c \uac1c\uc815 \uc774\ub825 \uc815\ubcf4", "src": "case_files/sd/sd_02.webp"}, {"title": "Gesture Behaviors", "src": "case_files/sd/sd_03.webp"}, {"title": "\uc815\ubcf4\uad6c\uc870\ub3c4 (As-is) \u00b7 \ud558\ub2e8 \ud0ed \uba54\ub274", "src": "case_files/sd/sd_04.webp"}, {"title": "\uc815\ubcf4\uad6c\uc870\ub3c4 (As-is) \u00b7 \uc0ac\uc774\ub4dc  \ud0ed \uba54\ub274", "src": "case_files/sd/sd_05.webp"}, {"title": "\uc815\ubcf4\uad6c\uc870\ub3c4 (To-be)", "src": "case_files/sd/sd_06.webp"}, {"title": "\uacf5\ud1b5 UI \uc815\uc758 \u00b7 \uae30\ubcf8 \ub808\uc774\uc544\uc6c3", "src": "case_files/sd/sd_07.webp"}, {"title": "\uacf5\ud1b5 UI \uc815\uc758 \u00b7 Modal", "src": "case_files/sd/sd_08.webp"}, {"title": "\uacf5\ud1b5 UI \uc815\uc758 \u00b7 UI \uc694\uc18c", "src": "case_files/sd/sd_09.webp"}, {"title": "\uacf5\ud1b5 UI \uc815\uc758 \u00b7 Transition", "src": "case_files/sd/sd_10.webp"}, {"title": "\uacf5\ud1b5 UI \uc815\uc758 \u00b7 Transition", "src": "case_files/sd/sd_11.webp"}, {"title": "\uc11c\ube44\uc2a4 \ud750\ub984\ub3c4 \u00b7 Beyond screen bounds", "src": "case_files/sd/sd_12.webp"}, {"title": "Screen Definition \u00b7 \ud648 (1/2)", "src": "case_files/sd/sd_13.webp"}, {"title": "Screen Definition \u00b7 \ud648 (2/2)", "src": "case_files/sd/sd_14.webp"}, {"title": "Screen Definition \u00b7 \ub098\uc758 \ud2f0\ucf13-\uc2b9\ucc28\uad8c", "src": "case_files/sd/sd_15.webp"}, {"title": "Screen Definition \u00b7 \ub098\uc758 \ud2f0\ucf13-\uc7a5\ubc14\uad6c\ub2c8 (1/2)", "src": "case_files/sd/sd_16.webp"}, {"title": "Screen Definition \u00b7 \ub098\uc758 \ud2f0\ucf13-\uc7a5\ubc14\uad6c\ub2c8 (2/2)", "src": "case_files/sd/sd_17.webp"}, {"title": "Screen Definition \u00b7 \uacb0\uc81c", "src": "case_files/sd/sd_18.webp"}, {"title": "Screen Definition \u00b7 \uc0ac\uc774\ub4dc GNB", "src": "case_files/sd/sd_19.webp"}, {"title": "General Rule \u00b7 \uc571 \uc9c4\uc785- \ub85c\uadf8\uc778\uc774 \ub418\uc5b4\uc788\ub294 \uacbd\uc6b0 / \ub85c\uadf8\uc778\uc774 \uc548 \ub418\uc5b4\uc788\ub294 \uacbd\uc6b0", "src": "case_files/sd/sd_20.webp"}, {"title": "General Rule \u00b7 \ub85c\uadf8\uc778_ \uc18c\uc15c \ub85c\uadf8\uc778\uc744 \ud1b5\ud55c \ub85c\uadf8\uc778", "src": "case_files/sd/sd_21.webp"}, {"title": "General Rule \u00b7 \ucc3d \ub2eb\uae30", "src": "case_files/sd/sd_22.webp"}, {"title": "General Rule \u00b7 \ubaa8\ub2ec \ub2eb\uae30", "src": "case_files/sd/sd_23.webp"}, {"title": "General Rule \u00b7 \ubaa8\ub2ec \ub2eb\uae30", "src": "case_files/sd/sd_24.webp"}, {"title": "General Rule \u00b7 \uc0ac\uc774\ub4dc \ud0ed \uba54\ub274\ub97c \ud1b5\ud55c \uc608\uc57d\ub41c \uc2b9\ucc28\uad8c \uc870\ud68c (\ub85c\uadf8\uc778\uc774 \uc548 \ub418\uc5b4\uc788\ub294 \uacbd\uc6b0)", "src": "case_files/sd/sd_25.webp"}, {"title": "General Rule \u00b7 \uc0ac\uc774\ub4dc \ud0ed \uba54\ub274\ub97c \ud1b5\ud55c \uc608\uc57d\ub41c \uc2b9\ucc28\uad8c \uc870\ud68c (\ub85c\uadf8\uc778\uc774 \ub418\uc5b4\uc788\ub294 \uacbd\uc6b0)", "src": "case_files/sd/sd_26.webp"}, {"title": "General Rule \u00b7 \ud558\ub2e8 \ub124\ube44\uac8c\uc774\uc158 \ubc14 \u2018\ub098\uc758 \ud2f0\ucf13\u2019 \uc744 \ud1b5\ud55c \uc608\uc57d\ub41c \uc2b9\ucc28\uad8c \uc870\ud68c (\ub85c\uadf8\uc778\uc774 \uc548 \ub418\uc5b4\uc788\ub294 \uacbd\uc6b0)", "src": "case_files/sd/sd_27.webp"}, {"title": "General Rule \u00b7 \uc0ac\uc774\ub4dc \ud0ed \uba54\ub274\ub97c \ud1b5\ud55c \uc608\uc57d\ub41c \uc2b9\ucc28\uad8c \uc870\ud68c (\ub85c\uadf8\uc778\uc774  \ub418\uc5b4\uc788\ub294 \uacbd\uc6b0)", "src": "case_files/sd/sd_28.webp"}];
 /* ══ 세부 페이지 전용 움직임(2판 · 2026-11-18) — 공통(목차 · 이미지 확대 · 등장)은 바탕 파일 것을 그대로 씀 ══
    사용자 "불필요한 인터랙션은 안 나와도" → 남긴 것: 숫자 굴러가기 · 그래프 자라기 · 경로 불 켜짐 · 불편 지점 표시 · 고르기 알약(As is/To be · 문제 · 분석 종류 · 서비스) · 연결도 · 갤러리(쫀득) · 화면설계서 창 */
 (function(){
@@ -2777,148 +2766,129 @@ if(V&&SD.length){var pg=$('.sdv-pg',V),im=$('img',pg),rail=$('.sdv-rail',V),cnt=
     pg.addEventListener('pointercancel',function(){on2=false})})()}
 })();
 
-/* ══ 허기 안내(7판 · 2026-11-18, 사용자 "에이전트마냥 탐색하면서 설명 · 상단 허기 버튼에") ══
-   허기 버튼 → 메뉴(처음부터 · 여기서부터) → 허기가 페이지를 내려가며 단계마다: 화면 옮김 → 비춤 → (필요하면) 허기 손으로 누름 → 문장마다 소리로 읽음.
-   글은 사실표(scratchpad/korail_ai)에서 확인한 것만. 사용자가 스크롤 · 키보드로 직접 움직이면 멈춤, Esc는 끝. */
+/* ══ 허기 안내 8판(2026-11-19): 마우스 손 · 클릭 없이 "짚어 주기" ══
+   사용자 "마우스 클릭 모션 말고 짚어줘야 하는 부분을 표시", "모든 부분을 다 읽어줄 필요 없어, 본질을 잘 설명하는 부분만".
+   상단 허기 버튼 → 허기 말풍선(버튼 아래)이 "같이 볼까요?" → 핵심 곳을 차례로: 화면을 옮김 → 문장마다 그 부분만 표시(글은 형광펜, 덩어리는 테두리) → 소리로 읽음.
+   내용은 window.CASE_TOUR(build.py가 data/tour.json을 넣음). 사용자가 직접 스크롤 · 키보드로 움직이면 멈춤, Esc 끝. */
 (function(){
 var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return [].slice.call((r||document).querySelectorAll(s))};
 var RM=matchMedia('(prefers-reduced-motion: reduce)').matches,MOB=matchMedia('(max-width:640px)');
-function q(s,k){return function(){var a=$$(s);return a[k||0]||null}}
-function has(s,re){return function(){return $$(s).filter(function(e){return re.test(e.textContent)})[0]||null}}
+var STOPS=(window.CASE_TOUR||[]).filter(function(s){return s&&s.lines&&s.lines.length});
+var END=window.CASE_TOUR_END||'여기까지가 핵심이에요. 더 궁금한 건 허기에게 물어보세요.';
+if(!STOPS.length)return;
+var INTRO='이 프로젝트의 핵심을 같이 볼까요?',INTRO_S='중요한 곳 '+STOPS.length+'군데를 짚으며 읽어 드려요';
 
-/* 단계: t 비출 곳 · sec 단계 이름 · say 문장 · act 누를 것(at = 몇 번째 문장 앞에서) · lab 허기 손 옆 이름 */
-var STEPS=[
- {t:q('#d-title'),sec:'첫 화면',say:['이 페이지는 코레일톡에서 예약한 승차권을 찾는 과정을 고친 팀 프로젝트예요.','중요한 곳을 차례로 짚어 드릴게요.']},
- {t:q('.res'),sec:'첫 화면',say:['결과부터 볼게요. 예약 내역을 확인하는 평균 시간이 24.5초에서 6.4초로 줄었어요.','1차 평가에서 예약 내역을 벗어났다가 다시 찾아간 참가자만 비교한 수치예요.']},
- {t:q('#s1 .tiles.t4'),sec:'01 프로젝트 개요',say:['코레일톡은 한국철도공사 공식 승차권 앱이에요.','KTX 승차권 구매의 90% 이상이 온라인이라, 예매한 뒤에도 앱에서 예약 정보를 관리해요.','그래서 예약 내역을 쉽고 빠르게 확인하게 만드는 걸 목표로 잡았어요.']},
- {t:q('#flow5'),sec:'02 문제정의',act:'rings',at:1,lab:'불편한 지점 보기',say:['처음에는 좌석 선택 기능도 함께 봤어요.','좌석을 고르지 않고 예매하면 안내 없이 자리가 자동으로 배정돼요.','빨간 박스가 불편했던 지점이에요.']},
- {t:q('#s2 .maps'),sec:'02 문제정의',say:['1차 사용성 평가는 참가자 5명과 사용성 테스트, 아이트래킹으로 진행했어요.','한정민은 이 사용성 평가 기획을 맡았어요.','성공했는지보다, 사용자가 기능이 어디 있을 거라 예상하는지를 봤어요.']},
- {t:q('#s2 .rt-box',1),sec:'02 문제정의',say:['좌석 선택은 한 화면 안에서 고칠 수 있는 문제였어요.','반면 예약된 승차권 조회는 탐색 경로 전체의 문제여서, 이 기능을 최종 개선 대상으로 다시 골랐어요.']},
- {t:q('#radar .rd'),sec:'03 개선안 설계',act:has('#radar .rd-tg button',/^SRT$/),at:1,lab:'SRT 눌러 보기',say:['다섯 서비스를 같은 기준 다섯 가지로 비교했어요.','SRT를 눌러 볼게요. 점선이 코레일톡이에요.','코레일톡은 특히 정보 가공 최소화와 정보 위계가 부족했어요.']},
- {t:q('#lk'),sec:'03 개선안 설계',say:['벤치마킹에서 찾은 근거를 개선안과 프로젝트 목표로 이었어요.','첫 번째 개선안은 흩어져 있던 장바구니와 예약 조회를 ‘나의 티켓’ 하나로 합친 거예요.']},
- {t:q('.ab'),sec:'03 개선안 설계',act:q('.ab .ab-b',2),at:1,lab:'상단 탭 구성 변경 보기',say:['개선 전후 화면이에요.','세 번째 개선안을 눌러 볼게요.','상단 탭을 승차권, 장바구니, 이용권, 정기권 패스로 바꿔, 예약 관련 기능을 한 영역에서 관리하게 했어요.']},
- {t:q('#s4 .bk2'),sec:'04 사용성 검증 및 개선',say:['개선안으로 2차 사용성 평가를 했어요. 참가자는 이번에도 5명이었어요.','예약된 승차권 기능 인지 점수가 37.5점에서 100점이 됐어요.','참가자들은 “이게 끝이야? 엄청 간단하네”라고 말했어요.']},
- {t:has('#s4 .bk2',/85%/),sec:'04 사용성 검증 및 개선',say:['아이트래킹으로 해결법마다 성공 비율도 봤어요.','네 가지 해결법의 전체 평균 성공 비율은 85%예요.']},
- {t:q('#s5 .sdp'),sec:'05 최종 산출물',say:['최종 산출물은 예약된 승차권 조회 모바일 화면설계서예요.','정보구조도부터 화면 정의까지 담았고, 누르면 전체를 넘겨 볼 수 있어요.']},
- {t:q('#s6 .ret'),sec:'06 프로젝트 회고',say:['회고 칸은 아직 정리 중이에요.','한정민은 이 프로젝트에서, 자기 경험은 문제를 찾는 출발점일 수는 있어도 문제를 확정하는 근거는 될 수 없다는 걸 배웠다고 말해요.']}
-];
-var END='여기까지예요. 더 궁금한 건 허기에게 물어보세요.';
+function pick(sel,nth){if(!sel)return null;var a=$$(sel);return a[nth||0]||null}
+function tgt(s){return pick(s.target,s.tn)}
+function norm(t){return t.replace(/ /g,' ')}
+/* 요소 안에서 글을 찾아 Range로(여러 글자 칸에 걸쳐도) */
+function findText(el,text){if(!el||!text)return null;var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT),ns=[],all='',n;
+  while((n=w.nextNode())){ns.push({n:n,a:all.length});all+=n.nodeValue}
+  var i=norm(all).indexOf(norm(text));if(i<0)return null;var j=i+text.length,r=document.createRange(),s=null,e=null;
+  ns.forEach(function(o){var b=o.a+o.n.nodeValue.length;if(!s&&i<b){s=o;r.setStart(o.n,i-o.a)}if(!e&&j<=b){e=o;r.setEnd(o.n,j-o.a)}});return s&&e?r:null}
 
 var HB=function(){return window.__HB||null},hb=function(k){var h=HB();if(!h)return;try{k==='speak'?h.speak('calm'):h.set(k)}catch(e){}};
-var root=document.documentElement,menu,spot,hand,lab,cap,tx,no,sec,bar,pp,pv,nx,snd;
-var on=false,i=0,si=0,playing=false,acted=false,seq=0,T=[],ended=false;
+var root=document.documentElement,bub,say,sub,dots,pp,nx,snd,veil,layer;
+var on=false,open=false,i=0,li=0,playing=false,ended=false,seq=0,T=[],marks=[];
 var SND=true;try{SND=localStorage.getItem('ht-snd')!=='0'}catch(e){}
 var TTS='speechSynthesis' in window&&'SpeechSynthesisUtterance' in window;
 function later(f,ms){var s=seq;T.push(setTimeout(function(){if(s===seq)f()},ms))}
 function clear(){seq++;T.forEach(clearTimeout);T=[];if(TTS)try{speechSynthesis.cancel()}catch(e){}}
-var IC={pause:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 5.5v13M15.5 5.5v13"/></svg>',play:'<svg class="i" aria-hidden="true"><use href="#i-play"/></svg>',
-  re:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v4h4"/></svg>'};
+var IC={pause:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6v12M15 6v12"/></svg>',play:'<svg class="i" aria-hidden="true"><use href="#i-play"/></svg>',
+  re:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v4h4"/></svg>',
+  mute:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4zM16 9.5l5 5M21 9.5l-5 5"/></svg>'};
 
-function build(){if(cap)return;
-  menu=document.createElement('div');menu.className='ht-menu glass';menu.setAttribute('role','dialog');menu.setAttribute('aria-label','허기 안내');
-  menu.innerHTML='<div><p>이 페이지를 같이 볼까요?</p><small>중요한 곳을 짚으며 소리로 읽어 드려요</small></div><div class="ht-go"><button class="a press" type="button" data-k="0">처음부터</button><button class="b press" type="button" data-k="here">여기서부터</button></div>';
-  spot=document.createElement('div');spot.className='ht-spot';spot.setAttribute('aria-hidden','true');
-  hand=document.createElement('div');hand.className='ht-hand';hand.setAttribute('aria-hidden','true');
-  hand.innerHTML='<i class="ht-rip"></i><svg viewBox="0 0 24 24"><path d="M4 3v16l4.5-4.2 2.9 6.2 2.6-1.2-2.8-6h6.3z"/></svg><span class="ht-lab glass"></span>';
-  cap=document.createElement('div');cap.className='ht-cap glass';cap.setAttribute('role','region');cap.setAttribute('aria-label','허기 안내 자막');
-  cap.innerHTML='<div class="ht-hd"><span class="ht-no"></span><span class="ht-sec"></span>'+
-    '<button class="ib press ht-snd" type="button" aria-label="소리"><span class="w"><svg class="i"><use href="#i-vol"/></svg></span><span class="m"><svg class="i" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z M16 9.5l5 5M21 9.5l-5 5"/></svg></span></button>'+
-    '<button class="ib press ht-x" type="button" aria-label="안내 끝내기"><svg class="i"><use href="#i-x"/></svg></button></div>'+
-    '<div class="ht-bar"><i></i></div><p class="ht-tx" aria-live="polite"></p>'+
-    '<div class="ht-ft"><div class="ht-mid"><button class="ib press ht-pv" type="button" aria-label="이전"><svg class="i"><use href="#i-left"/></svg></button>'+
+function build(){if(bub)return;
+  veil=document.createElement('div');veil.className='ht-veil';veil.setAttribute('aria-hidden','true');
+  layer=document.createElement('div');layer.className='ht-marks';layer.setAttribute('aria-hidden','true');
+  bub=document.createElement('div');bub.className='ht-bub glass';bub.setAttribute('role','dialog');bub.setAttribute('aria-label','허기 안내');
+  bub.innerHTML='<i class="ht-tail" aria-hidden="true"></i><p class="ht-sub"></p><p class="ht-say" aria-live="polite"></p>'+
+    '<div class="ht-row"><div class="ht-dots" aria-hidden="true"></div><span class="ht-sp"></span>'+
+    '<button class="ib press ht-snd" type="button"><span class="w"><svg class="i"><use href="#i-vol"/></svg></span><span class="m">'+IC.mute+'</span></button>'+
+    '<button class="ib press ht-nx" type="button" aria-label="다음"><svg class="i"><use href="#i-right"/></svg></button>'+
     '<button class="ht-pp press" type="button"></button>'+
-    '<button class="ib press ht-nx" type="button" aria-label="다음"><svg class="i"><use href="#i-right"/></svg></button></div></div>';
-  [spot,hand,cap,menu].forEach(function(e){document.body.appendChild(e)});
-  lab=$('.ht-lab',hand);tx=$('.ht-tx',cap);no=$('.ht-no',cap);sec=$('.ht-sec',cap);bar=$('.ht-bar i',cap);pp=$('.ht-pp',cap);pv=$('.ht-pv',cap);nx=$('.ht-nx',cap);snd=$('.ht-snd',cap);
-  $$('.ht-go button',menu).forEach(function(b){b.addEventListener('click',function(){unlock();hideMenu();start(b.dataset.k==='here'?nearest():0)})});
-  $('.ht-x',cap).addEventListener('click',stop);
-  pv.addEventListener('click',function(){go(i-1,true)});nx.addEventListener('click',function(){go(i+1,true)});
-  pp.addEventListener('click',function(){if(ended){go(0,true);return}playing?pause():resume()});
-  snd.addEventListener('click',function(){SND=!SND;try{localStorage.setItem('ht-snd',SND?'1':'0')}catch(e){}sndUI();if(playing){clear();speak()}});
+    '<button class="ib press ht-x" type="button" aria-label="안내 닫기"><svg class="i"><use href="#i-x"/></svg></button></div>';
+  [veil,layer,bub].forEach(function(e){document.body.appendChild(e)});
+  say=$('.ht-say',bub);sub=$('.ht-sub',bub);dots=$('.ht-dots',bub);pp=$('.ht-pp',bub);nx=$('.ht-nx',bub);snd=$('.ht-snd',bub);
+  STOPS.forEach(function(){dots.appendChild(document.createElement('i'))});
+  $('.ht-x',bub).addEventListener('click',close);
+  nx.addEventListener('click',function(){go(i+1,true)});
+  pp.addEventListener('click',function(){if(!on){unlock();start(0);return}if(ended){go(0,true);return}playing?pause():resume()});
+  snd.addEventListener('click',function(){SND=!SND;try{localStorage.setItem('ht-snd',SND?'1':'0')}catch(e){}sndUI();if(on&&playing){clear();line()}});
   sndUI()}
-function sndUI(){snd.setAttribute('aria-pressed',SND&&TTS?'true':'false');snd.disabled=!TTS;snd.setAttribute('aria-label',SND?'소리 끄기':'소리 켜기')}
-function ppUI(){if(ended){pp.innerHTML=IC.re+'처음부터';return}pp.innerHTML=playing?IC.pause+'멈추기':IC.play+'계속';pp.setAttribute('aria-label',playing?'멈추기':'계속')}
+function sndUI(){snd.setAttribute('aria-pressed',SND&&TTS?'true':'false');snd.hidden=!TTS;snd.setAttribute('aria-label',SND?'소리 끄기':'소리 켜기')}
+function ui(){bub.classList.toggle('run',on);nx.hidden=!on||ended;dots.hidden=!on;
+  if(!on){pp.innerHTML='같이 보기';pp.setAttribute('aria-label','같이 보기');return}
+  if(ended){pp.innerHTML=IC.re+'처음부터';pp.setAttribute('aria-label','처음부터')}else{pp.innerHTML=playing?IC.pause:IC.play;pp.setAttribute('aria-label',playing?'멈추기':'계속')}
+  nx.disabled=i>=STOPS.length-1;
+  $$('i',dots).forEach(function(d,k){d.className=ended||k<i?'rd':k===i?'now':''})}
 
-/* ── 메뉴: 허기 버튼 바로 아래 ── */
-var mOpen=false;
-function showMenu(){build();var b=$('#g-ai').getBoundingClientRect(),w=menu.offsetWidth,l=Math.max(16,Math.min(innerWidth-16-w,b.right-w));
-  menu.style.left=l+'px';menu.style.top=(b.bottom+10)+'px';menu.style.setProperty('--ox',(b.left+b.width/2-l)+'px');mOpen=true;menu.classList.add('on');hb('listening');
-  requestAnimationFrame(function(){$('.ht-go .a',menu).focus({preventScroll:true})})}
-function hideMenu(){if(!menu||!mOpen)return;mOpen=false;menu.classList.remove('on');if(!on)hb('idle')}
-document.addEventListener('pointerdown',function(e){if(mOpen&&!menu.contains(e.target)&&!e.target.closest('#g-ai'))hideMenu()},true);
+/* 말풍선: 허기 버튼 바로 아래, 꼬리가 버튼 가운데를 가리킴 */
+function place(){var g=$('#g-ai');if(!g||!bub)return;var b=g.getBoundingClientRect(),w=bub.offsetWidth,m=MOB.matches?12:16,
+  l=MOB.matches?m:Math.max(m,Math.min(innerWidth-m-w,b.left+b.width/2-w*.62));bub.style.left=l+'px';bub.style.top=(b.bottom+10)+'px';
+  bub.style.setProperty('--tx',Math.max(24,Math.min(w-24,b.left+b.width/2-l))+'px')}
+function text(t,s){say.classList.remove('in');void say.offsetWidth;say.textContent=t;sub.textContent=s||'';sub.hidden=!s;say.classList.add('in');place()}
 
-/* 지금 보는 곳에서 가장 가까운 단계(화면 위쪽 1/3 기준) */
-function nearest(){var y=innerHeight/3,best=0,d=1e9;STEPS.forEach(function(s,k){var el=s.t();if(!el)return;var r=el.getBoundingClientRect(),c=r.top<y&&r.bottom>y?0:Math.min(Math.abs(r.top-y),Math.abs(r.bottom-y));if(c<d){d=c;best=k}});return best}
+/* ── 표시: 글은 줄마다 형광펜(왼쪽에서 칠해짐), 덩어리는 테두리. 스크롤 · 크기 바뀜은 매 프레임 따라감 ── */
+function clearMarks(soft){marks.forEach(function(m){m.els.forEach(function(e){e.classList.remove('on');setTimeout(function(){e.remove()},soft&&!RM?420:0)})});marks=[]}
+function addMark(mk){if(!mk)return;var el=pick(mk.sel,mk.nth);if(!el)return;var m={el:el,kind:mk.kind||'box',els:[]};
+  if(m.kind==='text'){m.r=findText(el,mk.text);if(!m.r)m.kind='box'}
+  marks.push(m);draw(m)}
+function draw(fresh){marks.forEach(function(m){
+  if(m.kind==='text'){var rs=[].filter.call(m.r.getClientRects(),function(r){return r.width>2});
+    while(m.els.length<rs.length){var d=document.createElement('i');d.className='ht-mk t';d.style.setProperty('--d',(m.els.length*140)+'ms');layer.appendChild(d);m.els.push(d)}
+    m.els.forEach(function(d,k){var r=rs[k];if(!r){d.style.display='none';return}d.style.display='';
+      d.style.transform='translate('+(r.left-4)+'px,'+(r.top+r.height*.5)+'px)';d.style.width=(r.width+8)+'px';d.style.height=(r.height*.44)+'px'})}
+  else{if(!m.els.length){var b=document.createElement('i');b.className='ht-mk b';layer.appendChild(b);m.els.push(b)}
+    var r2=m.el.getBoundingClientRect(),p=6,rad=parseFloat(getComputedStyle(m.el).borderTopLeftRadius)||0,e=m.els[0];
+    e.style.transform='translate('+(r2.left-p)+'px,'+(r2.top-p)+'px)';e.style.width=(r2.width+p*2)+'px';e.style.height=(r2.height+p*2)+'px';e.style.borderRadius=Math.max(10,rad+p)+'px'}
+  if(fresh===m)requestAnimationFrame(function(){requestAnimationFrame(function(){m.els.forEach(function(e){e.classList.add('on')})})})})}
+/* 단계 전체(target) 밖은 바탕색으로 살짝 흐리게 */
+function veilTo(el){if(!el){veil.classList.remove('on');return}var r=el.getBoundingClientRect(),p=MOB.matches?8:14,rad=parseFloat(getComputedStyle(el).borderTopLeftRadius)||0;
+  veil.style.transform='translate('+(r.left-p)+'px,'+(r.top-p)+'px)';veil.style.width=(r.width+p*2)+'px';veil.style.height=(r.height+p*2)+'px';veil.style.borderRadius=Math.max(18,rad+p)+'px'}
+var raf=0;function tick(){raf=0;if(!open)return;if(on){draw(null);var s=STOPS[i];veilTo(s&&!ended?tgt(s):null)}place();raf=requestAnimationFrame(tick)}
+function loop(){if(!raf)raf=requestAnimationFrame(tick)}
 
-/* 사파리는 누름 안에서 한 번 말해야 그 뒤 소리가 남 */
-function unlock(){if(!TTS||!SND)return;try{var u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}catch(e){}}
-function voice(){try{var vs=speechSynthesis.getVoices().filter(function(v){return /^ko/i.test(v.lang)});return vs.filter(function(v){return /yuna|유나|google|siri/i.test(v.name)})[0]||vs[0]||null}catch(e){return null}}
-
-/* ── 비춤 · 허기 손: 대상 따라 스프링(갤러리와 같은 값 260 · 33) ── */
-var P={x:0,y:0,w:0,h:0,vx:0,vy:0,vw:0,vh:0},H={x:0,y:0,vx:0,vy:0},aim=null,raf=0,last=0;
-function topSafe(){return (parseFloat(getComputedStyle(root).getPropertyValue('--bar'))||64)+(MOB.matches?12:16)}
-function botSafe(){return (cap?cap.offsetHeight:140)+(MOB.matches?24:40)}
-function tick(t){raf=0;if(!on)return;var dt=last?Math.min(32,t-last)/1000:1/60;last=t;var el=STEPS[i].t();
-  if(el){var r=el.getBoundingClientRect(),pad=MOB.matches?6:10,tg={x:r.left-pad,y:r.top-pad,w:r.width+pad*2,h:r.height+pad*2};
-    if(RM){P.x=tg.x;P.y=tg.y;P.w=tg.w;P.h=tg.h}else['x','y','w','h'].forEach(function(k){var v='v'+k,a=-260*(P[k]-tg[k])-33*P[v];P[v]+=a*dt;P[k]+=P[v]*dt});
-    spot.style.transform='translate('+P.x+'px,'+P.y+'px)';spot.style.width=P.w+'px';spot.style.height=P.h+'px';
-    var rad=parseFloat(getComputedStyle(el).borderTopLeftRadius)||0;spot.style.borderRadius=Math.max(14,rad+pad)+'px';
-    var ax,ay;if(aim){var a=aim.getBoundingClientRect();ax=a.left+a.width/2-3;ay=a.top+a.height/2-2}else{ax=r.left+Math.min(36,r.width/4);ay=r.top+Math.min(28,r.height/4)}
-    ax=Math.max(8,Math.min(innerWidth-30,ax));ay=Math.max(topSafe(),Math.min(innerHeight-botSafe(),ay));
-    if(RM){H.x=ax;H.y=ay}else{var bx=-260*(H.x-ax)-33*H.vx,by=-260*(H.y-ay)-33*H.vy;H.vx+=bx*dt;H.vy+=by*dt;H.x+=H.vx*dt;H.y+=H.vy*dt}
-    hand.style.transform='translate('+H.x+'px,'+H.y+'px)'}
-  raf=requestAnimationFrame(tick)}
-function loop(){if(!raf){last=0;raf=requestAnimationFrame(tick)}}
-
-/* 대상이 자막 · 상단 바에 가리지 않게 옮김(다 들어가면 가운데, 크면 위에 맞춤) */
-function bring(el,cb){var r=el.getBoundingClientRect(),t=topSafe(),av=innerHeight-t-botSafe(),y=scrollY+r.top-t-(r.height<av?(av-r.height)/2:0);
-  y=Math.max(0,Math.min(y,document.documentElement.scrollHeight-innerHeight));
-  if(Math.abs(y-scrollY)<4){cb();return}scrollTo({top:y,behavior:RM?'auto':'smooth'});
+/* 화면 옮김: 말풍선 아래 ~ 화면 아래 사이 가운데(크면 위에 맞춤) */
+function topSafe(){return bub&&open?bub.getBoundingClientRect().bottom+18:(parseFloat(getComputedStyle(root).getPropertyValue('--bar'))||64)+16}
+function bring(el,cb){var r=el.getBoundingClientRect(),t=topSafe(),av=innerHeight-t-24,y=scrollY+r.top-t-(r.height<av?(av-r.height)/2:0);
+  y=Math.max(0,Math.min(y,root.scrollHeight-innerHeight));if(Math.abs(y-scrollY)<4){cb();return}scrollTo({top:y,behavior:RM?'auto':'smooth'});
   var s0=-1,still=0,t0=performance.now(),s=seq;(function w(){if(s!==seq)return;var sy=scrollY;still=Math.abs(sy-s0)<.5?still+1:0;s0=sy;if(still>6||performance.now()-t0>1600){cb();return}requestAnimationFrame(w)})()}
 
-/* ── 단계 ── */
-function render(){var s=STEPS[i];no.textContent=(i+1)+' / '+STEPS.length;sec.textContent=s.sec;bar.style.width=((i+1)/STEPS.length*100)+'%';
-  tx.innerHTML='';s.say.forEach(function(t,k){var sp=document.createElement('span');sp.textContent=t+(k<s.say.length-1?' ':'');tx.appendChild(sp)});
-  pv.disabled=i===0;nx.disabled=i===STEPS.length-1;ppUI();lab.textContent=s.lab||'';lab.classList.remove('on')}
-function mark(){$$('span',tx).forEach(function(sp,k){sp.className=k<si?'rd':k===si?'now':''})}
-function go(k,play){k=Math.max(0,Math.min(STEPS.length-1,k));clear();i=k;si=0;acted=false;aim=null;ended=false;if(play)playing=true;render();
-  var el=STEPS[i].t();if(!el){if(i<STEPS.length-1)go(i+1,play);else finish();return}hb('thinking');
-  bring(el,function(){if(playing)later(speak,RM?0:240);else hb('idle')})}
-function act(cb){var s=STEPS[i];acted=true;if(!s.act){cb();return}
-  if(s.act==='rings'){var el=s.t(),hs=$$('.hot',el);aim=hs[0]||null;lab.classList.add('on');
-    later(function(){hs.forEach(function(h){h.classList.remove('on')});hs.forEach(function(h,k){later(function(){h.classList.add('on')},RM?0:k*160)});later(function(){lab.classList.remove('on');cb()},RM?0:600)},RM?0:520);return}
-  var b=s.act();if(!b){cb();return}aim=b;lab.classList.add('on');
-  later(function(){hand.classList.remove('press');void hand.offsetWidth;hand.classList.add('press');
-    later(function(){b.click()},140);later(function(){hand.classList.remove('press');lab.classList.remove('on')},520);later(function(){aim=null;cb()},RM?200:820)},RM?0:640)}
-function speak(){if(!on||!playing)return;var s=STEPS[i];
-  if(si>=s.say.length){hb('idle');if(i<STEPS.length-1)later(function(){go(i+1,true)},900);else finish();return}
-  if(s.act&&!acted&&si===(s.at||0)){hb('thinking');act(speak);return}
-  mark();hb('speak');var text=s.say[si],done=false,my=seq;
-  function next(){if(done||my!==seq)return;done=true;si++;later(speak,RM?120:320)}
-  var est=Math.max(1600,text.length*95);
-  if(SND&&TTS){try{var u=new SpeechSynthesisUtterance(text);u.lang='ko-KR';var v=voice();if(v)u.voice=v;u.rate=1.04;u.onend=next;u.onerror=function(){later(next,est)};speechSynthesis.speak(u);later(next,est*1.8+2500)}catch(e){later(next,est)}}
+/* ── 단계 · 문장 ── */
+function go(k,play){if(k>=STOPS.length){finish();return}k=Math.max(0,k);clear();i=k;li=0;ended=false;if(play)playing=true;clearMarks(true);ui();
+  var s=STOPS[i],el=tgt(s);if(!el){go(i+1,play);return}hb('thinking');veil.classList.add('on');
+  if(s.prep==='ab0'){var b=$('.ab .ab-b');if(b&&b.getAttribute('aria-expanded')!=='true')b.click()}   /* 개선안 판이 첫 개선안을 보이게(누르는 모션 없이) */
+  text(s.lines[0].say,s.sec);bring(el,function(){if(playing)later(line,RM?0:260);else hb('idle')})}
+function line(){if(!on||!playing)return;var s=STOPS[i];
+  if(li>=s.lines.length){hb('idle');later(function(){go(i+1,true)},RM?400:1100);return}
+  var L=s.lines[li];if(li)text(L.say,s.sec);if(li&&!L.keep)clearMarks(true);addMark(L.mark);hb('speak');
+  var done=false,my=seq,est=Math.max(1800,L.say.length*100);
+  function next(){if(done||my!==seq)return;done=true;li++;later(line,RM?150:450)}
+  if(SND&&TTS){try{var u=new SpeechSynthesisUtterance(L.say);u.lang='ko-KR';var v=voice();if(v)u.voice=v;u.rate=1.02;u.onend=next;u.onerror=function(){later(next,est)};speechSynthesis.speak(u);later(next,est*1.8+2500)}catch(e){later(next,est)}}
   else later(next,est)}
-function finish(){ended=true;playing=false;si=STEPS[i].say.length;mark();tx.innerHTML='';var sp=document.createElement('span');sp.className='now';sp.textContent=END;tx.appendChild(sp);ppUI();hb('idle')}
-function pause(){if(!playing)return;playing=false;clear();ppUI();hb('idle');lab.classList.remove('on');aim=null;if(STEPS[i].act&&si<=(STEPS[i].at||0))acted=false}
-function resume(){if(playing||!on)return;playing=true;ppUI();var el=STEPS[i].t();if(!el){go(i+1,true);return}hb('thinking');bring(el,function(){later(speak,RM?0:200)})}
-function room(px){window.__syRes=px;document.body.style.paddingBottom=px?px+'px':'';dispatchEvent(new Event('ht-lay'))}   /* 마지막 단계도 자막 위로 올라오게 아래 여백 + 스크롤 고정 판 위치 다시 */
-function start(k){build();on=true;playing=true;root.classList.add('ht-on');room(botSafe());spot.classList.add('on');hand.classList.add('on');
-  var g=$('#g-ai').getBoundingClientRect();H.x=g.left+g.width/2;H.y=g.top+g.height/2;H.vx=H.vy=0;
-  var el=STEPS[k].t();if(el){var r=el.getBoundingClientRect();P.x=r.left;P.y=r.top;P.w=r.width;P.h=r.height;P.vx=P.vy=P.vw=P.vh=0}
-  loop();go(k,true);requestAnimationFrame(function(){pp.focus({preventScroll:true})})}
-function stop(){if(!on)return;clear();on=false;playing=false;root.classList.remove('ht-on');room(0);spot.classList.remove('on');hand.classList.remove('on');hb('idle');var g=$('#g-ai');if(g)g.focus({preventScroll:true})}
+function voice(){try{var vs=speechSynthesis.getVoices().filter(function(v){return /^ko/i.test(v.lang)});return vs.filter(function(v){return /yuna|유나|google|siri/i.test(v.name)})[0]||vs[0]||null}catch(e){return null}}
+function unlock(){if(!TTS||!SND)return;try{var u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}catch(e){}}
+function finish(){clear();ended=true;playing=false;clearMarks(true);veil.classList.remove('on');text(END,'');ui();hb('idle')}
+function pause(){if(!playing)return;playing=false;clear();ui();hb('idle')}
+function resume(){if(playing||!on)return;playing=true;ui();var el=tgt(STOPS[i]);if(!el){go(i+1,true);return}hb('thinking');bring(el,function(){later(line,RM?0:200)})}
+function start(k){build();on=true;playing=true;root.classList.add('ht-on');loop();go(k||0,true)}
 
-/* 사용자가 직접 움직이면 멈춤(자막 · 메뉴 안 조작은 빼고) */
-function mine(e){return e.target&&e.target.closest&&e.target.closest('.ht-cap,.ht-menu')}
+/* 열기 · 닫기: 허기 버튼 → 말풍선(같이 보기) */
+function show(){build();open=true;on=false;ended=false;text(INTRO,INTRO_S);ui();bub.classList.add('open');root.classList.add('ht-open');hb('listening');loop();requestAnimationFrame(function(){pp.focus({preventScroll:true})})}
+function close(){clear();var was=open;open=false;on=false;playing=false;clearMarks(true);if(veil)veil.classList.remove('on');root.classList.remove('ht-on','ht-open');if(bub)bub.classList.remove('open');hb('idle');if(was){var g=$('#g-ai');if(g)g.focus({preventScroll:true})}}
+document.addEventListener('pointerdown',function(e){if(open&&!on&&bub&&!bub.contains(e.target)&&!e.target.closest('#g-ai'))close()},true);
+
+function mine(e){return e.target&&e.target.closest&&e.target.closest('.ht-bub')}
 addEventListener('wheel',function(e){if(on&&playing&&!mine(e))pause()},{passive:true});
 addEventListener('touchmove',function(e){if(on&&playing&&!mine(e))pause()},{passive:true});
-addEventListener('keydown',function(e){
-  if(e.key==='Escape'){if(mOpen){hideMenu();var g=$('#g-ai');if(g)g.focus({preventScroll:true});return}if(on&&!$('#lb:not([hidden]),#sdv:not([hidden])')){stop()}return}
+addEventListener('keydown',function(e){if(e.key==='Escape'){if(open&&!$('#lb:not([hidden]),#sdv:not([hidden])'))close();return}
   if(on&&playing&&!mine(e)&&/^(ArrowDown|ArrowUp|PageDown|PageUp|Home|End| )$/.test(e.key))pause()});
-addEventListener('resize',function(){if(mOpen)showMenu()});
+addEventListener('resize',place);
 
-/* 허기 버튼: 안내 중이면 멈춤 · 계속, 아니면 메뉴 */
-window.__tour={menu:function(){if(on){playing?pause():resume();return}mOpen?hideMenu():showMenu()},start:function(k){unlock();start(k||0)},stop:stop,
-  state:function(){return {on:on,i:i,si:si,playing:playing,ended:ended,n:STEPS.length,menu:mOpen}},steps:function(){return STEPS.map(function(s){return !!s.t()})}};
+window.__tour={menu:function(){if(on){playing?pause():ended?go(0,true):resume();return}open?close():show()},
+  start:function(k){unlock();show();start(k||0)},stop:close,
+  state:function(){return {open:open,on:on,i:i,li:li,playing:playing,ended:ended,n:STOPS.length,marks:marks.length}},
+  steps:function(){return STOPS.map(function(s){return !!tgt(s)&&s.lines.every(function(L){return !L.mark||(!!pick(L.mark.sel,L.mark.nth)&&(L.mark.kind!=='text'||!!findText(pick(L.mark.sel,L.mark.nth),L.mark.text)))})})}};
 })();
 </script>
