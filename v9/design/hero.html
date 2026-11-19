@@ -8674,7 +8674,7 @@ body { word-break: keep-all; overflow-wrap: break-word; }
 (function () {
   var RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches, EO = 'cubic-bezier(.22,1,.36,1)', SP = 'cubic-bezier(.34,1.56,.64,1)';
   function place(sg, instant) { var ink = sg && sg.querySelector('.hs-sg-ink'), cur = sg && sg.querySelector('[aria-selected="true"]'); if (!ink || !cur || !cur.offsetWidth) return;
-    if (instant) ink.style.transition = 'none'; ink.style.width = cur.offsetWidth + 'px'; ink.style.transform = 'translateX(' + cur.offsetLeft + 'px)'; if (instant) { void ink.offsetWidth; ink.style.transition = ''; } }
+    if (instant) ink.style.transition = 'none'; var rc = cur.getBoundingClientRect(), rs = sg.getBoundingClientRect(); ink.style.width = rc.width + 'px'; ink.style.transform = 'translateX(' + (rc.left - rs.left) + 'px)';   /* 11-19 소수점 폭까지 → 흰 알약 둘레 여백 위아래 · 좌우 모두 3 */ if (instant) { void ink.offsetWidth; ink.style.transition = ''; } }
   function pick(b, focus) {
     var box = b.closest('.hs-kw'), sg = b.closest('.hs-kw-sg'), pv = box.querySelector('.hs-kw-pv'), i = +b.getAttribute('data-hs-kwtab');
     if (focus) b.focus(); if (b.getAttribute('aria-selected') === 'true') return;
