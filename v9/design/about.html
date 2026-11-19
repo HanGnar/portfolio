@@ -844,7 +844,7 @@ var stag=function(p){var k=0;$$('.w,.d,li',p).forEach(function(x){if(!x.classLis
 var sg=$('.sg'),box=$('.box');
 if(sg&&box){var ink=document.createElement('i');ink.className='sg-ink';ink.setAttribute('aria-hidden','true');sg.insertBefore(ink,sg.firstChild);
   var tabs=$$('button',sg),panes=$$('.pane',box);
-  var place=function(b,instant){if(!b.offsetWidth)return;if(instant)ink.style.transition='none';ink.style.width=b.offsetWidth+'px';ink.style.transform='translateX('+(b.offsetLeft-3)+'px)';if(instant){void ink.offsetWidth;ink.style.transition=''}};
+  var place=function(b,instant){if(!b.offsetWidth)return;if(instant)ink.style.transition='none';var rb=b.getBoundingClientRect(),rs=sg.getBoundingClientRect();ink.style.width=rb.width+'px';ink.style.transform='translateX('+(rb.left-rs.left)+'px)';/* 소수점 폭까지 → 알약 둘레 여백 3 = 위아래 3 (11-19) */if(instant){void ink.offsetWidth;ink.style.transition=''}};
   var pick=function(i,focus){var b=tabs[i];if(!b||b.getAttribute('aria-selected')==='true')return;
     var h0=box.offsetHeight;tabs.forEach(function(t,k){t.setAttribute('aria-selected',k===i?'true':'false');t.tabIndex=k===i?0:-1});
     panes.forEach(function(p,k){p.hidden=k!==i;p.classList.remove('in')});
